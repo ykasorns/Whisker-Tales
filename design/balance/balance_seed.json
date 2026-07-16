@@ -1,0 +1,81 @@
+{
+  "_source": "prototype v0.2 (YK approved feel: 60/40 ok, fight length ok after tuning)",
+  "player": {
+    "base_hp": 5,
+    "base_atk": 1.0,
+    "auto_attack_interval_s": 1.4,
+    "skills": {
+      "scratch": {
+        "dmg_mult": 2.2,
+        "cd_s": 4
+      },
+      "hiss": {
+        "stun_s": 2,
+        "cd_s": 9
+      },
+      "dodge": {
+        "cd_s": 2.5,
+        "invincible_s": 0.5
+      }
+    },
+    "telegraph_lead_s": 0.8,
+    "base_crit": 0.05
+  },
+  "monsters": {
+    "slime": {
+      "hp": 11,
+      "attack_interval_s": 2.6,
+      "heavy_every": 3
+    },
+    "shroom": {
+      "hp": 15,
+      "attack_interval_s": 2.6,
+      "heavy_every": 3
+    },
+    "bat": {
+      "hp": 13,
+      "attack_interval_s": 2.2,
+      "heavy_every": 2
+    },
+    "boss_paper_wolf": {
+      "hp": 48,
+      "attack_interval_s": 2.1,
+      "heavy_every": 2,
+      "phase2_below_pct": 50,
+      "phase2_speed_mult": 1.4
+    }
+  },
+  "damage": {
+    "light_chip": 0.5,
+    "heavy": 1,
+    "boss_heavy": 2
+  },
+  "rewards": {
+    "fight_fish": [
+      3,
+      6
+    ],
+    "chest_fish": [
+      5,
+      10
+    ],
+    "boss_fish": 30,
+    "death_keep_pct": 60
+  },
+  "run": {
+    "nodes_per_biome": [
+      8,
+      10
+    ],
+    "target_run_minutes": [
+      3,
+      5
+    ]
+  },
+  "village_shop_fish_prices": {
+    "perm_heart": 50,
+    "perm_claw_15pct": 40,
+    "cosmetic_hat": 30,
+    "cosmetic_scarf": 25
+  }
+}

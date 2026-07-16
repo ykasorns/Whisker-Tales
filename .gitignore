@@ -1,0 +1,9 @@
+build/
+.dart_tool/
+.idea/
+*.iml
+.DS_Store
+ios/Pods/
+android/.gradle/
+*.keystore
+*.ks

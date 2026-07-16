@@ -2,7 +2,7 @@
 Module: core_loop | Priority: P0 | Owner: Sonnet | Depends: T-001
 
 ## Goal
-สร้าง lib/core/contracts/ (abstract interfaces ทุก module) + lib/core/providers.dart + GameState/RunState enum + state machine โครง walk→encounter→resolve→walk ตาม GDD §3.2
+สร้าง `packages/wt_core/lib/src/core/contracts/` (abstract interfaces ทุก module) + `packages/wt_core/lib/src/core/providers.dart` + GameState/RunState enum + state machine โครง walk→encounter→resolve→walk ตาม GDD §3.2 — export ที่จำเป็นทั้งหมดผ่าน barrel `packages/wt_core/lib/wt_core.dart` (path ตาม GAME_CONTRACT §2/§3 v1.2, D-001)
 
 ## Interface (ห้ามเปลี่ยนโดยไม่ผ่าน Opus)
 abstract class ICombatEngine / ITalentSystem / ISaveService ฯลฯ + StateNotifier<RunState>

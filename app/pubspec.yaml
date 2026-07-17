@@ -1,0 +1,26 @@
+name: whisker_tales
+description: "Whisker Tales — mobile roguelite, แมวโมจิผจญภัยในโลกนิทานสีไม้"
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # flutter_localizations — added by T-004 alongside l10n.yaml + .arb files
+  wt_core:
+    path: ../packages/wt_core
+  wt_mode_story:
+    path: ../packages/wt_mode_story
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  # generate: true — enabled by T-004 once l10n.yaml + .arb files exist

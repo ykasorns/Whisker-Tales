@@ -1,0 +1,15 @@
+name: whisker_tales
+
+packages:
+  - app
+  - packages/**
+
+command:
+  bootstrap:
+    runPubGetInParallel: false
+
+scripts:
+  analyze:
+    run: melos exec -- flutter analyze
+  test:
+    run: melos exec --dir-exists=test -- flutter test

@@ -3,7 +3,17 @@ build/
 .idea/
 *.iml
 .DS_Store
-ios/Pods/
-android/.gradle/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+**/ios/Pods/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/android/.gradle/
+**/android/local.properties
 *.keystore
 *.ks
+
+# path-dependency packages don't commit a lockfile; the app does
+packages/*/pubspec.lock
+melos_*.iml

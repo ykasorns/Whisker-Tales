@@ -1,0 +1,5 @@
+include: package:flutter_lints/flutter.yaml
+
+# NOTE: barrel-only import enforcement (external packages must import only
+# package:wt_core/wt_core.dart, never package:wt_core/src/...) is scoped to
+# T-002 per its Amendment v1.1 — not yet configured here.

@@ -1,0 +1,29 @@
+name: wt_core
+description: >
+  Whisker Tales core engine — GameState/RunManager, combat, items, talents,
+  meta progression, ui shells, save, audio. Single engine package; game modes
+  consume it only through the wt_core.dart barrel (GAME_CONTRACT.md §3).
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flame: ^1.18.0
+  flutter_riverpod: ^2.5.1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  in_app_purchase: ^3.2.0
+  games_services: ^4.1.1
+  audioplayers: ^6.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:

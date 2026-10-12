@@ -14,3 +14,7 @@ class ContentRepository { Future<void> loadAll(); List<Relic> relics; ... }
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment v2.0 (D-002, 2026-10-12)
+loader + validator ต้องรองรับไฟล์ v2: `buffs.json` (CONTRACT §4.7), `gear_slots.json` + affix pools, `pets.json`, `research.json`, `pages.json` และ `design/balance/idle_balance_v1.json` (ค่าที่ขึ้นต้น `ASSUMPTION_` ต้องโหลดได้ปกติ) · validate cross-ref: ทุก `effects[]`/skill อ้าง buff id ที่มีจริง · schema ละเอียดของไฟล์ใหม่ Opus กำหนดใน T-043 → T-003 ทำ framework + schema ที่มีแล้วก่อน แล้วเติม schema ตาม T-043

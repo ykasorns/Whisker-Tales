@@ -17,3 +17,7 @@ RunManager.startRun(catId) / advanceToNextNode() / endRun(RunResult)
 ## Amendment v1.1 (MODE_PLUGIN_SPEC)
 - RunManager รับ `EncounterSource` + `WinCondition` จาก GameMode — ห้าม hardcode โครง node list ในตัวเอง (spec §3)
 - acceptance เพิ่ม: mock EncounterSource แบบ finite และ infinite ต้องใช้ RunManager ตัวเดียวกันได้
+
+---
+## Amendment v2.0 (D-002, 2026-10-12)
+RunManager ใช้เฉพาะ **โหมดเสริมแบบ run** (story/endless) — โหมดหลัก idle อยู่ใน `idle_loop` (T-034) ไม่ผ่าน RunManager · pacing 3–5 นาทียังใช้กับโหมดนิทานผจญภัย · ศัตรูในโหมดเสริม scale ตาม PowerScore จาก core

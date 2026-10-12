@@ -1,6 +1,6 @@
 # TASK_BREAKDOWN.md — Whisker Tales MVP 🐱
 
-**Version:** 1.0 | **อ้างอิง:** GDD v0.3 + GAME_CONTRACT v1.0
+**Version:** 2.0 | **อ้างอิง:** GDD v0.4 + GAME_CONTRACT v2.0 (ดู Amendment v2.0 ท้ายไฟล์)
 **รวม:** 30 task cards ใน `_dispatch/todo/` | Owner default = Sonnet (ยกเว้นระบุ)
 
 ---
@@ -83,3 +83,38 @@ A-1 ต้องเสร็จก่อน T-027 / A-2–A-6 ทยอยส่
 - Task ใหม่: **T-031** (mode framework + story เป็น plugin — เข้า Wave 7.5 หลัง T-020) และ **T-032** (endless vertical slice, enabled:false — เข้า Wave 8 ขนานกับ T-028)
 - Gate 3 "Feature Complete" ขยับเป็น: รวม T-031 (T-032 เป็น optional ก่อน launch แต่ต้องเสร็จก่อน v1.2)
 - `design/balance/balance_seed.json` = ค่าตั้งต้นจาก prototype v0.2 ที่ YK เล่นแล้วอนุมัติ feel — T-026 ใช้ไฟล์นี้เป็นฐาน T-029 จูนต่อจากค่านี้
+
+---
+
+## Amendment v2.0 — Idle RPG Pivot (D-002, 2026-10-12)
+
+อ้างอิง: GDD v0.4 + GAME_CONTRACT v2.0 · research: `design/research/lom_analysis.md` · balance: `design/balance/idle_balance_v1.json` + `tools/balance_sim`
+
+**เขียนใหม่:** T-007 (deterministic sim + damage pipeline), T-008 (buff engine + skills)
+**Amendment ต่อท้าย card:** T-005, T-006, T-010, T-011, T-012, T-013, T-020, T-021, T-022, T-025, T-026, T-029, T-032
+**ไม่แตะ:** T-001 (อยู่ใน doing)
+
+**Task ใหม่:**
+| Task | Module | Depends | Wave |
+|---|---|---|---|
+| T-033 GameClock + daily reset + v2 contracts | core_loop | T-002 | 3 |
+| T-040 age screen | age_gate | T-033, T-022 | 4 |
+| T-039 ads (AdService + fake + caps) | ads | T-033, T-040, T-022 | 5 |
+| T-034 idle loop | idle_loop | T-007, T-033, T-003 | 5 |
+| T-036 gear basket | gear_basket | T-007, T-003 | 5 |
+| T-035 offline reward | offline_reward | T-034, T-033, T-022 | 6 |
+| T-037 auto-craft | gear_basket | T-036 | 6 |
+| T-038 pets + hatch | pets | T-007, T-033, T-039 | 6 |
+| T-041 research | research | T-033, T-039, T-003 | 6 |
+| T-043 content JSON v2 (Opus) | design-data | T-003, T-008 | 6 |
+| T-042 idle UI panels | ui_panel | T-014, T-034, T-035, T-036, T-038, T-041 | 7 |
+
+**Gate ปรับ:**
+| Gate | เงื่อนไขใหม่ |
+|---|---|
+| 1 — Engine Alive | T-001–T-008, T-022, T-033 → sim สู้ deterministic + buff engine ใน test |
+| 2 — Idle Loop Playable | + T-034–T-041, T-043, T-042 → ฟาร์ม/ถัก/ฟัก/วิจัย/ออฟไลน์ บนเครื่องจริง |
+| 3 — Feature Complete | + โหมดนิทานผจญภัย (T-005, T-006, T-009–T-019, T-026, T-028, T-031) + T-020, T-021, T-023–T-025, T-027 |
+| 4 — Store Ready | T-029 (sim + playtest ผ่าน) → T-030 (+ Privacy/Data Safety/ads disclosure ใหม่) |
+
+**รอ YK:** Q7 จุดโฆษณาเพิ่ม · Q8 รูปแบบ IAP ถอดโฆษณา (GDD v0.4 §17) — ไม่บล็อก wave ใด (T-025/T-039 ทำแบบ flag ไว้)

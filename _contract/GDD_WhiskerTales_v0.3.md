@@ -2,7 +2,7 @@
 
 **Version:** 0.3 (Approved Baseline)
 **วันที่:** 5 กรกฎาคม 2026
-**สถานะ:** ✅ Approved — เดินหน้า GAME_CONTRACT.md + Art Prompt Bible
+**สถานะ:** ⛔ **Superseded by GDD v0.4 (2026-10-12, D-002)** — ใช้เป็น spec ของ**โหมดนิทานผจญภัย** (v0.4 §9) เท่านั้น · ข้อห้าม §12 ถูกแก้ใน v0.4 header
 **Advisor:** Fable 5 | **Orchestrator:** Opus | **Coder:** Sonnet
 
 > **Changelog v0.1 → v0.2**

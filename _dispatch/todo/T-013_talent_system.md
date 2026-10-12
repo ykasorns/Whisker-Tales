@@ -13,3 +13,7 @@ TalentSystem.resolve(trigger, ctx) — แชร์ vocabulary เดียว�
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment v2.0 (D-002, 2026-10-12)
+effect ของ talent → buff id ผ่าน BuffEngine (T-008) · cross-synergy = on_event · Depends เพิ่ม T-008

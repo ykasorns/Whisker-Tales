@@ -3,7 +3,7 @@
 คุณคือ **PM/Orchestrator** ของโปรเจกต์เกม Whisker Tales ทำงานร่วมกับ Sonnet workers ผ่าน file-based dispatch
 
 ## เริ่มทุก session
-1. อ่าน `_contract/GAME_CONTRACT.md` (กฎทั้งหมด) และ `_contract/GDD_WhiskerTales_v0.3.md` (spec)
+1. อ่าน `_contract/GAME_CONTRACT.md` (กฎทั้งหมด) และ `_contract/GDD_WhiskerTales_v0.4.md` (spec หลัก — v0.3 ใช้เฉพาะโหมดนิทานผจญภัย) + `design/balance/idle_balance_v1.json`
 2. สแกน `_dispatch/` ทั้ง 4 folders + `BLOCKED.md` เพื่อรู้สถานะปัจจุบัน
 3. อ่าน `DECISIONS.md` ล่าสุด กันตัดสินใจซ้ำ/ขัดกัน
 
@@ -22,9 +22,7 @@
 - งานขนาน: Sonnet หลายตัว claim ได้พร้อมกันเฉพาะ task ต่าง module — ห้ามสอง worker ใน module เดียวกัน
 
 ## Milestone Gates (รายงาน YK เมื่อถึง)
-- **Gate 1 "Engine Alive":** T-001–T-008, T-022 done → สู้มอนได้ใน test โดยไม่มี UI
-- **Gate 2 "Playable Loop":** + T-005–T-019, T-026 done → เล่นจบ run บนเครื่องจริงได้
-- **Gate 3 "Feature Complete":** + ทุก task ยกเว้น T-029/T-030 → พร้อม balancing
-- **Gate 4 "Store Ready":** T-030 done → พร้อม submit
+- **นิยาม Gate ใช้ตาม `TASK_BREAKDOWN.md` → Amendment v2.0 (D-002)** — Gate 1 Engine Alive / Gate 2 Idle Loop Playable / Gate 3 Feature Complete / Gate 4 Store Ready
+- กฎอ้าง § ใน card: Goal เดิม = GDD v0.3 · Amendment v2.0 / card `spec: GDD v0.4` = GDD v0.4
 
 รายงานแต่ละ Gate: สรุปสิ่งที่เสร็จ / ความเสี่ยงที่เห็น / คำถามที่ต้องการคำตอบจาก YK ไม่เกิน 10 บรรทัด

@@ -13,3 +13,7 @@ TalentSystem.gainXp(n) / Stream<LevelUp> / pickOptions() -> List<Talent>
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment v2.0 (D-002, 2026-10-12)
+ขอบเขต = โหมดนิทานผจญภัยเท่านั้น (XP/level ใน run) · โหมดหลักไม่มี talent pick — สาย Claw/Shadow/Magic ย้ายไปเป็นสกิลแมว (T-008)

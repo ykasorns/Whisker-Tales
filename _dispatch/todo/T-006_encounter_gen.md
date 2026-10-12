@@ -14,3 +14,7 @@ EncounterGenerator.generate(seed) -> NodeMap
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment v2.0 (D-002, 2026-10-12)
+ใช้กับโหมดนิทานผจญภัยเท่านั้น (spec = GDD v0.3 §3) · ไม่เกี่ยวกับ wave source ของ idle_loop

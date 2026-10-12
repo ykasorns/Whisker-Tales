@@ -14,3 +14,7 @@ CloudSync.sync() -> SyncResult
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment v2.0 (D-002, 2026-10-12)
+conflict rule เปลี่ยนเป็น **`idle.cleared_page` → PowerScore → `updated_at`** (CONTRACT §4.6) แทน total_runs → goldfish · `clock.max_seen_utc` = max ของสองฝั่งเสมอ · `daily` ใช้ของฝั่งที่ `date_key` ใหม่กว่า (ถ้าเท่ากันใช้ `ads_total`/`fish_pulls` ที่มากกว่า — กันรีเซ็ต quota ด้วยการสลับเครื่อง) · test: 2 เครื่องนาฬิกาต่างกัน ไม่ได้รางวัลออฟไลน์ซ้ำ · Depends เพิ่ม T-033

@@ -1,0 +1,7 @@
+name: wt_balance_sim
+description: Headless pacing simulator for the Whisker Tales idle main mode (GDD v0.4 §15). Reads design/balance/idle_balance_v1.json.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.0

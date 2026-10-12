@@ -13,3 +13,7 @@ ItemSystem.addRelic(id) / resolve(trigger, ctx)
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment v2.0 (D-002, 2026-10-12)
+ขอบเขต = โหมดนิทานผจญภัยเท่านั้น · resolver ต้อง**แปลง `effects[]` เป็น buff id แล้วส่งให้ BuffEngine (T-008)** แทนการ implement ผลเอง — ห้ามมี effect logic ซ้ำกับ combat · Depends เพิ่ม T-008

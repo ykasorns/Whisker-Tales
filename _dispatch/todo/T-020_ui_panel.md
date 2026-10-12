@@ -17,3 +17,7 @@ VillageScreen
 ## Amendment v1.1 (MODE_PLUGIN_SPEC)
 - เมนูโหมดในหมู่บ้าน build จาก ModeRegistry ตาม manifest.order — hub ห้ามรู้จักโหมดแบบ hardcode
 - โหมด enabled:false/ยังไม่ unlock → การ์ดล็อก 🔒 ตาม spec §4
+
+---
+## Amendment v2.0 (D-002, 2026-10-12)
+หมู่บ้านเลิกเป็น hub หลัก → hub = หน้าฟาร์ม (T-042) · card นี้เหลือ: เมนู 'ผจญภัย' (การ์ดโหมดจาก ModeRegistry + การ์ดล็อก) + ร้านนกฮูก (สกิล/เพื่อน/cosmetic) · ตัด 'เลือกแมว' ออกจาก MVP ถ้า roster แมวยังเป็น 1 ตัว (Opus ยืนยัน)

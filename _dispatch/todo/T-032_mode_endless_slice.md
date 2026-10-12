@@ -16,3 +16,7 @@ implements GameMode เท่านั้น — import ได้เฉพาะ
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment v2.0 (D-002, 2026-10-12)
+คงไว้ **P2 dormant** — ต่างจากโหมดหลัก idle ตรงที่เป็น run จบด้วยการตาย ใช้ relic/talent · ยังเป็น acceptance พิสูจน์ plugin (แก้ core = 0) · ถ้า Opus เห็นว่าทับซ้อน ให้เสนอ drop ผ่าน DECISIONS

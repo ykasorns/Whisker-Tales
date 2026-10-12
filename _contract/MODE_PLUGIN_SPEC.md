@@ -170,5 +170,12 @@ type vocabulary เริ่มต้น: `login_bonus | challenge_seed | shop_s
 | ใหม่ T-031 | Mode framework + ย้าย Story เป็น `wt_mode_story` (โหมดแรกที่พิสูจน์ plugin) |
 | ใหม่ T-032 | `wt_mode_endless` vertical slice — acceptance: **แก้ core = 0 ไฟล์** |
 
+## 10. Amendment v1.1 (D-002, 2026-10-12) — Idle pivot
+- **โหมด idle หลักไม่ใช่ GameMode** — เป็น core module `idle_loop` (GAME_CONTRACT v2.0 §3) เพราะ IGameMode สร้างรอบ run ที่มีจุดจบ (`RunConfig`/`WinCondition`/`RunResult`) ซึ่งไม่เข้ากับการฟาร์มต่อเนื่อง + ออฟไลน์ — ไม่ฝืนยัดเข้า run model
+- GameMode plugin = **โหมดเสริมแบบ run** เท่านั้น: `story` (นิทานผจญภัย, MVP) และ `endless` (T-032, P2 dormant)
+- hub = หน้าฟาร์มของ idle_loop; เมนู "ผจญภัย" สร้างจาก ModeRegistry ตามเดิม
+- โหมดเสริมรับ PowerScore จาก core ไปใช้ scale ศัตรู (อ่านผ่าน barrel) · `resolveReward` ให้ได้เฉพาะ currency ใน vocabulary กลาง: `goldfish | yarn | eggs | cookies | cosmetic`
+- save: ใช้ Save v3 (GAME_CONTRACT §4.6) — `modes.<id>` เหมือนเดิม, conflict rule ตาม v3
+
 ---
 *แก้ไข spec นี้ได้โดย Advisor + YK เท่านั้น — โหมดที่ต้องการเกินสัญญา IGameMode ให้เปิด BLOCKED แล้ว escalate*

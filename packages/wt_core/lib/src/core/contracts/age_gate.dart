@@ -4,7 +4,7 @@
 /// [over13] is the Dart name for `13plus`.
 enum AgeBand { unset, under13, over13 }
 
-/// Owner: `age_gate` (T-040).
+/// Neutral first-launch age screen (GDD v0.4 §14). Owner: `age_gate` (T-040).
 abstract class IAgeGate {
   AgeBand get band;
 

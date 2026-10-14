@@ -1,0 +1,8 @@
+include: package:flutter_lints/flutter.yaml
+
+# Barrel-only imports: mode packages may import wt_core through
+# package:wt_core/wt_core.dart only, never package:wt_core/src/...
+# (GAME_CONTRACT §3, MODE_PLUGIN_SPEC §7). Enforced as an error.
+analyzer:
+  errors:
+    implementation_imports: error

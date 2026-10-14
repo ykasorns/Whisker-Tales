@@ -28,7 +28,8 @@ class WaveCleared extends IdleEvent {
 }
 
 class BossResult extends IdleEvent {
-  const BossResult({required this.page, required this.won, required this.reward});
+  const BossResult(
+      {required this.page, required this.won, required this.reward});
   final int page;
   final bool won;
 

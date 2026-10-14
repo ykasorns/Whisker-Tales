@@ -72,7 +72,8 @@ void main() {
       time.utc = start.subtract(const Duration(days: 2));
       expect(clock.effectiveNow, peak);
       expect(clock.maxSeenUtc, peak);
-      expect(clock.now(), time.utc, reason: 'raw now() still reports the device');
+      expect(clock.now(), time.utc,
+          reason: 'raw now() still reports the device');
     });
 
     test('going back a day does not roll over or re-open the old day', () {
@@ -89,7 +90,9 @@ void main() {
       expect(rollovers, hasLength(1));
     });
 
-    test('markSeen uses effectiveNow, so a rewound clock cannot move last_seen back', () {
+    test(
+        'markSeen uses effectiveNow, so a rewound clock cannot move last_seen back',
+        () {
       time.advance(const Duration(hours: 3));
       clock.markSeen();
       final seen = clock.lastSeenUtc;
@@ -109,7 +112,8 @@ void main() {
     });
 
     test('flying west back across midnight does not roll back', () {
-      time.utc = DateTime.utc(2026, 10, 12, 17, 30); // 00:30 on the 13th in UTC+7
+      time.utc =
+          DateTime.utc(2026, 10, 12, 17, 30); // 00:30 on the 13th in UTC+7
       clock.tick();
       expect(clock.dateKey, '2026-10-13');
       time.offset = const Duration(hours: 1); // 18:30 on the 12th
@@ -145,7 +149,9 @@ void main() {
       expect(clock.snapshot(), before);
     });
 
-    test('merge does not emit a rollover; the next tick only rolls past the merged date', () {
+    test(
+        'merge does not emit a rollover; the next tick only rolls past the merged date',
+        () {
       clock.mergeFrom(ClockState(
         lastSeenUtc: start,
         maxSeenUtc: start,
@@ -177,7 +183,8 @@ void main() {
     test('a saved date older than today rolls over on the first tick', () {
       final restored = GameClock(
         FakeTimeSource(start),
-        restored: ClockState(lastSeenUtc: start, maxSeenUtc: start, dateKey: '2026-10-10'),
+        restored: ClockState(
+            lastSeenUtc: start, maxSeenUtc: start, dateKey: '2026-10-10'),
       );
       addTearDown(restored.dispose);
       final events = <DayRollover>[];

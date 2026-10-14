@@ -39,7 +39,13 @@ abstract class IGearBasket {
 }
 
 /// Why auto-craft stopped.
-enum AutoCraftStopReason { outOfYarn, matchFound, strictlyBetterFound, stoppedByPlayer, appBackgrounded }
+enum AutoCraftStopReason {
+  outOfYarn,
+  matchFound,
+  strictlyBetterFound,
+  stoppedByPlayer,
+  appBackgrounded
+}
 
 class AutoCraftRule {
   const AutoCraftRule({
@@ -55,7 +61,7 @@ class AutoCraftRule {
   final List<String> wantedAffixes;
 }
 
-/// Auto-craft, online only (D-002 Q4). Owner: `gear_basket` (T-037).
+/// Auto-craft, online only (GDD v0.4 §3, D-002 Q4). Owner: `gear_basket` (T-037).
 abstract class IAutoCraft {
   void configure(AutoCraftRule rule);
   void start();

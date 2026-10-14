@@ -1,0 +1,788 @@
+<title>Whisker Tales Wiki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mali:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: notebook — sticky index tabs on the left (chips row on phones), pages of notes on the right.
+   Palette = the game's locked colored-pencil palette (ART_PROMPT_BIBLE §2). */
+:root {
+  --paper: #F6F0E1;
+  --sheet: #FFFBF2;
+  --ink: #33291F;
+  --ink-soft: #6B5D4C;
+  --line: #E2D6BE;
+  --mochi: #F6A83C;
+  --coral: #EE6352;
+  --teal: #3FA7B8;
+  --lime: #8CC152;
+  --sun: #F9D64E;
+  --plum: #7A5E8C;
+  --coral-wash: #FBE0DB;
+  --teal-wash: #D9EEF1;
+  --lime-wash: #E6F1D8;
+  --sun-wash: #FCF1C4;
+  --plum-wash: #E8E0EE;
+  --mochi-wash: #FDE8C9;
+  --f-display: "Mali", "Sarabun", "Comic Sans MS", system-ui, sans-serif;
+  --f-body: "Sarabun", "Leelawadee UI", "Thonburi", system-ui, sans-serif;
+  --f-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1E1924; --sheet: #28212F; --ink: #F2E9D8; --ink-soft: #BEB0A0; --line: #3E3447;
+    --mochi: #F7B356; --coral: #F2786A; --teal: #5BBBCB; --lime: #9FCE6A; --sun: #F9DC6A; --plum: #B39BC4;
+    --coral-wash: #43262A; --teal-wash: #1F3A40; --lime-wash: #2A3A22; --sun-wash: #3F3820; --plum-wash: #352B40; --mochi-wash: #43331E;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1E1924; --sheet: #28212F; --ink: #F2E9D8; --ink-soft: #BEB0A0; --line: #3E3447;
+  --mochi: #F7B356; --coral: #F2786A; --teal: #5BBBCB; --lime: #9FCE6A; --sun: #F9DC6A; --plum: #B39BC4;
+  --coral-wash: #43262A; --teal-wash: #1F3A40; --lime-wash: #2A3A22; --sun-wash: #3F3820; --plum-wash: #352B40; --mochi-wash: #43331E;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.65 var(--f-body);
+  padding-inline: 16px;
+}
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 40px;
+  padding-block: 28px 64px;
+}
+
+/* ---- index tabs ---- */
+.index {
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + 20px);
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+.brand { font-family: var(--f-display); font-weight: 700; font-size: 1.5rem; line-height: 1.2; }
+.brand small { display: block; font-family: var(--f-body); font-weight: 500; font-size: .8rem; color: var(--ink-soft); }
+.search {
+  width: 100%;
+  font: inherit;
+  font-size: .95rem;
+  padding: 8px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  background: var(--sheet);
+  color: var(--ink);
+}
+.search:focus-visible { outline: 3px solid var(--mochi); outline-offset: 2px; }
+.index nav { display: flex; flex-direction: column; gap: 2px; }
+.index .group { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin-top: 10px; font-weight: 600; }
+.index a {
+  color: var(--ink);
+  text-decoration: none;
+  padding: 5px 10px 5px 12px;
+  border-left: 4px solid transparent;
+  border-radius: 0 8px 8px 0;
+  font-size: .95rem;
+}
+.index a:hover { background: var(--sheet); }
+.index a.on { border-left-color: var(--tab, var(--mochi)); background: var(--sheet); font-weight: 600; }
+.index a:focus-visible { outline: 2px solid var(--mochi); }
+
+/* ---- pages ---- */
+main { min-width: 0; display: flex; flex-direction: column; gap: 56px; }
+section { scroll-margin-top: 20px; min-width: 0; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; line-height: 1.25; margin: 0; }
+h1 { font-size: clamp(2rem, 4.5vw, 3.1rem); font-weight: 700; }
+h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  display: inline-block;
+  padding-bottom: 2px;
+  background: linear-gradient(transparent 62%, var(--hl, var(--sun-wash)) 62%);
+}
+h3 { font-size: 1.15rem; font-weight: 600; margin-top: 22px; }
+.sec-head { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.eyebrow { font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
+p { margin: 10px 0; max-width: 68ch; }
+.lead { font-size: 1.15rem; max-width: 60ch; }
+ul, ol { margin: 8px 0; padding-left: 1.3em; max-width: 68ch; }
+li { margin: 3px 0; }
+code { font-family: var(--f-mono); font-size: .85em; background: var(--sheet); border: 1px solid var(--line); padding: 1px 5px; border-radius: 5px; }
+a { color: var(--teal); }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 28px; align-items: center; }
+.hero .quote { font-family: var(--f-display); font-size: 1.25rem; margin-top: 14px; max-width: 34ch; }
+.stamp {
+  border: 3px solid var(--coral);
+  color: var(--coral);
+  border-radius: 14px;
+  padding: 10px 16px;
+  transform: rotate(-4deg);
+  font-family: var(--f-display);
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.3;
+}
+.stamp small { display: block; font-family: var(--f-body); font-weight: 600; font-size: .78rem; }
+
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 18px; }
+.fact { background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; min-width: 0; }
+.fact b { display: block; font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
+.fact span { font-weight: 600; }
+
+.pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; }
+.pillar { border-top: 4px solid var(--c); padding: 10px 2px 0; }
+.pillar strong { font-family: var(--f-display); font-size: 1.05rem; }
+
+/* loop strip */
+.loop { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+.step { background: var(--sheet); border: 2px solid var(--ink); border-radius: 999px; padding: 4px 14px; font-weight: 500; }
+.arrow { color: var(--ink-soft); font-weight: 700; }
+
+/* tables */
+.tbl { overflow-x: auto; margin-top: 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--sheet); }
+table { border-collapse: collapse; width: 100%; font-size: .94rem; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; font-size: .8rem; letter-spacing: .04em; color: var(--ink-soft); background: var(--paper); }
+tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* chips */
+.chip { display: inline-block; font-size: .78rem; font-weight: 600; padding: 1px 9px; border-radius: 999px; white-space: nowrap; }
+.c-coral { background: var(--coral-wash); color: var(--coral); }
+.c-teal { background: var(--teal-wash); color: var(--teal); }
+.c-lime { background: var(--lime-wash); color: var(--lime); }
+.c-sun { background: var(--sun-wash); color: var(--ink); }
+.c-plum { background: var(--plum-wash); color: var(--plum); }
+.c-mochi { background: var(--mochi-wash); color: var(--ink); }
+.c-mute { background: var(--paper); color: var(--ink-soft); border: 1px solid var(--line); }
+
+.note {
+  border-left: 4px solid var(--n, var(--teal));
+  background: var(--sheet);
+  padding: 10px 14px;
+  border-radius: 0 10px 10px 0;
+  margin-top: 14px;
+  max-width: 76ch;
+}
+.note b { font-weight: 700; }
+.warn { --n: var(--coral); }
+.good { --n: var(--lime); }
+
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+.two > * { min-width: 0; }
+
+/* grade bars */
+.grades { display: flex; height: 22px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); min-width: 220px; }
+.grades span { display: block; height: 100%; }
+
+.chart { margin-top: 12px; background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 12px; overflow-x: auto; }
+.chart svg { display: block; width: 100%; min-width: 420px; height: auto; }
+
+.kanban { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 12px; }
+.col { background: var(--sheet); border: 1px solid var(--line); border-radius: 12px; padding: 12px; min-width: 0; }
+.col h3 { margin: 0 0 8px; display: flex; justify-content: space-between; align-items: center; }
+.task { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 8px; padding: 6px 0; border-top: 1px dashed var(--line); font-size: .9rem; }
+.task:first-of-type { border-top: 0; }
+.task .id { font-variant-numeric: tabular-nums; font-weight: 700; }
+.task .mod { grid-column: 2; font-size: .78rem; color: var(--ink-soft); }
+details summary { cursor: pointer; font-weight: 600; margin-top: 8px; }
+
+.empty { display: none; padding: 20px; border: 2px dashed var(--line); border-radius: 12px; color: var(--ink-soft); }
+.empty.show { display: block; }
+
+footer { color: var(--ink-soft); font-size: .85rem; border-top: 1px solid var(--line); padding-top: 14px; }
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: minmax(0, 1fr); gap: 20px; padding-block: 16px 48px; }
+  .index { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); padding-block: 10px; max-height: none; overflow: visible; }
+  .index nav { flex-direction: row; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+  .index .group { display: none; }
+  .index a { border-left: 0; border-bottom: 3px solid transparent; border-radius: 8px; white-space: nowrap; background: var(--sheet); }
+  .index a.on { border-bottom-color: var(--tab, var(--mochi)); }
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .stamp { justify-self: start; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+</style>
+
+<div class="shell">
+  <aside class="index">
+    <div class="brand">Whisker Tales<small>wiki ของทีม · อัปเดต 14 ต.ค. 2026</small></div>
+    <label for="q" class="eyebrow">ค้นหาในวิกิ</label>
+    <input id="q" class="search" type="search" placeholder="เช่น ไข่, โฆษณา, T-034" autocomplete="off">
+    <nav id="toc">
+      <span class="group">เกม</span>
+      <a href="#overview" style="--tab: var(--mochi)">ภาพรวม</a>
+      <a href="#loop" style="--tab: var(--mochi)">วงจรการเล่น</a>
+      <span class="group">ระบบ</span>
+      <a href="#basket" style="--tab: var(--coral)">ตะกร้าไหมพรม</a>
+      <a href="#combat" style="--tab: var(--coral)">การต่อสู้ & stat</a>
+      <a href="#skills" style="--tab: var(--coral)">สกิลแมว</a>
+      <a href="#pets" style="--tab: var(--coral)">เพื่อนสัตว์ & ฟักไข่</a>
+      <a href="#library" style="--tab: var(--coral)">ห้องสมุดนกฮูก</a>
+      <a href="#offline" style="--tab: var(--coral)">รางวัลออฟไลน์</a>
+      <a href="#adventure" style="--tab: var(--coral)">โหมดนิทานผจญภัย</a>
+      <span class="group">เงิน & ตัวเลข</span>
+      <a href="#economy" style="--tab: var(--sun)">สกุลเงิน & โฆษณา</a>
+      <a href="#balance" style="--tab: var(--sun)">บาลานซ์</a>
+      <span class="group">การผลิต</span>
+      <a href="#content" style="--tab: var(--teal)">Content MVP</a>
+      <a href="#assets" style="--tab: var(--teal)">Asset ที่ต้องทำ</a>
+      <a href="#tasks" style="--tab: var(--teal)">งาน & สถานะ</a>
+      <a href="#tech" style="--tab: var(--teal)">โครงสร้างโค้ด</a>
+      <span class="group">อ้างอิง</span>
+      <a href="#compliance" style="--tab: var(--plum)">กฎ & compliance</a>
+      <a href="#decisions" style="--tab: var(--plum)">การตัดสินใจ</a>
+      <a href="#research" style="--tab: var(--plum)">วิจัย Legend of Mushroom</a>
+      <a href="#glossary" style="--tab: var(--plum)">คำศัพท์</a>
+    </nav>
+  </aside>
+
+  <main id="pages">
+    <!-- ===== OVERVIEW ===== -->
+    <section id="overview" style="--hl: var(--mochi-wash)">
+      <div class="hero">
+        <div>
+          <span class="eyebrow">Mobile idle RPG · iOS & Android · Flutter + Flame</span>
+          <h1>หนังสือนิทานสีไม้ที่แมวโมจิผจญภัยแทนเรา</h1>
+          <p class="quote">"เปิดมาเมื่อไหร่ก็มีของใหม่รอ"</p>
+        </div>
+        <div class="stamp">GDD v0.4<small>YK อนุมัติ 12 ต.ค. 2026<br>รอ Advisor review</small></div>
+      </div>
+      <div class="facts">
+        <div class="fact"><b>ผู้เล่น</b><span>ตั้งแต่ 5 ขวบ เล่นได้ทุกวัย</span></div>
+        <div class="fact"><b>Rating</b><span>4+ / Everyone</span></div>
+        <div class="fact"><b>การเล่น</b><span>แนวตั้ง มือเดียว</span></div>
+        <div class="fact"><b>ภาษา</b><span>ไทย + อังกฤษ</span></div>
+        <div class="fact"><b>Session</b><span>เก็บของ 1–3 นาที หรือนั่งดูนานเท่าไหร่ก็ได้</span></div>
+        <div class="fact"><b>รายได้</b><span>Rewarded ads + IAP cosmetic</span></div>
+      </div>
+      <h3>หลัก 4 ข้อของเกม</h3>
+      <div class="pillars">
+        <div class="pillar" style="--c: var(--mochi)"><strong>นิ้วเดียว ไม่กดดัน</strong><p>กดได้หมดด้วยนิ้วโป้งในโซนล่าง 40% ไม่มีอะไรลงโทษคนที่ไม่เข้าเกม โฆษณาเป็นทางเลือกเสมอ</p></div>
+        <div class="pillar" style="--c: var(--lime)"><strong>แพ้ไม่เสียอะไร</strong><p>แพ้บอสแค่ถอยไปฟาร์มต่อ ไม่มีของหาย</p></div>
+        <div class="pillar" style="--c: var(--teal)"><strong>ลึกสองชั้น</strong><p>เด็กดูแมวสู้และกดถักของ ผู้ใหญ่ปั้น build จาก stat คู่ สกิล และเพื่อนสัตว์</p></div>
+        <div class="pillar" style="--c: var(--plum)"><strong>กระดาษมีชีวิต</strong><p>ทุกอย่างดูเหมือนวาดด้วยสีไม้บนกระดาษ เส้นหมึกหนา เส้นสั่นเบา ๆ ให้ภาพ "หายใจ"</p></div>
+      </div>
+      <div class="note"><b>ที่มาของ v0.4:</b> เดิม (v0.3) เป็น roguelite รอบละ 3–5 นาที วันที่ 12 ต.ค. 2026 เปลี่ยนเป็น idle RPG หลังวิเคราะห์ Legend of Mushroom ส่วน roguelite เดิมยังอยู่ในเกมเป็น <a href="#adventure">โหมดนิทานผจญภัย</a></div>
+    </section>
+
+    <!-- ===== LOOP ===== -->
+    <section id="loop" style="--hl: var(--mochi-wash)">
+      <div class="sec-head"><span class="eyebrow">GDD v0.4 §2</span><h2>วงจรการเล่น</h2></div>
+      <h3>ในหนึ่งวัน</h3>
+      <div class="loop">
+        <span class="step">เปิดแอป รับรางวัลออฟไลน์</span><span class="arrow">→</span>
+        <span class="step">ถักของในตะกร้า</span><span class="arrow">→</span>
+        <span class="step">ฟักไข่เพื่อนสัตว์</span><span class="arrow">→</span>
+        <span class="step">อัพสกิล / เพื่อน / ห้องสมุด</span><span class="arrow">→</span>
+        <span class="step">ท้าบอสหน้าถัดไป</span><span class="arrow">→</span>
+        <span class="step">เล่นโหมดผจญภัย (ไม่บังคับ)</span><span class="arrow">→</span>
+        <span class="step">ปิดแอป โมจิฟาร์มต่อ</span>
+      </div>
+      <h3>ระหว่างเล่น</h3>
+      <ul>
+        <li>โมจิอยู่ซ้าย เดินไปทางขวาเอง ฉากกระดาษเลื่อนหลายชั้น เจอคลื่นมอนก็สู้เองไม่มีวันจบ</li>
+        <li>โลกแบ่งเป็น <b>เล่ม → บท → หน้า</b> หน้าละ 5 คลื่น บอสของหน้าท้าเมื่อพร้อม</li>
+        <li>ไม่ต้องกดอะไรก็เล่นได้ แตะสกิลเองหรือหลบตอนเห็น "!" เป็นโบนัส</li>
+      </ul>
+      <h3>หน้าจอ 60 / 40</h3>
+      <div class="tbl"><table>
+        <tr><th>ส่วน</th><th>มีอะไร</th></tr>
+        <tr><td>บน 60% — ฉากเกม</td><td>โมจิ มอน ฉาก parallax · HUD: ❤️ ซ้ายบน 🐟 ขวาบน พลังแมว 🐾 ย่อเป็น K/M</td></tr>
+        <tr><td>ล่าง 40% — "สมุดสเก็ตช์"</td><td>ฟาร์ม: ตะกร้ากลาง + ปุ่มท้าบอส + เมนู 5 แท็บ (แมว / สกิล / เพื่อน / ห้องสมุด / ผจญภัย) · ถักของ: เลือกช่อง + การ์ดเทียบ · ฟักไข่: 3 ปุ่ม + ดูอัตรา · ท้าบอส: สกิล 3 + หลบ</td></tr>
+      </table></div>
+    </section>
+
+    <!-- ===== BASKET ===== -->
+    <section id="basket" style="--hl: var(--coral-wash)">
+      <div class="sec-head"><span class="eyebrow">GDD v0.4 §3 · งาน T-036, T-037</span><h2>ตะกร้าไหมพรม 🧶</h2></div>
+      <p class="lead">หัวใจของเกม ใช้ไหมพรม 1 ม้วนถักอุปกรณ์ให้โมจิ 1 ชิ้น แล้วเทียบกับของเดิม สวมหรือรีไซเคิล</p>
+      <div class="tbl"><table>
+        <tr><th>เรื่อง</th><th>กติกา</th></tr>
+        <tr><td>เลือกช่อง</td><td>ผู้เล่นเลือกเองจาก 8 ช่อง: หมวก ผ้าพันคอ เสื้อ ปลอกแขน รองเท้า กระดิ่ง กระเป๋า ของเล่น · กด "สุ่มช่อง" ได้ EXP ตะกร้า +50%</td></tr>
+        <tr><td>เกรด</td><td>6 สี <span class="chip c-mute">ขาว</span> <span class="chip c-lime">เขียว</span> <span class="chip c-teal">ฟ้า</span> <span class="chip c-plum">ม่วง</span> <span class="chip c-sun">ทอง</span> <span class="chip c-coral">รุ้ง</span> ตามตารางเลเวลตะกร้าที่โชว์ในเกม</td></tr>
+        <tr><td>เทียบของ</td><td>การ์ดซ้าย-ขวา ลูกศรเขียว/แดงต่อ stat · ดีกว่าทุก stat → ขึ้นดาว ✨ เด็กกดตามดาวได้เลย</td></tr>
+        <tr><td>รีไซเคิล</td><td>ได้ปลาทอง + EXP ตะกร้า → ตะกร้าเลเวลขึ้น → เกรดสูงออกง่ายขึ้น</td></tr>
+        <tr><td>การันตี</td><td>ทุก 30 ครั้งได้เกรดม่วงขึ้นไป</td></tr>
+        <tr><td>Auto-craft</td><td>ปลดหลังบท 1 · ตั้งช่อง เกรดขั้นต่ำ และ stat ที่อยากได้ ≤ 2 → ไม่ผ่านรีไซเคิลเอง เจอของดีหยุดรอ · ทำงานเฉพาะตอนเปิดเกม</td></tr>
+        <tr><td>อัพเกรด</td><td>อัพที่ <b>ช่อง</b> ไม่ใช่ชิ้น เปลี่ยนของใหม่ไม่เสียของที่ลงทุน</td></tr>
+      </table></div>
+      <div class="note warn"><b>ห้ามเด็ดขาด:</b> ไหมพรมห้ามขายด้วยเงินจริงทุกรูปแบบ ไม่งั้นตะกร้าจะกลายเป็น loot box</div>
+    </section>
+
+    <!-- ===== COMBAT ===== -->
+    <section id="combat" style="--hl: var(--coral-wash)">
+      <div class="sec-head"><span class="eyebrow">GDD v0.4 §4 · งาน T-007, T-008</span><h2>การต่อสู้ & stat</h2></div>
+      <div class="two">
+        <div>
+          <h3>Stat</h3>
+          <div class="tbl"><table>
+            <tr><th>ชั้น</th><th>Stat</th><th>คู่กัน (anti-stat)</th></tr>
+            <tr><td>หลัก</td><td>❤️ HP · ⚔️ ATK · 🛡️ DEF · ⚡ ความเร็วตี</td><td>—</td></tr>
+            <tr><td rowspan="6">รอง</td><td>คริ / แรงคริ</td><td>กันคริ / ลดแรงคริ</td></tr>
+            <tr><td>ตีติด</td><td>กันตีติด</td></tr>
+            <tr><td>สวนกลับ</td><td>กันสวน</td></tr>
+            <tr><td>มึน</td><td>ต้านมึน</td></tr>
+            <tr><td>หลบ</td><td>แม่นยำ</td></tr>
+            <tr><td>ดูดเลือด</td><td>ต้านดูดเลือด</td></tr>
+          </table></div>
+          <p>เด็กเห็นแค่ <b>พลังแมว 🐾</b> ตัวเลขเดียว</p>
+        </div>
+        <div>
+          <h3>วิธีคิดดาเมจ</h3>
+          <ul>
+            <li>ดาเมจพื้นฐาน = <code>max(ATK − DEF, ATK × 5%)</code> ตีเบาแค่ไหนก็เจ็บนิดหน่อยเสมอ</li>
+            <li>สุ่มครั้งเดียวแบ่ง หลบ / ปกติ / คริ</li>
+            <li>คริคูณ <code>max(1.5, แรงคริ − ลดแรงคริ)</code></li>
+            <li>stat รองทุกตัว = <code>stat − anti</code> มีเพดาน: คริ 60% · ตีติด สวน หลบ 40% · มึน 25%</li>
+            <li>สู้แบบผลแน่นอน (fixed-point + seed) จึงคำนวณรางวัลออฟไลน์ได้โดยไม่ต้องมีเซิร์ฟเวอร์</li>
+          </ul>
+          <h3>Buff engine</h3>
+          <p>buff ทุกตัวมาจาก JSON (ชื่อ action + ค่า) และยิง buff อื่นต่อได้เมื่อเกิดเหตุการณ์ เช่น คริ โล่แตก ฆ่ามอน ทำให้ synergy ทั้งหมดเป็นข้อมูล เพิ่มได้โดยไม่ต้องแก้โค้ด</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SKILLS ===== -->
+    <section id="skills" style="--hl: var(--coral-wash)">
+      <div class="sec-head"><span class="eyebrow">GDD v0.4 §5 · งาน T-008</span><h2>สกิลแมว ✨</h2></div>
+      <ul>
+        <li>ช่องสกิล 3 ช่อง ปลดตามบท ร่ายเองตาม cooldown หรือแตะเองก็ได้</li>
+        <li>ได้จาก milestone ของบท และซื้อที่ร้านหนังสือนกฮูกด้วยปลาทอง <b>ไม่มี gacha สกิล</b></li>
+        <li>สกิลที่มีอยู่ให้พลังเพิ่มนิดหน่อยแม้ไม่ได้ใส่ช่อง</li>
+      </ul>
+      <div class="tbl"><table>
+        <tr><th>สาย</th><th>สีประจำสาย</th><th>แนว</th></tr>
+        <tr><td>🐾 Claw (ตี)</td><td><span class="chip c-coral">Coral</span></td><td>ดาเมจตรง ตี 2 ครั้ง รีเซ็ต cooldown ตอนคริ</td></tr>
+        <tr><td>💨 Shadow (หลบ)</td><td><span class="chip c-plum">Plum</span></td><td>หลบได้กว้างขึ้น หลบแล้วเร็วขึ้น หลบแล้วสวนอัตโนมัติ</td></tr>
+        <tr><td>✨ Whisker Magic (เวท)</td><td><span class="chip c-teal">Teal</span></td><td>ดาเมจเวท ลด cooldown ทิ้งดาวระเบิด</td></tr>
+      </table></div>
+    </section>
+
+    <!-- ===== PETS ===== -->
+    <section id="pets" style="--hl: var(--coral-wash)">
+      <div class="sec-head"><span class="eyebrow">GDD v0.4 §6 · งาน T-038</span><h2>เพื่อนสัตว์ & ฟักไข่ 🥚</h2></div>
+      <p>เพื่อนสัตว์ลงสนามสู้จริงข้างโมจิ ช่องออกรบ 1 → 3 ปลดตามบท อัพเลเวลด้วยขนม 🍪 ได้ตัวซ้ำเป็นดาว ★1–5 · MVP มี 6 ตัว: ธรรมดา 3 หายาก 2 ตำนาน 1</p>
+      <div class="two">
+        <div>
+          <h3>ช่องทางฟักไข่</h3>
+          <div class="tbl"><table>
+            <tr><th>ช่องทาง</th><th class="num">ต่อวัน</th><th>ต้นทุน</th></tr>
+            <tr><td>🥚 ไข่ที่ดรอป</td><td class="num">ไม่จำกัด</td><td>ไข่ 1 ใบ (บอสหน้า 1, บอสบท 3, คลื่น 1%)</td></tr>
+            <tr><td>📺 ดูโฆษณา</td><td class="num">3</td><td>ฟรี</td></tr>
+            <tr><td>🐟 ปลาทอง</td><td class="num">5</td><td>300 → 450 → 675 → 1,000 → 1,500</td></tr>
+          </table></div>
+        </div>
+        <div>
+          <h3>อัตรา (โชว์ก่อนกดทุกครั้ง)</h3>
+          <div class="grades" role="img" aria-label="ธรรมดา 75%, หายาก 22%, ตำนาน 3%">
+            <span style="width:75%; background: var(--lime)"></span><span style="width:22%; background: var(--teal)"></span><span style="width:3%; background: var(--sun)"></span>
+          </div>
+          <p><span class="chip c-lime">ธรรมดา 75%</span> <span class="chip c-teal">หายาก 22%</span> <span class="chip c-sun">ตำนาน 3%</span></p>
+          <p>การันตีตำนานทุก 40 ครั้ง (ตัวนับไม่รีเซ็ตข้ามวัน) · โควต้ารีเซ็ตเที่ยงคืนเวลาเครื่อง</p>
+        </div>
+      </div>
+      <div class="note warn"><b>เส้นห้ามข้าม:</b> ไข่และปลาทองห้ามขายด้วยเงินจริงและห้ามอยู่ใน IAP ใด ๆ ไม่งั้นจะกลายเป็น paid loot box ทันที</div>
+    </section>
+
+    <!-- ===== LIBRARY ===== -->
+    <section id="library" style="--hl: var(--coral-wash)">
+      <div class="sec-head"><span class="eyebrow">GDD v0.4 §7 · งาน T-041</span><h2>ห้องสมุดนกฮูก 🦉</h2></div>
+      <ul>
+        <li>ต้นไม้วิจัยถาวรประมาณ 25 node ให้ stat และปลดฟีเจอร์ เช่น auto-craft ช่องสกิล ช่องเพื่อน คิววิจัยที่ 2 และ "หมอนนุ่ม" ที่เพิ่มเวลาออฟไลน์</li>
+        <li>ใช้ปลาทอง + <b>เวลาจริง</b> เริ่ม 1 นาที ยาวสุด 4 ชั่วโมงต่อเลเวล</li>
+        <li>📺 ดูโฆษณาลดเวลา: ครั้งละ 30 นาทีหรือ 25% ของเวลาที่เหลือ (เอาที่มากกว่า) สูงสุด 5 ครั้งต่อวัน</li>
+        <li>ไม่มีการขายเร่งเวลาด้วยเงินจริง แจ้งเตือนได้แค่ "วิจัยเสร็จแล้ว" และปิดได้</li>
+      </ul>
+    </section>
+
+    <!-- ===== OFFLINE ===== -->
+    <section id="offline" style="--hl: var(--coral-wash)">
+      <div class="sec-head"><span class="eyebrow">GDD v0.4 §8 · งาน T-033, T-035</span><h2>รางวัลออฟไลน์ 🌙</h2></div>
+      <ul>
+        <li>ได้รายได้เท่ากับฟาร์มคลื่นปกติของหน้าที่อยู่ คิดตามเวลาที่ไม่ได้เข้าเกม</li>
+        <li>เก็บได้สูงสุด <b>8 ชั่วโมง</b> + 10 นาทีต่อเลเวลของ "หมอนนุ่ม" (MVP สูงสุด 10 ชั่วโมง)</li>
+        <li>หน้ารับรางวัลเป็นภาพโมจินอนกอดถุงของ ไม่มีปุ่ม x2 ด้วยโฆษณา</li>
+      </ul>
+      <div class="note"><b>กันโกงเวลา (มีแล้วใน GameClock):</b> ย้อนนาฬิกาเครื่องแล้วเวลาในเกมไม่ถอย · ย้อนวันไม่ได้ quota คืน · สลับเครื่องแล้วรับรางวัลออฟไลน์ซ้ำไม่ได้</div>
+    </section>
+
+    <!-- ===== ADVENTURE ===== -->
+    <section id="adventure" style="--hl: var(--coral-wash)">
+      <div class="sec-head"><span class="eyebrow">GDD v0.4 §9 · spec เต็มใน GDD v0.3</span><h2>โหมดนิทานผจญภัย 📖</h2></div>
+      <p>roguelite เดิมของ v0.3 อยู่ใน MVP เป็นโหมดเสริม รอบละ 3–5 นาที เดินบนแผนที่ 8–10 node จบที่บอส</p>
+      <div class="tbl"><table>
+        <tr><th>Node</th><th class="num">สัดส่วน</th><th>มีอะไร</th></tr>
+        <tr><td>⚔️ สู้</td><td class="num">~50%</td><td>มอน 1–3 ตัว ได้ปลาทอง + XP บางครั้งได้ relic</td></tr>
+        <tr><td>❓ Event</td><td class="num">~15%</td><td>เลือก 2 ทาง สื่อด้วยภาพ</td></tr>
+        <tr><td>🎁 หีบ</td><td class="num">~10%</td><td>หีบสมบัติ หรือ mimic น่ารัก</td></tr>
+        <tr><td>🏕️ กองไฟ</td><td class="num">~10%</td><td>ฟื้น HP 50% หรืออัพ item</td></tr>
+        <tr><td>🛒 ร้าน</td><td class="num">~10%</td><td>ร้านนกฮูก ใช้ปลาทองใน run</td></tr>
+        <tr><td>🔱 ทางแยก</td><td class="num">~5%</td><td>เสี่ยงมากได้มาก หรือปลอดภัย</td></tr>
+      </table></div>
+      <ul>
+        <li>มี relic 15 (synergy ≥ 6 คู่), talent 9 (3 สาย × 3), ยา 4, event 8 แบบ</li>
+        <li>ศัตรู scale ตามพลังแมวจากโหมดหลัก รางวัล: ไหมพรม ไข่ ปลาทอง cosmetic</li>
+        <li>เล่นได้ไม่จำกัด รางวัลเต็ม 3 รอบต่อวัน หลังจากนั้นได้ 25%</li>
+      </ul>
+    </section>
+
+    <!-- ===== ECONOMY ===== -->
+    <section id="economy" style="--hl: var(--sun-wash)">
+      <div class="sec-head"><span class="eyebrow">GDD v0.4 §10 · D-003</span><h2>สกุลเงิน & โฆษณา</h2></div>
+      <div class="tbl"><table>
+        <tr><th>สกุล</th><th>ได้จาก</th><th>ใช้กับ</th><th>ซื้อด้วยเงินจริง</th></tr>
+        <tr><td>🐟 ปลาทอง</td><td>ทุกอย่าง</td><td>ห้องสมุด ร้าน อัพช่อง ฟักไข่</td><td><span class="chip c-coral">ไม่ได้</span></td></tr>
+        <tr><td>🧶 ไหมพรม</td><td>สู้ ออฟไลน์ ภารกิจ ผจญภัย</td><td>ถักของ</td><td><span class="chip c-coral">ไม่ได้</span></td></tr>
+        <tr><td>🥚 ไข่</td><td>บอส ออฟไลน์ ผจญภัย</td><td>ฟักเพื่อนสัตว์</td><td><span class="chip c-coral">ไม่ได้</span></td></tr>
+        <tr><td>🍪 ขนม</td><td>บอส event เพื่อนซ้ำเกิน ★5</td><td>อัพเพื่อนสัตว์</td><td><span class="chip c-coral">ไม่ได้</span></td></tr>
+      </table></div>
+      <h3>โฆษณา (rewarded เท่านั้น รวมไม่เกิน 10 ครั้งต่อวัน)</h3>
+      <div class="tbl"><table>
+        <tr><th>จุด</th><th class="num">ต่อวัน</th><th>ได้อะไร</th><th>สถานะ</th></tr>
+        <tr><td>🥚 ฟักไข่</td><td class="num">3</td><td>ฟักฟรี 1 ครั้ง</td><td><span class="chip c-lime">เปิด</span></td></tr>
+        <tr><td>🦉 ลดเวลาวิจัย</td><td class="num">5</td><td>−30 นาที หรือ −25%</td><td><span class="chip c-lime">เปิด</span></td></tr>
+        <tr><td>🧶 ไหมพรมพิเศษ</td><td class="num">2</td><td>ไหมพรมเท่ารายได้ 30 นาที</td><td><span class="chip c-lime">เปิด</span></td></tr>
+        <tr><td>🎁 ของขวัญประจำวัน</td><td class="num">1</td><td>ปลาทองเท่ารายได้ 60 นาที</td><td><span class="chip c-lime">เปิด</span></td></tr>
+        <tr><td>🌙 x2 ออฟไลน์</td><td class="num">—</td><td>—</td><td><span class="chip c-coral">ไม่ทำ (ทำให้คนดูโฆษณาเร็วกว่า 38.6%)</span></td></tr>
+      </table></div>
+      <p>ไม่มีโฆษณาแบบเด้งขึ้นเองหรือแบนเนอร์ · เด็กอายุต่ำกว่า 13 ได้โฆษณาแบบไม่ personalized</p>
+      <h3>IAP</h3>
+      <ul>
+        <li><b>Cosmetic:</b> สกินแมว ธีมตะกร้า ฉาก</li>
+        <li><b>Supporter Pack:</b> cosmetic + ช่อง preset อุปกรณ์ + ซ่อนปุ่มโฆษณาทุกจุด (ไม่ได้รางวัลแทน)</li>
+        <li>ทุกการซื้อผ่าน parental gate</li>
+      </ul>
+    </section>
+
+    <!-- ===== BALANCE ===== -->
+    <section id="balance" style="--hl: var(--sun-wash)">
+      <div class="sec-head"><span class="eyebrow">GDD v0.4 §15 · design/balance/idle_balance_v1.json</span><h2>บาลานซ์</h2></div>
+      <h3>พลังศัตรูต่อหน้า</h3>
+      <p><code>P(n) = 100 × 1.18<sup>n−1</sup></code> · บอสหน้า ×1.5 · บอสบท (หน้า 10, 20, 30) ×2.2</p>
+      <div class="chart" id="curve" aria-label="กราฟพลังศัตรูหน้า 1 ถึง 30"></div>
+      <h3>ผล sim ล่าสุด (20 seeds)</h3>
+      <div class="tbl"><table>
+        <tr><th>ผู้เล่น</th><th class="num">ผ่านหน้า 10</th><th class="num">หน้า 20</th><th class="num">จบเล่ม 1 (หน้า 30)</th><th class="num">โฆษณา/วัน</th></tr>
+        <tr><td>ดูโฆษณาครบ</td><td class="num">วันที่ 0.6</td><td class="num">1.9</td><td class="num">14.8</td><td class="num">8.0</td></tr>
+        <tr><td>ไม่ดูเลย</td><td class="num">วันที่ 0.6</td><td class="num">2.1</td><td class="num">15.6</td><td class="num">0</td></tr>
+      </table></div>
+      <div class="note good"><b>ผ่านทั้ง 2 เป้า:</b> จบเล่ม 1 ใน 14 ± 2 วัน และคนไม่ดูโฆษณาช้ากว่าแค่ 5.8% (เพดาน 25%)</div>
+      <div class="note warn"><b>ยังต้องจูนใน T-029:</b> ค่าไวมาก (ค่าพลังอุปกรณ์ 1.065 → 15.6 วัน แต่ 1.07 → 6.9 วัน) · บท 3 เป็นกำแพง · บท 1–2 เร็วเกิน (เป้าหน้า 20 ≈ วันที่ 4)</div>
+      <h3>ตารางเกรดตะกร้า</h3>
+      <div class="tbl"><table id="gradeTable">
+        <tr><th class="num">เลเวล</th><th>สัดส่วนเกรด</th><th class="num">ขาว</th><th class="num">เขียว</th><th class="num">ฟ้า</th><th class="num">ม่วง</th><th class="num">ทอง</th><th class="num">รุ้ง</th></tr>
+      </table></div>
+      <p>รันเองได้: <code>cd tools/balance_sim && dart run bin/sim.dart --seeds 20</code></p>
+    </section>
+
+    <!-- ===== CONTENT ===== -->
+    <section id="content" style="--hl: var(--teal-wash)">
+      <div class="sec-head"><span class="eyebrow">GDD v0.4 §12</span><h2>Content MVP</h2></div>
+      <div class="tbl"><table>
+        <tr><th>อะไร</th><th>จำนวน</th></tr>
+        <tr><td>เล่ม 1 "ป่าดินสอสี"</td><td>3 บท × 10 หน้า + บอสบท 3 ตัว (บท 3 = หมาป่ากระดาษยักษ์)</td></tr>
+        <tr><td>อุปกรณ์</td><td>8 ช่อง × 6 เกรด</td></tr>
+        <tr><td>สกิล</td><td>9 (3 สาย × 3)</td></tr>
+        <tr><td>เพื่อนสัตว์</td><td>6</td></tr>
+        <tr><td>ห้องสมุด</td><td>~25 node</td></tr>
+        <tr><td>โหมดผจญภัย</td><td>biome 1 · relic 15 · talent 9 · ยา 4 · event 8</td></tr>
+        <tr><td>อื่น ๆ</td><td>TH + EN · cloud save · rewarded ads</td></tr>
+      </table></div>
+    </section>
+
+    <!-- ===== ASSETS ===== -->
+    <section id="assets" style="--hl: var(--teal-wash)">
+      <div class="sec-head"><span class="eyebrow">assetlist.md · ART_PROMPT_BIBLE</span><h2>Asset ที่ต้องทำ</h2></div>
+      <p>รวมประมาณ <b>402 ไฟล์ภาพ PNG</b> + <b>40 ไฟล์เสียง</b> + <b>ฟอนต์ 2</b> · รายละเอียดเต็มอยู่ใน <code>assetlist.md</code></p>
+      <div class="tbl"><table>
+        <tr><th>หมวด</th><th class="num">ไฟล์</th><th>ลำดับ</th><th>ตัวอย่าง</th></tr>
+        <tr><td>ตัวละคร</td><td class="num">26</td><td><span class="chip c-coral">P0</span></td><td>โมจิแยก 6 ชิ้น × 3 เฟรมสั่น + หน้า 4 อารมณ์ · นกฮูก</td></tr>
+        <tr><td>มอน + บอส</td><td class="num">60</td><td><span class="chip c-coral">P0</span>–<span class="chip c-sun">P1</span></td><td>6 มอน × 6 เฟรม · บอสบท 3 ตัว</td></tr>
+        <tr><td>เพื่อนสัตว์</td><td class="num">36</td><td><span class="chip c-sun">P1</span></td><td>6 ตัว × (idle 3 + ตี 2 + ไอคอน)</td></tr>
+        <tr><td>ไอคอน</td><td class="num">104</td><td><span class="chip c-coral">P0</span>–<span class="chip c-teal">P2</span></td><td>อุปกรณ์ 24, กรอบเกรด 6, สกุลเงิน 5, สกิล 9, ห้องสมุด 25, relic/talent/ยา 28, node 7</td></tr>
+        <tr><td>ตะกร้า + ไข่</td><td class="num">31</td><td><span class="chip c-coral">P0</span>–<span class="chip c-sun">P1</span></td><td>ตะกร้า 4 ขั้น, ถักไหมพรม, ไข่ร้าว</td></tr>
+        <tr><td>การ์ด + ภาพประกอบ</td><td class="num">28</td><td><span class="chip c-sun">P1</span>–<span class="chip c-teal">P2</span></td><td>กรอบการ์ด, ภาพ event 8, ภาพออฟไลน์, หน้าถามอายุ</td></tr>
+        <tr><td>ฉากหลัง</td><td class="num">10</td><td><span class="chip c-coral">P0</span>–<span class="chip c-sun">P1</span></td><td>parallax 4 ชั้น (ชั้นกลางแยกตามบท)</td></tr>
+        <tr><td>เอฟเฟกต์</td><td class="num">44 เฟรม</td><td><span class="chip c-coral">P0</span>–<span class="chip c-sun">P1</span></td><td>12 ชุด: ตี คริ ฮีล หลบ ควัน …</td></tr>
+        <tr><td>UI</td><td class="num">57</td><td><span class="chip c-coral">P0</span></td><td>ปุ่ม 11 × 2 สถานะ, แท็บ 5, panel 9-slice</td></tr>
+        <tr><td>ไอคอนแอป + store</td><td class="num">6</td><td><span class="chip c-plum">P3</span></td><td>iOS 1024, Android adaptive, splash</td></tr>
+        <tr><td>เสียง</td><td class="num">40</td><td><span class="chip c-sun">P1</span></td><td>เพลงวน 4, jingle 4, SFX 32</td></tr>
+      </table></div>
+      <h3>สไตล์ที่ล็อกแล้ว</h3>
+      <p>"การ์ตูนสีไม้" เส้นหมึกหนา + สีไม้สด เห็นเส้นขีดเฉียง เงาชั้นเดียว ไม่มี gradient · PNG พื้นโปร่งใส ห้ามมีตัวหนังสือในภาพ</p>
+      <p>
+        <span class="chip" style="background: var(--ink); color: var(--paper)">Ink</span>
+        <span class="chip c-mochi">Mochi Orange</span>
+        <span class="chip c-coral">Coral</span>
+        <span class="chip c-teal">Teal</span>
+        <span class="chip c-lime">Lime</span>
+        <span class="chip c-sun">Sun Yellow</span>
+        <span class="chip c-mute">Paper</span>
+        <span class="chip c-plum">Shadow Plum</span>
+      </p>
+    </section>
+
+    <!-- ===== TASKS ===== -->
+    <section id="tasks" style="--hl: var(--teal-wash)">
+      <div class="sec-head"><span class="eyebrow">_dispatch/ · TASK_BREAKDOWN v2.0</span><h2>งาน & สถานะ</h2></div>
+      <p>งานเดินตามโฟลเดอร์ <b>todo → doing → review → done</b> · 1 card = 1 module</p>
+      <div class="kanban" id="kanban"></div>
+      <h3>Milestone</h3>
+      <div class="tbl"><table>
+        <tr><th>Gate</th><th>ต้องเสร็จ</th><th>ได้อะไร</th></tr>
+        <tr><td>1 Engine Alive</td><td>T-001–T-008, T-022, T-033</td><td>สู้แบบผลแน่นอน + buff engine ใน test</td></tr>
+        <tr><td>2 Idle Loop Playable</td><td>+ T-034–T-043</td><td>ฟาร์ม ถัก ฟัก วิจัย ออฟไลน์ บนเครื่องจริง</td></tr>
+        <tr><td>3 Feature Complete</td><td>+ โหมดผจญภัย + hub + save cloud + IAP + art</td><td>พร้อม balancing</td></tr>
+        <tr><td>4 Store Ready</td><td>T-029 → T-030</td><td>พร้อมส่ง store</td></tr>
+      </table></div>
+    </section>
+
+    <!-- ===== TECH ===== -->
+    <section id="tech" style="--hl: var(--teal-wash)">
+      <div class="sec-head"><span class="eyebrow">GAME_CONTRACT v2.0 · MODE_PLUGIN_SPEC</span><h2>โครงสร้างโค้ด</h2></div>
+      <div class="tbl"><table>
+        <tr><th>ส่วน</th><th>อยู่ที่</th><th>หน้าที่</th></tr>
+        <tr><td>wt_core</td><td><code>packages/wt_core</code></td><td>engine ทั้งหมด import ได้ผ่าน <code>wt_core.dart</code> ทางเดียว</td></tr>
+        <tr><td>โหมดเสริม</td><td><code>packages/wt_mode_story</code>, <code>wt_mode_endless</code></td><td>plugin แบบ run เสียบผ่าน ModeRegistry</td></tr>
+        <tr><td>แอป</td><td><code>app/</code></td><td>ประกอบทุกอย่าง ลงทะเบียนโหมดใน <code>modes.dart</code></td></tr>
+        <tr><td>Balance sim</td><td><code>tools/balance_sim</code></td><td>จำลองการเล่น 14 วัน เช็กเป้าบาลานซ์</td></tr>
+      </table></div>
+      <h3>Module ใน wt_core</h3>
+      <p>
+        <span class="chip c-mute">core_loop</span> <span class="chip c-coral">combat</span> <span class="chip c-coral">idle_loop</span> <span class="chip c-coral">offline_reward</span> <span class="chip c-coral">gear_basket</span> <span class="chip c-coral">pets</span> <span class="chip c-coral">research</span> <span class="chip c-sun">ads</span> <span class="chip c-plum">age_gate</span> <span class="chip c-mute">meta_progression</span> <span class="chip c-mute">ui_panel</span> <span class="chip c-mute">save_cloud</span> <span class="chip c-mute">audio</span> <span class="chip c-mute">iap_gate</span> <span class="chip c-teal">encounter_gen</span> <span class="chip c-teal">item_synergy</span> <span class="chip c-teal">talent_system</span>
+      </p>
+      <p>Flutter 3.44.8 · Dart 3.12.2 · Riverpod · Flame · Hive · test ใน wt_core ผ่าน 34 ตัว</p>
+    </section>
+
+    <!-- ===== COMPLIANCE ===== -->
+    <section id="compliance" style="--hl: var(--plum-wash)">
+      <div class="sec-head"><span class="eyebrow">GDD v0.4 §14 · ยืนยันกับ policy store ก่อนส่งทุกครั้ง</span><h2>กฎ & compliance</h2></div>
+      <div class="two">
+        <div>
+          <h3>ห้ามเด็ดขาด</h3>
+          <ul>
+            <li>ขายไหมพรม ไข่ ปลาทอง ด้วยเงินจริง</li>
+            <li>ขายการเร่งเวลา</li>
+            <li>Pay-to-win, ระบบ energy</li>
+            <li>โฆษณาแบบเด้งเอง / แบนเนอร์</li>
+            <li>แชท โซเชียล UGC</li>
+            <li>analytics ที่เก็บ identifier</li>
+          </ul>
+        </div>
+        <div>
+          <h3>ต้องมี</h3>
+          <ul>
+            <li>หน้าถามอายุแบบเป็นกลางตอนเปิดครั้งแรก</li>
+            <li>อายุต่ำกว่า 13 = โฆษณาไม่ personalized + child-directed</li>
+            <li>ad SDK ต้องอยู่ในรายการ Google Play Families self-certified</li>
+            <li>ไม่ขอ ATT บน iOS</li>
+            <li>โชว์อัตราสุ่มก่อนกดทุกครั้ง</li>
+            <li>Parental gate ก่อนซื้อและก่อนลิงก์ออกนอกแอป</li>
+            <li>Privacy Policy TH/EN, Data Safety, Privacy Label ฉบับใหม่</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DECISIONS ===== -->
+    <section id="decisions" style="--hl: var(--plum-wash)">
+      <div class="sec-head"><span class="eyebrow">DECISIONS.md</span><h2>การตัดสินใจ</h2></div>
+      <div class="tbl"><table>
+        <tr><th>รหัส</th><th>วันที่</th><th>เรื่อง</th></tr>
+        <tr><td>D-001</td><td class="num">16 ก.ค. 2026</td><td>ใช้โครง monorepo (wt_core + wt_mode_* + app) เป็นทางการ</td></tr>
+        <tr><td>D-002</td><td class="num">12 ต.ค. 2026</td><td>เปลี่ยนเป็น idle RPG · ตะกร้าแบบถักเอง · โหมดผจญภัยอยู่ใน MVP · วิจัยใช้เวลาจริง + ad ลดเวลา · ออฟไลน์ 8 ชม. · auto-craft · ใช้ตัวเลขของเราเอง · เพิ่มโฆษณาและ gacha เพื่อนสัตว์ · คงกลุ่มเป้าหมายเด็ก · idle เป็น core module ไม่ใช่ plugin</td></tr>
+        <tr><td>D-003</td><td class="num">12 ต.ค. 2026</td><td>เพิ่มโฆษณา 🎁 ของขวัญประจำวัน + 🧶 ไหมพรมพิเศษ (cap 10/วัน) · IAP ถอดโฆษณา = Supporter Pack</td></tr>
+      </table></div>
+    </section>
+
+    <!-- ===== RESEARCH ===== -->
+    <section id="research" style="--hl: var(--plum-wash)">
+      <div class="sec-head"><span class="eyebrow">design/research/lom_analysis.md</span><h2>วิจัย Legend of Mushroom</h2></div>
+      <p>วิเคราะห์ Legend of Mushroom v2.0.34 ด้วย REA แบบ static อ่านแค่ไฟล์ในแอป ไม่ได้รันเกม ไม่ได้ถอดตารางตัวเลขของเขา และไม่ได้ก๊อปโค้ด</p>
+      <div class="tbl"><table>
+        <tr><th>ระบบของเขา</th><th>เราเอาอะไรมา</th></tr>
+        <tr><td>เปิดกล่องได้อุปกรณ์</td><td>วงจรเปิด → เทียบ → สวม/ขาย, auto-open พร้อมตัวกรอง, อัพเกรดตามช่อง → กลายเป็นตะกร้าถักเอง (ไม่สุ่มช่อง)</td></tr>
+        <tr><td>Buff engine ~85 แบบ</td><td>buff = action + ค่า + hook, ยิง buff ต่อจาก event → synergy เป็นข้อมูล</td></tr>
+        <tr><td>สูตรดาเมจ</td><td>รูปแบบ DEF หักลบ + stat คู่ (ตัวเลขเป็นของเราเอง)</td></tr>
+        <tr><td>Pet + Science</td><td>เพื่อนสัตว์ลงสนามจริง, ให้พลังตอนครอบครอง · ต้นไม้วิจัยใช้เวลาจริง</td></tr>
+        <tr><td>Rogue mode</td><td>ยืนยันว่า roguelite เดิมของเราเป็นโหมดเสริมได้</td></tr>
+        <tr><td>Gacha เติมเงิน, VIP, PvP, กิลด์, แชท, 66 กิจกรรมเทศกาล</td><td><span class="chip c-coral">ไม่เอา</span></td></tr>
+      </table></div>
+    </section>
+
+    <!-- ===== GLOSSARY ===== -->
+    <section id="glossary" style="--hl: var(--plum-wash)">
+      <div class="sec-head"><span class="eyebrow">ใช้คำเดียวกันทั้งทีม</span><h2>คำศัพท์</h2></div>
+      <div class="tbl"><table>
+        <tr><th>คำ</th><th>English / ในโค้ด</th><th>ความหมาย</th></tr>
+        <tr><td>โมจิ</td><td>Mochi / <code>cat_mochi</code></td><td>แมวตัวเอก</td></tr>
+        <tr><td>พลังแมว</td><td>Power / <code>PowerScore</code></td><td>ตัวเลขเดียวสรุปความแข็งแรง</td></tr>
+        <tr><td>ไหมพรม</td><td>Yarn / <code>Currency.yarn</code></td><td>ใช้ถักของในตะกร้า</td></tr>
+        <tr><td>ปลาทอง</td><td>Goldfish / <code>Currency.goldfish</code></td><td>เงินหลักของเกม</td></tr>
+        <tr><td>ขนม</td><td>Cookies / <code>Currency.cookies</code></td><td>อัพเลเวลเพื่อนสัตว์</td></tr>
+        <tr><td>เพื่อนสัตว์</td><td>Pets / <code>pets</code></td><td>ผู้ช่วยลงสนาม</td></tr>
+        <tr><td>ห้องสมุดนกฮูก</td><td>Owl Library / <code>research</code></td><td>ต้นไม้วิจัย</td></tr>
+        <tr><td>หมอนนุ่ม</td><td><code>offline_cap</code> node</td><td>node ห้องสมุดที่เพิ่มเวลาออฟไลน์</td></tr>
+        <tr><td>เล่ม / บท / หน้า</td><td>Book / Chapter / Page</td><td>โครงสร้างด่านของโหมดหลัก</td></tr>
+        <tr><td>คลื่น</td><td>Wave</td><td>มอนกลุ่มหนึ่งที่วิ่งเข้ามาในหน้า</td></tr>
+        <tr><td>Boiling line</td><td>—</td><td>สลับเฟรมเส้นสั่น 3 แบบ ให้ภาพ "หายใจ"</td></tr>
+        <tr><td>Supporter Pack</td><td>SKU / <code>no_ads</code></td><td>IAP cosmetic + ซ่อนโฆษณา</td></tr>
+      </table></div>
+    </section>
+
+    <div class="empty" id="empty">ไม่เจอหัวข้อที่ตรงกับคำค้นนี้ ลองคำอื่น เช่น "ตะกร้า" หรือ "T-0"</div>
+
+    <footer>สรุปจาก GDD v0.4, GAME_CONTRACT v2.0, DECISIONS, TASK_BREAKDOWN, assetlist.md และ idle_balance_v1.json ณ 14 ต.ค. 2026 · ถ้าขัดกับเอกสารใน repo ให้ยึดเอกสารใน repo</footer>
+  </main>
+</div>
+
+<script>
+(() => {
+  // ---- tasks (from _dispatch/, 14 Oct 2026) ----
+  const tasks = [
+    ["doing","T-001","repo scaffold + layout constants","core_loop"],
+    ["review","T-002","core contracts + GameState skeleton","core_loop"],
+    ["review","T-033","GameClock + daily reset + v2 contracts","core_loop"],
+    ["todo","T-003","data loader + schema validation","core_loop"],
+    ["todo","T-004","l10n TH/EN setup","ui_panel"],
+    ["todo","T-005","RunManager","core_loop"],
+    ["todo","T-006","encounter generator (seed-based)","encounter_gen"],
+    ["todo","T-007","combat engine — deterministic sim + damage","combat"],
+    ["todo","T-008","buff engine + skills + cooldown","combat"],
+    ["todo","T-009","dodge & telegraph","combat"],
+    ["todo","T-010","relic system + effect resolver","item_synergy"],
+    ["todo","T-011","synergy resolver","item_synergy"],
+    ["todo","T-012","talent XP/level + pick logic","talent_system"],
+    ["todo","T-013","talent effect resolver","talent_system"],
+    ["todo","T-014","ui panel shell + page-flip","ui_panel"],
+    ["todo","T-015","HUD","ui_panel"],
+    ["todo","T-016","floating node map scroll","ui_panel"],
+    ["todo","T-017","combat panel","ui_panel"],
+    ["todo","T-018","card pick panel","ui_panel"],
+    ["todo","T-019","event/shop/campfire panels","ui_panel"],
+    ["todo","T-020","village hub → เมนูผจญภัย + ร้าน","ui_panel"],
+    ["todo","T-021","meta progression","meta_progression"],
+    ["todo","T-022","save local + Save v3","save_cloud"],
+    ["todo","T-023","cloud sync","save_cloud"],
+    ["todo","T-024","audio service","audio"],
+    ["todo","T-025","IAP + parental gate + Supporter Pack","iap_gate"],
+    ["todo","T-026","content JSON (โหมดผจญภัย)","design-data"],
+    ["todo","T-027","art integration + sprite rig loader","ui_panel"],
+    ["todo","T-028","boss fight: หมาป่ากระดาษยักษ์","combat"],
+    ["todo","T-029","balancing pass + telemetry","core_loop"],
+    ["todo","T-030","store readiness","release"],
+    ["todo","T-031","mode framework + story plugin","core_loop"],
+    ["todo","T-032","endless mode slice (P2 dormant)","mode_endless"],
+    ["todo","T-034","idle loop — page, wave, boss gate","idle_loop"],
+    ["todo","T-035","offline reward","offline_reward"],
+    ["todo","T-036","gear basket","gear_basket"],
+    ["todo","T-037","auto-craft","gear_basket"],
+    ["todo","T-038","pets + hatch","pets"],
+    ["todo","T-039","ads — AdService + caps","ads"],
+    ["todo","T-040","age screen","age_gate"],
+    ["todo","T-041","research — owl library","research"],
+    ["todo","T-042","idle UI panels","ui_panel"],
+    ["todo","T-043","content JSON v2 (idle)","design-data"]
+  ];
+  const cols = [
+    ["doing", "กำลังทำ", "c-sun"],
+    ["review", "รอตรวจ", "c-teal"],
+    ["done", "เสร็จ", "c-lime"],
+    ["todo", "รอทำ", "c-mute"]
+  ];
+  const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const kb = document.getElementById("kanban");
+  kb.innerHTML = cols.map(([key, label, cls]) => {
+    const list = tasks.filter(t => t[0] === key);
+    const rows = list.map(t => `<div class="task"><span class="id">${t[1]}</span><span>${esc(t[2])}</span><span class="mod">${t[3]}</span></div>`).join("");
+    const body = list.length === 0
+      ? `<p class="mod" style="color: var(--ink-soft)">ยังไม่มีงานที่ผ่านการตรวจ</p>`
+      : key === "todo"
+        ? `<details><summary>ดูทั้ง ${list.length} งาน</summary>${rows}</details>`
+        : rows;
+    return `<div class="col"><h3>${label} <span class="chip ${cls}">${list.length}</span></h3>${body}</div>`;
+  }).join("");
+
+  // ---- basket grade table ----
+  const grades = [
+    [1, [70,25,5,0,0,0]], [5, [40,35,20,5,0,0]], [10, [15,30,35,17,3,0]],
+    [15, [5,15,35,33,11,1]], [20, [0,5,25,42,23,5]]
+  ];
+  const gColors = ["var(--line)","var(--lime)","var(--teal)","var(--plum)","var(--sun)","var(--coral)"];
+  const gt = document.getElementById("gradeTable");
+  grades.forEach(([lv, pct]) => {
+    const bar = pct.map((p, i) => p ? `<span style="width:${p}%; background:${gColors[i]}"></span>` : "").join("");
+    gt.insertAdjacentHTML("beforeend",
+      `<tr><td class="num">${lv}</td><td><div class="grades" role="img" aria-label="เลเวล ${lv}">${bar}</div></td>${pct.map(p => `<td class="num">${p}%</td>`).join("")}</tr>`);
+  });
+
+  // ---- enemy power curve ----
+  const W = 640, H = 260, L = 56, R = 16, T = 16, B = 40;
+  const pts = Array.from({length: 30}, (_, i) => [i + 1, 100 * Math.pow(1.18, i)]);
+  const maxY = 14000;
+  const x = n => L + (n - 1) / 29 * (W - L - R);
+  const y = v => T + (1 - v / maxY) * (H - T - B);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="พลังศัตรูต่อหน้า จาก 100 ที่หน้า 1 ถึงประมาณ 12,100 ที่หน้า 30">`;
+  [0, 4000, 8000, 12000].forEach(v => {
+    svg += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`;
+    svg += `<text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="var(--ink-soft)">${v === 0 ? 0 : (v / 1000) + "K"}</text>`;
+  });
+  [1, 10, 20, 30].forEach(n => {
+    svg += `<text x="${x(n)}" y="${H - 18}" text-anchor="middle" font-size="11" fill="var(--ink-soft)">หน้า ${n}</text>`;
+  });
+  [10, 20].forEach(n => {
+    svg += `<line x1="${x(n)}" x2="${x(n)}" y1="${T}" y2="${H - B}" stroke="var(--plum)" stroke-width="1" stroke-dasharray="4 4"/>`;
+  });
+  const path = pts.map(([n, v], i) => `${i ? "L" : "M"}${x(n).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  svg += `<path d="${path} L${x(30)},${y(0)} L${x(1)},${y(0)} Z" fill="var(--mochi-wash)"/>`;
+  svg += `<path d="${path}" fill="none" stroke="var(--mochi)" stroke-width="3" stroke-linejoin="round"/>`;
+  const last = pts[29];
+  svg += `<circle cx="${x(30)}" cy="${y(last[1])}" r="5" fill="var(--coral)"/>`;
+  svg += `<text x="${x(30) - 8}" y="${y(last[1]) - 10}" text-anchor="end" font-size="12" font-weight="600" fill="var(--ink)">หน้า 30 ≈ 12.1K</text>`;
+  svg += `<text x="${x(10) + 6}" y="${T + 12}" font-size="11" fill="var(--plum)">จบบท 1</text>`;
+  svg += `<text x="${x(20) + 6}" y="${T + 12}" font-size="11" fill="var(--plum)">จบบท 2</text>`;
+  svg += `</svg>`;
+  document.getElementById("curve").innerHTML = svg;
+
+  // ---- nav highlight ----
+  const links = [...document.querySelectorAll("#toc a")];
+  const sections = links.map(a => document.querySelector(a.getAttribute("href")));
+  const mark = id => links.forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + id));
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(entries => {
+      const vis = entries.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (vis[0]) mark(vis[0].target.id);
+    }, { rootMargin: "-10% 0px -70% 0px" });
+    sections.forEach(s => s && io.observe(s));
+  }
+  mark("overview");
+
+  // ---- search ----
+  const q = document.getElementById("q");
+  const empty = document.getElementById("empty");
+  q.addEventListener("input", () => {
+    const term = q.value.trim().toLowerCase();
+    let shown = 0;
+    sections.forEach((s, i) => {
+      const hit = !term || s.textContent.toLowerCase().includes(term);
+      s.hidden = !hit;
+      links[i].hidden = !hit;
+      if (hit) shown++;
+    });
+    empty.classList.toggle("show", shown === 0);
+  });
+})();
+</script>

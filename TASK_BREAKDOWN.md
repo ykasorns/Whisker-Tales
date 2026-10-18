@@ -118,3 +118,24 @@ A-1 ต้องเสร็จก่อน T-027 / A-2–A-6 ทยอยส่
 | 4 — Store Ready | T-029 (sim + playtest ผ่าน) → T-030 (+ Privacy/Data Safety/ads disclosure ใหม่) |
 
 **รอ YK:** Q7 จุดโฆษณาเพิ่ม · Q8 รูปแบบ IAP ถอดโฆษณา (GDD v0.4 §17) — ไม่บล็อก wave ใด (T-025/T-039 ทำแบบ flag ไว้)
+
+---
+
+## Amendment v2.1 — Classes · Wardrobe · Idle-only (D-004, 2026-10-18)
+
+อ้างอิง: GDD v0.5 + CONTRACT v2.1 · แผน: `design/proposals/v0.5_plan.md`
+
+- **ยกเลิก:** T-009 (→ `HOLD_T-009`, ไม่มีปุ่มหลบ)
+- **เขียนใหม่:** T-027 → rig runtime (P0, module `rig`)
+- **Amendment:** T-007, T-008, T-017, T-032, T-036, T-037, T-042, T-043
+- **ใหม่:**
+
+| Task | Module | Depends | Wave |
+|---|---|---|---|
+| T-046 rig prototype ในเว็บ (Claude) | design-data | ภาพโมจิสองขา | ทันทีที่ได้ภาพ |
+| T-044 cat level + classes | cat_class | T-007, T-033, T-003 | 6 |
+| T-045 wardrobe | wardrobe | T-036, T-022 | 7 |
+| T-027 rig runtime | rig | T-001, T-046 | 7 |
+| HOLD_T-047 dungeon | mode_dungeon | T-031, T-044, T-045 | v1.1 |
+
+- **Gate 2 (Idle Loop Playable)** เพิ่ม: T-044, T-027 (โมจิประกอบจาก rig + เลือกคลาสได้)

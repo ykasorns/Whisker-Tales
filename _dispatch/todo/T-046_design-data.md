@@ -1,0 +1,17 @@
+# T-046: rig prototype ในเว็บต้นแบบ (พิสูจน์ว่าภาพ AI ประกอบ rig ได้)
+Module: design-data | Priority: P0 | Owner: Opus/Claude | Depends: ภาพโมจิสองขา (sheet ใหม่)
+> D-004 · spec: GDD v0.5 · contract v2.1
+
+## Goal
+ก่อนลงทุนวาดอุปกรณ์ 24+ ชิ้น: ตัดชิ้นส่วนโมจิสองขา → วัด pivot/attach point → ทำ rig ในเว็บต้นแบบ (ท่ายืน เดิน ตี 4 คลาส) + ใส่หมวก/อาวุธทดลอง 1–2 ชิ้น → YK ดู
+
+## Interface (ห้ามเปลี่ยนโดยไม่ผ่าน Opus)
+ผลลัพธ์: `design/art/rig_mochi.json` (ชิ้นส่วน, pivot, attach, keyframe) ที่ T-027 ใช้ต่อได้ตรง ๆ
+
+## Acceptance Criteria
+- [ ] รอยต่อชิ้นส่วนไม่แหว่งในทุกท่า
+- [ ] YK ยืนยัน feel ของท่าเดิน/ตี
+- [ ] ถ้าไม่ผ่าน: เสนอทางสำรอง (gen ชิ้นส่วนสวมอุปกรณ์ทีละชุด / จ้างวาด rig ต้นแบบ) ลง DECISIONS
+
+## DoD
+ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล

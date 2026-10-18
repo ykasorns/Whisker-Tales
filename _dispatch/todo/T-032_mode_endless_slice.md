@@ -20,3 +20,7 @@ implements GameMode เท่านั้น — import ได้เฉพาะ
 ---
 ## Amendment v2.0 (D-002, 2026-10-12)
 คงไว้ **P2 dormant** — ต่างจากโหมดหลัก idle ตรงที่เป็น run จบด้วยการตาย ใช้ relic/talent · ยังเป็น acceptance พิสูจน์ plugin (แก้ core = 0) · ถ้า Opus เห็นว่าทับซ้อน ให้เสนอ drop ผ่าน DECISIONS
+
+---
+## Amendment v2.1 (D-004, 2026-10-18)
+โหมดเสริมแบบ run ตอนนี้มี: ท้าทายนิทาน (story) + ดันเจี้ยน (T-047, v1.1) — endless ยังคง P2 dormant

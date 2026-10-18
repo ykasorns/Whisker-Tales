@@ -18,3 +18,7 @@ BuffEngine.apply(unit, buffId, source) / CombatEngine.useSkill(slotIndex) / Skil
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment v2.1 (D-004, 2026-10-18)
+สกิลเปลี่ยนเป็น **สกิลคลาส** (GDD v0.5 §3.2): 4 คลาส × 3 = 12 สกิล **ร่ายเองตาม cooldown เท่านั้น** (ตัด `useSkill(slotIndex)` จากการแตะ — เก็บเป็น API ภายในให้ auto-cast เรียก) · ช่องสกิลปลดตามเลเวลจาก `cat_class` · เมจ: cooldown ×0.75 + ดาเมจสกิล ×1.8 จาก JSON · Depends เพิ่ม T-044

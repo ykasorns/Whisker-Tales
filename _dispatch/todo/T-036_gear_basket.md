@@ -17,3 +17,7 @@ GearBasket.craft(slot|random) -> CraftResult / equip(id) / recycle(id) / upgrade
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment v2.1 (D-004, 2026-10-18)
+ช่องอุปกรณ์ตาม GDD v0.5 §4.1: weapon, hat, shirt, shoes เริ่ม · scarf/gloves/bell/bag ปลดตาม `slot_unlocks` · ถักได้เฉพาะช่องที่ปลด · ของแต่ละชิ้นมี `style_id` (ส่งให้ `wardrobe` ปลด) · affix 3 ชั้น (หลัก/รอง/พิเศษ) · "ดีกว่า" สำหรับระบบอัตโนมัติ = PowerScore ของชิ้นสูงกว่า

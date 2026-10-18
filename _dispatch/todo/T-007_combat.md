@@ -19,3 +19,7 @@ StatBlock (stat+anti-stat, cap จาก data) · PowerScore.of(StatBlock)
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment v2.1 (D-004, 2026-10-18)
+ไม่มี input ผู้เล่นระหว่างสู้ (idle ล้วน) · หลบ = stat (`evade` vs `accuracy`) · ระยะโจมตี melee/ranged ตามคลาส (ranged ตีจากที่ยืน) · ความเร็วตี = `attack_interval_s` ของคลาส × ตัวคูณจาก stat · เพิ่ม stat พิเศษใน `Attribute`: skill_dmg, boss_dmg, pet_dmg, cdr, yarn_find, fish_find, exp_find, craft_luck (GDD v0.5 §5)

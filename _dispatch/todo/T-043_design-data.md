@@ -14,3 +14,7 @@ Module: design-data | Priority: P0 | Owner: Opus | Depends: T-003,T-008
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment v2.1 (D-004, 2026-10-18)
+เพิ่ม content: 4 คลาส × 3 สกิล (12) · affix pool ต่อช่อง 3 ชั้น · style ช่องละ 3 + อาวุธ 3 × 4 คลาส · ตาราง EXP Lv1–40

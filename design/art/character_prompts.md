@@ -27,7 +27,57 @@ SHEET LAYOUT: a clean sprite sheet on a perfectly flat solid magenta background 
 
 ---
 
-## 1. โมจิ (ตัวเอก) — 3 แผ่น
+## 1. โมจิสองขา (v0.5 — ใช้อันนี้) — 3 แผ่น
+
+> แบบสี่ขาเดิม (§1-old ด้านล่าง) เลิกใช้แล้ว (D-004) · prompt ด้านล่างประกอบเสร็จแล้ว ก๊อปทั้งกล่องได้เลย · **แนบ `sheet_mochi_poses.png` (แบบเดิม) เป็น reference เรื่องหน้าตา/สี/ลายเส้น** แต่ให้ยืนสองขา
+
+### 1A. `sheet_mochi2_poses.png` — 4 × 3 · หันขวา · สัดส่วน 4:3
+```
+Create a sprite sheet of the same cartoon kitten adventurer in 12 poses, full body, side view facing RIGHT. Keep the face, fur colors, stripes and drawing style of the reference image, but the kitten now STANDS AND WALKS UPRIGHT ON TWO LEGS like a hero in an adventure cartoon.
+
+CHARACTER: "Mochi", a chubby orange tabby kitten (#F6A83C fur with darker orange stripes), cream belly and muzzle, big friendly dark eyes with white highlights, small pink nose, about 2.2 heads tall, standing upright on two short sturdy hind legs, two arms with round paws, fluffy curved tail with a cream tip. Wears nothing except where a weapon is listed.
+
+FRAMES, left to right, top to bottom:
+Row 1: (1) idle, standing upright, arms relaxed, tail up; (2) walk, contact pose, front leg forward, arms swinging; (3) walk, passing pose, legs together, body slightly raised; (4) walk, contact pose, the other leg forward.
+Row 2: (5) WARRIOR attack: holding a small round shield on the back arm, slashing a short wooden sword forward with the front arm; (6) ROGUE attack: quick forward stab with two small daggers, leaning in; (7) ARCHER attack: standing firm, drawing a small bow aimed to the right; (8) MAGE attack: raising a short wooden staff with a star tip, small sparkles.
+Row 3: (9) dodge, quick hop backward, ears flattened; (10) hurt, flinching, eyes squeezed shut, cute not painful; (11) victory, jumping with both arms up, happy closed eyes; (12) sleeping curled up sitting, hugging a small teal cloth sack.
+
+STYLE: bold dark ink outlines (#33291F), filled with vibrant saturated colored pencil strokes clearly visible at a diagonal angle, single flat shadow tone, saturday-morning-cartoon energy, bright playful palette limited to warm orange #F6A83C, coral #EE6352, teal #3FA7B8, lime #8CC152, sun yellow #F9D64E, shadow plum #7A5E8C and cream #F6F0E1, strong readable silhouette, flat 2D side-scroller game sprite, no digital gradients, no airbrush, child-friendly.
+
+SHEET LAYOUT: a clean sprite sheet on a perfectly flat solid magenta background (#FF00FF) filling the entire image. Arrange the frames in an invisible grid of 4 columns by 3 rows, every cell the same size. One pose per cell, centered, with wide empty magenta gaps so no two frames touch, nothing crossing into another cell. Same character, same proportions, same size and the same ground line in every cell. No text, no letters, no numbers, no symbols, no grid lines, no borders, no floor, no cast shadows, no background scenery.
+```
+→ `cat_mochi_{idle|walk_f1|walk_f2|walk_f3|atk_warrior|atk_rogue|atk_archer|atk_mage|dodge|hurt|victory|sleep}.png` — ใช้เป็นท่าอ้างอิงสำหรับทำ rig (และเป็นเฟรมสำรองถ้า rig ไม่ผ่าน)
+
+### 1B. `sheet_mochi2_parts.png` — 9 × 3 · หันขวา · สัดส่วน 3:1 · **แนบภาพจาก 1A เป็น reference**
+```
+Create a character rig parts sheet: the same upright two-legged kitten as in the reference image, taken apart into separate body parts for 2D skeletal animation, side view facing RIGHT, NO weapons, NO clothes. Draw every part complete, including the areas normally hidden where parts overlap, and extend each part slightly past its joint (rounded ends) so it can rotate without gaps.
+
+CHARACTER: "Mochi", a chubby orange tabby kitten (#F6A83C fur with darker orange stripes), cream belly and muzzle, big friendly dark eyes with white highlights, small pink nose, about 2.2 heads tall, upright on two legs, fluffy curved tail with a cream tip.
+
+COLUMNS (same order in every row): (1) head with neutral face, no ears; (2) both ears as one piece; (3) torso with cream belly, no head, no limbs; (4) front arm, straight, open round paw; (5) back arm, straight, open round paw; (6) front leg with foot; (7) back leg with foot; (8) tail; (9) front paw closed into a fist with a round hole, as if gripping a stick.
+ROWS: three copies of the exact same parts in the same positions and sizes, each redrawn by hand with slightly different line wobble. Parts stay identical in shape, size and color across rows; only the hand-drawn line wobble changes. Every part keeps the same scale it has on the assembled character.
+
+STYLE: bold dark ink outlines (#33291F), filled with vibrant saturated colored pencil strokes clearly visible at a diagonal angle, single flat shadow tone, flat 2D game sprite, no digital gradients, no airbrush, child-friendly.
+
+SHEET LAYOUT: a clean sprite sheet on a perfectly flat solid magenta background (#FF00FF) filling the entire image. Arrange the parts in an invisible grid of 9 columns by 3 rows, every cell the same size, one part per cell, centered, with wide empty magenta gaps so no two parts touch. No text, no letters, no numbers, no symbols, no grid lines, no borders, no shadows.
+```
+→ `cat_mochi_{head|ears|torso|frontarm|backarm|frontleg|backleg|tail|fist}_f{1-3}.png`
+
+### 1C. `sheet_mochi2_faces.png` — 5 × 1 · หันขวา · **แนบภาพจาก 1A + 1B**
+```
+Create a sheet of 5 versions of the same kitten HEAD from the reference images, head only (no ears, no body), side view facing RIGHT. Identical head shape, size and position in every cell — it must match the head part in the reference parts sheet exactly; only the facial expression changes.
+
+FRAMES left to right: (1) neutral, eyes open; (2) blinking, eyes closed as gentle curves; (3) hurt, eyes squeezed shut, small wobbly mouth; (4) happy, closed smiling eyes, open mouth; (5) determined, narrowed eyes, small confident smile.
+
+STYLE: bold dark ink outlines (#33291F), filled with vibrant saturated colored pencil strokes clearly visible at a diagonal angle, single flat shadow tone, flat 2D game sprite, no digital gradients, no airbrush, child-friendly.
+
+SHEET LAYOUT: a clean sprite sheet on a perfectly flat solid magenta background (#FF00FF) filling the entire image. Arrange the heads in an invisible grid of 5 columns by 1 row, every cell the same size, one head per cell, centered, with wide empty magenta gaps. No text, no letters, no symbols, no grid lines, no borders, no shadows.
+```
+→ `cat_mochi_face_{neutral|blink|hurt|happy|fierce}.png`
+
+---
+
+## 1-old. โมจิสี่ขา (v0.4 — เลิกใช้ เก็บไว้อ้างอิง)
 
 โมจิเป็นตัวเดียวที่ต้องทำ **layered rig** (CONTRACT §5 — รองรับ cosmetic และ Mochi Studio) จึงต้องมี 3 แผ่น: ท่าเต็มตัว (ใช้เป็นเฟรม animation สำรอง + reference), ชิ้นส่วน rig, หน้าอารมณ์
 
@@ -174,6 +224,29 @@ Row 3: (9–11) idle phase 2 (angry): the same wolf with paper edges crinkled, f
 {SHEET SUFFIX with COLS=4, ROWS=3}
 ```
 → `boss_{id}_idle_f{1-3}`, `boss_{id}_hurt`, `boss_{id}_telegraph_f{1-2}`, `boss_{id}_attack`, `boss_{id}_defeated` (+ หมาป่า: `boss_paperwolf_idle2_f{1-3}`, `boss_paperwolf_telegraph2`)
+
+---
+
+## 4D. ไอคอนหน้าบอส (ปุ่ม "ท้าบอส" กลางบนจอ) — แผ่นละบท · 3 คอลัมน์ × 1 แถว
+
+ปุ่มเป็นวงกลม — เกมตัดเป็นวงกลมเอง ตอนรอฟาร์มจะทำเป็นสีเทา พร้อมท้าแล้วเป็นสีปกติ · **แนบ sheet ของมอนและบอสในบทนั้นเป็น reference**
+
+บท 1 → `sheet_icon_boss_ch1.png` (แนบ `sheet_mon_eraserslime`, `sheet_mon_acorn`, `sheet_boss_eraserking`)
+```
+Create 3 round game UI portrait icons of the boss characters from the reference images, one per cell, for a "challenge the boss" button. Match the reference art style exactly (same line weight, colored pencil texture and palette).
+
+ICONS left to right:
+(1) the pink Eraser Slime from the reference, wearing a small sun-yellow crown, grumpy determined face;
+(2) the Grumpy Acorn from the reference, wearing a small sun-yellow crown on its plum cap, grumpy determined face, holding the twig up;
+(3) the Eraser King from the reference, its lopsided paper crown, proud and grumpy face.
+
+Each icon: head-and-shoulders close-up, three-quarter view looking slightly to the LEFT toward the viewer, face large and centered, everything important inside the central 80% of the cell so it survives a circular crop, bold readable at 64 px.
+
+STYLE: bold dark ink outlines (#33291F), filled with vibrant saturated colored pencil strokes clearly visible at a diagonal angle, single flat shadow tone, saturday-morning-cartoon energy, flat 2D game icon, no digital gradients, no airbrush, child-friendly, never scary.
+
+SHEET LAYOUT: a clean icon sheet on a perfectly flat solid magenta background (#FF00FF) filling the entire image. Arrange the icons in an invisible grid of 3 columns by 1 row, every cell the same square size, one icon per cell, centered, with wide empty magenta gaps so no two icons touch. No circles, no frames, no borders, no text, no letters, no symbols, no background scenery.
+```
+→ `ui_bossface_eraserslime.png`, `ui_bossface_acorn.png`, `ui_bossface_eraserking.png` · บท 2–3 ทำหลังมี sheet มอนของบทนั้นแล้ว (โครงเดียวกัน เปลี่ยนชื่อตัวละคร)
 
 ---
 

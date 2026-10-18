@@ -2,6 +2,7 @@
 
 **Version:** 0.4 | **วันที่:** 2026-10-12 | **แทนที่:** GDD v0.3 (เก็บไว้เป็นประวัติ + เป็น spec ของโหมดนิทานผจญภัย §9)
 **สถานะ:** ✅ **Approved by YK 2026-10-12 · ⏳ Advisor (Fable) review pending** — log: DECISIONS D-002
+**⚠️ v0.5 (D-004) แทนที่บางหัวข้อ:** §2.2 (แตะสกิล/หลบ), §3 (ช่อง + auto-craft), §4.1, §5, §9, §12 — ดู `GDD_WhiskerTales_v0.5.md` · หัวข้ออื่นยังมีผล
 **Q7/Q8 ปิดแล้ว (D-003):** เพิ่ม 🎁 ของขวัญประจำวัน + 🧶 ไหมพรมพิเศษ (cap รวม 10/วัน) · IAP ถอดโฆษณา = **Supporter Pack (ค)**
 **ที่มา:** YK สั่ง pivot เป็น idle RPG แบบ Legend of Mushroom โดยใช้แมวแทนเห็ด — research: `design/research/lom_analysis.md`
 

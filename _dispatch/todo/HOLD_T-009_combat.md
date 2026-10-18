@@ -13,3 +13,7 @@ CombatEngine.onTelegraph stream / PlayerInput.dodge()
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment v2.1 (D-004, 2026-10-18)
+**ยกเลิก** — GDD v0.5 §1 idle ล้วน ไม่มีปุ่มหลบ · หลบเป็น stat (T-007) · "!" ก่อนมอนตีเป็นแค่ภาพ (T-042) · อย่า claim card นี้

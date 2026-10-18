@@ -224,5 +224,97 @@
     "sessions_per_day": 3,
     "session_minutes": 15,
     "awake_hours": 14
+  },
+  "speed": {
+    "_doc": "GDD v0.5 §1 — ปลดตามหน้าที่ผ่าน · มีผลเฉพาะตอนเปิดเกม",
+    "steps": [
+      {
+        "mult": 1,
+        "unlock_cleared_page": 0
+      },
+      {
+        "mult": 1.5,
+        "unlock_cleared_page": 5
+      },
+      {
+        "mult": 2,
+        "unlock_cleared_page": 10
+      }
+    ]
+  },
+  "slot_unlocks": {
+    "_doc": "GDD v0.5 §4.1 — cleared_page ที่ปลดช่อง (0 = เริ่ม)",
+    "weapon": 0,
+    "hat": 0,
+    "shirt": 0,
+    "shoes": 0,
+    "scarf": 5,
+    "gloves": 10,
+    "bell": 20,
+    "bag": 30
+  },
+  "cat_level": {
+    "_doc": "GDD v0.5 §3.1 — ASSUMPTION ทั้งหมด จูนใน T-029",
+    "max_level": 40,
+    "class_unlock_level": 10,
+    "class_tier2_level": 40,
+    "skill_slot_levels": [
+      10,
+      20,
+      30
+    ],
+    "ASSUMPTION_exp_to_next_base": 20,
+    "ASSUMPTION_exp_to_next_growth": 1.12,
+    "ASSUMPTION_exp_per_kill_base": 2,
+    "ASSUMPTION_base_stat_pct_per_level": 0.02
+  },
+  "classes": {
+    "_doc": "GDD v0.5 §3.2 — ตัวคูณจาก stat พื้นฐาน · attack_interval_s = ช่วงห่างการตี · ASSUMPTION จูนใน T-029",
+    "novice": {
+      "hp": 1.0,
+      "def": 1.0,
+      "atk": 1.0,
+      "attack_interval_s": 1.0,
+      "range": "melee",
+      "evade_add": 0.0,
+      "skill_dmg": 1.0
+    },
+    "warrior": {
+      "hp": 1.4,
+      "def": 1.5,
+      "atk": 0.8,
+      "attack_interval_s": 1.0,
+      "range": "melee",
+      "evade_add": 0.0,
+      "skill_dmg": 1.0
+    },
+    "rogue": {
+      "hp": 0.9,
+      "def": 0.9,
+      "atk": 0.75,
+      "attack_interval_s": 0.6,
+      "range": "melee",
+      "evade_add": 0.15,
+      "skill_dmg": 1.0
+    },
+    "archer": {
+      "hp": 0.9,
+      "def": 0.85,
+      "atk": 1.35,
+      "attack_interval_s": 0.8,
+      "range": "ranged",
+      "evade_add": 0.05,
+      "skill_dmg": 1.1
+    },
+    "mage": {
+      "hp": 1.0,
+      "def": 0.85,
+      "atk": 0.9,
+      "attack_interval_s": 1.4,
+      "range": "ranged",
+      "evade_add": 0.0,
+      "skill_dmg": 1.8,
+      "cooldown_mult": 0.75
+    }
   }
 }

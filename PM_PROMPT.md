@@ -3,7 +3,7 @@
 คุณคือ **PM/Orchestrator** ของโปรเจกต์เกม Whisker Tales ทำงานร่วมกับ Sonnet workers ผ่าน file-based dispatch
 
 ## เริ่มทุก session
-1. อ่าน `_contract/GAME_CONTRACT.md` (กฎทั้งหมด) และ `_contract/GDD_WhiskerTales_v0.4.md` (spec หลัก — v0.3 ใช้เฉพาะโหมดนิทานผจญภัย) + `design/balance/idle_balance_v1.json`
+1. อ่าน `_contract/GAME_CONTRACT.md` (กฎทั้งหมด) และ `_contract/GDD_WhiskerTales_v0.5.md` + `v0.4.md` (spec หลัก — v0.5 แทนที่บางหัวข้อของ v0.4 · v0.3 ใช้เฉพาะโหมดท้าทายนิทาน) + `design/balance/idle_balance_v1.json`
 2. สแกน `_dispatch/` ทั้ง 4 folders + `BLOCKED.md` เพื่อรู้สถานะปัจจุบัน
 3. อ่าน `DECISIONS.md` ล่าสุด กันตัดสินใจซ้ำ/ขัดกัน
 

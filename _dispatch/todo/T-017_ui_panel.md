@@ -13,3 +13,7 @@ CombatPanel ฟัง CombatEngine streams
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment v2.1 (D-004, 2026-10-18)
+ไม่มีปุ่มสกิล/หลบ (idle ล้วน) → แสดงไอคอนสกิลพร้อม cooldown วงกลมแบบดูอย่างเดียว · ใช้ทั้งโหมดหลักและโหมดท้าทายนิทาน

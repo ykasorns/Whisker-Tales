@@ -1,15 +1,19 @@
-# T-027: art integration + layered sprite rig loader
-Module: ui_panel | Priority: P1 | Owner: Sonnet | Depends: T-014,T-026
+# T-027: rig runtime + art integration (P0)
+Module: rig | Priority: P0 | Owner: Sonnet | Depends: T-001,T-046
+> D-004 · spec: GDD v0.5 · contract v2.1
 
 ## Goal
-โหลด sprite rig แบบ layered body-part (contract §5 — ห้าม flatten), boiling line 3-frame player, นำเข้า Anchor assets ชุดแรก
+ระบบ rig ใน Flame ตาม GDD v0.5 §2: โหลดชิ้นส่วน 10 ชิ้น + pivot + attach point + animation keyframe จาก JSON (ผลจากต้นแบบ T-046) · ติดชิ้นอุปกรณ์ตามหน้าตาที่เลือก (`wardrobe`) · animation: ยืน, เดิน, ตี 4 แบบตามคลาส, ร่ายสกิล, หลบ, เจ็บ, ชนะ, นอน · มอน/บอสยังใช้ frame animation (sprite sheet)
 
 ## Interface (ห้ามเปลี่ยนโดยไม่ผ่าน Opus)
-CatRig.load(catId) / RigRenderer
+RigComponent(rigDef, animations) / play(animId) / setAttachment(slotId, styleId|null) · Flame component ไม่มี game logic
 
 ## Acceptance Criteria
-- [ ] สลับ cosmetic layer runtime ได้ (พิสูจน์ pathway สู่ Mochi Studio)
-- [ ] boiling line 8fps ไม่กิน perf (60fps คงที่บนเครื่อง mid-range)
+- [ ] ประกอบโมจิจากชิ้นส่วนได้ตรงกับภาพอ้างอิง (golden test)
+- [ ] เปลี่ยนอุปกรณ์ทุกช่องได้โดยไม่ต้องสร้าง component ใหม่
+- [ ] 60 fps บนเครื่อง Android ระดับกลาง ขณะมีโมจิ + มอน 3 + เพื่อนสัตว์ 3
+- [ ] rig/animation ทั้งหมดเป็น data (JSON) — เพิ่มท่าใหม่ไม่ต้องแก้โค้ด
+- [ ] ไม่มี import ข้าม module (render อย่างเดียว อ่าน state ผ่าน provider)
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล

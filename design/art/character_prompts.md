@@ -230,7 +230,16 @@ Create a sprite sheet of a cute cartoon animal companion in 8 frames, side view 
 
 ## 8. ส่งให้ Claude ตัด
 
-วางไฟล์ไว้ที่ `assets/raw/sheets/` ตามชื่อแผ่นในไฟล์นี้ แล้วบอก Claude — Claude จะ:
+วางไฟล์ไว้ที่ `assets/raw/sheets/` ตามชื่อแผ่นในไฟล์นี้ (หรือส่งภาพให้ Claude ในแชท) — เฟรมที่ตัดแล้วอยู่ที่ `assets/raw/frames/<ตัวละคร>/`
+
+เครื่องมือ: `tools/sprite_slicer/slice_sheet.py` — หาเฟรมจากช่องว่างพื้นหลังจริง (ไม่ต้องเป็นตารางเป๊ะ) แต่**เฟรมห้ามแตะกันเอง**
+```
+python3 -I tools/sprite_slicer/slice_sheet.py assets/raw/sheets/sheet_mochi_poses.png \
+  --cols 4 --rows 3 --align ground --out assets/raw/frames/mochi --names cat_mochi_idle,...
+```
+`--align ground` = ท่าตัวละคร (เท้าอยู่ระดับเดียวกัน) · `--align center` = ชิ้นส่วน rig, หน้า, ไอคอน
+
+Claude จะ:
 1. ตัดตาม grid → ลบพื้น magenta เป็นโปร่งใส (เก็บขอบเส้นให้เนียน)
 2. จัดทุกเฟรมของตัวเดียวกันให้ขนาด canvas เท่ากันและเท้าอยู่ระดับเดียวกัน
 3. ตั้งชื่อตาม Bible §7 → `assets/raw/` แล้วรัน QA checklist (Bible §6) ที่ตรวจด้วยโค้ดได้: พื้นโปร่งใสจริง, ไม่มี halo magenta, ขนาดตรงกัน

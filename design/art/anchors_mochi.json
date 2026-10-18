@@ -1,0 +1,28 @@
+{
+  "_doc": "GDD v0.5 plan A: full-body frames + gear attached at per-frame anchors. Coordinates are in each frame's own canvas px (assets/raw/frames/mochi2/*.png, ground-aligned). head = top of head between the ears (hat sits here), fp = front paw grip, bp = back paw grip, deg = weapon angle (0 = pointing up, clockwise +). neck/back are derived: neck = head + [20, 125], back = head + [-55, 150].",
+  "frames": {
+    "idle":         { "head": [225, 55], "fp": [290, 250], "fpDeg": 25,  "bp": null },
+    "walk_f1":      { "head": [235, 50], "fp": [305, 225], "fpDeg": 35,  "bp": null },
+    "walk_f2":      { "head": [235, 50], "fp": [293, 258], "fpDeg": 25,  "bp": null },
+    "walk_f3":      { "head": [225, 55], "fp": [310, 220], "fpDeg": 35,  "bp": null },
+    "dodge":        { "head": [191, 72], "fp": [288, 193], "fpDeg": -20, "bp": null },
+    "hurt":         { "head": [212, 54], "fp": [212, 193], "fpDeg": -10, "bp": null },
+    "victory":      { "head": [212, 46], "fp": [332, 97],  "fpDeg": 10,  "bp": [132, 114] },
+    "bare_warrior": { "head": [225, 45], "fp": [325, 185], "fpDeg": 60,  "bp": [172, 185] },
+    "bare_rogue":   { "head": [235, 65], "fp": [340, 220], "fpDeg": 80,  "bp": [220, 235], "bpDeg": 70 },
+    "bare_archer":  { "head": [225, 45], "fp": [337, 175], "fpDeg": 0,   "bp": [147, 182] },
+    "bare_mage":    { "head": [220, 45], "fp": [322, 97],  "fpDeg": 10,  "bp": null },
+    "bare_novice":  { "head": [210, 47], "fp": [340, 175], "fpDeg": 0,   "bp": null }
+  },
+  "gear": {
+    "_doc": "size = drawn height in frame px; grip = point in the item image (fraction of width/height) placed on the anchor",
+    "sword":  { "size": 150, "grip": [0.5, 0.82] },
+    "shield": { "size": 95,  "grip": [0.5, 0.5] },
+    "dagger": { "size": 95,  "grip": [0.5, 0.84] },
+    "bow":    { "size": 175, "grip": [0.62, 0.5] },
+    "staff":  { "size": 175, "grip": [0.5, 0.78] },
+    "hat":    { "size": 105, "grip": [0.55, 0.78], "width_note": "hat bottom rim sits a little below the head top" },
+    "scarf":  { "size": 85,  "grip": [0.4, 0.3] },
+    "bag":    { "size": 105, "grip": [0.6, 0.35] }
+  }
+}

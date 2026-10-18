@@ -1,0 +1,143 @@
+{
+  "_doc": "T-046 rig for two-legged Mochi. Coordinates are in each part's trimmed image (px at sheet scale). 'pivot' = joint the part rotates around; 'at' = where that pivot sits in the parent's image. Draw order is back to front. 'rest' = rest rotation in degrees (clockwise) applied before animation.",
+  "frames_dir": "assets/raw/frames/mochi2",
+  "parts": {
+    "torso": {
+      "parent": null,
+      "pivot": [
+        73,
+        104
+      ],
+      "at": [
+        0,
+        0
+      ]
+    },
+    "tail": {
+      "parent": "torso",
+      "pivot": [
+        158,
+        160
+      ],
+      "at": [
+        14,
+        140
+      ],
+      "rest": 0
+    },
+    "backarm": {
+      "parent": "torso",
+      "pivot": [
+        26,
+        24
+      ],
+      "at": [
+        70,
+        48
+      ],
+      "rest": 12
+    },
+    "backleg": {
+      "parent": "torso",
+      "pivot": [
+        36,
+        24
+      ],
+      "at": [
+        46,
+        158
+      ],
+      "rest": 6
+    },
+    "frontleg": {
+      "parent": "torso",
+      "pivot": [
+        76,
+        24
+      ],
+      "at": [
+        112,
+        158
+      ],
+      "rest": -4
+    },
+    "ears": {
+      "parent": "head",
+      "pivot": [
+        88,
+        100
+      ],
+      "at": [
+        108,
+        58
+      ]
+    },
+    "head": {
+      "parent": "torso",
+      "pivot": [
+        112,
+        158
+      ],
+      "at": [
+        92,
+        22
+      ]
+    },
+    "frontarm": {
+      "parent": "torso",
+      "pivot": [
+        94,
+        24
+      ],
+      "at": [
+        116,
+        52
+      ],
+      "rest": -12
+    }
+  },
+  "draw_order": [
+    "tail",
+    "backarm",
+    "backleg",
+    "frontleg",
+    "torso",
+    "frontarm",
+    "patch",
+    "ears",
+    "head"
+  ],
+  "attach": {
+    "_doc": "attach points in the part's own image px",
+    "weapon_front": {
+      "part": "frontarm",
+      "at": [
+        35,
+        135
+      ]
+    },
+    "weapon_back": {
+      "part": "backarm",
+      "at": [
+        100,
+        125
+      ]
+    },
+    "hat": {
+      "part": "head",
+      "at": [
+        100,
+        18
+      ]
+    }
+  },
+  "faces": {
+    "_doc": "face heads (sheet_mochi2_faces) are drawn larger than the head part; scale them by this factor and use the head pivot",
+    "scale": 0.729
+  },
+  "root_offset_from_ground": 209,
+  "status": "T-046 web prototype: assembles cleanly in idle/walk/4 class attacks/hurt/victory (2026-10-18). Awaiting YK feel check.",
+  "patch_radius": 26,
+  "torso_note": "torso replaced 2026-10-18 with side-view sheet_mochi2_torso (scaled \u00d70.52 to match other parts)",
+  "assembled_height": 470
+}

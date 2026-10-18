@@ -10,6 +10,9 @@ All frames of one sheet are written on the same canvas size:
   --align ground   feet on a shared ground line; jumps keep their height
                    above the row's lowest feet (poses, monsters, pets)
   --align center   centred (rig parts, faces, icons)
+  --align feet     each frame's main body (largest blob) stands on the ground
+                   line; loose bits like motion lines or crumbs don't lift it
+                   (monsters — use ground for poses that jump)
 
 Usage:
   python3 -I tools/sprite_slicer/slice_sheet.py SHEET.png --cols 4 --rows 3 \
@@ -202,7 +205,7 @@ def main() -> int:
     p.add_argument("--rows", type=int, required=True)
     p.add_argument("--names", required=True, help="comma-separated, left→right, top→bottom")
     p.add_argument("--out", required=True)
-    p.add_argument("--align", choices=["ground", "center"], default="center")
+    p.add_argument("--align", choices=["ground", "center", "feet"], default="center")
     args = p.parse_args()
 
     names = [n.strip() for n in args.names.split(",") if n.strip()]
@@ -238,13 +241,26 @@ def main() -> int:
             ys, xs = np.nonzero(mine & band)
             mask = np.zeros_like(solid)
             mask[y0:y1] = mine
-            row_frames.append([names[r * args.cols + c], mask,
-                               y0 + ys.min(), y0 + ys.max() + 1, xs.min(), xs.max() + 1])
-        row_bottom = max(f[3] for f in row_frames)
-        frames += [f + [row_bottom] for f in row_frames]
+            fr = [names[r * args.cols + c], mask, y0 + ys.min(), y0 + ys.max() + 1, xs.min(), xs.max() + 1]
+            if args.align == "feet":
+                sub = (mine & band)[:, xs.min():xs.max() + 1]
+                labels, _ = label_components(sub)
+                ids, counts = np.unique(labels[sub], return_counts=True)
+                body = labels == ids[np.argmax(counts)]
+                fr.append(y0 + np.nonzero(body.any(axis=1))[0].max() + 1)  # feet
+            row_frames.append(fr)
+        if args.align == "feet":
+            frames += row_frames  # each frame carries its own feet line
+        else:
+            row_bottom = max(f[3] for f in row_frames)
+            frames += [f + [row_bottom] for f in row_frames]
 
     max_w = max(f[5] - f[4] for f in frames)
-    if args.align == "ground":
+    if args.align == "feet":
+        above = max(f[6] - f[2] for f in frames)              # art above the feet line
+        below = max(max(0, f[3] - f[6]) for f in frames)      # bits hanging below it
+        max_h = above + below
+    elif args.align == "ground":
         max_h = max(f[6] - f[2] for f in frames)  # tallest art incl. lift above ground
     else:
         max_h = max(f[3] - f[2] for f in frames)
@@ -257,7 +273,9 @@ def main() -> int:
         canvas = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
         w, h = x1 - x0, y1 - y0
         left = (cw - w) // 2
-        if args.align == "ground":
+        if args.align == "feet":
+            top = ch - PAD - below - (row_bottom - y0)  # row_bottom holds this frame's feet
+        elif args.align == "ground":
             top = ch - PAD - (row_bottom - y0)
         else:
             top = (ch - h) // 2

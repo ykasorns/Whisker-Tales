@@ -17,3 +17,7 @@ build/
 # path-dependency packages don't commit a lockfile; the app does
 packages/*/pubspec.lock
 melos_*.iml
+
+# Python bytecode
+__pycache__/
+*.pyc

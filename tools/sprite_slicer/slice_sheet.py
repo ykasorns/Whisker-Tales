@@ -94,6 +94,107 @@ def merge_to(spans: list[list[int]], count: int) -> list[list[int]]:
     return spans
 
 
+def split_to(spans: list[list[int]], count: int, profile: np.ndarray, label: str) -> list[list[int]]:
+    """Split the widest span at its thinnest column until `count` spans exist.
+
+    Used when two frames touch. Warns with the number of art pixels the cut
+    goes through, so a bad cut can be checked or the sheet regenerated.
+    """
+    spans = [s[:] for s in spans]
+    while len(spans) < count:
+        i = max(range(len(spans)), key=lambda k: spans[k][1] - spans[k][0])
+        x0, x1 = spans[i]
+        lo, hi = x0 + (x1 - x0) // 4, x1 - (x1 - x0) // 4
+        cut = lo + int(np.argmin(profile[lo:hi]))
+        print(f"WARN {label}: frames touch — split at {cut} through {int(profile[cut])} art px")
+        spans[i:i + 1] = [[x0, cut], [cut, x1]]
+    return spans
+
+
+def label_components(mask: np.ndarray) -> tuple[np.ndarray, int]:
+    """8-connected component labels (0 = background), run-length union-find."""
+    h, w = mask.shape
+    labels = np.zeros((h, w), dtype=np.int32)
+    parent = [0]
+
+    def find(a: int) -> int:
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+
+    prev_runs: list[tuple[int, int, int]] = []
+    for y in range(h):
+        row = mask[y]
+        cur_runs = []
+        for x0, x1 in runs(row):
+            lab = 0
+            for px0, px1, plab in prev_runs:
+                if px0 <= x1 and x0 <= px1:  # touches incl. diagonals
+                    if lab == 0:
+                        lab = find(plab)
+                    else:
+                        a, b = find(lab), find(plab)
+                        if a != b:
+                            parent[max(a, b)] = min(a, b)
+                            lab = min(a, b)
+            if lab == 0:
+                parent.append(len(parent))
+                lab = len(parent) - 1
+            labels[y, x0:x1] = lab
+            cur_runs.append((x0, x1, lab))
+        prev_runs = cur_runs
+    roots = np.array([find(i) for i in range(len(parent))], dtype=np.int32)
+    return roots[labels], len(parent)
+
+
+def dilate(mask: np.ndarray, radius: int) -> np.ndarray:
+    out = mask.copy()
+    h, w = mask.shape
+    for dy in range(-radius, radius + 1):
+        for dx in range(-radius, radius + 1):
+            out[max(dy, 0):h + min(dy, 0), max(dx, 0):w + min(dx, 0)] |= \
+                mask[max(-dy, 0):h - max(dy, 0), max(-dx, 0):w - max(dx, 0)]
+    return out
+
+
+def assign_owners(band: np.ndarray, spans: list[list[int]], touching: bool) -> np.ndarray:
+    """Which frame (column index) owns each pixel of a row band.
+
+    By default a pixel belongs to the column span it sits in. When frames
+    touch, each separate blob of art moves whole to the frame holding most of
+    it, so a cape tip or sparkle that pokes past the cut stays with its frame.
+    Only art that is truly connected across the cut is split by column.
+    """
+    h, w = band.shape
+    col_owner = np.zeros(w, dtype=np.int32)
+    for i, (x0, x1) in enumerate(spans):
+        col_owner[x0:x1] = i
+    # Gaps between spans go to the nearer neighbour.
+    starts = np.array([s[0] for s in spans])
+    for x in range(w):
+        if not any(x0 <= x < x1 for x0, x1 in spans):
+            col_owner[x] = int(np.argmin(np.abs(starts - x)))
+    owner = np.broadcast_to(col_owner, (h, w)).copy()
+    if not touching:
+        return owner
+
+    labels, n = label_components(band)
+    moved = np.zeros_like(band)
+    for lab in np.unique(labels[band]):
+        comp = labels == lab
+        votes = np.bincount(owner[comp], minlength=len(spans))
+        best = int(np.argmax(votes))
+        if votes[best] >= 0.85 * comp.sum():
+            owner[comp] = best
+            moved |= comp
+    # Soft rims (below the solid threshold) follow the blob next to them.
+    for i in range(len(spans)):
+        near = dilate(moved & (owner == i), 3) & ~band
+        owner[near] = i
+    return owner
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("sheet")
@@ -121,32 +222,38 @@ def main() -> int:
         return 1
     row_spans = merge_to(row_spans, args.rows)
 
-    frames = []  # (name, y0, y1, x0, x1, row_bottom)
+    frames = []  # (name, mask over the whole sheet, y0, y1, x0, x1, row_bottom)
     for r, (y0, y1) in enumerate(row_spans):
         band = solid[y0:y1]
-        col_spans = runs(band.sum(axis=0))
-        if len(col_spans) < args.cols:
-            print(f"ERROR: row {r + 1} has {len(col_spans)} frames, expected {args.cols} — frames touch", file=sys.stderr)
-            return 1
+        profile = band.sum(axis=0)
+        col_spans = runs(profile)
+        touching = len(col_spans) < args.cols
+        if touching:
+            col_spans = split_to(col_spans, args.cols, profile, f"row {r + 1}")
         col_spans = merge_to(col_spans, args.cols)
+        owner = assign_owners(band, col_spans, touching)
         row_frames = []
-        for c, (x0, x1) in enumerate(col_spans):
-            ys = np.nonzero(band[:, x0:x1].any(axis=1))[0]
-            row_frames.append([names[r * args.cols + c], y0 + ys[0], y0 + ys[-1] + 1, x0, x1])
-        row_bottom = max(f[2] for f in row_frames)
+        for c in range(args.cols):
+            mine = owner == c
+            ys, xs = np.nonzero(mine & band)
+            mask = np.zeros_like(solid)
+            mask[y0:y1] = mine
+            row_frames.append([names[r * args.cols + c], mask,
+                               y0 + ys.min(), y0 + ys.max() + 1, xs.min(), xs.max() + 1])
+        row_bottom = max(f[3] for f in row_frames)
         frames += [f + [row_bottom] for f in row_frames]
 
-    max_w = max(f[4] - f[3] for f in frames)
+    max_w = max(f[5] - f[4] for f in frames)
     if args.align == "ground":
-        max_h = max(f[5] - f[1] for f in frames)  # tallest art incl. lift above ground
+        max_h = max(f[6] - f[2] for f in frames)  # tallest art incl. lift above ground
     else:
-        max_h = max(f[2] - f[1] for f in frames)
+        max_h = max(f[3] - f[2] for f in frames)
     cw, ch = max_w + 2 * PAD, max_h + 2 * PAD
     os.makedirs(args.out, exist_ok=True)
 
-    for name, y0, y1, x0, x1, row_bottom in frames:
+    for name, mask, y0, y1, x0, x1, row_bottom in frames:
         crop = rgba[y0:y1, x0:x1].copy()
-        crop[~solid[y0:y1, x0:x1] & (crop[..., 3] < 8)] = 0
+        crop[~mask[y0:y1, x0:x1]] = 0
         canvas = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
         w, h = x1 - x0, y1 - y0
         left = (cw - w) // 2

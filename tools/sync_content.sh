@@ -6,7 +6,8 @@ set -e
 cd "$(dirname "$0")/.."
 dest=app/assets/content
 rm -rf "$dest"
-mkdir -p "$dest/design/balance" "$dest/design/data"
+mkdir -p "$dest/design/balance" "$dest/design/data" "$dest/design/art"
 cp design/balance/idle_balance_v1.json "$dest/design/balance/"
 cp design/data/*.json "$dest/design/data/"
+cp design/art/anchors_mochi.json "$dest/design/art/"
 echo "synced $(ls "$dest/design/data" | wc -l | tr -d ' ') data files + balance into $dest"

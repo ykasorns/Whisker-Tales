@@ -4,6 +4,7 @@
 library wt_core;
 
 export 'src/ads/ads.dart';
+export 'src/avatar/avatar.dart';
 export 'src/cat/cat.dart';
 export 'src/combat/combat.dart';
 export 'src/gear/gear.dart';

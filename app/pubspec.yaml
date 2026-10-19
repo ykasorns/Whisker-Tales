@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   # flutter_localizations — added by T-004 alongside l10n.yaml + .arb files
+  flame: ^1.18.0
   flutter_riverpod: ^2.5.1
   hive_flutter: ^1.1.0
   wt_core:
@@ -29,4 +30,8 @@ flutter:
   assets:
     - assets/content/design/balance/
     - assets/content/design/data/
+    - assets/content/design/art/
+    # Sprites, copied from assets/raw by tools/sync_sprites.py (T-027)
+    - assets/game/cat/
+    - assets/game/gear/
   # generate: true — enabled by T-004 once l10n.yaml + .arb files exist

@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flame/game.dart';
+import 'package:whisker_tales/game_view.dart';
 import 'package:whisker_tales/main.dart';
 import 'package:wt_core/wt_core.dart';
 
@@ -40,5 +42,26 @@ void main() {
     await tester.pumpWidget(
         const BootErrorApp(message: 'design/data/skills.json\nbad'));
     expect(find.textContaining('design/data/skills.json'), findsOneWidget);
+  });
+
+  testWidgets('the game area loads Mochi with the worn gear', (tester) async {
+    final content = await ContentRepository(DiskSource()).loadAll();
+    final container = ProviderContainer(overrides: [
+      ...content.overrides,
+      saveServiceProvider.overrideWithValue(SaveService(MemorySaveStore())),
+    ]);
+    addTearDown(container.dispose);
+    await tester.runAsync(() async {
+      await tester.pumpWidget(UncontrolledProviderScope(
+          container: container,
+          child: WhiskerTalesApp(avatarRules: content.avatar)));
+      await Future<void>.delayed(const Duration(seconds: 2));
+    });
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(tester.takeException(), isNull);
+    final game = tester
+        .widget<GameWidget<MochiGame>>(find.byType(GameWidget<MochiGame>))
+        .game!;
+    expect(game.mochi.anim, 'walk');
   });
 }

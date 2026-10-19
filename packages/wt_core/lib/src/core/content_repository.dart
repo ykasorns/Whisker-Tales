@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../ads/ads.dart';
+import '../avatar/avatar.dart';
 import '../cat/cat.dart';
 import '../combat/combat.dart';
 import '../gear/gear.dart';
@@ -40,6 +41,7 @@ class GameContent {
     required this.offline,
     required this.buffs,
     required this.skills,
+    required this.avatar,
   });
 
   final CombatRules combat;
@@ -52,6 +54,9 @@ class GameContent {
   final OfflineRules offline;
   final BuffBook buffs;
   final SkillBook skills;
+
+  /// Mochi anchors + gear grips (T-027) — used by the app's AvatarComponent.
+  final AvatarRules avatar;
 
   /// Provider overrides for `ProviderScope` / `ProviderContainer`.
   List<Override> get overrides => [
@@ -85,6 +90,7 @@ class ContentRepository {
     'design/data/gear_slots.json': 1,
     'design/data/wardrobe.json': 1,
     'design/data/road_events.json': 1,
+    'design/art/anchors_mochi.json': 1,
   };
 
   Future<GameContent> loadAll() async {
@@ -121,6 +127,20 @@ class ContentRepository {
         () => SkillBook.fromJson(json['design/data/skills.json']!, buffs));
     final wardrobe = parse('design/data/wardrobe.json',
         () => WardrobeRules.fromJson(json['design/data/wardrobe.json']!));
+    final avatar = parse('design/art/anchors_mochi.json',
+        () => AvatarRules.fromJson(json['design/art/anchors_mochi.json']!));
+    for (final art in {
+      ...wardrobe.weaponArt.values,
+      ...wardrobe.offHandArt.values,
+      'hat',
+      'scarf',
+      'bag',
+    }) {
+      if (!avatar.gear.containsKey(art)) {
+        throw ContentError(
+            'design/art/anchors_mochi.json', 'gear has no "$art"');
+      }
+    }
     final road = parse(
         'design/data/road_events.json',
         () =>
@@ -169,6 +189,7 @@ class ContentRepository {
       offline: offline,
       buffs: buffs,
       skills: skills,
+      avatar: avatar,
     );
   }
 

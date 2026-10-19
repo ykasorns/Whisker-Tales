@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wt_core/wt_core.dart';
 
+import 'game_view.dart';
 import 'modes.dart';
 
 /// Reads game data from the app bundle (copied by tools/sync_content.sh).
@@ -31,14 +32,18 @@ Future<void> main() async {
     ]);
     await container.read(gameSaverProvider).load();
     runApp(UncontrolledProviderScope(
-        container: container, child: const WhiskerTalesApp()));
+        container: container,
+        child: WhiskerTalesApp(avatarRules: content.avatar)));
   } on ContentError catch (e) {
     runApp(BootErrorApp(message: '${e.file}\n${e.message}'));
   }
 }
 
 class WhiskerTalesApp extends ConsumerStatefulWidget {
-  const WhiskerTalesApp({super.key});
+  const WhiskerTalesApp({super.key, this.avatarRules});
+
+  /// Null in tests that don't load sprites.
+  final AvatarRules? avatarRules;
 
   @override
   ConsumerState<WhiskerTalesApp> createState() => _WhiskerTalesAppState();
@@ -74,7 +79,9 @@ class _WhiskerTalesAppState extends ConsumerState<WhiskerTalesApp> {
             children: [
               Expanded(
                 flex: (AppLayout.gameViewportRatio * 100).round(),
-                child: const ColoredBox(color: Colors.black12),
+                child: widget.avatarRules == null
+                    ? const ColoredBox(color: Colors.black12)
+                    : GameView(avatarRules: widget.avatarRules!),
               ),
               Expanded(
                 flex: (AppLayout.uiPanelRatio * 100).round(),

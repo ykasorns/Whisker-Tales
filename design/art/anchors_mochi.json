@@ -1,4 +1,5 @@
 {
+ "schema_version": 1,
  "_doc": "GDD v0.5.1 plan A + D-012 fit: full-body frames + gear on per-frame anchors, in each frame's own canvas px (assets/raw/frames/mochi2). head = top of skull; hat = offset from head where the hat grip goes, hatDeg = head tilt; fp/bp = front/back paw grip, fpDeg/bpDeg = weapon angle (0 = up, clockwise +); neck = scarf loop centre; chin = line [back-of-head point, chin point]; back = bag point (default head + [-55, 150]); fpBehind = weapon goes behind the body; occluders = extra polygons of the cat drawn again over gear.",
  "frames": {
   "idle": {
@@ -486,6 +487,8 @@
   ],
   "paw_radius": 20,
   "hat_scale": 1.05,
-  "scarf_scale": 0.85
+  "scarf_scale": 0.85,
+  "ground_pad_px": 12,
+  "_doc_ground": "frames are bottom-padded by the slicer (PAD): feet sit ground_pad_px above the canvas bottom"
  }
 }

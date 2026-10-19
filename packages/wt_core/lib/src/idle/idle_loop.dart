@@ -17,10 +17,11 @@ class IdleHooks {
     this.onWaveCleared,
     this.onBossEnded,
     this.canAutoChallenge,
+    this.adjustReward,
   });
 
-  /// The cat starts walking to the next fight.
-  final void Function()? onWalkBetweenWaves;
+  /// The cat starts walking to the next fight on the farm page.
+  final void Function(int page)? onWalkBetweenWaves;
   final void Function(int page, int waveIndex)? onWaveCleared;
 
   /// A boss fight ended; it counts as one wave of event duration.
@@ -28,6 +29,9 @@ class IdleHooks {
 
   /// AUTO boss waits while this is false (e.g. a debuff is active).
   final bool Function()? canAutoChallenge;
+
+  /// Changes a wave's reward (e.g. a rainbow doubles yarn). Online only.
+  final RewardBundle Function(RewardBundle)? adjustReward;
 }
 
 /// The main idle loop (GDD v0.4 §2, v0.5.2 §9): walk → wave → walk … on the
@@ -196,7 +200,7 @@ class IdleLoop implements IIdleLoop {
   void _walk() {
     _phase = IdlePhase.walking;
     _phaseLeftMs = rules.walkMs;
-    hooks.onWalkBetweenWaves?.call();
+    hooks.onWalkBetweenWaves?.call(_farmPage);
   }
 
   void _rest() {
@@ -301,7 +305,8 @@ class IdleLoop implements IIdleLoop {
 
   void _finishWave() {
     final page = _farmPage, index = _waveIndex;
-    final reward = _pay(page);
+    final paid = _pay(page);
+    final reward = hooks.adjustReward?.call(paid) ?? paid;
     _waveIndex++;
     _attempt = 0;
     _lossStreak = 0;

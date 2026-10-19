@@ -125,6 +125,12 @@ void main() {
     final c = ProviderContainer(overrides: [
       combatRulesProvider.overrideWithValue(combat),
       catRulesProvider.overrideWithValue(CatRules.fromBalance(balance)),
+      roadEventRulesProvider.overrideWithValue(RoadEventRules.fromJson(
+          jsonDecode(File('../../design/balance/idle_balance_v1.json')
+              .readAsStringSync()) as Map<String, dynamic>,
+          jsonDecode(
+                  File('../../design/data/road_events.json').readAsStringSync())
+              as Map<String, dynamic>)),
       idleRulesProvider.overrideWithValue(IdleRules.fromBalance(balance)),
       gearRulesProvider.overrideWithValue(gearRules),
       wardrobeRulesProvider.overrideWithValue(rules),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../cat/cat.dart';
 import '../combat/combat.dart';
 import 'clock/game_clock.dart';
+import 'contracts/ads.dart';
 import 'contracts/combat.dart';
 import 'contracts/idle_loop.dart';
 import 'contracts/rewards.dart';
@@ -127,16 +128,18 @@ final incomeModelProvider = Provider<IncomeModel>((ref) => IncomeModel(
 /// to [catProgressProvider] here.
 final Provider<IdleLoop> idleLoopProvider = Provider<IdleLoop>((ref) {
   final weights = ref.watch(combatRulesProvider).powerWeights;
+  final road = ref.watch(roadEventsProvider);
   final loop = IdleLoop(
     rules: ref.watch(idleRulesProvider),
     income: ref.watch(incomeModelProvider),
     engineFactory: ref.watch(combatEngineFactoryProvider),
-    catSpec: () => ref
+    catSpec: () => road.apply(ref
         .read(catClassProvider)
-        .combatSpec(extra: ref.read(catExtraStatsProvider)()),
+        .combatSpec(extra: ref.read(catExtraStatsProvider)())),
     hpWeightPm: weights.hpPm,
     atkWeightPm: weights.atkPm,
     seed: ref.watch(idleSeedProvider),
+    hooks: road.hooks,
   );
   final sub = loop.events.listen((e) {
     final (reward, exp) = switch (e) {
@@ -163,3 +166,25 @@ final Provider<Wardrobe> wardrobeProvider = Provider<Wardrobe>((ref) =>
     Wardrobe(ref.watch(wardrobeRulesProvider),
         equipped: (slot) => ref.read(gearBasketProvider).equipped(slot),
         clearedPage: () => ref.read(idleLoopProvider).state.clearedPage));
+
+/// Rewarded ads (T-039). Until the ads module lands nothing can be watched.
+final adServiceProvider = Provider<IAdService>(
+    (ref) => throw UnimplementedError('ads module (T-039) not wired yet'));
+
+/// Road-event numbers + events (`road_events`, `road_events.json`).
+/// Overridden at boot with the loaded rules (T-003).
+final roadEventRulesProvider = Provider<RoadEventRules>(
+    (ref) => throw UnimplementedError('override with loaded RoadEventRules'));
+
+/// Road events (T-048) — plugged into the idle loop's hooks.
+final roadEventsProvider = Provider<RoadEvents>((ref) {
+  final r = RoadEvents(
+    rules: ref.watch(roadEventRulesProvider),
+    idleRules: ref.watch(idleRulesProvider),
+    wallet: ref.watch(walletProvider),
+    ads: () => ref.read(adServiceProvider),
+    seed: ref.watch(idleSeedProvider),
+  );
+  ref.onDispose(r.dispose);
+  return r;
+});

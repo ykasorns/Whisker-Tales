@@ -244,7 +244,7 @@ void main() {
       final l = loop(
           spec: () => strong,
           hooks: IdleHooks(
-            onWalkBetweenWaves: () => walks++,
+            onWalkBetweenWaves: (_) => walks++,
             onWaveCleared: (_, __) => waves++,
             onBossEnded: (_) => bosses++,
           ))
@@ -293,6 +293,12 @@ void main() {
     final c = ProviderContainer(overrides: [
       combatRulesProvider.overrideWithValue(combat),
       catRulesProvider.overrideWithValue(cat),
+      roadEventRulesProvider.overrideWithValue(RoadEventRules.fromJson(
+          jsonDecode(File('../../design/balance/idle_balance_v1.json')
+              .readAsStringSync()) as Map<String, dynamic>,
+          jsonDecode(
+                  File('../../design/data/road_events.json').readAsStringSync())
+              as Map<String, dynamic>)),
       idleRulesProvider.overrideWithValue(rules),
       catExtraStatsProvider
           .overrideWithValue(() => StatBlock(hp: 100000, atk: 100000, def: 0)),

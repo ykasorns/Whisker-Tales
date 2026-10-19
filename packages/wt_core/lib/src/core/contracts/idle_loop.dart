@@ -133,3 +133,58 @@ abstract class IIncomeModel {
   /// Waves cleared per minute of farming.
   double get wavesPerMinute;
 }
+
+/// Good or bad road event (GDD v0.5.2 §9.2).
+enum RoadEventKind { good, bad }
+
+/// A road event in effect. [wavesLeft] counts down per wave cleared and per
+/// boss fight; it never counts real time.
+class ActiveRoadEvent {
+  const ActiveRoadEvent({
+    required this.uid,
+    required this.eventId,
+    required this.kind,
+    required this.wavesLeft,
+    this.boosted = false,
+  });
+
+  /// Unique per occurrence (the same event can come back later).
+  final String uid;
+  final String eventId;
+  final RoadEventKind kind;
+  final int wavesLeft;
+
+  /// Made longer with a rewarded ad.
+  final bool boosted;
+}
+
+sealed class RoadEventNews {
+  const RoadEventNews();
+}
+
+class RoadEventStarted extends RoadEventNews {
+  const RoadEventStarted(this.event);
+  final ActiveRoadEvent event;
+}
+
+enum RoadEventEndReason { wornOff, cleansed }
+
+class RoadEventEnded extends RoadEventNews {
+  const RoadEventEnded(this.event, this.reason);
+  final ActiveRoadEvent event;
+  final RoadEventEndReason reason;
+}
+
+/// Road events (GDD v0.5.2 §9.2–9.3). Owner: `idle_loop` (T-048).
+abstract class IRoadEvents {
+  List<ActiveRoadEvent> get active;
+  Stream<RoadEventNews> get news;
+
+  /// Watches a `road_event` ad to make a good event last longer. Returns
+  /// false when no ad was watched (cap, Supporter Pack, skipped).
+  Future<bool> boostWithAd(String uid);
+
+  /// Watches a `road_event` ad to end a bad event now. A bad event always
+  /// wears off by itself too.
+  Future<bool> cleanseWithAd(String uid);
+}

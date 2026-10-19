@@ -139,3 +139,11 @@ A-1 ต้องเสร็จก่อน T-027 / A-2–A-6 ทยอยส่
 | HOLD_T-047 dungeon | mode_dungeon | T-031, T-044, T-045 | v1.1 |
 
 - **Gate 2 (Idle Loop Playable)** เพิ่ม: T-044, T-027 (โมจิประกอบจาก rig + เลือกคลาสได้)
+
+---
+
+## Amendment v2.2 — Frame avatar instead of rig (D-005, 2026-10-18)
+
+- T-046 → `done/` (ผลทดสอบ: ใช้ท่าเต็มตัว + จุดยึด)
+- T-027 เขียนใหม่: module `avatar` · Depends T-001, T-045
+- T-045 amend: skin + ช่องที่ไม่เห็นบนตัว

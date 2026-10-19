@@ -1,6 +1,7 @@
 # GAME_CONTRACT.md — Whisker Tales 🐱📖
 
-**Version:** 2.1 | **อ้างอิง:** GDD_WhiskerTales_v0.5.md + v0.4.md + MODE_PLUGIN_SPEC.md (+ GDD v0.3 สำหรับโหมดท้าทายนิทาน)
+**Version:** 2.2 | **อ้างอิง:** GDD_WhiskerTales_v0.5.md + v0.4.md + MODE_PLUGIN_SPEC.md (+ GDD v0.3 สำหรับโหมดท้าทายนิทาน)
+> **v2.2 (D-005, 2026-10-18):** module `rig` เปลี่ยนเป็น **`avatar`** — frame animation ท่าเต็มตัว + อุปกรณ์ติดตามจุดยึดต่อเฟรม (ไม่ใช่ skeletal rig) · save `wardrobe` เพิ่ม `skin`
 > **v2.1 (D-004, 2026-10-18):** §3 เพิ่ม module `cat_class`, `wardrobe`, `rig` · `combat` ไม่มี input ระหว่างสู้ (idle ล้วน) · §4.6 Save v3 เพิ่ม `cat`, `wardrobe`, `gear.stash`, `gear.unlocked_slots`, `settings.speed`
 > **v2.0 (D-002, 2026-10-12, YK approved · Advisor review pending):** pivot เป็น idle RPG — §2 เพิ่ม `tools/` · §3 เพิ่ม module `idle_loop` `offline_reward` `gear_basket` `pets` `research` `ads` `age_gate` + `combat` เป็น deterministic sim + buff engine · §4.4 save schema v3 + conflict rule ใหม่ + กฎนาฬิกา · §4.5 effect vocabulary → buff action/hook · §5 อนุญาต rewarded ads แบบมีเงื่อนไข
 > **v1.2 (D-001):** แก้ §2/§3 ให้ตรงกับ layout monorepo ที่ v1.1 ประกาศไว้จริง — `lib/` single-app เดิมเลิกใช้ เปลี่ยนเป็น `packages/wt_core` (module ทั้งหมดย้ายมาที่ `lib/src/<module>/` + barrel `lib/wt_core.dart`) + `packages/wt_mode_*` + `app/`
@@ -82,7 +83,7 @@ whisker_tales/
 | `ads` | `packages/wt_core/lib/src/ads/` | `AdService` interface + fake impl, placement registry จาก JSON, **daily cap รวม/ต่อจุด (บังคับที่นี่ที่เดียว)**, โหมด non-personalized ตาม age band | core, save |
 | `cat_class` | `packages/wt_core/lib/src/cat/` | เลเวล/EXP แมว, คลาส (เลือก Lv10, ขั้น 2 Lv40), ตัวคูณ stat คลาส, ปลดสกิลตามเลเวล (GDD v0.5 §3) | core, combat |
 | `wardrobe` | `packages/wt_core/lib/src/wardrobe/` | แบบ (style) ที่ปลดแล้ว, หน้าตาที่เลือกต่อช่อง, สมุดสะสม, แบบจาก IAP (GDD v0.5 §4.2) | core, save |
-| `rig` | `packages/wt_core/lib/src/rig/` | rig runtime: ชิ้นส่วน + pivot + attach point + keyframe JSON, ติดชิ้นอุปกรณ์ตามหน้าตาที่เลือก (GDD v0.5 §2) — render อย่างเดียว ไม่มี game logic | core |
+| `avatar` | `packages/wt_core/lib/src/avatar/` | ตัวละครแมว: frame animation ท่าเต็มตัว (ตาม skin) + วางอุปกรณ์ที่เห็นบนตัวตามจุดยึดต่อเฟรม (`anchors_*.json`) (GDD v0.5.1 §2) — render อย่างเดียว ไม่มี game logic | core |
 | `age_gate` | `packages/wt_core/lib/src/age/` | age screen เป็นกลางตอนเปิดครั้งแรก → age band (`under13` / `13plus`) | core, save |
 | `item_synergy` | `packages/wt_core/lib/src/items/` | relic/potion, synergy resolver (อ่าน relics.json) | core, combat |
 | `talent_system` | `packages/wt_core/lib/src/talents/` | XP/level, talent pick, effect resolver (อ่าน talents.json) | core, combat |
@@ -159,7 +160,7 @@ whisker_tales/
   "idle": { "cleared_page": 0, "book": 1 },
   "gear": { "slots": [{ "item": null, "level": 0 }], "unlocked_slots": ["weapon", "hat", "shirt", "shoes"], "stash": { "slot_id": "item" }, "basket": { "level": 1, "exp": 0, "pity": 0 }, "auto_craft": { "on": false, "better": "stash | equip" } },
   "cat": { "level": 1, "exp": 0, "class": "novice", "tier": 0 },
-  "wardrobe": { "unlocked": ["style_id"], "chosen": { "slot_id": "style_id" } },
+  "wardrobe": { "unlocked": ["style_id"], "chosen": { "slot_id": "style_id" }, "skin": "base", "skins_unlocked": ["base"] },
   "pets": { "owned": { "pet_id": { "stars": 1, "level": 1 } }, "deployed": [], "pity": 0 },
   "research": { "levels": { "node_id": 0 }, "task": { "node": "node_id", "ends_at_utc": "ISO8601" } },
   "daily": { "date_key": "2026-10-12", "ads_used": { "pet_hatch": 0 }, "ads_total": 0, "fish_pulls": 0 },

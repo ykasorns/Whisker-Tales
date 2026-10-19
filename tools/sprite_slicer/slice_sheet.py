@@ -221,8 +221,7 @@ def main() -> int:
 
     row_spans = runs(solid.sum(axis=1))
     if len(row_spans) < args.rows:
-        print(f"ERROR: found {len(row_spans)} rows, expected {args.rows} — frames overlap vertically", file=sys.stderr)
-        return 1
+        row_spans = split_to(row_spans, args.rows, solid.sum(axis=1), "rows")
     row_spans = merge_to(row_spans, args.rows)
 
     frames = []  # (name, mask over the whole sheet, y0, y1, x0, x1, row_bottom)

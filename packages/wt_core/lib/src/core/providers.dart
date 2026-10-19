@@ -8,6 +8,7 @@ import 'contracts/idle_loop.dart';
 import 'contracts/rewards.dart';
 import '../gear/gear.dart';
 import '../idle/idle.dart';
+import '../wardrobe/wardrobe.dart';
 import 'contracts/wallet.dart';
 import 'wallet/memory_wallet.dart';
 import 'state/game_state.dart';
@@ -105,6 +106,7 @@ final Provider<GearBasket> gearBasketProvider = Provider<GearBasket>((ref) {
     clearedPage: () => ref.read(idleLoopProvider).state.clearedPage,
     powerOf: power.of,
     seed: ref.watch(idleSeedProvider) ^ 0x6EA2,
+    unlockStyle: (id) => ref.read(wardrobeProvider).unlock(id),
   );
 });
 
@@ -151,3 +153,13 @@ final Provider<IdleLoop> idleLoopProvider = Provider<IdleLoop>((ref) {
   });
   return loop;
 });
+
+/// Wardrobe catalog (`design/data/wardrobe.json`). Overridden at boot (T-003).
+final wardrobeRulesProvider = Provider<WardrobeRules>(
+    (ref) => throw UnimplementedError('override with loaded WardrobeRules'));
+
+/// Looks, collection book and skins (T-045). Reads gear lazily.
+final Provider<Wardrobe> wardrobeProvider = Provider<Wardrobe>((ref) =>
+    Wardrobe(ref.watch(wardrobeRulesProvider),
+        equipped: (slot) => ref.read(gearBasketProvider).equipped(slot),
+        clearedPage: () => ref.read(idleLoopProvider).state.clearedPage));

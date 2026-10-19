@@ -299,6 +299,8 @@ void main() {
       catRulesProvider.overrideWithValue(CatRules.fromBalance(b)),
       idleRulesProvider.overrideWithValue(IdleRules.fromBalance(b)),
       gearRulesProvider.overrideWithValue(rules),
+      wardrobeRulesProvider.overrideWithValue(
+          WardrobeRules.fromJson(_json('../../design/data/wardrobe.json'))),
     ]);
     addTearDown(c.dispose);
     final loop = c.read(idleLoopProvider)..autoBoss = true;

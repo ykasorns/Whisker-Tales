@@ -17,3 +17,7 @@ AvatarComponent(skinId, anchors) / play(animId) / setGear(slotId, styleId|null) 
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment D-012 (2026-10-19)
+วาดอุปกรณ์ตาม `anchors_mochi.json → render_order` (ไม่ใช่แปะทับ): ของหลังตัว → แมว → ผ้าพันคอ + วาดแมวซ้ำเหนือเส้น `chin` และใน `occluders` → หมวกที่ `head + hat` หมุน `hatDeg` → อาวุธ + วาดแมวซ้ำในวงกลม `paw_radius` รอบ `fp` · `fpBehind` = อาวุธหลังตัว · ภาพที่จะวาดต่อช่องมาจาก `Wardrobe.lookFor(slot, classId)` / `offHandFor(classId)` (T-045) · อ้างอิงการทำงาน: เว็บต้นแบบ v13 `drawMochiA` + `tools/gear_fit/render.py`

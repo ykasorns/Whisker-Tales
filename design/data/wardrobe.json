@@ -1,0 +1,13 @@
+{
+  "_doc": "GDD v0.5.1 §4.2 (T-045, D-012) — แบบ (style) = '{slot}_{tier}' ปลดเมื่อถักได้ชิ้นแบบนั้นครั้งแรก · tier 1 = ขาว/เขียว, 2 = ฟ้า/ม่วง, 3 = ทอง/รุ้ง · on_body = ช่องที่เห็นบนตัว (ภาพ gear_*), ช่องอื่นเป็นไอคอน (icon_*) · อาวุธเลือกภาพตามคลาส (weapon_art) · skin = ชุดท่าเต็มตัวทั้งชุด · iap = ของตกแต่งที่ปลดด้วยการซื้อ (ไม่มีผลต่อพลัง, ผ่าน parental gate)",
+  "schema_version": 1,
+  "tiers": 3,
+  "on_body": ["weapon", "hat", "scarf", "bag"],
+  "weapon_art": { "novice": "sword", "warrior": "sword", "rogue": "dagger", "archer": "bow", "mage": "staff" },
+  "off_hand_art": { "warrior": "shield", "rogue": "dagger" },
+  "skins": [
+    { "id": "base", "default": true },
+    { "id": "adventurer", "unlock": "cleared_page", "value": 10 }
+  ],
+  "iap": {}
+}

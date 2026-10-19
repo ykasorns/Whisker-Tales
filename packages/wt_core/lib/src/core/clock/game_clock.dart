@@ -37,6 +37,27 @@ class ClockState {
   /// Local calendar date `yyyy-MM-dd` of the last daily reset.
   final String dateKey;
 
+  Map<String, dynamic> toJson() => {
+        'last_seen_utc': lastSeenUtc.toUtc().toIso8601String(),
+        'max_seen_utc': maxSeenUtc.toUtc().toIso8601String(),
+        'date_key': dateKey,
+      };
+
+  /// [json] = Save v3 `clock` block; [dateKey] comes from `daily.date_key`.
+  factory ClockState.fromJson(Map<String, dynamic> json, String dateKey) {
+    DateTime t(String k) {
+      final v = json[k];
+      final d = v is String ? DateTime.tryParse(v) : null;
+      if (d == null) throw FormatException('clock: "$k" must be an ISO date');
+      return d.toUtc();
+    }
+
+    return ClockState(
+        lastSeenUtc: t('last_seen_utc'),
+        maxSeenUtc: t('max_seen_utc'),
+        dateKey: dateKey);
+  }
+
   @override
   bool operator ==(Object other) =>
       other is ClockState &&
@@ -127,6 +148,15 @@ class GameClock {
 
   /// Records that the player is present now (on pause/save).
   void markSeen() => _lastSeenUtc = effectiveNow;
+
+  /// Loads the saved clock on this device (T-022): `last_seen` and
+  /// `date_key` come from the save (so the offline window and a missed
+  /// daily reset are seen on the next [tick]); `max_seen` never goes down.
+  void restore(ClockState saved) {
+    _lastSeenUtc = saved.lastSeenUtc;
+    _maxSeenUtc = _later(_maxSeenUtc, saved.maxSeenUtc);
+    _dateKey = saved.dateKey;
+  }
 
   /// Merges a clock restored from another device's cloud save: every field
   /// takes the later value, so an offline window or a daily reset can never

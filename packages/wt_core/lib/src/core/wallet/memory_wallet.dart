@@ -18,6 +18,13 @@ class MemoryWallet implements IWallet {
     return true;
   }
 
+  /// Replaces every balance (save restore).
+  void setBalances(Map<Currency, int> balances) {
+    _b
+      ..clear()
+      ..addAll(balances);
+  }
+
   @override
   void add(RewardBundle reward) {
     for (final e in reward.amounts.entries) {

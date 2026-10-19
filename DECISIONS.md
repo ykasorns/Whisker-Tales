@@ -181,3 +181,12 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 3. dot = ดาเมจจริง (ไม่หัก DEF) คิดจาก ATK ผู้ใส่ตอนใส่ · โล่ดูดก่อน HP · on_event/add_buff ลึกสุด 4 ชั้น (กัน loop)
 4. บัฟความเร็วตีมีผลจากการตีครั้งถัดไป
 5. หนี้: PowerScore + balance sim ยังไม่นับสกิล (T-029)
+
+---
+
+## D-016 (2026-10-19) — Opus — local save (T-022)
+
+1. เซฟ 2 ช่องสลับกัน (`save_a`/`save_b`) + generation + checksum — atomic โดยไม่ต้องพึ่ง rename ของระบบไฟล์ · โหลดช่องใหม่สุดที่ checksum ผ่าน
+2. `GameSaver` อยู่ชั้น wiring (เหมือน `providers.dart`) — ที่เดียวที่รู้จักทุกโมดูล · โมดูลมีแค่ toJson/restore
+3. section ที่ยังไม่มีโมดูลเจ้าของ (pets, research, age, modes, settings) ถือผ่านไม่เปลี่ยน
+4. โหลด = เปิดแอป → `clock.tick()` ทันที

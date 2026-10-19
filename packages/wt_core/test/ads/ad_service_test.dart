@@ -167,8 +167,9 @@ void main() {
       for (final f in dir.listSync(recursive: true).whereType<File>()) {
         if (!f.path.endsWith('.dart') || f.path.contains('/src/ads/')) continue;
         if (f.path.endsWith('wt_core.dart') ||
-            f.path.endsWith('providers.dart')) {
-          continue; // barrel export + the one wiring point
+            f.path.endsWith('providers.dart') ||
+            f.path.endsWith('game_save.dart')) {
+          continue; // barrel export + the wiring layer (no network calls)
         }
         final src = f.readAsStringSync();
         if (src.contains('google_mobile_ads') ||

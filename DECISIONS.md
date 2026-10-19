@@ -190,3 +190,14 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 2. `GameSaver` อยู่ชั้น wiring (เหมือน `providers.dart`) — ที่เดียวที่รู้จักทุกโมดูล · โมดูลมีแค่ toJson/restore
 3. section ที่ยังไม่มีโมดูลเจ้าของ (pets, research, age, modes, settings) ถือผ่านไม่เปลี่ยน
 4. โหลด = เปิดแอป → `clock.tick()` ทันที
+
+---
+
+## D-017 (2026-10-19) — YK — ลง Google Play อย่างเดียว (ไม่ทำ iOS / App Store)
+
+**ที่มา:** เครื่อง YK พื้นที่ไม่พอติดตั้ง Xcode (~10–15 GB) และ YK ตัดสินใจขึ้น Google Play อย่างเดียว
+
+1. แพลตฟอร์ม = **Android เท่านั้น** · ลบ `app/ios/` · applicationId `com.whiskertales.whisker_tales` (เปลี่ยนได้ก่อนขึ้น Play)
+2. cloud save = Play Games Services อย่างเดียว (T-023) · IAP = Google Play Billing ผ่าน `in_app_purchase` (T-025)
+3. compliance เหลือฝั่ง Google: Families policy, Data Safety, Target audience, ad SDK ใน Families self-certified list (ไม่มี App Store Privacy Label / ATT)
+4. T-001 AC "iOS build" ตัดออก → ผ่านด้วย Android build · ถ้าวันหน้าจะทำ iOS: โค้ด Flutter ใช้ร่วมได้ → `flutter create --platforms=ios` + build บน Mac คลาวด์ (Codemagic/GitHub Actions) ไม่ต้องลง Xcode ในเครื่อง

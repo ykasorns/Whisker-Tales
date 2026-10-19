@@ -33,3 +33,16 @@ class AppLayout { static const gameViewportRatio = 0.60; } — อยู่ใ�
 - ไม่ได้รัน `flutter analyze` / `flutter test` — ไม่ยืนยัน 0 issue และ test เขียวจริง
 
 **ข้อเสนอ:** ติดตั้ง toolchain แล้วรัน `flutter create --platforms=ios,android .` ใน `app/`, ตามด้วย `flutter pub get && flutter analyze && flutter test` ทั้ง workspace — ผ่านครบค่อยย้ายเข้า `review/`
+
+## Progress note 2 (2026-10-19)
+- `flutter create --platforms=android,ios --org com.whiskertales` ใน `app/` → `app/android/`, `app/ios/` (applicationId / bundle id = `com.whiskertales.whisker_tales` — เปลี่ยนได้ก่อนขึ้นสโตร์) · ลบไฟล์ตัวอย่าง (widget_test, README)
+- ✅ `flutter build apk --debug` ผ่าน (`app/build/app/outputs/flutter-apk/app-debug.apk`) · ✅ `flutter test` + `flutter analyze` ผ่านทั้ง wt_core / wt_mode_story / app
+- ⚠️ เตือน: plugin `games_services` ใช้ Kotlin Gradle Plugin แบบเก่า — Flutter รุ่นหน้าจะ build ไม่ผ่าน → ต้องอัปเกรดหรือเปลี่ยนตอนทำ T-023
+- ❌ iOS: เครื่องไม่มี Xcode เต็ม (มีแค่ Command Line Tools) + ไม่มี CocoaPods → build/รัน iOS ไม่ได้ — YK ต้องติดตั้ง Xcode จาก App Store แล้วรัน `sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer` และ `sudo xcodebuild -runFirstLaunch` และติดตั้ง CocoaPods
+- ไม่มี Android emulator (AVD) บนเครื่อง → ยังไม่ได้รันบนเครื่องจำลอง · ติดตั้ง APK ลงมือถือ Android จริงได้
+- การ์ดยังอยู่ doing/ จนกว่า iOS build ผ่าน
+
+## ส่งงาน (2026-10-19) — D-017: Android อย่างเดียว
+- AC "build iOS" ตัดออกตาม D-017 (YK ลง Google Play อย่างเดียว) · ลบ `app/ios/`
+- ✅ โครง monorepo ตาม contract §2 · ✅ `app/` อ้าง wt_core ผ่าน path dep + lint `implementation_imports: error` · ✅ `flutter build apk --debug` ผ่าน · ✅ `flutter test` + `flutter analyze` 0 issue ทั้ง wt_core / wt_mode_story / app
+- หนี้: `games_services` ใช้ Kotlin Gradle Plugin แบบเก่า (เตือนตอน build) → แก้ใน T-023 · ยังไม่มี Android emulator บนเครื่อง YK (สร้างได้ใน Android Studio → Device Manager หรือใช้มือถือจริง)

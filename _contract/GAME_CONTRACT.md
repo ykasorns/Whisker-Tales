@@ -89,7 +89,7 @@ whisker_tales/
 | `talent_system` | `packages/wt_core/lib/src/talents/` | XP/level, talent pick, effect resolver (อ่าน talents.json) | core, combat |
 | `meta_progression` | `packages/wt_core/lib/src/meta/` | currency ถาวร (ปลาทอง/ไหมพรม/ไข่/ขนม), ร้านนกฮูก, ปลดล็อกสกิล/ฟีเจอร์ตามบท, hub เมนู | core, save |
 | `ui_panel` | `packages/wt_core/lib/src/ui/` | โซนล่าง 40% ทุก state + HUD + node map ลอย | ทุก module ผ่าน Riverpod provider เท่านั้น |
-| `save_cloud` | `packages/wt_core/lib/src/save/` | local (Hive) + cloud sync (Game Center/Play Games), versioned save schema | core |
+| `save_cloud` | `packages/wt_core/lib/src/save/` | local (Hive) + cloud sync (Play Games — Android only, D-017), versioned save schema | core |
 | `audio` | `packages/wt_core/lib/src/audio/` | BGM/SFX service | core |
 | `iap_gate` | `packages/wt_core/lib/src/iap/` | in_app_purchase + parental gate + entitlement `no_ads` (รูปแบบรางวัลรอ GDD v0.4 §17 Q8 — ทำเป็น flag ก่อน) | meta, save |
 

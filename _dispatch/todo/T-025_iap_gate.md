@@ -21,3 +21,7 @@ IapService.purchase(sku) / ParentalGate.challenge() -> bool
 
 ## Amendment D-003 (2026-10-12)
 - SKU "ถอดโฆษณา" = **Supporter Pack** (D-003): ปลดธีม cosmetic + ช่อง preset อุปกรณ์ + ตั้ง entitlement `no_ads` → ซ่อนปุ่มโฆษณาทุกจุด **ไม่ให้รางวัลแทน** · ห้ามมีไข่/ปลาทอง/ไหมพรมใน SKU
+
+---
+## Amendment D-017 (2026-10-19)
+**Android / Google Play อย่างเดียว** — ตัดทุกอย่างที่เป็น iOS (Game Center, App Store Privacy Label, ATT, build iOS) · cloud = Play Games Services · IAP = Google Play Billing

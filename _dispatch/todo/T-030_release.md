@@ -18,3 +18,7 @@ scripts/build_release.sh (iOS+Android)
 ---
 ## Amendment v2.0 (D-002, 2026-10-12)
 checklist compliance ตาม **GDD v0.4 §14** (แทน v0.3 §12.3): Privacy Policy TH/EN ใหม่ (ad SDK + age screen) · Play Data Safety (ระบุ ad SDK, ไม่เก็บ ad ID จาก <13) · Play Target audience & content + Families policy + ad SDK อยู่ในรายการ Families self-certified · App Store Privacy Nutrition Label + **ไม่ขอ ATT** · หน้าโชว์อัตรา gacha/ตะกร้า ครบ · ยืนยันว่าไม่มี IAP ใดให้ ไข่/ปลาทอง/ไหมพรม · ยืนยัน policy ปัจจุบันของทั้งสอง store ณ วัน submit
+
+---
+## Amendment D-017 (2026-10-19)
+**Android / Google Play อย่างเดียว** — ตัดทุกอย่างที่เป็น iOS (Game Center, App Store Privacy Label, ATT, build iOS) · cloud = Play Games Services · IAP = Google Play Billing

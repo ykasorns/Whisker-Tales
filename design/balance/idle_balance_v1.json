@@ -316,5 +316,36 @@
       "skill_dmg": 1.8,
       "cooldown_mult": 0.75
     }
+  },
+  "combat": {
+    "_doc": "GDD v0.4 §4.2 + §15.2 · v0.5 §5 — ค่าเป็นเปอร์เซ็นต์ (5 = 5%) โค้ดแปลงเป็น basis point (1/10000) ตอนโหลดครั้งเดียว · ASSUMPTION_ = ยังไม่มีใน GDD จูนใน T-029",
+    "def_floor_pct": 5,
+    "crit_mult_min_pct": 150,
+    "ASSUMPTION_base_crit_dmg_pct": 150,
+    "caps_pct": {
+      "crit": 60,
+      "combo": 40,
+      "counter": 40,
+      "evade": 40,
+      "stun": 25,
+      "ASSUMPTION_lifesteal": 30,
+      "ASSUMPTION_regen": 5,
+      "ASSUMPTION_attack_speed": 100,
+      "ASSUMPTION_cdr": 50
+    },
+    "ASSUMPTION_stun_ms": 1000,
+    "ASSUMPTION_regen_tick_ms": 1000,
+    "power_weights": {
+      "atk": 5,
+      "hp": 0.5,
+      "def": 3,
+      "crit": 1.2,
+      "crit_dmg": 0.6,
+      "combo": 1.0,
+      "counter": 0.8,
+      "stun": 1.0,
+      "evade": 0.9,
+      "lifesteal": 0.7
+    }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../combat/combat.dart';
 import 'clock/game_clock.dart';
+import 'contracts/combat.dart';
 import 'state/game_state.dart';
 
 /// Shared Riverpod providers — the only channel between modules besides
@@ -25,3 +27,18 @@ final gameStateProvider = StateNotifierProvider<GameStateMachine, GameState>(
 /// Phase of the current run in a run-based side mode (T-002, used by T-005).
 final runStateProvider = StateNotifierProvider<RunStateMachine, RunState>(
     (ref) => RunStateMachine());
+
+/// Combat numbers (`idle_balance_v1.json` → `combat`). Overridden at boot
+/// with the rules the data loader (T-003) reads.
+final combatRulesProvider = Provider<CombatRules>(
+    (ref) => throw UnimplementedError('override with loaded CombatRules'));
+
+/// Makes a fresh engine per fight (T-007).
+final combatEngineFactoryProvider = Provider<ICombatEngine Function()>((ref) {
+  final rules = ref.watch(combatRulesProvider);
+  return () => CombatEngine(rules);
+});
+
+/// Cat power 🐾 (GDD v0.4 §15.2).
+final powerScoreProvider = Provider<PowerScore>(
+    (ref) => PowerScore(ref.watch(combatRulesProvider).powerWeights));

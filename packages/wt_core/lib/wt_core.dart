@@ -3,6 +3,7 @@
 /// package:wt_core/src/... directly (GAME_CONTRACT.md §3).
 library wt_core;
 
+export 'src/combat/combat.dart';
 export 'src/core/clock/game_clock.dart';
 export 'src/core/contracts/ads.dart';
 export 'src/core/contracts/age_gate.dart';

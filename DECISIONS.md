@@ -76,3 +76,15 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 5. GDD v0.5 → 0.5.1 (§2, §4.1, §4.2)
 
 **ผลกระทบ:** T-027 rewrite · T-045 amend (skin + ช่องที่ไม่เห็นบนตัว) · T-046 ปิด (ผลทดสอบ) · assetlist: ชิ้นอุปกรณ์บนตัวลดลง (ไม่ต้องวาดเสื้อ/รองเท้า/ถุงมือให้พอดีตัว) + skin ละ 13 เฟรม
+
+---
+
+## D-006 (2026-10-19) — Opus — combat engine (T-007): ข้อมูล + โครง type
+
+**ที่มา:** T-007 ต้องการค่าทุกตัวจาก data แต่ floor/cap/น้ำหนักพลังมีแค่ใน GDD v0.4 §4.2/§15.2 ยังไม่มีใน JSON · module อื่น (`cat_class`, `gear_basket`, `idle_loop`, UI) ต้องใช้ StatBlock/event โดยห้าม import `combat` ตรง
+
+**คำตัดสิน:**
+1. เพิ่ม section `combat` ใน `idle_balance_v1.json` (หน่วย % → โค้ดแปลงเป็น basis point ตอนโหลด) · ค่าที่ GDD ยังไม่กำหนดเป็น `ASSUMPTION_`: แรงคริฐาน 150%, cap ดูดเลือด 30% / ฟื้นเลือด 5% / ความเร็วตี 100% / ลดคูลดาวน์ 50%, มึน 1000 ms, รอบฟื้นเลือด 1000 ms — จูนใน T-029
+2. Type ร่วม (`Attribute`, `StatBlock`, `CombatUnitSpec`, `CombatSetup` เป็น class จริง, event ทั้งหมด) อยู่ใน `core/contracts/combat.dart` · engine/rules/RNG/PowerScore อยู่ใน `src/combat/` · ต่อผ่าน `providers.dart` (`combatRulesProvider` override ตอน boot)
+3. `ICombatEngine.useSkill` คงไว้เป็น no-op ตาม D-004 (ไม่มี input ผู้เล่น) — T-008 ตัดสินว่าจะเปลี่ยนเป็น auto-cast อย่างไร
+4. Sim ไม่มีระยะทาง: melee/ranged เป็นข้อมูลสำหรับ render เท่านั้น

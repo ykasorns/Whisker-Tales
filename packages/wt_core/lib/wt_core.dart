@@ -3,6 +3,7 @@
 /// package:wt_core/src/... directly (GAME_CONTRACT.md §3).
 library wt_core;
 
+export 'src/ads/ads.dart';
 export 'src/cat/cat.dart';
 export 'src/combat/combat.dart';
 export 'src/gear/gear.dart';

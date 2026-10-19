@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../ads/ads.dart';
 import '../cat/cat.dart';
 import '../combat/combat.dart';
 import 'clock/game_clock.dart';
 import 'contracts/ads.dart';
+import 'contracts/age_gate.dart';
 import 'contracts/combat.dart';
 import 'contracts/idle_loop.dart';
 import 'contracts/rewards.dart';
@@ -167,9 +169,28 @@ final Provider<Wardrobe> wardrobeProvider = Provider<Wardrobe>((ref) =>
         equipped: (slot) => ref.read(gearBasketProvider).equipped(slot),
         clearedPage: () => ref.read(idleLoopProvider).state.clearedPage));
 
-/// Rewarded ads (T-039). Until the ads module lands nothing can be watched.
-final adServiceProvider = Provider<IAdService>(
-    (ref) => throw UnimplementedError('ads module (T-039) not wired yet'));
+/// Ad placements + caps (`ads`). Overridden at boot with the loaded rules.
+final adRulesProvider = Provider<AdRules>(
+    (ref) => throw UnimplementedError('override with loaded AdRules'));
+
+/// The ad SDK seam. A fake until Opus picks a Families-certified SDK.
+final adNetworkProvider = Provider<AdNetwork>((ref) => FakeAdNetwork());
+
+/// Age band from the first-launch screen (T-040 overrides this).
+final ageBandProvider =
+    Provider<AgeBand Function()>((ref) => () => AgeBand.unset);
+
+/// Supporter Pack `no_ads` entitlement (T-025 overrides this).
+final noAdsProvider = Provider<bool Function()>((ref) => () => false);
+
+/// Rewarded ads with daily caps (T-039) — every placement goes through here.
+final adServiceProvider = Provider<IAdService>((ref) => AdService(
+      rules: ref.watch(adRulesProvider),
+      network: ref.watch(adNetworkProvider),
+      clock: ref.watch(gameClockProvider),
+      ageBand: ref.watch(ageBandProvider),
+      hasNoAds: ref.watch(noAdsProvider),
+    ));
 
 /// Road-event numbers + events (`road_events`, `road_events.json`).
 /// Overridden at boot with the loaded rules (T-003).

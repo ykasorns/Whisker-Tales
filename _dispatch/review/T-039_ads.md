@@ -24,3 +24,21 @@ AdService.canShow(placementId) / show(placementId) -> Future<AdOutcome{rewarded|
 ---
 ## Amendment v2.3 (D-008, 2026-10-19)
 placement ใหม่ `road_event` (3/วัน, อยู่ในเพดานรวม 10) — ใช้โดย T-048
+
+---
+## ส่งงาน (2026-10-19)
+**ไฟล์**
+- `src/ads/ad_network.dart` — `AdNetwork` (ช่องเสียบ SDK จริง), `AdRequest` (childDirected / nonPersonalized), `FakeAdNetwork` (dev/test, จดทุก request)
+- `src/ads/ad_service.dart` — `AdRules.fromJson` (validator: `grant` ต้องมี `grant_allowed` จาก DECISIONS), `AdService` (canShow / show / remainingToday, เพดานต่อจุด + รวม, รีเซ็ตเมื่อ date_key ของ GameClock เดินหน้า, ทีละ 1 โฆษณา), `AdDailyState` (Save v3 `daily`: date_key / ads_used / ads_total)
+- providers: `adRulesProvider`, `adNetworkProvider` (fake), `ageBandProvider` (T-040 override), `noAdsProvider` (T-025 override), `adServiceProvider` (แทนตัวที่ throw — road events ใช้ได้แล้ว)
+
+**Test** (`test/ads/` +12 → รวม 162 · analyze 0 ทั้ง 3 package)
+- placement จาก JSON · ปิด/ไม่รู้จัก = ไม่แสดง · เพดานต่อจุด + รวม 10 พร้อมกัน · นับเฉพาะดูจบ
+- รีเซ็ตวันใหม่ตามเวลาท้องถิ่น · ย้อนนาฬิกาไม่รีเซ็ต · ทีละ 1 โฆษณา
+- unset/under13 → child-directed + non-personalized · 13+ → ไม่ child-directed แต่ยัง non-personalized
+- Supporter Pack → ซ่อนทุกจุด ไม่มีรางวัล · `grant` โดนปฏิเสธถ้าไม่มี DECISIONS
+- save/load + วันเก่าถูกทิ้ง · สแกนโค้ดทั้ง wt_core / wt_mode_story / app: ไม่มีที่อื่นแตะ AdNetwork/ad SDK
+
+**ข้อสังเกต**
+- ยังไม่ต่อ SDK จริง (ตาม card) — Opus เลือก SDK ที่อยู่ใน Families self-certified list + log DECISIONS ก่อน
+- 13+ ยัง non-personalized เพราะยังไม่มีหน้าขอความยินยอม (D-014)

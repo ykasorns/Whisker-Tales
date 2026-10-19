@@ -353,12 +353,7 @@ CombatUnitSpec applyRoadEffects(CombatUnitSpec cat, List<RoadEventDef> events) {
   if (atk == 0 && hp == 0 && def == 0 && evade == 0 && speed == 0) return cat;
   final s = cat.stats;
   final ev = s[Attribute.evade] + evade * 100;
-  return CombatUnitSpec(
-    id: cat.id,
-    side: cat.side,
-    range: cat.range,
-    isPartner: cat.isPartner,
-    isBoss: cat.isBoss,
+  return cat.copyWith(
     attackIntervalMs: cat.attackIntervalMs * 100 ~/ (100 + speed),
     stats: s.copyWith(
       atk: s.atk * (100 + atk) ~/ 100,

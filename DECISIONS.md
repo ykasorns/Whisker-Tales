@@ -171,3 +171,13 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 2. ทุก request: unset/under13 = child-directed + non-personalized · **13+ = non-personalized ด้วย** จนกว่าจะมีหน้าขอความยินยอม (ไม่ขอ ATT)
 3. นับเฉพาะโฆษณาที่ดูจบ (ข้าม/ล้มเหลวไม่กินโควต้า) · เพดานรีเซ็ตเมื่อ date_key ของ GameClock เดินหน้าเท่านั้น
 4. `no_ads_behavior: grant` ต้องมี `grant_allowed: true` ในข้อมูล (และ DECISIONS) ไม่งั้นโหลดไม่ผ่าน
+
+---
+
+## D-015 (2026-10-19) — Opus — สกิลคลาส + buff engine (T-008)
+
+1. สกิลร่ายเองตาม cooldown — ครั้งแรกที่ 50% ของ cooldown · cooldown × (1 − cdr, cap 50%) · **สกิลหลบไม่ได้** แต่คริได้ · ดาเมจสกิล = % ATK หัก DEF แบบตีปกติ × (1 + skill_dmg)
+2. 12 สกิล (คลาสละ 3 ปลด Lv10/20/30) + 11 บัฟ ใน `design/data/skills.json` / `buffs.json` — ASSUMPTION จูนใน T-029 · จูนรอบแรกให้เมจ Lv10 ใกล้ธนูบนคลื่นหลายตัว และ Lv30 เคลียร์เร็วสุด
+3. dot = ดาเมจจริง (ไม่หัก DEF) คิดจาก ATK ผู้ใส่ตอนใส่ · โล่ดูดก่อน HP · on_event/add_buff ลึกสุด 4 ชั้น (กัน loop)
+4. บัฟความเร็วตีมีผลจากการตีครั้งถัดไป
+5. หนี้: PowerScore + balance sim ยังไม่นับสกิล (T-029)

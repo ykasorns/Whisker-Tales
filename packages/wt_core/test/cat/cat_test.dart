@@ -12,9 +12,14 @@ Map<String, dynamic> balance() => jsonDecode(
 void main() {
   final rules = CatRules.fromBalance(balance());
   final combat = CombatRules.fromBalance(balance());
+  Map<String, dynamic> data(String f) =>
+      jsonDecode(File('../../design/data/$f').readAsStringSync())
+          as Map<String, dynamic>;
+  final buffs = BuffBook.fromJson(data('buffs.json'));
+  final skills = SkillBook.fromJson(data('skills.json'), buffs);
 
   CatClass catAt(int level, [String cls = 'novice']) {
-    final c = CatClass(rules, CatProgress(rules));
+    final c = CatClass(rules, CatProgress(rules), skillsFor: skills.skillsFor);
     c.restore(
         CatState(level: level, classId: cls, tier: rules.classById(cls)!.tier));
     return c;
@@ -223,7 +228,8 @@ void main() {
 
     /// Fights a dummy for one minute; returns the engine and its events.
     (CombatEngine, List<CombatEvent>) duel(String cls, CombatUnitSpec dummy) {
-      final e = CombatEngine(combat);
+      final e =
+          CombatEngine(combat, buffs: buffs, firstCastPct: skills.firstCastPct);
       final ev = <CombatEvent>[];
       e.events.listen(ev.add);
       e.start(CombatSetup(
@@ -268,7 +274,8 @@ void main() {
       final hits = each((c) => duel(c, punchingBag)
           .$2
           .whereType<HitResolved>()
-          .where((h) => h.attackerId == 'mochi')
+          .where(
+              (h) => h.attackerId == 'mochi' && h.source == AttackSource.normal)
           .length);
       expect(top(hits), 'rogue', reason: '$hits');
       final dodges = each((c) => duel(c, punchingBag)
@@ -292,10 +299,17 @@ void main() {
       expect(top(survived), 'warrior', reason: '$survived');
     });
 
-    test('mage has the strongest skill damage (skills cast in T-008)', () {
+    test('mage deals the most skill damage (T-008)', () {
       final skill =
-          each((c) => catAt(30, c).combatSpec().stats[Attribute.skillDmg]);
+          each((c) => duel(c, punchingBag).$1.damageDealt(DamageChannel.skill));
       expect(top(skill), 'mage', reason: '$skill');
+    });
+
+    test('skills unlock by level: Lv10 = slot 1, Lv30 = all three', () {
+      expect(
+          catAt(10, 'mage').combatSpec().skills.map((s) => s.id), ['fireball']);
+      expect(catAt(30, 'mage').combatSpec().skills, hasLength(3));
+      expect(catAt(30, 'novice').combatSpec().skills, isEmpty);
     });
   });
 

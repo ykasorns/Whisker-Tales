@@ -187,7 +187,10 @@ void main() {
           stepMs: 20000,
           maxMs: 20000);
       final sources = ev.whereType<HitResolved>().map((h) => h.source).toSet();
-      expect(sources, containsAll(AttackSource.values));
+      expect(
+          sources,
+          containsAll(
+              [AttackSource.normal, AttackSource.combo, AttackSource.counter]));
       // a counter answers a monster hit; a combo follows a cat hit
       for (final h in ev.whereType<HitResolved>()) {
         if (h.source != AttackSource.normal) expect(h.attackerId, 'mochi');

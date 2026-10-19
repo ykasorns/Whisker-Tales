@@ -1,0 +1,34 @@
+{
+  "_doc": "GDD v0.5 §3.2 (T-008, D-015) — คลาสละ 3 สกิล ร่ายเองตาม cooldown (ไม่มีการแตะ, D-004) · slot 1/2/3 ปลดที่ cat_level.skill_slot_levels · target: front (ตัวหน้าสุด) | all (ทุกตัว) | self · damage_pct = % ของ ATK ต่อครั้ง (หัก DEF + floor แบบตีปกติ, หลบไม่ได้, คริได้) × (1 + skill_dmg) · cooldown × (1 − cdr) · buffs_target/buffs_self = id ใน buffs.json · first_cast_pct = ร่ายครั้งแรกเมื่อผ่าน % ของ cooldown · ASSUMPTION ทั้งไฟล์ จูนใน T-029",
+  "schema_version": 1,
+  "first_cast_pct": 50,
+  "skills": [
+    { "id": "shield_bash", "class": "warrior", "slot": 1, "icon": "🛡️", "name_th": "โล่กระแทก", "name_en": "Shield Bash",
+      "cooldown_ms": 6000, "target": "front", "damage_pct": 150, "buffs_target": ["stun_short"] },
+    { "id": "iron_wall", "class": "warrior", "slot": 2, "icon": "🧱", "name_th": "กำแพงเหล็ก", "name_en": "Iron Wall",
+      "cooldown_ms": 12000, "target": "self", "buffs_self": ["iron_wall"] },
+    { "id": "war_cry", "class": "warrior", "slot": 3, "icon": "📣", "name_th": "เสียงคำราม", "name_en": "War Cry",
+      "cooldown_ms": 15000, "target": "self", "buffs_self": ["war_cry_atk", "war_cry_def"] },
+
+    { "id": "twin_strike", "class": "rogue", "slot": 1, "icon": "⚔️", "name_th": "ฟันคู่", "name_en": "Twin Strike",
+      "cooldown_ms": 4000, "target": "front", "damage_pct": 70, "hits": 2 },
+    { "id": "poison_blade", "class": "rogue", "slot": 2, "icon": "🧪", "name_th": "มีดอาบพิษ", "name_en": "Poison Blade",
+      "cooldown_ms": 8000, "target": "front", "damage_pct": 50, "buffs_target": ["poison"] },
+    { "id": "shadow_step", "class": "rogue", "slot": 3, "icon": "💨", "name_th": "ก้าวเงา", "name_en": "Shadow Step",
+      "cooldown_ms": 12000, "target": "self", "buffs_self": ["shadow_evade", "shadow_speed"] },
+
+    { "id": "power_shot", "class": "archer", "slot": 1, "icon": "🎯", "name_th": "ยิงทะลวง", "name_en": "Power Shot",
+      "cooldown_ms": 5000, "target": "front", "damage_pct": 220 },
+    { "id": "arrow_rain", "class": "archer", "slot": 2, "icon": "🌧️", "name_th": "ฝนลูกธนู", "name_en": "Arrow Rain",
+      "cooldown_ms": 9000, "target": "all", "damage_pct": 90 },
+    { "id": "eagle_eye", "class": "archer", "slot": 3, "icon": "🦅", "name_th": "ตาเหยี่ยว", "name_en": "Eagle Eye",
+      "cooldown_ms": 14000, "target": "self", "buffs_self": ["eagle_crit", "eagle_crit_dmg"] },
+
+    { "id": "fireball", "class": "mage", "slot": 1, "icon": "🔥", "name_th": "ลูกไฟ", "name_en": "Fireball",
+      "cooldown_ms": 3000, "target": "front", "damage_pct": 200, "buffs_target": ["burn"] },
+    { "id": "frost_nova", "class": "mage", "slot": 2, "icon": "❄️", "name_th": "วงน้ำแข็ง", "name_en": "Frost Nova",
+      "cooldown_ms": 8000, "target": "all", "damage_pct": 110, "buffs_target": ["stun_frost"] },
+    { "id": "meteor", "class": "mage", "slot": 3, "icon": "☄️", "name_th": "อุกกาบาต", "name_en": "Meteor",
+      "cooldown_ms": 12000, "target": "all", "damage_pct": 240 }
+  ]
+}

@@ -8,9 +8,14 @@ import 'cat_rules.dart';
 /// boss fight; grow into a tier-2 class from the parent at
 /// [CatRules.tier2Level].
 class CatClass implements ICatClass {
-  CatClass(this.rules, this.progress, {bool Function()? inBossFight})
+  CatClass(this.rules, this.progress,
+      {bool Function()? inBossFight, this.skillsFor})
       : _inBossFight = inBossFight ?? _never,
         _current = rules.novice;
+
+  /// Skill lookup from `combat` (SkillBook.skillsFor), injected so this
+  /// module does not import combat. Null = no skills.
+  final List<SkillSpec> Function(String classId, int slots)? skillsFor;
 
   final CatRules rules;
   final CatProgress progress;
@@ -83,6 +88,7 @@ class CatClass implements ICatClass {
       ),
       attackIntervalMs: c.attackIntervalMs,
       range: c.range,
+      skills: skillsFor?.call(c.id, skillsUnlocked) ?? const [],
     );
   }
 

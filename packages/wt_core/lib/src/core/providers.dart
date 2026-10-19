@@ -44,10 +44,19 @@ final runStateProvider = StateNotifierProvider<RunStateMachine, RunState>(
 final combatRulesProvider = Provider<CombatRules>(
     (ref) => throw UnimplementedError('override with loaded CombatRules'));
 
-/// Makes a fresh engine per fight (T-007).
+/// Buffs (`design/data/buffs.json`). Empty until boot loads it (T-003).
+final buffBookProvider = Provider<BuffBook>((ref) => BuffBook.empty);
+
+/// Class skills (`design/data/skills.json`). Empty until boot loads it.
+final skillBookProvider = Provider<SkillBook>(
+    (ref) => const SkillBook(byClass: {}, firstCastPct: 50));
+
+/// Makes a fresh engine per fight (T-007, T-008).
 final combatEngineFactoryProvider = Provider<ICombatEngine Function()>((ref) {
   final rules = ref.watch(combatRulesProvider);
-  return () => CombatEngine(rules);
+  final buffs = ref.watch(buffBookProvider);
+  final first = ref.watch(skillBookProvider).firstCastPct;
+  return () => CombatEngine(rules, buffs: buffs, firstCastPct: first);
 });
 
 /// Cat power 🐾 (GDD v0.4 §15.2).
@@ -75,7 +84,8 @@ final catProgressProvider = Provider<CatProgress>((ref) {
 /// Cat class (T-044).
 final Provider<CatClass> catClassProvider = Provider<CatClass>((ref) =>
     CatClass(ref.watch(catRulesProvider), ref.watch(catProgressProvider),
-        inBossFight: ref.watch(inBossFightProvider)));
+        inBossFight: ref.watch(inBossFightProvider),
+        skillsFor: ref.watch(skillBookProvider).skillsFor));
 
 /// Pages, waves, income numbers (`enemy`, `pages`, `income`, `player`).
 /// Overridden at boot with the rules the data loader (T-003) reads.

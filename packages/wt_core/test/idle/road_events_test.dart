@@ -206,6 +206,17 @@ void main() {
       expect(road().apply(plain), same(plain));
     });
 
+    test('road effects keep the cat\'s skills', () {
+      const sk = SkillSpec(
+          id: 'fireball',
+          cooldownMs: 3000,
+          target: SkillTarget.front,
+          damagePct: 200);
+      final buffed =
+          withEvent('grilled_fish').apply(cat().copyWith(skills: const [sk]));
+      expect(buffed.skills.single.id, 'fireball');
+    });
+
     test('rainbow doubles wave yarn', () {
       final r = withEvent('rainbow');
       final out = r.hooks.adjustReward!(

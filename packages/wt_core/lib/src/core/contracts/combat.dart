@@ -127,6 +127,33 @@ enum CombatSide { cat, enemy }
 /// ranged classes attack from where they stand).
 enum AttackRange { melee, ranged }
 
+/// Where a skill lands (GDD v0.5 §3.2).
+enum SkillTarget { front, all, self }
+
+/// A class skill, cast on its own cooldown (D-004: no tapping). Values come
+/// from `design/data/skills.json`; buffs are ids in `buffs.json`.
+class SkillSpec {
+  const SkillSpec({
+    required this.id,
+    required this.cooldownMs,
+    required this.target,
+    this.damagePct = 0,
+    this.hits = 1,
+    this.buffsTarget = const [],
+    this.buffsSelf = const [],
+  });
+
+  final String id;
+  final int cooldownMs;
+  final SkillTarget target;
+
+  /// % of ATK per hit (0 = no damage).
+  final int damagePct;
+  final int hits;
+  final List<String> buffsTarget;
+  final List<String> buffsSelf;
+}
+
 class CombatUnitSpec {
   const CombatUnitSpec({
     required this.id,
@@ -136,6 +163,7 @@ class CombatUnitSpec {
     this.range = AttackRange.melee,
     this.isPartner = false,
     this.isBoss = false,
+    this.skills = const [],
   });
 
   /// Unique within one fight.
@@ -153,6 +181,25 @@ class CombatUnitSpec {
 
   /// [Attribute.bossDmg] applies against this unit.
   final bool isBoss;
+
+  /// Skills cast automatically, in slot order.
+  final List<SkillSpec> skills;
+
+  CombatUnitSpec copyWith({
+    StatBlock? stats,
+    int? attackIntervalMs,
+    List<SkillSpec>? skills,
+  }) =>
+      CombatUnitSpec(
+        id: id,
+        side: side,
+        stats: stats ?? this.stats,
+        attackIntervalMs: attackIntervalMs ?? this.attackIntervalMs,
+        range: range,
+        isPartner: isPartner,
+        isBoss: isBoss,
+        skills: skills ?? this.skills,
+      );
 }
 
 /// Everything a fight needs to start (GDD v0.4 §4).
@@ -179,7 +226,20 @@ enum HitOutcome { dodge, normal, crit }
 /// Separate damage tallies so pet damage can be shown and scaled on its own.
 enum DamageChannel { normal, partner, skill }
 
-enum AttackSource { normal, combo, counter }
+enum AttackSource {
+  normal,
+  combo,
+  counter,
+
+  /// A skill hit (channel [DamageChannel.skill]).
+  skill,
+
+  /// Damage over time from a buff.
+  dot,
+
+  /// An extra hit granted by a buff (`extra_hit`).
+  extra,
+}
 
 enum HealCause { lifesteal, regen }
 
@@ -326,6 +386,102 @@ class CombatEnded extends CombatEvent {
 
   @override
   String toString() => 'CombatEnded($atMs won=$playerWon)';
+}
+
+/// A unit cast a skill (UI: icon + name, effect).
+class SkillCast extends CombatEvent {
+  const SkillCast(
+      {required this.atMs, required this.unitId, required this.skillId});
+  final int atMs;
+  final String unitId;
+  final String skillId;
+
+  @override
+  bool operator ==(Object other) =>
+      other is SkillCast &&
+      other.atMs == atMs &&
+      other.unitId == unitId &&
+      other.skillId == skillId;
+
+  @override
+  int get hashCode => Object.hash(atMs, unitId, skillId);
+
+  @override
+  String toString() => 'SkillCast($atMs $unitId $skillId)';
+}
+
+class BuffApplied extends CombatEvent {
+  const BuffApplied(
+      {required this.atMs,
+      required this.unitId,
+      required this.buffId,
+      required this.stacks});
+  final int atMs;
+  final String unitId;
+  final String buffId;
+  final int stacks;
+
+  @override
+  bool operator ==(Object other) =>
+      other is BuffApplied &&
+      other.atMs == atMs &&
+      other.unitId == unitId &&
+      other.buffId == buffId &&
+      other.stacks == stacks;
+
+  @override
+  int get hashCode => Object.hash(atMs, unitId, buffId, stacks);
+
+  @override
+  String toString() => 'BuffApplied($atMs $unitId $buffId x$stacks)';
+}
+
+class BuffEnded extends CombatEvent {
+  const BuffEnded(
+      {required this.atMs, required this.unitId, required this.buffId});
+  final int atMs;
+  final String unitId;
+  final String buffId;
+
+  @override
+  bool operator ==(Object other) =>
+      other is BuffEnded &&
+      other.atMs == atMs &&
+      other.unitId == unitId &&
+      other.buffId == buffId;
+
+  @override
+  int get hashCode => Object.hash(atMs, unitId, buffId);
+
+  @override
+  String toString() => 'BuffEnded($atMs $unitId $buffId)';
+}
+
+/// A shield took [amount] of a hit; [left] is what remains (0 = broke).
+class ShieldAbsorbed extends CombatEvent {
+  const ShieldAbsorbed(
+      {required this.atMs,
+      required this.unitId,
+      required this.amount,
+      required this.left});
+  final int atMs;
+  final String unitId;
+  final int amount;
+  final int left;
+
+  @override
+  bool operator ==(Object other) =>
+      other is ShieldAbsorbed &&
+      other.atMs == atMs &&
+      other.unitId == unitId &&
+      other.amount == amount &&
+      other.left == left;
+
+  @override
+  int get hashCode => Object.hash(atMs, unitId, amount, left);
+
+  @override
+  String toString() => 'ShieldAbsorbed($atMs $unitId $amount left=$left)';
 }
 
 /// Shared deterministic combat sim used by every mode (GDD v0.4 §4,

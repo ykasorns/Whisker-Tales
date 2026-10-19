@@ -81,11 +81,33 @@ class IdleRules {
           math.pow(_num(_enemy, 'page_power_growth'), page - 1))
       .round();
 
-  /// Boss power: page boss or chapter boss multiplier × P(n).
+  /// Boss power: page boss or chapter boss multiplier × P(n), minus the
+  /// early-page discount (D-011).
   int bossPower(int page) => (wavePower(page) *
           _num(_enemy,
-              isChapterBoss(page) ? 'chapter_boss_mult' : 'page_boss_mult'))
+              isChapterBoss(page) ? 'chapter_boss_mult' : 'page_boss_mult') *
+          (100 - earlyBossDiscountPct(page)) /
+          100)
       .round();
+
+  /// % taken off the boss on the first pages, fading to 0 (D-011).
+  num earlyBossDiscountPct(int page) {
+    final until = _int(_enemy, 'early_boss_until_page');
+    if (page > until) return 0;
+    return _num(_enemy, 'early_boss_discount_pct') * (until - page + 1) / until;
+  }
+
+  /// Yarn a new player starts with (D-011).
+  int get starterYarn => _int(_income, 'starter_yarn');
+
+  /// Extra yarn per wave on the first pages, fading linearly to 0 (D-011).
+  num _earlyYarn(int page) {
+    final until = _int(_income, 'early_yarn_until_page');
+    if (page > until) return 0;
+    return _num(_income, 'early_yarn_bonus_per_wave') *
+        (until - page + 1) /
+        until;
+  }
 
   /// One wave's income in thousandths (rounded once per page).
   Map<Currency, int> perWaveMilli(int page) => {
@@ -93,11 +115,12 @@ class IdleRules {
                 math.pow(_num(_income, 'fish_growth_per_page'), page - 1) *
                 1000)
             .round(),
-        Currency.yarn: (_num(_income, 'yarn_per_wave') *
-                (1 +
-                    _num(_income, 'yarn_growth_per_page_pct') /
-                        100 *
-                        (page - 1)) *
+        Currency.yarn: ((_num(_income, 'yarn_per_wave') *
+                        (1 +
+                            _num(_income, 'yarn_growth_per_page_pct') /
+                                100 *
+                                (page - 1)) +
+                    _earlyYarn(page)) *
                 1000)
             .round(),
         Currency.eggs: (_num(_income, 'egg_drop_wave_chance') * 1000).round(),

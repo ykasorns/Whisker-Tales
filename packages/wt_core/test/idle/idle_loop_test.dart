@@ -58,8 +58,11 @@ void main() {
     test('P(n) and boss multipliers (GDD v0.4 §15.3)', () {
       expect(rules.wavePower(1), 100);
       expect(rules.wavePower(10), 444);
-      expect(rules.bossPower(5), 291); // page boss ×1.5
-      expect(rules.bossPower(10), 977); // chapter boss 2.2 × P(10)=444
+      // page boss ×1.5, early-page discount 40% fading over pages 1–10 (D-011)
+      expect(rules.bossPower(5), 221); // 194 × 1.5 × 0.76
+      expect(rules.bossPower(10), 938); // chapter boss 444 × 2.2 × 0.96
+      expect(rules.bossPower(20),
+          (rules.wavePower(20) * 2.2).round()); // no discount after chapter 1
       expect(rules.isChapterBoss(20), isTrue);
     });
 
@@ -71,12 +74,15 @@ void main() {
     });
 
     test('income per wave in thousandths', () {
+      // yarn 0.1 + early bonus 0.5 fading over pages 1–10 (D-011)
       expect(income.perWaveMilli(1),
-          {Currency.goldfish: 2000, Currency.yarn: 100, Currency.eggs: 10});
+          {Currency.goldfish: 2000, Currency.yarn: 600, Currency.eggs: 10});
       expect(income.perWaveMilli(10)[Currency.goldfish], 3379);
-      expect(income.perWaveMilli(10)[Currency.yarn], 118);
+      expect(income.perWaveMilli(10)[Currency.yarn], 168);
+      expect(income.perWaveMilli(11)[Currency.yarn], 120);
       expect(income.forWaves(1, 10),
-          RewardBundle({Currency.goldfish: 20, Currency.yarn: 1}));
+          RewardBundle({Currency.goldfish: 20, Currency.yarn: 6}));
+      expect(rules.starterYarn, 10);
       expect(income.perWave(1), RewardBundle({Currency.goldfish: 2}));
       expect(income.expForWaves(1, 10), 50); // 10 × 2.5 monsters × 2 EXP
     });

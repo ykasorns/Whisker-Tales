@@ -1,0 +1,83 @@
+{
+  "_doc": "GDD v0.5 §4.1 + §5 (T-036, D-010) — ช่องอุปกรณ์: สัดส่วนพลังของชิ้น (power_split %) แปลงเป็น HP/ATK/DEF ด้วยน้ำหนักพลัง §15.2 · affix สุ่มจาก pool ของช่อง · ค่า affix เป็น % (5 = 5%) · special = เกรดม่วงขึ้นไปเท่านั้น · ปลดช่องดู idle_balance_v1.json → slot_unlocks · ASSUMPTION ทั้งไฟล์ จูนใน T-029",
+  "schema_version": 1,
+  "affix_count_by_grade": [1, 1, 2, 2, 3, 3],
+  "special_min_grade": 3,
+  "affix_grade_bonus_pct": 20,
+  "item_power_variance_pct": 10,
+  "slots": {
+    "weapon": {
+      "power_split": { "atk": 80, "hp": 20, "def": 0 },
+      "affixes": [
+        { "stat": "crit", "min": 2, "max": 5 },
+        { "stat": "crit_dmg", "min": 10, "max": 25 },
+        { "stat": "accuracy", "min": 2, "max": 5 },
+        { "stat": "boss_dmg", "min": 4, "max": 10, "special": true },
+        { "stat": "skill_dmg", "min": 4, "max": 10, "special": true }
+      ]
+    },
+    "hat": {
+      "power_split": { "atk": 20, "hp": 50, "def": 30 },
+      "affixes": [
+        { "stat": "crit_res", "min": 2, "max": 5 },
+        { "stat": "stun_res", "min": 2, "max": 5 },
+        { "stat": "regen", "min": 0.2, "max": 0.5 },
+        { "stat": "exp_find", "min": 3, "max": 8, "special": true }
+      ]
+    },
+    "shirt": {
+      "power_split": { "atk": 0, "hp": 60, "def": 40 },
+      "affixes": [
+        { "stat": "counter", "min": 2, "max": 5 },
+        { "stat": "lifesteal_res", "min": 2, "max": 5 },
+        { "stat": "combo_res", "min": 2, "max": 5 },
+        { "stat": "cdr", "min": 2, "max": 5, "special": true }
+      ]
+    },
+    "shoes": {
+      "power_split": { "atk": 30, "hp": 40, "def": 30 },
+      "affixes": [
+        { "stat": "evade", "min": 2, "max": 5 },
+        { "stat": "attack_speed", "min": 3, "max": 8 },
+        { "stat": "counter_res", "min": 2, "max": 5 },
+        { "stat": "fish_find", "min": 3, "max": 8, "special": true }
+      ]
+    },
+    "scarf": {
+      "power_split": { "atk": 10, "hp": 70, "def": 20 },
+      "affixes": [
+        { "stat": "regen", "min": 0.2, "max": 0.5 },
+        { "stat": "crit_dmg_res", "min": 5, "max": 15 },
+        { "stat": "evade", "min": 2, "max": 4 },
+        { "stat": "pet_dmg", "min": 4, "max": 10, "special": true }
+      ]
+    },
+    "gloves": {
+      "power_split": { "atk": 70, "hp": 10, "def": 20 },
+      "affixes": [
+        { "stat": "combo", "min": 2, "max": 5 },
+        { "stat": "stun", "min": 1, "max": 3 },
+        { "stat": "lifesteal", "min": 2, "max": 5 },
+        { "stat": "boss_dmg", "min": 4, "max": 10, "special": true }
+      ]
+    },
+    "bell": {
+      "power_split": { "atk": 40, "hp": 40, "def": 20 },
+      "affixes": [
+        { "stat": "crit", "min": 2, "max": 4 },
+        { "stat": "accuracy", "min": 2, "max": 5 },
+        { "stat": "stun_res", "min": 2, "max": 5 },
+        { "stat": "craft_luck", "min": 2, "max": 5, "special": true }
+      ]
+    },
+    "bag": {
+      "power_split": { "atk": 10, "hp": 60, "def": 30 },
+      "affixes": [
+        { "stat": "lifesteal", "min": 2, "max": 4 },
+        { "stat": "regen", "min": 0.2, "max": 0.5 },
+        { "stat": "yarn_find", "min": 3, "max": 8, "special": true },
+        { "stat": "fish_find", "min": 3, "max": 8, "special": true }
+      ]
+    }
+  }
+}

@@ -72,3 +72,13 @@ STYLE: bold dark ink outlines (#33291F), filled with vibrant saturated colored p
 SHEET LAYOUT: a clean sheet on a perfectly flat solid magenta background (#FF00FF) filling the entire image. Arrange the icons in an invisible grid of 4 columns by 3 rows, every cell the same size, one icon per cell, centered, with wide empty magenta gaps so no two icons touch. No text, no letters, no symbols, no grid lines, no borders, no shadows.
 ```
 → `icon_{shirt|shoes|gloves|bell}_{1|2|3}.png`
+
+## 4. ปุ่มก้อนไหมพรม — `ui_yarn_ball.png` (ภาพเดียว · สี่เหลี่ยมจัตุรัส 1:1)
+```
+Create a single game UI icon: a round, plump ball of coral-red yarn for a cute cat adventure game, slightly squishy and friendly, with clearly visible wound yarn strands crossing over the ball, a small loose yarn end curling out at the bottom right, and a tiny highlight on the top left. No knitting needles, no face, no text. Centered, filling about 80% of the image.
+
+STYLE: bold dark ink outlines (#33291F), filled with vibrant saturated colored pencil strokes clearly visible at a diagonal angle, single flat shadow tone, saturday-morning-cartoon energy, flat 2D game icon, no digital gradients, no airbrush, child-friendly.
+
+LAYOUT: one icon on a perfectly flat solid magenta background (#FF00FF) filling the entire image. No text, no letters, no symbols, no borders, no shadows on the background.
+```
+→ `ui_yarn_ball.png` (ใช้กับปุ่มถักหน้าหลัก + หัวหน้าเลือกช่อง · เกมทำอนิเมชันขยับ/เด้งเอง ไม่ต้องวาดหลายเฟรม)

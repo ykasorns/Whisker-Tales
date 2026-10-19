@@ -12,6 +12,9 @@
     "page_power_growth": 1.18,
     "page_boss_mult": 1.5,
     "chapter_boss_mult": 2.2,
+    "_doc_early": "D-011: บอสหน้า 1..early_boss_until_page อ่อนลง early_boss_discount_pct% ลดลงเป็นเส้นตรงจนเต็มหลังหน้านั้น",
+    "ASSUMPTION_early_boss_discount_pct": 40,
+    "ASSUMPTION_early_boss_until_page": 10,
     "pages_per_chapter": 10,
     "farm_min_power_ratio": 0.7,
     "_doc_monsters": "พลังคลื่น P(n) แบ่งเป็น HP:ATK ตาม hp_share (GDD v0.4 §15.3 = 60:40) แล้วแปลงกลับด้วยน้ำหนักพลัง §15.2 · หารเท่ากันทุกตัวในคลื่น",
@@ -50,7 +53,9 @@
     "ASSUMPTION_recycle_fish_per_item": 4,
     "recycle_basket_exp": 1,
     "pity_every": 30,
-    "pity_min_grade": 3
+    "pity_min_grade": 3,
+    "ASSUMPTION_random_slot_exp_bonus_pct": 50,
+    "ASSUMPTION_auto_craft_interval_ms": 1000
   },
   "basket": {
     "_doc": "ตารางเกรด % ต่อเลเวล — level ระหว่างแถวใช้แถวล่าสุดที่ <= level. exp_to_next = EXP สู่เลเวลถัดไป",
@@ -121,6 +126,10 @@
   "income": {
     "ASSUMPTION_yarn_per_wave": 0.1,
     "ASSUMPTION_yarn_growth_per_page_pct": 2,
+    "_doc_early": "ช่วงแรกง่ายขึ้น (YK 2026-10-19, D-011): เริ่มเกมได้ไหมพรม starter_yarn · หน้า 1..early_yarn_until_page ได้ไหมพรมเพิ่มต่อคลื่น ลดลงเป็นเส้นตรงจนหมดหลังหน้านั้น",
+    "ASSUMPTION_starter_yarn": 10,
+    "ASSUMPTION_early_yarn_bonus_per_wave": 0.5,
+    "ASSUMPTION_early_yarn_until_page": 10,
     "ASSUMPTION_fish_per_wave_base": 2,
     "ASSUMPTION_fish_growth_per_page": 1.06,
     "boss_fish_mult_waves": 20,

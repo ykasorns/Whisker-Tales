@@ -5,6 +5,7 @@ library wt_core;
 
 export 'src/cat/cat.dart';
 export 'src/combat/combat.dart';
+export 'src/gear/gear.dart';
 export 'src/core/clock/game_clock.dart';
 export 'src/core/contracts/ads.dart';
 export 'src/core/contracts/cat_class.dart';
@@ -19,8 +20,10 @@ export 'src/core/contracts/research.dart';
 export 'src/core/contracts/rewards.dart';
 export 'src/core/contracts/run_systems.dart';
 export 'src/core/contracts/services.dart';
+export 'src/core/contracts/wallet.dart';
 export 'src/core/layout.dart';
 export 'src/core/providers.dart';
 export 'src/core/random/seeded_rng.dart';
 export 'src/core/state/game_state.dart';
+export 'src/core/wallet/memory_wallet.dart';
 export 'src/idle/idle.dart';

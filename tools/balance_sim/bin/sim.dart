@@ -128,7 +128,8 @@ class _Sim {
   late List<double> slotItem;
   late List<int> slotLevel;
   int basketLevel = 1, basketExp = 0, gearPity = 0;
-  double yarn = 0, fish = 0, eggFrac = 0;
+  late double yarn = _n(income, 'ASSUMPTION_starter_yarn').toDouble();
+  double fish = 0, eggFrac = 0;
   int eggs = 0, petPity = 0;
   final Map<String, List<int>> petStars = {};
   int statLv = 0, offlineLv = 0;
@@ -148,11 +149,18 @@ class _Sim {
   // ---- curves
   double pagePower(int n) =>
       _n(enemy, 'page_power_base') * pow(_n(enemy, 'page_power_growth'), n - 1);
-  double bossPower(int n) =>
-      pagePower(n) *
-      (n % _i(enemy, 'pages_per_chapter') == 0
-          ? _n(enemy, 'chapter_boss_mult')
-          : _n(enemy, 'page_boss_mult'));
+  double bossPower(int n) {
+    final until = _n(enemy, 'ASSUMPTION_early_boss_until_page');
+    final discount = n > until
+        ? 0.0
+        : _n(enemy, 'ASSUMPTION_early_boss_discount_pct') * (until - n + 1) / until;
+    return pagePower(n) *
+        (n % _i(enemy, 'pages_per_chapter') == 0
+            ? _n(enemy, 'chapter_boss_mult')
+            : _n(enemy, 'page_boss_mult')) *
+        (100 - discount) /
+        100;
+  }
   int get chapterIdx => min(cleared ~/ _i(enemy, 'pages_per_chapter'), 2);
 
   int get farmPage {
@@ -198,9 +206,17 @@ class _Sim {
   double fishPerWave(int page) =>
       _n(income, 'ASSUMPTION_fish_per_wave_base') *
       pow(_n(income, 'ASSUMPTION_fish_growth_per_page'), page - 1);
-  double yarnPerWave(int page) =>
-      _n(income, 'ASSUMPTION_yarn_per_wave') *
-      (1 + _n(income, 'ASSUMPTION_yarn_growth_per_page_pct') / 100 * (page - 1));
+  double yarnPerWave(int page) {
+    final until = _n(income, 'ASSUMPTION_early_yarn_until_page');
+    final early = page > until
+        ? 0.0
+        : _n(income, 'ASSUMPTION_early_yarn_bonus_per_wave') *
+            (until - page + 1) /
+            until;
+    return _n(income, 'ASSUMPTION_yarn_per_wave') *
+            (1 + _n(income, 'ASSUMPTION_yarn_growth_per_page_pct') / 100 * (page - 1)) +
+        early;
+  }
 
   // ---- actions
   void farmWaves(double waves) {

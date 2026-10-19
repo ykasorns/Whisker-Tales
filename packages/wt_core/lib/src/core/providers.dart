@@ -5,7 +5,11 @@ import '../combat/combat.dart';
 import 'clock/game_clock.dart';
 import 'contracts/combat.dart';
 import 'contracts/idle_loop.dart';
+import 'contracts/rewards.dart';
+import '../gear/gear.dart';
 import '../idle/idle.dart';
+import 'contracts/wallet.dart';
+import 'wallet/memory_wallet.dart';
 import 'state/game_state.dart';
 
 /// Shared Riverpod providers — the only channel between modules besides
@@ -77,18 +81,48 @@ final idleRulesProvider = Provider<IdleRules>(
 /// Seed of the player's world; restored from the save.
 final idleSeedProvider = Provider<int>((ref) => 0);
 
-/// Flat stats added to the cat before the class multiplier: gear, pets,
-/// research, road-event buffs. Each module that adds stats overrides this.
+/// Flat stats added to the cat before the class multiplier. Gear for now;
+/// pets, research and road-event buffs add theirs here when they land.
 final catExtraStatsProvider = Provider<StatBlock Function()>(
-    (ref) => () => StatBlock(hp: 0, atk: 0, def: 0));
+    (ref) => () => ref.read(gearBasketProvider).totalStats);
+
+/// Player currencies. In memory until `meta_progression` (T-021) owns them;
+/// a new game starts with the starter yarn (D-011).
+final walletProvider = Provider<IWallet>((ref) =>
+    MemoryWallet({Currency.yarn: ref.watch(idleRulesProvider).starterYarn}));
+
+/// Gear + basket numbers (`gear`, `basket`, `slot_unlocks`,
+/// `gear_slots.json`). Overridden at boot with the loaded rules (T-003).
+final gearRulesProvider = Provider<GearRules>(
+    (ref) => throw UnimplementedError('override with loaded GearRules'));
+
+/// Yarn basket (T-036).
+final Provider<GearBasket> gearBasketProvider = Provider<GearBasket>((ref) {
+  final power = ref.watch(powerScoreProvider);
+  return GearBasket(
+    rules: ref.watch(gearRulesProvider),
+    wallet: ref.watch(walletProvider),
+    clearedPage: () => ref.read(idleLoopProvider).state.clearedPage,
+    powerOf: power.of,
+    seed: ref.watch(idleSeedProvider) ^ 0x6EA2,
+  );
+});
+
+/// Auto-craft (T-037) — call `tick` only while the game is open.
+final autoCraftProvider = Provider<AutoCraft>((ref) {
+  final auto =
+      AutoCraft(ref.watch(gearBasketProvider), ref.watch(walletProvider));
+  ref.onDispose(auto.dispose);
+  return auto;
+});
 
 /// The one income formula for online and offline (T-034, T-035).
 final incomeModelProvider = Provider<IncomeModel>((ref) => IncomeModel(
     ref.watch(idleRulesProvider),
     expPerKill: ref.watch(catRulesProvider).expPerKill));
 
-/// The main idle loop (T-034). Cat EXP from waves and bosses is granted to
-/// [catProgressProvider] here.
+/// The main idle loop (T-034). Rewards go to [walletProvider] and cat EXP
+/// to [catProgressProvider] here.
 final Provider<IdleLoop> idleLoopProvider = Provider<IdleLoop>((ref) {
   final weights = ref.watch(combatRulesProvider).powerWeights;
   final loop = IdleLoop(
@@ -103,11 +137,12 @@ final Provider<IdleLoop> idleLoopProvider = Provider<IdleLoop>((ref) {
     seed: ref.watch(idleSeedProvider),
   );
   final sub = loop.events.listen((e) {
-    final exp = switch (e) {
-      WaveCleared(:final exp) => exp,
-      BossResult(:final exp) => exp,
-      WaveFailed() => 0,
+    final (reward, exp) = switch (e) {
+      WaveCleared(:final reward, :final exp) => (reward, exp),
+      BossResult(:final reward, :final exp) => (reward, exp),
+      WaveFailed() => (RewardBundle.empty, 0),
     };
+    if (!reward.isEmpty) ref.read(walletProvider).add(reward);
     if (exp > 0) ref.read(catProgressProvider).gainExp(exp);
   });
   ref.onDispose(() {

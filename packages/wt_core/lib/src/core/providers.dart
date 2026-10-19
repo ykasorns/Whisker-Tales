@@ -11,6 +11,7 @@ import 'contracts/idle_loop.dart';
 import 'contracts/rewards.dart';
 import '../gear/gear.dart';
 import '../idle/idle.dart';
+import '../offline/offline_reward.dart';
 import '../wardrobe/wardrobe.dart';
 import 'contracts/wallet.dart';
 import 'wallet/memory_wallet.dart';
@@ -219,3 +220,18 @@ final roadEventsProvider = Provider<RoadEvents>((ref) {
   ref.onDispose(r.dispose);
   return r;
 });
+
+/// Offline numbers (`offline`, `research.offline_node_*`). Overridden at boot.
+final offlineRulesProvider = Provider<OfflineRules>(
+    (ref) => throw UnimplementedError('override with loaded OfflineRules'));
+
+/// Offline rewards (T-035): call `checkIn()` on open/resume, show the
+/// result, then `claim()`. Same income formula as online (T-034).
+final offlineRewardProvider = Provider<OfflineReward>((ref) => OfflineReward(
+      rules: ref.watch(offlineRulesProvider),
+      income: ref.watch(incomeModelProvider),
+      clock: ref.watch(gameClockProvider),
+      wallet: ref.watch(walletProvider),
+      farmPage: () => ref.read(idleLoopProvider).state.farmPage,
+      grantExp: (exp) => ref.read(catProgressProvider).gainExp(exp),
+    ));

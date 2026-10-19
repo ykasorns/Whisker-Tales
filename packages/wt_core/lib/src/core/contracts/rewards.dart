@@ -13,6 +13,11 @@ class RewardBundle {
 
   static final empty = RewardBundle();
 
+  /// Const empty bundle for const contexts.
+  static const emptyConst = RewardBundle._const();
+
+  const RewardBundle._const() : amounts = const {};
+
   final Map<Currency, int> amounts;
 
   int operator [](Currency c) => amounts[c] ?? 0;

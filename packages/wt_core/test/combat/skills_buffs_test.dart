@@ -99,7 +99,8 @@ void main() {
           ]),
           ms: 10000,
           step: 10000);
-      expect(ev.whereType<SkillCast>().map((e) => e.atMs), [1125, 3375, 5625, 7875]);
+      expect(ev.whereType<SkillCast>().map((e) => e.atMs),
+          [1125, 3375, 5625, 7875]);
     });
 
     test('skills cannot be dodged; skill damage and crits scale', () {

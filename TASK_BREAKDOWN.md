@@ -147,3 +147,15 @@ A-1 ต้องเสร็จก่อน T-027 / A-2–A-6 ทยอยส่
 - T-046 → `done/` (ผลทดสอบ: ใช้ท่าเต็มตัว + จุดยึด)
 - T-027 เขียนใหม่: module `avatar` · Depends T-001, T-045
 - T-045 amend: skin + ช่องที่ไม่เห็นบนตัว
+
+---
+
+## Amendment v2.3 — Pages + road events (D-008, 2026-10-19)
+
+- GDD v0.5.2 §9 · ข้อมูล `pages`, `road_events`, ads `road_event` ใน `idle_balance_v1.json`
+- **Amendment:** T-034 (คลื่นตามบท + จุดเชื่อมเหตุการณ์ + EXP), T-039 (placement), T-043 (ข้อมูลเหตุการณ์)
+- **ใหม่:**
+
+| Task | Module | Depends | Wave |
+|---|---|---|---|
+| T-048 road events | idle_loop | T-034, T-008, T-039, T-043 | 7 |

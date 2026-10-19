@@ -88,3 +88,36 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 2. Type ร่วม (`Attribute`, `StatBlock`, `CombatUnitSpec`, `CombatSetup` เป็น class จริง, event ทั้งหมด) อยู่ใน `core/contracts/combat.dart` · engine/rules/RNG/PowerScore อยู่ใน `src/combat/` · ต่อผ่าน `providers.dart` (`combatRulesProvider` override ตอน boot)
 3. `ICombatEngine.useSkill` คงไว้เป็น no-op ตาม D-004 (ไม่มี input ผู้เล่น) — T-008 ตัดสินว่าจะเปลี่ยนเป็น auto-cast อย่างไร
 4. Sim ไม่มีระยะทาง: melee/ranged เป็นข้อมูลสำหรับ render เท่านั้น
+
+---
+
+## D-007 (2026-10-19) — Opus — cat_class (T-044): ข้อมูล + โครง type
+
+1. เพิ่มใน `idle_balance_v1.json`: `cat_level.ASSUMPTION_base_stats` (Lv1 HP 40 / ATK 6 / DEF 3 ให้พลังเท่ากับ `player.base_power`), `ASSUMPTION_exp_per_kill_growth_per_page`, `classes.*.tier` + `from` (tier 2 — content v1.1)
+2. Type ร่วมอยู่ใน `core/contracts/cat_class.dart` · event เลเวลแมวชื่อ `CatLevelUp` (ชื่อ `LevelUp` ใช้แล้วในโหมดท้าทาย)
+3. EXP ต่อมอน = `CatRules.expPerKill(page)` จุดเดียว ให้ idle loop + ออฟไลน์เรียกร่วม (T-034/T-035) — ยังไม่แก้ `IIncomeModel` เพราะ loop รอคุยใหม่กับ YK
+4. **YK 2026-10-19:** stat หลัก = (ค่าเลเวล + อุปกรณ์) × ตัวคูณคลาส — คลาสมีผลตลอดเกม (แก้ GDD v0.5 §5)
+5. **YK 2026-10-19:** ไม่มีเลเวลสูงสุด · EXP curve เป็นช่วง (`exp_curve`): Lv1–19 ×1.10/เลเวล, **Lv20–39 ×1.15** (ช่วงกลางยากขึ้น), Lv40+ ×1.08 — ASSUMPTION จูนใน T-029 (แก้ GDD v0.5 §3.1, §8)
+
+---
+
+## D-008 (2026-10-19) — YK — คลื่นต่อหน้าไม่เท่ากัน + เหตุการณ์ระหว่างทาง
+
+**ที่มา:** YK เห็นในเว็บต้นแบบว่าหน้าละ 3 คลื่นเท่ากันทุกหน้า อยากให้ยาวสั้นต่างกันตามบท + มีเหตุการณ์สุ่มทั้งเพิ่ม/ลดพลังแมว + ผูกกับโฆษณาได้
+
+**คำตัดสิน (GDD v0.5.2 §9):**
+1. คลื่นต่อหน้าตามบท: บท 1 = 3–4 · บท 2 = 4–6 · บท 3 = 5–8 (สุ่มจาก seed) · หน้า 5/10 ของทุกบท +2 คลื่น — `idle_balance_v1.json` → `pages`
+2. เหตุการณ์ระหว่างทาง ทุก 3–5 คลื่น · **อัตโนมัติ** (YK) · ดี 70 / ไม่ดี 30 · ผลนับเป็นคลื่น · ไม่เกิดออฟไลน์ · เหตุการณ์ใหม่ไม่เกิดตอนบอส แต่**ผลที่ค้างอยู่มีผลถึงบอส** (YK — บอส 1 ครั้ง = 1 คลื่นของอายุผล) · AUTO ท้าบอสรอดีบัฟหมดก่อน (Opus) · ใช้ buff engine — `road_events`
+3. โฆษณา placement `road_event`: ดี = ผล ×2 · ไม่ดี = ปัดเป่า (**YK เลือกให้ปัดเป่าได้**) · 3 ครั้ง/วัน **ในเพดานรวม 10 เดิม** (YK)
+4. **เงื่อนไข compliance ที่ผูกกับข้อ 3 (Opus):** ดีบัฟเบา (≤ −10%/stat, ≤ 2 คลื่น), หายเองเสมอ, ไม่ทำให้แพ้ได้เอง, ไม่มีนับถอยหลัง/ข้อความเร่ง/popup เต็มจอ — ถ้าข้อใดไม่ผ่าน ให้ตัดปุ่มปัดเป่าออก เหลือแค่ปุ่มเสริมผลดี
+
+**ผลกระทบ:** T-034 amend (คลื่นตาม `pages`) · ใหม่ T-048 road events · T-039 + placement `road_event` · T-043 + ข้อมูลเหตุการณ์ · T-029 จูนรวม
+
+---
+
+## D-009 (2026-10-19) — Opus — idle loop (T-034): โครง + ข้อมูล
+
+1. `IIncomeModel` เพิ่ม `perWaveMilli` / `forWaves` / `expForWaves` — รายได้เป็นเศษ (ไหมพรม 0.1/คลื่น, ไข่ 1%) สะสมเป็นหน่วยพัน · ออฟไลน์ใช้ `forWaves` ตัวเดียวกัน · ไข่ได้แบบสะสม (คาดเดาได้) ไม่ใช่สุ่ม
+2. contract เพิ่ม `PagePlan`, `WaveFailed`, `exp` ใน `WaveCleared`/`BossResult` (additive) · `SeededRng` ย้ายไป `core/random/`
+3. แพ้คลื่น = พัก + ลองใหม่ · แพ้ 3 ครั้งติด → ฟาร์มถอย 1 หน้า · แพ้บอส → AUTO รอ 3 คลื่น · บอสมีเวลา 60 วิ — ASSUMPTION ใน `pages`
+4. มอน: พลังคลื่น P(n) แบ่ง HP:ATK 60:40 แปลงกลับด้วยน้ำหนักพลัง §15.2 หารเท่ากันทุกตัว · DEF 0

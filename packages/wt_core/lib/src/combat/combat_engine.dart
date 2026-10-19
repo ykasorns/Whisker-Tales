@@ -3,7 +3,7 @@ import 'dart:async';
 import '../core/contracts/combat.dart';
 import 'combat_rules.dart';
 import 'fixed_point.dart';
-import 'seeded_rng.dart';
+import '../core/random/seeded_rng.dart';
 
 /// One hit, decided by a single roll in [0, kBp) (GDD v0.4 §4.2): below the
 /// evade chance is a dodge, the next crit-chance band is a crit, the rest is

@@ -20,3 +20,7 @@ AdService.canShow(placementId) / show(placementId) -> Future<AdOutcome{rewarded|
 
 ## Amendment D-003 (2026-10-12)
 - placement ที่เปิด: pet_hatch 3, research_speedup 5, yarn_bundle 2, daily_gift 1 · cap รวม 10 · `no_ads_behavior` = `hide` ทุกจุด (D-003) — `grant` ยังห้าม · test: no_ads=true → canShow=false ทุกจุด และไม่มีรางวัลออก
+
+---
+## Amendment v2.3 (D-008, 2026-10-19)
+placement ใหม่ `road_event` (3/วัน, อยู่ในเพดานรวม 10) — ใช้โดย T-048

@@ -13,7 +13,11 @@
     "page_boss_mult": 1.5,
     "chapter_boss_mult": 2.2,
     "pages_per_chapter": 10,
-    "farm_min_power_ratio": 0.7
+    "farm_min_power_ratio": 0.7,
+    "_doc_monsters": "พลังคลื่น P(n) แบ่งเป็น HP:ATK ตาม hp_share (GDD v0.4 §15.3 = 60:40) แล้วแปลงกลับด้วยน้ำหนักพลัง §15.2 · หารเท่ากันทุกตัวในคลื่น",
+    "ASSUMPTION_hp_share_pct": 60,
+    "ASSUMPTION_monster_attack_interval_ms": 1200,
+    "ASSUMPTION_boss_attack_interval_ms": 1500
   },
   "player": {
     "base_power": 60,
@@ -122,7 +126,8 @@
     "boss_fish_mult_waves": 20,
     "egg_drop_wave_chance": 0.01,
     "egg_page_boss": 1,
-    "egg_chapter_boss": 3
+    "egg_chapter_boss": 3,
+    "ASSUMPTION_boss_exp_kills": 10
   },
   "pets": {
     "rarities": [
@@ -216,6 +221,12 @@
         "per_day": 1,
         "fish_minutes_of_income": 60,
         "no_ads_behavior": "hide"
+      },
+      "road_event": {
+        "_doc": "D-008: ดี = ผล ×2 นานขึ้น · ไม่ดี = ปัดเป่าทันที · ดีบัฟหายเองเสมอถ้าไม่ดู",
+        "enabled": true,
+        "per_day": 3,
+        "no_ads_behavior": "hide"
       }
     }
   },
@@ -254,8 +265,7 @@
     "bag": 30
   },
   "cat_level": {
-    "_doc": "GDD v0.5 §3.1 — ASSUMPTION ทั้งหมด จูนใน T-029",
-    "max_level": 40,
+    "_doc": "GDD v0.5 §3.1 — ไม่มีเลเวลสูงสุด (YK 2026-10-19) · EXP สู่เลเวลถัดไป = base × growth ต่อเลเวล ตามช่วง exp_curve (ช่วงกลาง Lv20–39 ชันขึ้น) · ASSUMPTION ทั้งหมด จูนใน T-029",
     "class_unlock_level": 10,
     "class_tier2_level": 40,
     "skill_slot_levels": [
@@ -264,13 +274,25 @@
       30
     ],
     "ASSUMPTION_exp_to_next_base": 20,
-    "ASSUMPTION_exp_to_next_growth": 1.12,
+    "ASSUMPTION_exp_curve": [
+      { "from_level": 1, "growth": 1.10 },
+      { "from_level": 20, "growth": 1.15 },
+      { "from_level": 40, "growth": 1.08 }
+    ],
     "ASSUMPTION_exp_per_kill_base": 2,
-    "ASSUMPTION_base_stat_pct_per_level": 0.02
+    "ASSUMPTION_base_stat_pct_per_level": 0.02,
+    "ASSUMPTION_base_stats": {
+      "_doc": "ค่าพื้นฐาน Lv1 ก่อนตัวคูณคลาส — พลัง §15.2 = 6×5 + 40×0.5 + 3×3 = 59 ≈ player.base_power",
+      "hp": 40,
+      "atk": 6,
+      "def": 3
+    },
+    "ASSUMPTION_exp_per_kill_growth_per_page": 1.06
   },
   "classes": {
-    "_doc": "GDD v0.5 §3.2 — ตัวคูณจาก stat พื้นฐาน · attack_interval_s = ช่วงห่างการตี · ASSUMPTION จูนใน T-029",
+    "_doc": "GDD v0.5 §3.2 — tier 0 = ฝึกหัด, 1 = คลาสแรก, 2 = ขั้นที่ 2 (ต้องมี \"from\": id คลาส tier 1 — content v1.1) · ตัวคูณจาก stat พื้นฐาน · attack_interval_s = ช่วงห่างการตี · ASSUMPTION จูนใน T-029",
     "novice": {
+      "tier": 0,
       "hp": 1.0,
       "def": 1.0,
       "atk": 1.0,
@@ -280,6 +302,7 @@
       "skill_dmg": 1.0
     },
     "warrior": {
+      "tier": 1,
       "hp": 1.4,
       "def": 1.5,
       "atk": 0.8,
@@ -289,6 +312,7 @@
       "skill_dmg": 1.0
     },
     "rogue": {
+      "tier": 1,
       "hp": 0.9,
       "def": 0.9,
       "atk": 0.75,
@@ -298,6 +322,7 @@
       "skill_dmg": 1.0
     },
     "archer": {
+      "tier": 1,
       "hp": 0.9,
       "def": 0.85,
       "atk": 1.35,
@@ -307,6 +332,7 @@
       "skill_dmg": 1.1
     },
     "mage": {
+      "tier": 1,
       "hp": 1.0,
       "def": 0.85,
       "atk": 0.9,
@@ -347,5 +373,28 @@
       "evade": 0.9,
       "lifesteal": 0.7
     }
+  },
+  "pages": {
+    "_doc": "GDD v0.5.2 §9.1 (D-008) — สุ่มจาก seed ของหน้า · [min, max] รวมปลาย · ASSUMPTION จูนใน T-029",
+    "ASSUMPTION_waves_by_chapter": [[3, 4], [4, 6], [5, 8]],
+    "ASSUMPTION_monsters_per_wave_by_chapter": [[2, 3], [3, 4], [3, 5]],
+    "long_pages_in_chapter": [5, 10],
+    "ASSUMPTION_long_page_extra_waves": 2,
+    "chapters_per_book": 3,
+    "ASSUMPTION_walk_ms": 1600,
+    "ASSUMPTION_faint_rest_ms": 2000,
+    "ASSUMPTION_retreat_after_losses": 3,
+    "ASSUMPTION_auto_boss_retry_waves": 3,
+    "ASSUMPTION_boss_time_limit_ms": 60000
+  },
+  "road_events": {
+    "_doc": "GDD v0.5.2 §9.2 (D-008) — เกิดระหว่างคลื่น · ผลนับเป็นคลื่น (บอส 1 ครั้ง = 1 คลื่น ผลค้างมีผลกับบอสด้วย) · ไม่เกิดออฟไลน์ · ไม่เกิดเหตุการณ์ใหม่ตอนบอส · AUTO บอสรอดีบัฟหมด · ตัวเหตุการณ์อยู่ใน design/data (T-043) · ASSUMPTION จูนใน T-029",
+    "ASSUMPTION_every_waves": [3, 5],
+    "ASSUMPTION_good_pct": 70,
+    "max_active": 2,
+    "debuff_max_stat_pct": 10,
+    "debuff_max_waves": 2,
+    "ASSUMPTION_buff_waves": 3,
+    "ad_boost_mult": 2
   }
 }

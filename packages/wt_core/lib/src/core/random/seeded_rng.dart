@@ -1,4 +1,4 @@
-import '../core/contracts/combat.dart';
+import '../contracts/combat.dart';
 
 /// Deterministic xorshift32 (GAME_CONTRACT §5). Shifts and xors on 32-bit
 /// values only, so it gives the same sequence on every platform.

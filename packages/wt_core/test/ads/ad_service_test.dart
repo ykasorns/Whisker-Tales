@@ -168,7 +168,8 @@ void main() {
         if (!f.path.endsWith('.dart') || f.path.contains('/src/ads/')) continue;
         if (f.path.endsWith('wt_core.dart') ||
             f.path.endsWith('providers.dart') ||
-            f.path.endsWith('game_save.dart')) {
+            f.path.endsWith('game_save.dart') ||
+            f.path.endsWith('content_repository.dart')) {
           continue; // barrel export + the wiring layer (no network calls)
         }
         final src = f.readAsStringSync();

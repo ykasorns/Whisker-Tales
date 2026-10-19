@@ -1,0 +1,20 @@
+{
+  "_doc": "GDD v0.5.2 §9.2 (T-048, D-008) — เหตุการณ์ระหว่างทาง · kind good/bad · effects: stat (atk/hp/def/evade/attack_speed) + pct ของค่าแมว, หรือ reward + mult_pct ของรางวัลคลื่น · instant: ได้ทันที (goldfish_waves = ปลาทองเท่ารายได้ N คลื่น) · waves = นานกี่คลื่น (ไม่ใส่ = road_events.buff_waves) · ดีบัฟห้ามเกิน road_events.debuff_max_* (validator) · buff = id ใน buffs.json เมื่อ T-008 มา · ASSUMPTION ทั้งไฟล์",
+  "schema_version": 1,
+  "events": [
+    { "id": "grilled_fish", "kind": "good", "icon": "🐟", "name_th": "ปลาย่างหอม", "name_en": "Grilled fish",
+      "effects": [{ "stat": "atk", "pct": 20 }] },
+    { "id": "tailwind", "kind": "good", "icon": "🍃", "name_th": "ลมส่งหลัง", "name_en": "Tailwind",
+      "effects": [{ "stat": "attack_speed", "pct": 15 }] },
+    { "id": "rainbow", "kind": "good", "icon": "🌈", "name_th": "สายรุ้ง", "name_en": "Rainbow",
+      "effects": [{ "reward": "yarn", "mult_pct": 200 }] },
+    { "id": "fish_bag", "kind": "good", "icon": "💰", "name_th": "ถุงปลาทองตกทาง", "name_en": "Lost fish bag",
+      "instant": { "goldfish_waves": 5 } },
+    { "id": "drizzle", "kind": "bad", "icon": "🌧️", "name_th": "ฝนปรอย", "name_en": "Drizzle",
+      "effects": [{ "stat": "attack_speed", "pct": -10 }], "waves": 2 },
+    { "id": "bees", "kind": "bad", "icon": "🐝", "name_th": "ผึ้งตอม", "name_en": "Buzzing bees",
+      "effects": [{ "stat": "evade", "pct": -10 }], "waves": 1 },
+    { "id": "mud", "kind": "bad", "icon": "🟤", "name_th": "โคลนเลอะ", "name_en": "Muddy paws",
+      "effects": [{ "stat": "def", "pct": -10 }], "waves": 2 }
+  ]
+}

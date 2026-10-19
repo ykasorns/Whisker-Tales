@@ -1,0 +1,409 @@
+{
+  "_doc": "Whisker Tales idle main mode — balance seed v1 (GDD v0.4 §15). ค่าที่ขึ้นต้น ASSUMPTION = สมมติฐานของ sim ที่ GDD ยังไม่ได้กำหนด ต้องยืนยันด้วย playtest. ไม่มีค่าจาก Legend of Mushroom.",
+  "schema_version": 1,
+  "pacing_targets": {
+    "book1_pages": 30,
+    "book1_target_day_full_ads": 14,
+    "book1_target_day_tolerance": 2,
+    "max_no_ads_slowdown_pct": 25
+  },
+  "enemy": {
+    "page_power_base": 100,
+    "page_power_growth": 1.18,
+    "page_boss_mult": 1.5,
+    "chapter_boss_mult": 2.2,
+    "_doc_early": "D-011: บอสหน้า 1..early_boss_until_page อ่อนลง early_boss_discount_pct% ลดลงเป็นเส้นตรงจนเต็มหลังหน้านั้น",
+    "ASSUMPTION_early_boss_discount_pct": 40,
+    "ASSUMPTION_early_boss_until_page": 10,
+    "pages_per_chapter": 10,
+    "farm_min_power_ratio": 0.7,
+    "_doc_monsters": "พลังคลื่น P(n) แบ่งเป็น HP:ATK ตาม hp_share (GDD v0.4 §15.3 = 60:40) แล้วแปลงกลับด้วยน้ำหนักพลัง §15.2 · หารเท่ากันทุกตัวในคลื่น",
+    "ASSUMPTION_hp_share_pct": 60,
+    "ASSUMPTION_monster_attack_interval_ms": 1200,
+    "ASSUMPTION_boss_attack_interval_ms": 1500
+  },
+  "player": {
+    "base_power": 60,
+    "ASSUMPTION_waves_per_minute_online": 3,
+    "offline_rate_vs_online": 1.0
+  },
+  "gear": {
+    "slots": 8,
+    "ASSUMPTION_item_power_base_per_slot": 12,
+    "ASSUMPTION_item_power_growth_per_page": 1.065,
+    "grades": [
+      "white",
+      "green",
+      "blue",
+      "purple",
+      "gold",
+      "rainbow"
+    ],
+    "grade_mult": [
+      1.0,
+      1.4,
+      2.0,
+      2.8,
+      4.0,
+      5.6
+    ],
+    "ASSUMPTION_slot_upgrade_pct_per_level": 0.04,
+    "ASSUMPTION_slot_upgrade_cost_base": 40,
+    "ASSUMPTION_slot_upgrade_cost_growth": 1.16,
+    "ASSUMPTION_recycle_fish_per_item": 4,
+    "recycle_basket_exp": 1,
+    "pity_every": 30,
+    "pity_min_grade": 3,
+    "ASSUMPTION_random_slot_exp_bonus_pct": 50,
+    "ASSUMPTION_auto_craft_interval_ms": 1000
+  },
+  "basket": {
+    "_doc": "ตารางเกรด % ต่อเลเวล — level ระหว่างแถวใช้แถวล่าสุดที่ <= level. exp_to_next = EXP สู่เลเวลถัดไป",
+    "max_level": 20,
+    "rows": [
+      {
+        "level": 1,
+        "pct": [
+          70,
+          25,
+          5,
+          0,
+          0,
+          0
+        ],
+        "exp_to_next": 20
+      },
+      {
+        "level": 5,
+        "pct": [
+          40,
+          35,
+          20,
+          5,
+          0,
+          0
+        ],
+        "exp_to_next": 120
+      },
+      {
+        "level": 10,
+        "pct": [
+          15,
+          30,
+          35,
+          17,
+          3,
+          0
+        ],
+        "exp_to_next": 400
+      },
+      {
+        "level": 15,
+        "pct": [
+          5,
+          15,
+          35,
+          33,
+          11,
+          1
+        ],
+        "exp_to_next": 900
+      },
+      {
+        "level": 20,
+        "pct": [
+          0,
+          5,
+          25,
+          42,
+          23,
+          5
+        ],
+        "exp_to_next": 0
+      }
+    ]
+  },
+  "income": {
+    "ASSUMPTION_yarn_per_wave": 0.1,
+    "ASSUMPTION_yarn_growth_per_page_pct": 2,
+    "_doc_early": "ช่วงแรกง่ายขึ้น (YK 2026-10-19, D-011): เริ่มเกมได้ไหมพรม starter_yarn · หน้า 1..early_yarn_until_page ได้ไหมพรมเพิ่มต่อคลื่น ลดลงเป็นเส้นตรงจนหมดหลังหน้านั้น",
+    "ASSUMPTION_starter_yarn": 10,
+    "ASSUMPTION_early_yarn_bonus_per_wave": 0.5,
+    "ASSUMPTION_early_yarn_until_page": 10,
+    "ASSUMPTION_fish_per_wave_base": 2,
+    "ASSUMPTION_fish_growth_per_page": 1.06,
+    "boss_fish_mult_waves": 20,
+    "egg_drop_wave_chance": 0.01,
+    "egg_page_boss": 1,
+    "egg_chapter_boss": 3,
+    "ASSUMPTION_boss_exp_kills": 10
+  },
+  "pets": {
+    "rarities": [
+      "common",
+      "rare",
+      "legend"
+    ],
+    "pull_pct": [
+      75,
+      22,
+      3
+    ],
+    "pity_legend_every": 40,
+    "roster": {
+      "common": 3,
+      "rare": 2,
+      "legend": 1
+    },
+    "deploy_slots_by_chapter": [
+      1,
+      2,
+      3
+    ],
+    "ASSUMPTION_deployed_pct": [
+      0.06,
+      0.12,
+      0.25
+    ],
+    "ASSUMPTION_owned_pct": [
+      0.01,
+      0.02,
+      0.04
+    ],
+    "ASSUMPTION_star_bonus_pct": 0.2,
+    "max_stars": 5,
+    "fish_pull_daily_max": 5,
+    "fish_pull_cost_base": 300,
+    "fish_pull_cost_growth": 1.5,
+    "fish_pull_chapter_scale_pct": 8
+  },
+  "skills": {
+    "ASSUMPTION_pct_per_skill": 0.06,
+    "unlocked_by_chapter": [
+      3,
+      6,
+      9
+    ]
+  },
+  "research": {
+    "time_base_min": 1,
+    "time_growth": 1.6,
+    "time_cap_min": 240,
+    "cost_base": 100,
+    "cost_growth": 1.45,
+    "ASSUMPTION_stat_node_pct_per_level": 0.03,
+    "offline_node_min_per_level": 10,
+    "offline_node_max_level": 12
+  },
+  "offline": {
+    "base_cap_min": 480
+  },
+  "ads": {
+    "_doc": "rewarded เท่านั้น. daily_cap_total บังคับรวมทุก placement (D-003: 10 = hatch 3 + research 5 + yarn 2 ... cap รวมตัดที่ 10). no_ads_behavior = ผลของ Supporter Pack (D-003 = hide: ซ่อนปุ่ม ไม่ให้รางวัลแทน)",
+    "daily_cap_total": 10,
+    "placements": {
+      "pet_hatch": {
+        "enabled": true,
+        "per_day": 3,
+        "no_ads_behavior": "hide"
+      },
+      "research_speedup": {
+        "enabled": true,
+        "per_day": 5,
+        "cut_min": 30,
+        "cut_pct": 25,
+        "no_ads_behavior": "hide"
+      },
+      "offline_x2": {
+        "enabled": false,
+        "per_day": 1,
+        "no_ads_behavior": "hide"
+      },
+      "yarn_bundle": {
+        "enabled": true,
+        "per_day": 2,
+        "yarn_minutes_of_income": 30,
+        "no_ads_behavior": "hide"
+      },
+      "daily_gift": {
+        "enabled": true,
+        "per_day": 1,
+        "fish_minutes_of_income": 60,
+        "no_ads_behavior": "hide"
+      },
+      "road_event": {
+        "_doc": "D-008: ดี = ผล ×2 นานขึ้น · ไม่ดี = ปัดเป่าทันที · ดีบัฟหายเองเสมอถ้าไม่ดู",
+        "enabled": true,
+        "per_day": 3,
+        "no_ads_behavior": "hide"
+      }
+    }
+  },
+  "ASSUMPTION_player_profile": {
+    "_doc": "ผู้เล่นทั่วไป: เข้าเกม sessions_per_day ครั้ง ครั้งละ session_minutes นาที กระจายเท่า ๆ กันใน awake_hours",
+    "sessions_per_day": 3,
+    "session_minutes": 15,
+    "awake_hours": 14
+  },
+  "speed": {
+    "_doc": "GDD v0.5 §1 — ปลดตามหน้าที่ผ่าน · มีผลเฉพาะตอนเปิดเกม",
+    "steps": [
+      {
+        "mult": 1,
+        "unlock_cleared_page": 0
+      },
+      {
+        "mult": 1.5,
+        "unlock_cleared_page": 5
+      },
+      {
+        "mult": 2,
+        "unlock_cleared_page": 10
+      }
+    ]
+  },
+  "slot_unlocks": {
+    "_doc": "GDD v0.5 §4.1 — cleared_page ที่ปลดช่อง (0 = เริ่ม)",
+    "weapon": 0,
+    "hat": 0,
+    "shirt": 0,
+    "shoes": 0,
+    "scarf": 5,
+    "gloves": 10,
+    "bell": 20,
+    "bag": 30
+  },
+  "cat_level": {
+    "_doc": "GDD v0.5 §3.1 — ไม่มีเลเวลสูงสุด (YK 2026-10-19) · EXP สู่เลเวลถัดไป = base × growth ต่อเลเวล ตามช่วง exp_curve (ช่วงกลาง Lv20–39 ชันขึ้น) · ASSUMPTION ทั้งหมด จูนใน T-029",
+    "class_unlock_level": 10,
+    "class_tier2_level": 40,
+    "skill_slot_levels": [
+      10,
+      20,
+      30
+    ],
+    "ASSUMPTION_exp_to_next_base": 20,
+    "ASSUMPTION_exp_curve": [
+      { "from_level": 1, "growth": 1.10 },
+      { "from_level": 20, "growth": 1.15 },
+      { "from_level": 40, "growth": 1.08 }
+    ],
+    "ASSUMPTION_exp_per_kill_base": 2,
+    "ASSUMPTION_base_stat_pct_per_level": 0.02,
+    "ASSUMPTION_base_stats": {
+      "_doc": "ค่าพื้นฐาน Lv1 ก่อนตัวคูณคลาส — พลัง §15.2 = 6×5 + 40×0.5 + 3×3 = 59 ≈ player.base_power",
+      "hp": 40,
+      "atk": 6,
+      "def": 3
+    },
+    "ASSUMPTION_exp_per_kill_growth_per_page": 1.06
+  },
+  "classes": {
+    "_doc": "GDD v0.5 §3.2 — tier 0 = ฝึกหัด, 1 = คลาสแรก, 2 = ขั้นที่ 2 (ต้องมี \"from\": id คลาส tier 1 — content v1.1) · ตัวคูณจาก stat พื้นฐาน · attack_interval_s = ช่วงห่างการตี · ASSUMPTION จูนใน T-029",
+    "novice": {
+      "tier": 0,
+      "hp": 1.0,
+      "def": 1.0,
+      "atk": 1.0,
+      "attack_interval_s": 1.0,
+      "range": "melee",
+      "evade_add": 0.0,
+      "skill_dmg": 1.0
+    },
+    "warrior": {
+      "tier": 1,
+      "hp": 1.4,
+      "def": 1.5,
+      "atk": 0.8,
+      "attack_interval_s": 1.0,
+      "range": "melee",
+      "evade_add": 0.0,
+      "skill_dmg": 1.0
+    },
+    "rogue": {
+      "tier": 1,
+      "hp": 0.9,
+      "def": 0.9,
+      "atk": 0.75,
+      "attack_interval_s": 0.6,
+      "range": "melee",
+      "evade_add": 0.15,
+      "skill_dmg": 1.0
+    },
+    "archer": {
+      "tier": 1,
+      "hp": 0.9,
+      "def": 0.85,
+      "atk": 1.35,
+      "attack_interval_s": 0.8,
+      "range": "ranged",
+      "evade_add": 0.05,
+      "skill_dmg": 1.1
+    },
+    "mage": {
+      "tier": 1,
+      "hp": 1.0,
+      "def": 0.85,
+      "atk": 0.9,
+      "attack_interval_s": 1.4,
+      "range": "ranged",
+      "evade_add": 0.0,
+      "skill_dmg": 1.8,
+      "cooldown_mult": 0.75
+    }
+  },
+  "combat": {
+    "_doc": "GDD v0.4 §4.2 + §15.2 · v0.5 §5 — ค่าเป็นเปอร์เซ็นต์ (5 = 5%) โค้ดแปลงเป็น basis point (1/10000) ตอนโหลดครั้งเดียว · ASSUMPTION_ = ยังไม่มีใน GDD จูนใน T-029",
+    "def_floor_pct": 5,
+    "crit_mult_min_pct": 150,
+    "ASSUMPTION_base_crit_dmg_pct": 150,
+    "caps_pct": {
+      "crit": 60,
+      "combo": 40,
+      "counter": 40,
+      "evade": 40,
+      "stun": 25,
+      "ASSUMPTION_lifesteal": 30,
+      "ASSUMPTION_regen": 5,
+      "ASSUMPTION_attack_speed": 100,
+      "ASSUMPTION_cdr": 50
+    },
+    "ASSUMPTION_stun_ms": 1000,
+    "ASSUMPTION_regen_tick_ms": 1000,
+    "power_weights": {
+      "atk": 5,
+      "hp": 0.5,
+      "def": 3,
+      "crit": 1.2,
+      "crit_dmg": 0.6,
+      "combo": 1.0,
+      "counter": 0.8,
+      "stun": 1.0,
+      "evade": 0.9,
+      "lifesteal": 0.7
+    }
+  },
+  "pages": {
+    "_doc": "GDD v0.5.2 §9.1 (D-008) — สุ่มจาก seed ของหน้า · [min, max] รวมปลาย · ASSUMPTION จูนใน T-029",
+    "ASSUMPTION_waves_by_chapter": [[3, 4], [4, 6], [5, 8]],
+    "ASSUMPTION_monsters_per_wave_by_chapter": [[2, 3], [3, 4], [3, 5]],
+    "long_pages_in_chapter": [5, 10],
+    "ASSUMPTION_long_page_extra_waves": 2,
+    "chapters_per_book": 3,
+    "ASSUMPTION_walk_ms": 1600,
+    "ASSUMPTION_faint_rest_ms": 2000,
+    "ASSUMPTION_retreat_after_losses": 3,
+    "ASSUMPTION_auto_boss_retry_waves": 3,
+    "ASSUMPTION_boss_time_limit_ms": 60000
+  },
+  "road_events": {
+    "_doc": "GDD v0.5.2 §9.2 (D-008) — เกิดระหว่างคลื่น · ผลนับเป็นคลื่น (บอส 1 ครั้ง = 1 คลื่น ผลค้างมีผลกับบอสด้วย) · ไม่เกิดออฟไลน์ · ไม่เกิดเหตุการณ์ใหม่ตอนบอส · AUTO บอสรอดีบัฟหมด · ตัวเหตุการณ์อยู่ใน design/data (T-043) · ASSUMPTION จูนใน T-029",
+    "ASSUMPTION_every_waves": [3, 5],
+    "ASSUMPTION_good_pct": 70,
+    "max_active": 2,
+    "debuff_max_stat_pct": 10,
+    "debuff_max_waves": 2,
+    "ASSUMPTION_buff_waves": 3,
+    "ad_boost_mult": 2
+  }
+}

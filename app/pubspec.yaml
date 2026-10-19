@@ -11,6 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   # flutter_localizations — added by T-004 alongside l10n.yaml + .arb files
+  flutter_riverpod: ^2.5.1
+  hive_flutter: ^1.1.0
   wt_core:
     path: ../packages/wt_core
   wt_mode_story:
@@ -23,4 +25,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  # Game data, copied from design/ by tools/sync_content.sh (T-003)
+  assets:
+    - assets/content/design/balance/
+    - assets/content/design/data/
   # generate: true — enabled by T-004 once l10n.yaml + .arb files exist

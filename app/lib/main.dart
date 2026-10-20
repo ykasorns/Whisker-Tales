@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wt_core/wt_core.dart';
 
-import 'game_view.dart';
+import 'ui/game_shell.dart';
+import 'l10n/strings.dart';
 import 'modes.dart';
 
 /// Reads game data from the app bundle (copied by tools/sync_content.sh).
@@ -20,6 +21,8 @@ class AssetContentSource implements ContentSource {
 /// with the file and field on screen instead of running on bad numbers.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // the game is designed for a phone held upright (60/40 layout)
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   registerModes();
   try {
     final content =
@@ -40,7 +43,10 @@ Future<void> main() async {
 }
 
 class WhiskerTalesApp extends ConsumerStatefulWidget {
-  const WhiskerTalesApp({super.key, this.avatarRules});
+  const WhiskerTalesApp({super.key, this.avatarRules, this.lang = 'th'});
+
+  /// UI language (`th` / `en`).
+  final String lang;
 
   /// Null in tests that don't load sprites.
   final AvatarRules? avatarRules;
@@ -59,7 +65,6 @@ class _WhiskerTalesAppState extends ConsumerState<WhiskerTalesApp> {
     // when it comes back (the "welcome back" screen is T-042).
     _lifecycle = AppLifecycleListener(
       onPause: () => ref.read(gameSaverProvider).save(),
-      onResume: () => ref.read(offlineRewardProvider).checkIn(),
     );
   }
 
@@ -73,23 +78,16 @@ class _WhiskerTalesAppState extends ConsumerState<WhiskerTalesApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Whisker Tales',
-      home: Scaffold(
-        body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                flex: (AppLayout.gameViewportRatio * 100).round(),
-                child: widget.avatarRules == null
-                    ? const ColoredBox(color: Colors.black12)
-                    : GameView(avatarRules: widget.avatarRules!),
-              ),
-              Expanded(
-                flex: (AppLayout.uiPanelRatio * 100).round(),
-                child: const ColoredBox(color: Colors.white),
-              ),
-            ],
-          ),
-        ),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xFFFFFBF2),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFF6A83C)),
+      ),
+      home: LangScope(
+        lang: widget.lang,
+        child: widget.avatarRules == null
+            ? const Scaffold(body: ColoredBox(color: Colors.black12))
+            : GameShell(avatarRules: widget.avatarRules!),
       ),
     );
   }

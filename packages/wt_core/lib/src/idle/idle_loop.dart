@@ -68,6 +68,9 @@ class IdleLoop implements IIdleLoop {
   IdleHooks hooks;
 
   final _events = StreamController<IdleEvent>.broadcast(sync: true);
+  final _combat = StreamController<CombatEvent>.broadcast(sync: true);
+  List<CombatUnitSpec> _fightUnits = const [];
+  int _fightId = 0;
   final _remMilli = <Currency, int>{};
 
   int _cleared = 0;
@@ -99,6 +102,17 @@ class IdleLoop implements IIdleLoop {
   Stream<IdleEvent> get events => _events.stream;
 
   IdlePhase get phase => _phase;
+
+  /// Every event of the running fight (hits, skills, defeats) for the scene
+  /// to animate (T-042). Rendering only — the loop's outcome never depends
+  /// on listeners.
+  Stream<CombatEvent> get combatEvents => _combat.stream;
+
+  /// Units of the current fight (cat side first); empty between fights.
+  List<CombatUnitSpec> get fightUnits => _fightUnits;
+
+  /// Changes every time a fight starts.
+  int get fightId => _fightId;
 
   /// Waves cleared on the farm page since arriving there.
   int get waveIndex => _waveIndex;
@@ -195,6 +209,7 @@ class IdleLoop implements IIdleLoop {
   Future<void> dispose() async {
     _endFight();
     await _events.close();
+    await _combat.close();
   }
 
   void _walk() {
@@ -275,8 +290,11 @@ class IdleLoop implements IIdleLoop {
   void _startFight(IdlePhase phase, CombatSetup setup) {
     _endFight();
     final engine = engineFactory();
+    _fightUnits = setup.units;
+    _fightId++;
     _sub = engine.events.listen((e) {
       if (e is CombatEnded) _ended = e;
+      if (_combat.hasListener) _combat.add(e);
     });
     _engine = engine;
     _fightElapsed = 0;
@@ -285,6 +303,7 @@ class IdleLoop implements IIdleLoop {
   }
 
   void _endFight() {
+    _fightUnits = const [];
     _sub?.cancel();
     _sub = null;
     _engine = null;

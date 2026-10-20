@@ -214,7 +214,13 @@ class BuffBook {
 
 /// `design/data/skills.json`: 3 skills per class (GDD v0.5 §3.2).
 class SkillBook {
-  const SkillBook({required this.byClass, required this.firstCastPct});
+  const SkillBook(
+      {required this.byClass,
+      required this.firstCastPct,
+      this.info = const {}});
+
+  /// Skill id → icon and names, for the UI.
+  final Map<String, ({String icon, String th, String en})> info;
 
   /// Class id → skills in slot order.
   final Map<String, List<SkillSpec>> byClass;
@@ -236,6 +242,7 @@ class SkillBook {
           'skills.json: needs skills and first_cast_pct 0..100');
     }
     final byClass = <String, List<(int, SkillSpec)>>{};
+    final info = <String, ({String icon, String th, String en})>{};
     for (final s in raw.cast<Map<String, dynamic>>()) {
       final id = s['id'];
       if (id is! String) {
@@ -266,8 +273,14 @@ class SkillBook {
         buffsSelf: ids('buffs_self'),
       );
       (byClass[cls] ??= []).add((slot, spec));
+      info[id] = (
+        icon: s['icon'] as String? ?? '✨',
+        th: s['name_th'] as String? ?? id,
+        en: s['name_en'] as String? ?? id,
+      );
     }
     return SkillBook(
+      info: Map.unmodifiable(info),
       firstCastPct: first,
       byClass: {
         for (final e in byClass.entries)

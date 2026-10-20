@@ -34,4 +34,7 @@ flutter:
     # Sprites, copied from assets/raw by tools/sync_sprites.py (T-027)
     - assets/game/cat/
     - assets/game/gear/
+    - assets/game/mon/
+    - assets/game/bg/
+    - assets/game/ui/
   # generate: true — enabled by T-004 once l10n.yaml + .arb files exist

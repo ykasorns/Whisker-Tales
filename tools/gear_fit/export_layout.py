@@ -11,10 +11,8 @@ A = json.load(open(f'{ROOT}/design/art/anchors_mochi.json'))
 FR, GS, RO = A['frames'], A['gear'], A['render_order']
 W = json.load(open(f'{ROOT}/design/data/wardrobe.json'))
 
-def size(name):  # trimmed gear image size, as the app bundles it
-    im = Image.open(f'{ROOT}/assets/raw/frames/gear/gear_{name}.png')
-    b = im.getbbox()
-    return b[2] - b[0], b[3] - b[1]
+def size(name):  # gear image size exactly as the app bundles it (tools/sync_sprites.py)
+    return Image.open(f'{ROOT}/app/assets/game/gear/{name}.png').size
 
 def gear(name, x, y, deg=0, scale=1.0):
     base = name.rsplit('_', 1)[0]

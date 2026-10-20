@@ -201,3 +201,12 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 2. cloud save = Play Games Services อย่างเดียว (T-023) · IAP = Google Play Billing ผ่าน `in_app_purchase` (T-025)
 3. compliance เหลือฝั่ง Google: Families policy, Data Safety, Target audience, ad SDK ใน Families self-certified list (ไม่มี App Store Privacy Label / ATT)
 4. T-001 AC "iOS build" ตัดออก → ผ่านด้วย Android build · ถ้าวันหน้าจะทำ iOS: โค้ด Flutter ใช้ร่วมได้ → `flutter create --platforms=ios` + build บน Mac คลาวด์ (Codemagic/GitHub Actions) ไม่ต้องลง Xcode ในเครื่อง
+
+---
+
+## D-018 (2026-10-19) — YK — แถบเมนูล่าง 5 ปุ่ม
+
+1. ซ้าย → ขวา: **ตัวละคร · Dungeon · 🏠 หลัก · กิจกรรม · ร้านค้า** (หลักอยู่กลาง = หน้าเกมฟาร์ม 60/40 เดิม)
+2. **ตัวละคร** มีแท็บย่อย: แมว (stat / คลาส / สกิล) · ตู้เสื้อผ้า · เพื่อนสัตว์ · ห้องสมุดนกฮูก — ทุกอย่างที่ทำให้แมวเก่งขึ้นอยู่ที่เดียว (YK)
+3. **Dungeon** = ล็อก "เปิดใน v1.1" จนกว่า T-047 · **กิจกรรม** = ของขวัญรายวัน 🎁 + ไหมพรมพิเศษ 🧶 (โฆษณา, D-003) · **ร้านค้า** = Supporter Pack + ของตกแต่ง ผ่าน parental gate (T-025)
+4. หน้าเมนูอื่นนอกจากหลัก = เต็มจอเหนือแถบเมนู · เกมยังเดินต่อเบื้องหลัง (idle) · แตะ 🏠 กลับหน้าเกม

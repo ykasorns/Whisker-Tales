@@ -12,7 +12,11 @@ class PlacementRule {
     required this.enabled,
     required this.perDay,
     required this.noAds,
+    this.params = const {},
   });
+
+  /// The placement's own numbers (e.g. `fish_minutes_of_income`).
+  final Map<String, num> params;
   final String id;
   final bool enabled;
   final int perDay;
@@ -59,7 +63,15 @@ class AdRules {
             'ads.${e.key}: no_ads_behavior "grant" needs a DECISIONS entry (grant_allowed)');
       }
       placements[e.key] = PlacementRule(
-          id: e.key, enabled: enabled, perDay: perDay, noAds: behavior.first);
+          id: e.key,
+          enabled: enabled,
+          perDay: perDay,
+          noAds: behavior.first,
+          params: Map.unmodifiable({
+            for (final p2 in p.entries)
+              if (p2.value is num && p2.key != 'per_day')
+                p2.key: p2.value as num,
+          }));
     }
     return AdRules(
         dailyCapTotal: total, placements: Map.unmodifiable(placements));

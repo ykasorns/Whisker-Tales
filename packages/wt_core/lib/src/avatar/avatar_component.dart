@@ -22,6 +22,7 @@ class AvatarComponent extends PositionComponent {
     String skin = 'base',
     String classId = 'novice',
     super.position,
+    super.priority,
   })  : _skin = skin,
         _classId = classId;
 

@@ -1,6 +1,7 @@
 """Copies game sprites into the app bundle (T-027): Mochi full-body frames
 as-is (anchors are in their pixels) and gear art trimmed to its bounding box
-(gear grips in anchors_mochi.json are fractions of the trimmed image).
+(gear grips in anchors_mochi.json are fractions of the trimmed image),
+scaled to at most 220 px.
 
     python3 tools/sync_sprites.py
 """
@@ -21,6 +22,30 @@ n = 0
 for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/gear/*.png')):
     name = os.path.basename(src)[:-4].replace('gear_', '', 1)
     im = Image.open(src)
-    im.crop(im.getbbox()).save(f'{OUT}/gear/{name}.png', optimize=True)
+    im = im.crop(im.getbbox())
+    # drawn at ≤ ~150 px on a phone: 220 px keeps it crisp and the APK small
+    s = min(1, 220 / max(im.size))
+    im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS).save(
+        f'{OUT}/gear/{name}.png', optimize=True)
     n += 1
-print(f'{len(FRAMES)} cat frames + {n} gear images → {OUT}')
+# monsters + bosses (feet-aligned frames, as sliced)
+os.makedirs(f'{OUT}/mon', exist_ok=True)
+m = 0
+for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/eraserslime/*.png') +
+                  glob.glob(f'{ROOT}/assets/raw/frames/acorn/*.png') +
+                  glob.glob(f'{ROOT}/assets/raw/frames/eraserking/*.png')):
+    name = os.path.basename(src)[:-4].replace('mon_', '').replace('boss_', '')
+    shutil.copy(src, f'{OUT}/mon/{name}.png')
+    m += 1
+# parallax layers, scaled down to a phone-sized height
+os.makedirs(f'{OUT}/bg', exist_ok=True)
+for src in sorted(glob.glob(f'{ROOT}/assets/raw/backgrounds/*.png')):
+    im = Image.open(src)
+    s = 400 / im.height
+    im.resize((round(im.width * s), 400), Image.LANCZOS).save(
+        f'{OUT}/bg/{os.path.basename(src)}', optimize=True)
+# boss faces for the challenge button
+os.makedirs(f'{OUT}/ui', exist_ok=True)
+for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/ui/*.png')):
+    shutil.copy(src, f'{OUT}/ui/{os.path.basename(src)}')
+print(f'{len(FRAMES)} cat frames + {n} gear + {m} monster frames + bg + ui → {OUT}')

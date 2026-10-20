@@ -10,6 +10,14 @@ class IdleRules {
         _pages = _map(b, 'pages'),
         _income = _map(b, 'income'),
         _player = _map(b, 'player') {
+    final steps = (_map(b, 'speed')['steps'] as List?) ?? const [];
+    speedSteps = List.unmodifiable([
+      for (final s in steps.cast<Map<String, dynamic>>())
+        ((s['mult'] as num).toDouble(), s['unlock_cleared_page'] as int),
+    ]);
+    if (speedSteps.isEmpty) {
+      throw const FormatException('balance: "speed.steps" must list speeds');
+    }
     pagesPerChapter = _int(_enemy, 'pages_per_chapter');
     chaptersPerBook = _int(_pages, 'chapters_per_book');
     wavesByChapter = _ranges(_pages, 'waves_by_chapter');
@@ -42,6 +50,15 @@ class IdleRules {
       IdleRules._(balance);
 
   final Map<String, dynamic> _enemy, _pages, _income, _player;
+
+  /// Speed button steps (GDD v0.5 §1): (multiplier, pages cleared to unlock).
+  late final List<(double, int)> speedSteps;
+
+  /// Speeds open after [clearedPage] pages.
+  List<double> speedsFor(int clearedPage) => [
+        for (final (m, at) in speedSteps)
+          if (clearedPage >= at) m
+      ];
 
   late final int pagesPerChapter;
   late final int chaptersPerBook;

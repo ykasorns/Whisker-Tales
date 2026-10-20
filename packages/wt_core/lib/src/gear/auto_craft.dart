@@ -19,6 +19,11 @@ class AutoCraft implements IAutoCraft {
   final GearBasket basket;
   final IWallet wallet;
   final _stopped = StreamController<AutoCraftStopReason>.broadcast(sync: true);
+  final _crafted = StreamController<(CraftResult, bool)>.broadcast(sync: true);
+
+  /// Every auto-knit: the result and whether it was kept (worn or stashed)
+  /// rather than recycled — for the yarn-ball effect (D-010).
+  Stream<(CraftResult, bool)> get crafted => _crafted.stream;
   AutoCraftRule _rule = const AutoCraftRule();
   int _sinceLastMs = 0;
 
@@ -78,6 +83,7 @@ class AutoCraft implements IAutoCraft {
     final reference = basket.stashed(slot) ?? basket.equipped(slot);
     final keep = basket.powerOfItem(item) > _best(slot) ||
         item.isStrictlyBetterThan(reference);
+    if (_crafted.hasListener) _crafted.add((result, keep));
     if (!keep) {
       basket.recycle(item.id);
     } else if (_rule.mode == AutoCraftMode.equip) {
@@ -96,5 +102,8 @@ class AutoCraft implements IAutoCraft {
     return worn > kept ? worn : kept;
   }
 
-  Future<void> dispose() => _stopped.close();
+  Future<void> dispose() async {
+    await _stopped.close();
+    await _crafted.close();
+  }
 }

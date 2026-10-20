@@ -36,8 +36,12 @@ class RoadEventDef {
     required this.effects,
     required this.waves,
     this.instantFishWaves = 0,
+    this.icon = '✨',
   });
   final String id;
+
+  /// Shown on the road and on the effect chip.
+  final String icon;
   final RoadEventKind kind;
   final List<RoadEffect> effects;
   final int waves;
@@ -125,6 +129,7 @@ class RoadEventRules {
         kind: kind.first,
         effects: List.unmodifiable(effects),
         waves: e['waves'] as int? ?? buffWaves,
+        icon: e['icon'] as String? ?? '✨',
         instantFishWaves: instant is int ? instant : 0,
       );
       if (def.effects.isEmpty && !def.isInstant) {
@@ -219,6 +224,9 @@ class RoadEvents implements IRoadEvents {
   Stream<RoadEventNews> get news => _news.stream;
 
   bool get hasBad => _active.any((a) => a.def.kind == RoadEventKind.bad);
+
+  /// Data of an active event (icon, effects) for the UI.
+  RoadEventDef defOf(String uid) => _find(uid)!.def;
 
   int _roll() {
     final (lo, hi) = rules.everyWaves;

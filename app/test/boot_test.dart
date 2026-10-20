@@ -51,6 +51,9 @@ void main() {
       saveServiceProvider.overrideWithValue(SaveService(MemorySaveStore())),
     ]);
     addTearDown(container.dispose);
+    tester.view.physicalSize = const Size(1080, 2340); // phone, portrait
+    tester.view.devicePixelRatio = 2.75;
+    addTearDown(tester.view.reset);
     await tester.runAsync(() async {
       await tester.pumpWidget(UncontrolledProviderScope(
           container: container,
@@ -59,8 +62,10 @@ void main() {
     });
     await tester.pump(const Duration(milliseconds: 500));
     expect(tester.takeException(), isNull);
+    await expectLater(
+        find.byType(WhiskerTalesApp), matchesGoldenFile('goldens/home.png'));
     final game = tester
-        .widget<GameWidget<MochiGame>>(find.byType(GameWidget<MochiGame>))
+        .widget<GameWidget<BattleGame>>(find.byType(GameWidget<BattleGame>))
         .game!;
     expect(game.mochi.anim, 'walk');
   });

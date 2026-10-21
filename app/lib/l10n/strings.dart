@@ -73,6 +73,8 @@ class S {
       .replaceAll('{r}', '$r')
       .replaceAll('{l}', '$l')
       .replaceAll('{p}', '$pity');
+  String get saveOlder => _t('save_older');
+  String get saveNew => _t('save_new');
   String get libraryTitle => _t('library_title');
   String statNode(String stat, String per, String now) => _t('stat_node')
       .replaceAll('{s}', _t('stat.$stat'))
@@ -149,6 +151,10 @@ class S {
     'ad_free': '📺 ฟรี เหลือ {n}',
     'fish_hatch': '🐟 {c} · เหลือ {n}',
     'odds': 'ธรรมดา {c}% · หายาก {r}% · ตำนาน {l}% · การันตีตำนานใน {p} ครั้ง',
+    'save_older':
+        'เปิดเซฟล่าสุดไม่ได้ 😿 เลยเล่นต่อจากเซฟก่อนหน้า (เก็บเซฟเดิมสำรองไว้แล้ว)',
+    'save_new':
+        'เปิดเซฟเดิมไม่ได้ 😿 เลยเริ่มเกมใหม่ (เก็บเซฟเดิมสำรองไว้แล้ว)',
     'library_title': 'ห้องสมุดนกฮูก',
     'stat.atk': 'พลังโจมตี',
     'stat.hp': 'พลังชีวิต',
@@ -222,6 +228,10 @@ class S {
     'ad_free': '📺 Free · {n} left',
     'fish_hatch': '🐟 {c} · {n} left',
     'odds': 'Common {c}% · Rare {r}% · Legend {l}% · Legend guaranteed in {p}',
+    'save_older':
+        "Couldn't open the latest save 😿 so we went on from the one before (the old save is kept)",
+    'save_new':
+        "Couldn't open the save 😿 so a new game started (the old save is kept)",
     'library_title': 'Owl Library',
     'stat.atk': 'Attack',
     'stat.hp': 'Health',

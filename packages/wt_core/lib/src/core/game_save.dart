@@ -38,6 +38,11 @@ class GameSaver {
 
   /// The whole game as a Save v3 document. Marks the player as seen now.
   Map<String, dynamic> capture() {
+    // A "welcome back" window still on screen is paid now: marking the
+    // player seen below would otherwise move last_seen past it, and leaving
+    // the app (pause → save) or killing it would lose the reward.
+    final offline = _ref.read(offlineRewardProvider);
+    if (offline.pending != null) offline.claim();
     final clock = _ref.read(gameClockProvider)..markSeen();
     final wallet = _ref.read(walletProvider);
     final loop = _ref.read(idleLoopProvider);
@@ -187,6 +192,62 @@ class GameSaver {
   }
 
   Future<void> save() => _ref.read(saveServiceProvider).save(capture());
+}
+
+/// How the game came up when the newest save could not be loaded.
+enum BootFallback {
+  /// The other save slot (one save older) loaded instead.
+  olderSave,
+
+  /// No save fit this build: a new game. The old save is kept aside.
+  newGame,
+}
+
+class GameBoot {
+  const GameBoot(this.container, {this.fallback, this.error});
+
+  /// Holds the loaded game; use it for the app's `ProviderScope`.
+  final ProviderContainer container;
+
+  /// Null when the newest save (or no save: first launch) loaded.
+  final BootFallback? fallback;
+
+  /// Why the newest save did not load, for the log.
+  final Object? error;
+}
+
+/// Starts the game from the newest save that fits this build (T-022). A save
+/// that throws while loading (newer app version, data it does not know, a
+/// bug) never stops the app: the older slot is tried, then a new game, each
+/// in a fresh container from [make] so no half-loaded state is left. The
+/// broken save is copied aside first (`broken_save_a/b`) and the next save
+/// is written so it never overwrites the save the game runs on.
+///
+/// Every container from [make] must share one [SaveService].
+Future<GameBoot> bootGame(ProviderContainer Function() make) async {
+  var container = make();
+  final saves = container.read(saveServiceProvider);
+  final read = await saves.readSlots();
+  Object? error;
+  for (var i = 0; i < read.slots.length; i++) {
+    final slot = read.slots[i];
+    try {
+      container.read(gameSaverProvider).restore(saves.upgrade(slot.doc));
+    } on Object catch (e) {
+      error ??= e;
+      container.dispose();
+      container = make();
+      continue;
+    }
+    saves.resumeAfter(read, slot);
+    if (i == 0) return GameBoot(container);
+    await saves.keepBroken();
+    return GameBoot(container, fallback: BootFallback.olderSave, error: error);
+  }
+  saves.resumeAfter(read, null);
+  if (read.slots.isEmpty) return GameBoot(container);
+  await saves.keepBroken();
+  return GameBoot(container, fallback: BootFallback.newGame, error: error);
 }
 
 /// Local save storage + migrations (T-022). Boot overrides this with a

@@ -37,7 +37,8 @@ class IdleHooks {
 /// The main idle loop (GDD v0.4 §2, v0.5.2 §9): walk → wave → walk … on the
 /// farm page; once a page's planned waves are done its boss can be fought.
 /// Losing costs nothing: the cat rests and tries again, and after a few
-/// losses in a row it farms one page back.
+/// losses in a row it farms one page back, then climbs back to the frontier
+/// one cleared page at a time.
 ///
 /// Driven by [tick] with game time (the caller applies the speed button).
 /// Every fight is seeded from (seed, page, wave, attempt), so the same seed
@@ -83,6 +84,10 @@ class IdleLoop implements IIdleLoop {
   int _attempt = 0;
   int _lossStreak = 0;
   int _autoBossWait = 0;
+
+  /// Below the frontier because of a retreat (not a page the player chose):
+  /// each page's planned waves cleared moves the cat one page forward.
+  bool _climbBack = false;
   IdlePhase _phase = IdlePhase.walking;
   late int _phaseLeftMs = rules.walkMs;
 
@@ -150,6 +155,7 @@ class IdleLoop implements IIdleLoop {
     _attempt = 0;
     _lossStreak = 0;
     _autoBossWait = 0;
+    _climbBack = false;
     _remMilli.clear();
     _walk();
   }
@@ -160,6 +166,7 @@ class IdleLoop implements IIdleLoop {
       throw RangeError.range(page, 1, _cleared + 1, 'page');
     }
     if (isBossFight) throw StateError('cannot change page during a boss fight');
+    _climbBack = false;
     if (page == _farmPage) return;
     _farmPage = page;
     _waveIndex = 0;
@@ -339,6 +346,11 @@ class IdleLoop implements IIdleLoop {
     _attempt = 0;
     _lossStreak = 0;
     if (_autoBossWait > 0) _autoBossWait--;
+    if (_climbBack && _waveIndex >= plan.waves) {
+      _farmPage++;
+      _waveIndex = 0;
+      _climbBack = _farmPage <= _cleared;
+    }
     _events.add(WaveCleared(
       page: page,
       waveIndex: index,
@@ -358,6 +370,7 @@ class IdleLoop implements IIdleLoop {
       _waveIndex = 0;
       _attempt = 0;
       _lossStreak = 0;
+      _climbBack = true;
     }
     _rest();
   }

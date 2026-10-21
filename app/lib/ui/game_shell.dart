@@ -16,8 +16,11 @@ import 'palette.dart';
 /// keeps running whatever page is open — it is driven from here, not from
 /// the (possibly hidden) game view.
 class GameShell extends ConsumerStatefulWidget {
-  const GameShell({super.key, required this.avatarRules});
+  const GameShell({super.key, required this.avatarRules, this.saveFallback});
   final AvatarRules avatarRules;
+
+  /// The newest save did not load (bootGame): say so once.
+  final BootFallback? saveFallback;
 
   @override
   ConsumerState<GameShell> createState() => _GameShellState();
@@ -44,7 +47,17 @@ class _GameShellState extends ConsumerState<GameShell>
       ..start();
     // welcome back: on open and on every return to the app
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) showOfflineReward(context, ref);
+      if (!mounted) return;
+      if (widget.saveFallback case final f?) {
+        final s = S.of(context);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          duration: const Duration(seconds: 8),
+          backgroundColor: Palette.ink,
+          content: Text(f == BootFallback.olderSave ? s.saveOlder : s.saveNew,
+              style: const TextStyle(fontWeight: FontWeight.w800)),
+        ));
+      }
+      showOfflineReward(context, ref);
     });
     _life = AppLifecycleListener(onResume: () {
       if (mounted) showOfflineReward(context, ref);

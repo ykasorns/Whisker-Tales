@@ -219,7 +219,62 @@ void main() {
     expect(() => k2.restore({'slots': []}), throwsFormatException);
   });
 
+  test('a knit left on the compare card is kept or recycled, never lost', () {
+    final wallet = MemoryWallet({Currency.yarn: 40});
+    final k = basket(wallet);
+    var kept = 0, recycled = 0;
+    for (var i = 0; i < 40; i++) {
+      final item = k.craft(GearSlot.weapon).item;
+      final keeper = k.isKeeper(item);
+      final fish = wallet.balance(Currency.goldfish);
+      expect(k.settle(item.id), keeper);
+      expect(k.isPending(item.id), isFalse);
+      if (keeper) {
+        kept++;
+        expect(k.stashed(GearSlot.weapon)?.id, item.id);
+      } else {
+        recycled++;
+        expect(wallet.balance(Currency.goldfish),
+            fish + rules.recycleFish(item.page));
+      }
+    }
+    expect(kept, greaterThan(0));
+    expect(recycled, greaterThan(0));
+    expect(() => k.settle('g999'), throwsStateError);
+  });
+
+  test('knits still pending when the app closes are saved, settled on load',
+      () {
+    final k = basket(MemoryWallet({Currency.yarn: 5}));
+    final item = k.craft(GearSlot.weapon).item;
+    final saved = jsonDecode(jsonEncode(k.toJson())) as Map<String, dynamic>;
+    expect((saved['pending'] as List).single['id'], item.id);
+    final k2 = basket(MemoryWallet())..restore(saved);
+    expect(k2.isPending(item.id), isFalse);
+    expect(k2.stashed(GearSlot.weapon)?.id, item.id); // nothing worn: kept
+  });
+
   group('auto-craft (GDD v0.5 §4.3)', () {
+    test('held while the player knits by hand: no auto-knit, no race', () {
+      final wallet = MemoryWallet({Currency.yarn: 100});
+      final auto = AutoCraft(basket(wallet), wallet)
+        ..start()
+        ..hold()
+        ..hold();
+      auto.tick(rules.autoCraftIntervalMs * 10);
+      expect(wallet.balance(Currency.yarn), 100);
+      auto
+        ..release()
+        ..tick(rules.autoCraftIntervalMs * 10);
+      expect(wallet.balance(Currency.yarn), 100); // one hold left
+      auto
+        ..release()
+        ..release() // an extra release is harmless
+        ..tick(rules.autoCraftIntervalMs * 2);
+      expect(wallet.balance(Currency.yarn), 98);
+      expect(auto.running, isTrue);
+    });
+
     test('fills the weakest slots, stops when the yarn runs out', () {
       final wallet = MemoryWallet({Currency.yarn: 40});
       final k = basket(wallet);

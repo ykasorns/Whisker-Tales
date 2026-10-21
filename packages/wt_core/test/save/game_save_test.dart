@@ -23,8 +23,7 @@ void main() {
   final w = combat.powerWeights;
   final t0 = DateTime.utc(2026, 10, 19, 2);
 
-  ProviderContainer game(Time time, SaveStore store) =>
-      ProviderContainer(overrides: [
+  List<Override> world(Time time) => [
         timeSourceProvider.overrideWithValue(time),
         combatRulesProvider.overrideWithValue(combat),
         catRulesProvider.overrideWithValue(CatRules.fromBalance(b)),
@@ -44,6 +43,11 @@ void main() {
             b,
             _j('../../design/data/research.json'),
             AdRules.fromJson(b).placements['research_speedup']!.params)),
+      ];
+
+  ProviderContainer game(Time time, SaveStore store) =>
+      ProviderContainer(overrides: [
+        ...world(time),
         saveServiceProvider.overrideWithValue(SaveService(store)),
       ]);
 
@@ -131,6 +135,116 @@ void main() {
     addTearDown(c.dispose);
     await c.read(gameSaverProvider).load();
     expect(c.read(offlineRewardProvider).checkIn().creditedMinutes, 120);
+  });
+
+  test('a "welcome back" still open is paid before a save moves last_seen',
+      () async {
+    final time = Time(t0);
+    final a = game(time, MemorySaveStore());
+    addTearDown(a.dispose);
+    await a.read(gameSaverProvider).save(); // last_seen = t0
+    time.utc = t0.add(const Duration(hours: 3));
+    final offline = a.read(offlineRewardProvider);
+    final shown = offline.checkIn(); // the sheet is up, not claimed yet
+    final fish = a.read(walletProvider).balance(Currency.goldfish);
+    expect(shown.reward[Currency.goldfish], greaterThan(0));
+    // the player leaves (pause → save) and comes back a minute later
+    await a.read(gameSaverProvider).save();
+    expect(offline.pending, isNull);
+    expect(a.read(walletProvider).balance(Currency.goldfish),
+        fish + shown.reward[Currency.goldfish]);
+    time.utc = time.utc.add(const Duration(minutes: 1));
+    expect(offline.checkIn().creditedMinutes, 1);
+    // the old sheet's button now only pays the new minute: nothing twice
+    final paid = offline.claim();
+    expect(paid[Currency.goldfish], lessThan(shown.reward[Currency.goldfish]));
+  });
+
+  group('boot never stops on a save it cannot load', () {
+    /// Writes [doc] as the newest save, beside what is stored.
+    Future<void> write(SaveStore store, Map<String, dynamic> doc,
+        {int version = 3}) async {
+      final s = SaveService(store, currentVersion: version);
+      final read = await s.readSlots();
+      s.resumeAfter(read, read.slots.isEmpty ? null : read.slots.first);
+      await s.save(doc);
+    }
+
+    Future<GameBoot> boot(Time time, SaveStore store) async {
+      final saves = SaveService(store);
+      final b = await bootGame(() => ProviderContainer(overrides: [
+            ...world(time),
+            saveServiceProvider.overrideWithValue(saves),
+          ]));
+      addTearDown(b.container.dispose);
+      return b;
+    }
+
+    Map<String, dynamic> played(Time time, int fish) {
+      final c = game(time, MemorySaveStore());
+      addTearDown(c.dispose);
+      (c.read(walletProvider) as MemoryWallet)
+          .add(RewardBundle({Currency.goldfish: fish}));
+      return c.read(gameSaverProvider).capture();
+    }
+
+    test('a save that loads is used as is', () async {
+      final time = Time(t0);
+      final store = MemorySaveStore();
+      await write(store, played(time, 50));
+      final b = await boot(time, store);
+      expect(b.fallback, isNull);
+      expect(b.container.read(walletProvider).balance(Currency.goldfish), 50);
+      expect(store.data.keys.where((k) => k.startsWith('broken')), isEmpty);
+    });
+
+    test('newest does not fit the data → the older slot, broken kept aside',
+        () async {
+      final time = Time(t0);
+      final store = MemorySaveStore();
+      await write(store, played(time, 50));
+      final bad = played(time, 80)
+        ..['pets'] = {
+          'owned': {
+            'dragon': {'stars': 1, 'level': 1}
+          },
+          'deployed': [],
+          'pity': 0
+        };
+      await write(store, bad);
+      final rawBad = store.data['save_b'];
+      final b = await boot(time, store);
+      expect(b.fallback, BootFallback.olderSave);
+      expect(b.error, isA<FormatException>());
+      expect(b.container.read(walletProvider).balance(Currency.goldfish), 50);
+      expect(store.data['broken_save_b'], rawBad);
+      // the next save replaces the broken slot, not the one the game runs on
+      await b.container.read(gameSaverProvider).save();
+      expect(store.data['save_b'], isNot(rawBad));
+      final again = await boot(time, store);
+      expect(again.fallback, isNull);
+      expect(store.data['broken_save_b'], rawBad); // the copy stays
+    });
+
+    test('nothing fits (a newer app wrote it) → new game, save kept aside',
+        () async {
+      final time = Time(t0);
+      final store = MemorySaveStore();
+      await write(store, played(time, 50)..['save_version'] = 4, version: 4);
+      final raw = store.data['save_a'];
+      final b = await boot(time, store);
+      expect(b.fallback, BootFallback.newGame);
+      expect(b.container.read(walletProvider).balance(Currency.goldfish), 0);
+      expect(store.data['broken_save_a'], raw);
+      // new progress is saved as the newest and loads next time
+      (b.container.read(walletProvider) as MemoryWallet)
+          .add(RewardBundle({Currency.goldfish: 7}));
+      await b.container.read(gameSaverProvider).save();
+      final again = await boot(time, store);
+      expect(again.fallback, isNull);
+      expect(
+          again.container.read(walletProvider).balance(Currency.goldfish), 7);
+    });
   });
 
   test('a new day since the save resets the ad caps', () async {

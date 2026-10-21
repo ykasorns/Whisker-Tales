@@ -29,24 +29,32 @@ Future<void> main() async {
         await ContentRepository(const AssetContentSource()).loadAll();
     await Hive.initFlutter();
     final box = await Hive.openBox<String>('whisker_tales_save');
-    final container = ProviderContainer(overrides: [
-      ...content.overrides,
-      saveServiceProvider.overrideWithValue(SaveService(HiveSaveStore(box))),
-    ]);
-    await container.read(gameSaverProvider).load();
+    final saves = SaveService(HiveSaveStore(box));
+    // a save this build cannot load never stops the app: older slot or a
+    // new game, with the broken save kept aside (bootGame)
+    final boot = await bootGame(() => ProviderContainer(overrides: [
+          ...content.overrides,
+          saveServiceProvider.overrideWithValue(saves),
+        ]));
+    if (boot.error != null) debugPrint('save not loaded: ${boot.error}');
     runApp(UncontrolledProviderScope(
-        container: container,
-        child: WhiskerTalesApp(avatarRules: content.avatar)));
+        container: boot.container,
+        child: WhiskerTalesApp(
+            avatarRules: content.avatar, saveFallback: boot.fallback)));
   } on ContentError catch (e) {
     runApp(BootErrorApp(message: '${e.file}\n${e.message}'));
   }
 }
 
 class WhiskerTalesApp extends ConsumerStatefulWidget {
-  const WhiskerTalesApp({super.key, this.avatarRules, this.lang = 'th'});
+  const WhiskerTalesApp(
+      {super.key, this.avatarRules, this.lang = 'th', this.saveFallback});
 
   /// UI language (`th` / `en`).
   final String lang;
+
+  /// Set when the newest save could not be loaded (told once on screen).
+  final BootFallback? saveFallback;
 
   /// Null in tests that don't load sprites.
   final AvatarRules? avatarRules;
@@ -87,7 +95,9 @@ class _WhiskerTalesAppState extends ConsumerState<WhiskerTalesApp> {
         lang: widget.lang,
         child: widget.avatarRules == null
             ? const Scaffold(body: ColoredBox(color: Colors.black12))
-            : GameShell(avatarRules: widget.avatarRules!),
+            : GameShell(
+                avatarRules: widget.avatarRules!,
+                saveFallback: widget.saveFallback),
       ),
     );
   }

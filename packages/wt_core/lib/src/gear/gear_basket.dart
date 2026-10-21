@@ -74,6 +74,35 @@ class GearBasket implements IGearBasket {
   int powerOfItem(GearItem? item) =>
       item == null ? 0 : powerOf(_withSlotLevel(item));
 
+  /// Power of the best item kept for [s], worn or stashed.
+  int bestPower(GearSlot s) {
+    final worn = powerOfItem(_equipped[s]), kept = powerOfItem(_stash[s]);
+    return worn > kept ? worn : kept;
+  }
+
+  /// Worth keeping: more power than both the worn and the stashed item, or
+  /// ✨ strictly better than the one it would replace (GDD v0.5 §4.3).
+  bool isKeeper(GearItem item) =>
+      powerOfItem(item) > bestPower(item.slot) ||
+      item.isStrictlyBetterThan(_stash[item.slot] ?? _equipped[item.slot]);
+
+  /// Knitted, waiting for the player to wear or recycle it.
+  bool isPending(String itemId) => _pending.containsKey(itemId);
+
+  /// Puts away a knitted item the player left without choosing (sheet
+  /// closed, app restarted): into the stash (✨ on the slot) when it is a
+  /// keeper, recycled for goldfish otherwise. Returns true when kept.
+  bool settle(String itemId) {
+    final item = _pending[itemId];
+    if (item == null) throw StateError('item $itemId is not pending');
+    if (isKeeper(item)) {
+      stash(itemId);
+      return true;
+    }
+    recycle(itemId);
+    return false;
+  }
+
   /// Sum of everything worn, slot levels applied — the `extra` the cat class
   /// multiplies (T-044 `combatSpec`).
   StatBlock get totalStats {
@@ -202,8 +231,8 @@ class GearBasket implements IGearBasket {
   }
 
   /// Save v3 `gear` (+ `basket.rng` / `basket.next_id` so the sequence
-  /// continues). Pending items are not saved — the craft screen recycles or
-  /// equips them before the app can close a session.
+  /// continues). Pending items are saved too and [settle]d on load, so an
+  /// app closed on the compare card never loses the yarn spent.
   Map<String, dynamic> toJson() => {
         'slots': [
           for (final s in GearSlot.values)
@@ -215,6 +244,7 @@ class GearBasket implements IGearBasket {
         ],
         'unlocked_slots': [for (final s in openSlots) s.name],
         'stash': {for (final e in _stash.entries) e.key.name: e.value.toJson()},
+        'pending': [for (final i in _pending.values) i.toJson()],
         'basket': {
           'level': _level,
           'exp': _expMilli ~/ 1000,
@@ -274,5 +304,11 @@ class GearBasket implements IGearBasket {
     _pity = pity;
     if (basket['rng'] is int) _rng = SeededRng.fromState(basket['rng'] as int);
     if (basket['next_id'] is int) _nextId = basket['next_id'] as int;
+    for (final raw
+        in (j['pending'] as List? ?? const []).cast<Map<String, dynamic>>()) {
+      final item = GearItem.fromJson(raw);
+      _pending[item.id] = item;
+      settle(item.id);
+    }
   }
 }

@@ -228,11 +228,35 @@ void main() {
       expect(l.state.clearedPage, 2);
     });
 
+    test('after a retreat the cat climbs back and the boss opens again', () {
+      var spec = weak;
+      final l = loop(spec: () => spec)..restore(clearedPage: 2);
+      run(l, ms: 60000);
+      expect(l.state.farmPage, lessThan(3));
+      spec = strong; // stronger now (gear, level, pets …)
+      final pages = <int>[];
+      l.events.listen((e) {
+        if (e is WaveCleared) pages.add(e.page);
+      });
+      for (var t = 0; t < 30 * 60000 && !l.bossReady; t += 100) {
+        l.tick(100);
+      }
+      expect(l.state.farmPage, 3);
+      expect(l.bossReady, isTrue);
+      // one page at a time, each page's planned waves first
+      for (var p = pages.first; p < 3; p++) {
+        expect(pages.where((x) => x == p).length,
+            greaterThanOrEqualTo(pagePlan(rules, p).waves));
+      }
+    });
+
     test('farm page can be chosen up to the frontier', () {
       final l = loop(spec: () => strong)..restore(clearedPage: 4);
       l.setFarmPage(2);
       expect(l.state.farmPage, 2);
       expect(l.bossReady, isFalse); // boss only on the frontier page
+      run(l, ms: 5 * 60000);
+      expect(l.state.farmPage, 2); // a page the player picked is kept
       expect(() => l.setFarmPage(6), throwsRangeError);
       expect(() => l.setFarmPage(0), throwsRangeError);
       expect(l.recommendedFarmPage(1 << 30), 5);

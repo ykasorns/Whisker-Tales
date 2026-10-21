@@ -26,6 +26,17 @@ class AutoCraft implements IAutoCraft {
   Stream<(CraftResult, bool)> get crafted => _crafted.stream;
   AutoCraftRule _rule = const AutoCraftRule();
   int _sinceLastMs = 0;
+  int _holds = 0;
+
+  /// Pauses auto-knit while the player knits by hand (the knit sheet), so
+  /// the two never race for the last yarn or the stash. Every [hold] needs
+  /// a [release]; time held does not count toward the next knit.
+  void hold() => _holds++;
+  void release() {
+    if (_holds > 0) _holds--;
+  }
+
+  bool get held => _holds > 0;
 
   AutoCraftRule get rule => _rule;
   bool get running => _rule.on;
@@ -53,7 +64,7 @@ class AutoCraft implements IAutoCraft {
 
   /// Advances online play time; crafts once per interval.
   void tick(int dtMs) {
-    if (!_rule.on) return;
+    if (!_rule.on || held) return;
     _sinceLastMs += dtMs;
     final every = basket.rules.autoCraftIntervalMs;
     while (_rule.on && _sinceLastMs >= every) {
@@ -71,7 +82,7 @@ class AutoCraft implements IAutoCraft {
     GearSlot? weakest;
     var weakestPower = 0;
     for (final s in basket.openSlots) {
-      final p = _best(s);
+      final p = basket.bestPower(s);
       if (weakest == null || p < weakestPower) {
         weakest = s;
         weakestPower = p;
@@ -80,9 +91,7 @@ class AutoCraft implements IAutoCraft {
     final result = basket.craft(weakest);
     final item = result.item;
     final slot = item.slot;
-    final reference = basket.stashed(slot) ?? basket.equipped(slot);
-    final keep = basket.powerOfItem(item) > _best(slot) ||
-        item.isStrictlyBetterThan(reference);
+    final keep = basket.isKeeper(item);
     if (_crafted.hasListener) _crafted.add((result, keep));
     if (!keep) {
       basket.recycle(item.id);
@@ -94,12 +103,6 @@ class AutoCraft implements IAutoCraft {
       basket.stash(item.id);
     }
     return result;
-  }
-
-  int _best(GearSlot s) {
-    final worn = basket.powerOfItem(basket.equipped(s));
-    final kept = basket.powerOfItem(basket.stashed(s));
-    return worn > kept ? worn : kept;
   }
 
   Future<void> dispose() async {

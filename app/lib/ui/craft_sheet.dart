@@ -30,6 +30,8 @@ class _CraftSheet extends ConsumerStatefulWidget {
 }
 
 class _CraftSheetState extends ConsumerState<_CraftSheet> {
+  late final GearBasket _basket;
+  late final AutoCraft _auto;
   GearItem? _item;
   bool _knitting = false;
   int _wiggle = 0;
@@ -37,15 +39,33 @@ class _CraftSheetState extends ConsumerState<_CraftSheet> {
   @override
   void initState() {
     super.initState();
+    _basket = ref.read(gearBasketProvider);
+    // auto-knit waits while the sheet is open, so it can neither spend the
+    // last yarn nor replace the stashed item being compared
+    _auto = ref.read(autoCraftProvider)..hold();
     _item = widget.stashed;
   }
 
+  @override
+  void dispose() {
+    // closed (✕, swipe, back) on the compare card: never lose the knit
+    final item = _item;
+    if (item != null && _basket.isPending(item.id)) _basket.settle(item.id);
+    _auto.release();
+    super.dispose();
+  }
+
   Future<void> _knit(GearSlot slot) async {
+    if (_knitting) return; // a second tap in the same frame
+    if (ref.read(walletProvider).balance(Currency.yarn) < 1) {
+      Navigator.of(context).pop();
+      return;
+    }
     setState(() {
       _knitting = true;
       _wiggle++;
     });
-    final r = ref.read(gearBasketProvider).craft(slot);
+    final r = _basket.craft(slot);
     await Future<void>.delayed(
         const Duration(milliseconds: 550)); // wiggle, then pop
     if (mounted) {
@@ -68,7 +88,7 @@ class _CraftSheetState extends ConsumerState<_CraftSheet> {
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
-    final basket = ref.read(gearBasketProvider);
+    final basket = _basket;
     final cls = ref.read(catClassProvider).current;
     final wr = ref.read(wardrobeRulesProvider);
     final grades = s.gradeNames.split(',');

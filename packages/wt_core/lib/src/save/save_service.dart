@@ -34,6 +34,12 @@ class HiveSaveStore implements SaveStore {
   }
 }
 
+/// One readable save slot: generation, slot index, stored document.
+typedef SavedSlot = ({int gen, int slot, Map<String, dynamic> doc});
+
+/// [SaveService.readSlots] result.
+typedef SaveSlots = ({List<SavedSlot> slots, bool damaged});
+
 /// Upgrades a save document one version (`from` → `from + 1`).
 typedef SaveMigration = Map<String, dynamic> Function(Map<String, dynamic>);
 
@@ -69,8 +75,24 @@ class SaveService {
   int _generation = 0;
   int _lastSlot = -1;
 
+  /// The newest readable save, migrated (no document = new game).
   Future<SaveLoadResult> load() async {
-    ({int gen, int slot, Map<String, dynamic> doc})? best;
+    final read = await readSlots();
+    if (read.slots.isEmpty) {
+      return SaveLoadResult(null, recovered: read.damaged);
+    }
+    final best = read.slots.first;
+    resumeAfter(read, best);
+    final from = best.doc['save_version'];
+    return SaveLoadResult(upgrade(best.doc),
+        migratedFrom: from == currentVersion ? null : from as int,
+        recovered: read.damaged);
+  }
+
+  /// Every slot whose checksum holds, newest first, as stored (not yet
+  /// migrated). [damaged]: some slot failed its checksum.
+  Future<SaveSlots> readSlots() async {
+    final slots = <SavedSlot>[];
     var damaged = false;
     for (var i = 0; i < _slots.length; i++) {
       final raw = await store.read(_slots[i]);
@@ -80,22 +102,40 @@ class SaveService {
         damaged = true;
         continue;
       }
-      if (best == null || env.gen > best.gen) {
-        best = (gen: env.gen, slot: i, doc: env.doc);
-      }
+      slots.add((gen: env.gen, slot: i, doc: env.doc));
     }
-    if (best == null) return SaveLoadResult(null, recovered: damaged);
-    _generation = best.gen;
-    _lastSlot = best.slot;
-    final from = best.doc['save_version'];
+    slots.sort((a, b) => b.gen.compareTo(a.gen));
+    return (slots: slots, damaged: damaged);
+  }
+
+  /// [doc] migrated to [currentVersion]. Throws [FormatException] when it
+  /// has no version, is newer than this app or a migration is missing.
+  Map<String, dynamic> upgrade(Map<String, dynamic> doc) {
+    final from = doc['save_version'];
     if (from is! int) {
       throw const FormatException('save: "save_version" missing');
     }
-    final doc = from == currentVersion
-        ? best.doc
-        : migrate(best.doc, from, currentVersion);
-    return SaveLoadResult(doc,
-        migratedFrom: from == currentVersion ? null : from, recovered: damaged);
+    return from == currentVersion ? doc : migrate(doc, from, currentVersion);
+  }
+
+  /// The next [save] continues after every slot in [read] (so it is the
+  /// newest) and never overwrites [loaded], the save the game runs on. With
+  /// [loaded] null (new game) slot A is written first.
+  void resumeAfter(SaveSlots read, SavedSlot? loaded) {
+    _generation = read.slots.fold(0, (g, s) => s.gen > g ? s.gen : g);
+    _lastSlot = loaded?.slot ?? -1;
+  }
+
+  /// Copies both slots aside as `broken_save_a/b` before a save that does
+  /// not load gets overwritten. The first broken save is kept: a later
+  /// failure never replaces it.
+  Future<void> keepBroken() async {
+    for (final k in _slots) {
+      final raw = await store.read(k);
+      if (raw != null && await store.read('broken_$k') == null) {
+        await store.write('broken_$k', raw);
+      }
+    }
   }
 
   /// Writes [document] to the slot not holding the last good save.

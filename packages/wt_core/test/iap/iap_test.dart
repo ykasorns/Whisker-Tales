@@ -72,7 +72,6 @@ void main() {
   late GameClock clock;
   late ParentalGate gate;
   late FakeIapStore store;
-  late List<String> granted;
   late IapService iap;
 
   setUp(() {
@@ -83,10 +82,7 @@ void main() {
     store = FakeIapStore({
       for (final p in catalog.products) p.sku: '฿35.00',
     });
-    granted = [];
-    iap = IapService(
-        catalog: catalog, store: store, gate: gate, grantCosmetics: granted.add)
-      ..start();
+    iap = IapService(catalog: catalog, store: store, gate: gate)..start();
   });
 
   GatePass pass() {
@@ -159,20 +155,18 @@ void main() {
       expect(await iap.purchase('supporter_pack', pass()), PurchaseStart.owned);
     });
 
-    test('a cosmetic unlocks its look through the wardrobe only', () async {
-      await iap.purchase('skin_pajama', pass());
-      expect(granted, ['skin_pajama']);
-      expect(iap.hasNoAds, isFalse);
+    test('only SKUs of the catalog can be bought', () async {
       expect(await iap.purchase('gold_pile', pass()), PurchaseStart.unknown);
+      expect(iap.owned, isEmpty);
     });
 
     test('delivery needs no gate (already paid) and grants once', () {
       final news = <StoreEvent>[];
       iap.news.listen(news.add);
-      expect(iap.deliver('skin_raincoat'), isTrue);
-      expect(iap.deliver('skin_raincoat'), isFalse);
+      expect(iap.deliver('supporter_pack'), isTrue);
+      expect(iap.deliver('supporter_pack'), isFalse);
       expect(iap.deliver('not_a_sku'), isFalse);
-      expect(iap.owned, {'skin_raincoat'});
+      expect(iap.owned, {'supporter_pack'});
       expect(
           news.where((e) => e.kind == StoreEventKind.purchased), hasLength(1));
     });
@@ -183,28 +177,25 @@ void main() {
       final news = <StoreEvent>[];
       iap.news.listen(news.add);
       expect(
-          await iap.purchase('skin_explorer', pass()), PurchaseStart.started);
+          await iap.purchase('supporter_pack', pass()), PurchaseStart.started);
       expect(news.single.kind, StoreEventKind.pending);
       expect(iap.owned, isEmpty);
       // the payment clears while the app is closed; next boot delivers it
       final store2 = FakeIapStore({})
-        ..emit(const StoreEvent(StoreEventKind.purchased, 'skin_explorer'));
-      final iap2 = IapService(
-          catalog: catalog, store: store2, gate: gate, grantCosmetics: (_) {});
+        ..emit(const StoreEvent(StoreEventKind.purchased, 'supporter_pack'));
+      final iap2 = IapService(catalog: catalog, store: store2, gate: gate);
       expect(iap2.owned, isEmpty);
       iap2.start();
-      expect(iap2.owned, {'skin_explorer'});
+      expect(iap2.owned, {'supporter_pack'});
     });
 
     test('restore brings back everything bought before', () async {
       await iap.purchase('supporter_pack', pass());
-      await iap.purchase('skin_pajama', pass());
-      final fresh = IapService(
-          catalog: catalog, store: store, gate: gate, grantCosmetics: (_) {})
+      final fresh = IapService(catalog: catalog, store: store, gate: gate)
         ..start();
       expect(fresh.owned, isEmpty);
       expect(await fresh.restore(pass()), isTrue);
-      expect(fresh.owned, {'supporter_pack', 'skin_pajama'});
+      expect(fresh.owned, {'supporter_pack'});
       expect(fresh.hasNoAds, isTrue);
     });
 
@@ -226,8 +217,7 @@ void main() {
         'no_ads': true,
         'skus': ['supporter_pack']
       });
-      final back = IapService(
-          catalog: catalog, store: store, gate: gate, grantCosmetics: (_) {})
+      final back = IapService(catalog: catalog, store: store, gate: gate)
         ..restoreSaved({
           ...json,
           'skus': ['supporter_pack', 'retired_sku']
@@ -238,9 +228,9 @@ void main() {
   });
 
   group('catalog never sells gameplay', () {
-    test('shipped data: Supporter Pack + cosmetics, no currency', () {
-      expect(catalog.products.map((p) => p.sku).toSet(),
-          {'supporter_pack', 'skin_pajama', 'skin_raincoat', 'skin_explorer'});
+    test('shipped data: the Supporter Pack only, no currency', () {
+      // outfits come back when every class has its art (D-024)
+      expect(catalog.products.map((p) => p.sku), ['supporter_pack']);
       for (final p in catalog.products) {
         expect(kEntitlements.containsAll(p.entitlements), isTrue);
       }
@@ -251,7 +241,8 @@ void main() {
             'products': [
               {
                 'sku': 'x',
-                'kind': 'cosmetic',
+                'kind': 'supporter',
+                'entitlements': ['no_ads'],
                 'name_th': 'x',
                 'name_en': 'x',
                 'desc_th': 'x',
@@ -260,6 +251,7 @@ void main() {
               }
             ]
           };
+      expect(IapCatalog.fromJson(one({})).products.single.sku, 'x');
       for (final bad in [
         {'goldfish': 1000},
         {'eggs': 5},
@@ -268,16 +260,12 @@ void main() {
           'grants': {'cookies': 3}
         },
         {
-          'kind': 'supporter',
           'entitlements': ['no_ads', 'skip_timers']
         },
         {
-          'kind': 'supporter',
           'entitlements': ['gear_presets']
         },
-        {
-          'entitlements': ['no_ads']
-        },
+        {'kind': 'cosmetic'},
         {'kind': 'bundle'},
       ]) {
         expect(() => IapCatalog.fromJson(one(bad)), throwsFormatException,
@@ -287,13 +275,18 @@ void main() {
 
     test('the iap module never touches the wallet or currencies', () {
       for (final f in Directory('lib/src/iap').listSync().whereType<File>()) {
-        final src = f.readAsStringSync();
+        // code only: the doc comments say what is never sold
+        final src = f
+            .readAsLinesSync()
+            .where((l) => !l.trimLeft().startsWith('//'))
+            .join('\n');
         for (final w in [
           'IWallet',
-          'Currency.',
+          'Currency',
           'wallet',
           'goldfish',
-          'eggs'
+          'eggs',
+          'yarn'
         ]) {
           expect(src.contains(w), isFalse, reason: '${f.path}: $w');
         }

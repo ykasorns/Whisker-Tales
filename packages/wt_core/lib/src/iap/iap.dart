@@ -8,7 +8,9 @@ export 'parental_gate.dart';
 /// in the data is refused: no currency, eggs, speed-ups or power for money.
 const kEntitlements = {'no_ads', 'gear_presets', 'basket_theme'};
 
-enum IapKind { cosmetic, supporter }
+/// Only the Supporter Pack for now; outfits come back as a kind when every
+/// class has its art (D-024).
+enum IapKind { supporter }
 
 class IapProduct {
   const IapProduct({
@@ -27,9 +29,7 @@ class IapProduct {
   final Set<String> entitlements;
 }
 
-/// `design/data/iap.json` (GDD v0.4 §10/§12, D-003, T-025). Cosmetics per
-/// SKU live in `wardrobe.json → iap`; the boot loader checks both lists
-/// match.
+/// `design/data/iap.json` (GDD v0.4 §10/§12, D-003, T-025, D-024).
 class IapCatalog {
   const IapCatalog(this.products);
   final List<IapProduct> products;
@@ -63,17 +63,13 @@ class IapCatalog {
           p.keys.where((k) => !_keys.contains(k) && !k.startsWith('_'));
       if (extra.isNotEmpty) throw bad('unknown field ${extra.first}');
       final kind = switch (p['kind']) {
-        'cosmetic' => IapKind.cosmetic,
         'supporter' => IapKind.supporter,
-        _ => throw bad('kind must be cosmetic or supporter'),
+        _ => throw bad('kind must be supporter'),
       };
       final ent =
           (p['entitlements'] as List? ?? const []).cast<String>().toSet();
       final unknown = ent.difference(kEntitlements);
       if (unknown.isNotEmpty) throw bad('unknown entitlement ${unknown.first}');
-      if (kind == IapKind.cosmetic && ent.isNotEmpty) {
-        throw bad('a cosmetic gives no entitlements');
-      }
       if (kind == IapKind.supporter && !ent.contains('no_ads')) {
         throw bad('the Supporter Pack must give no_ads');
       }
@@ -144,7 +140,7 @@ class UnavailableIapStore implements IapStore {
 
 enum PurchaseStart { started, needsGate, owned, unknown, unavailable }
 
-/// Purchases (T-025, D-003, D-023): cosmetics and the Supporter Pack only,
+/// Purchases (T-025, D-003, D-023): the Supporter Pack only (D-024),
 /// started only with a live [GatePass]. What the store delivers is granted
 /// once ([deliver] is idempotent) and kept in Save v3 `entitlements`.
 /// Never touches the wallet.
@@ -153,15 +149,11 @@ class IapService {
     required this.catalog,
     required this.store,
     required this.gate,
-    required this.grantCosmetics,
   });
 
   final IapCatalog catalog;
   final IapStore store;
   final ParentalGate gate;
-
-  /// Unlocks a SKU's looks in the wardrobe (wired in providers).
-  final void Function(String sku) grantCosmetics;
 
   final _owned = <String>{};
   final _news = StreamController<StoreEvent>.broadcast(sync: true);
@@ -222,7 +214,6 @@ class IapService {
   /// paid). Unknown SKUs are ignored; a second delivery grants nothing new.
   bool deliver(String sku) {
     if (catalog.bySku(sku) == null) return false;
-    grantCosmetics(sku); // also repairs looks a lost save forgot
     if (!_owned.add(sku)) return false;
     if (_news.hasListener) {
       _news.add(StoreEvent(StoreEventKind.purchased, sku));

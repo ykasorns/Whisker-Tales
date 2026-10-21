@@ -7,6 +7,7 @@ import 'home_page.dart';
 import 'palette.dart';
 import 'library_tab.dart';
 import 'pets_tab.dart';
+import 'shop.dart';
 
 Widget _pageTitle(String t) => Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -158,57 +159,76 @@ class _CatTabState extends ConsumerState<_CatTab> {
   }
 }
 
-class _WardrobeTab extends ConsumerStatefulWidget {
+/// Collection book (D-024): the outfit of every class (Mochi always wears
+/// the current one) and every look ever knitted — silhouettes until found.
+/// Nothing here is worn or chosen.
+class _WardrobeTab extends ConsumerWidget {
   const _WardrobeTab();
 
   @override
-  ConsumerState<_WardrobeTab> createState() => _WardrobeTabState();
-}
-
-class _WardrobeTabState extends ConsumerState<_WardrobeTab> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final s = S.of(context);
     final wd = ref.read(wardrobeProvider);
     final cls = ref.read(catClassProvider).current;
     final wr = ref.read(wardrobeRulesProvider);
-    return GridView.count(
-      padding: const EdgeInsets.all(12),
-      crossAxisCount: 3,
-      mainAxisSpacing: 8,
-      crossAxisSpacing: 8,
-      children: [
-        for (final e in wd.collection)
-          GestureDetector(
-            onTap: !e.unlocked
-                ? null
-                : () => setState(() => wd.choose(e.slot,
-                    wd.styleOn(e.slot) == e.styleId ? null : e.styleId)),
-            child: Container(
-              padding: const EdgeInsets.all(8),
+    final classes = ref.read(catRulesProvider).classes;
+    final found = wd.collection.where((e) => e.unlocked).length;
+    return ListView(padding: const EdgeInsets.all(12), children: [
+      Text(s.classOutfits,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+      const SizedBox(height: 6),
+      SizedBox(
+        height: 104,
+        child: ListView(scrollDirection: Axis.horizontal, children: [
+          for (final c in classes)
+            Container(
+              width: 80,
+              margin: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.all(4),
               decoration: inkBox(
-                  fill: wd.styleOn(e.slot) == e.styleId
-                      ? Palette.sun
-                      : Palette.paper,
-                  radius: 12),
+                  fill: c.id == cls ? Palette.sun : Palette.paper, radius: 12),
               child: Column(children: [
                 Expanded(
-                  child: ColorFiltered(
-                    colorFilter: e.unlocked
-                        ? const ColorFilter.mode(
-                            Colors.transparent, BlendMode.dst)
-                        : const ColorFilter.mode(Palette.ink, BlendMode.srcIn),
-                    child: Image.asset(
-                        'assets/game/${FarmPanel.slotArt(e.slot, GearItem(id: '', slot: e.slot, grade: (e.tier - 1) * 2, page: 1, stats: StatBlock(hp: 0, atk: 0, def: 0)), cls, wr)}.png'),
-                  ),
-                ),
-                Text(e.unlocked ? e.styleId : s.lockedLook,
-                    style: const TextStyle(fontSize: 11)),
+                    child: Image.asset('assets/game/cat/bare_${c.id}.png',
+                        fit: BoxFit.contain)),
+                Text(c.id,
+                    style: const TextStyle(
+                        fontSize: 11, fontWeight: FontWeight.w700)),
               ]),
             ),
-          ),
-      ],
-    );
+        ]),
+      ),
+      const SizedBox(height: 12),
+      Text(s.looksFound(found, wd.collection.length),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+      const SizedBox(height: 6),
+      GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 4,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        children: [
+          for (final e in wd.collection)
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: inkBox(
+                  border: e.unlocked ? Palette.ink : Palette.inkSoft,
+                  radius: 12),
+              child: ColorFiltered(
+                colorFilter: e.unlocked
+                    ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
+                    : const ColorFilter.mode(Palette.ink, BlendMode.srcIn),
+                child: Opacity(
+                  opacity: e.unlocked ? 1 : 0.25,
+                  child: Image.asset(
+                      'assets/game/${FarmPanel.slotArt(e.slot, GearItem(id: '', slot: e.slot, grade: (e.tier - 1) * 2, page: 1, stats: StatBlock(hp: 0, atk: 0, def: 0)), cls, wr)}.png'),
+                ),
+              ),
+            ),
+        ],
+      ),
+    ]);
   }
 }
 
@@ -299,11 +319,11 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 }
 
 /// 🛒 Shop: Supporter Pack + cosmetics, behind the parental gate (T-025).
-class ShopPage extends StatelessWidget {
+class ShopPage extends ConsumerWidget {
   const ShopPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final s = S.of(context);
     return ListView(children: [
       _pageTitle(s.navShop),
@@ -318,14 +338,19 @@ class ShopPage extends StatelessWidget {
           const SizedBox(height: 4),
           Text(s.supporterDesc),
           const SizedBox(height: 12),
-          Opacity(
-            opacity:
-                0.5, // purchases arrive with T-025 (parental gate + Play Billing)
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: inkBox(fill: Palette.lime, radius: 12),
-              child: Text('👨‍👩‍👧 ${s.askParent}',
-                  style: const TextStyle(fontWeight: FontWeight.w800)),
+          // the parental gate comes first, always (T-025)
+          Semantics(
+            button: true,
+            label: s.askParent,
+            child: GestureDetector(
+              onTap: () => openShop(context, ref),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: inkBox(fill: Palette.lime, radius: 12),
+                child: Text('👨‍👩‍👧 ${s.askParent}',
+                    style: const TextStyle(fontWeight: FontWeight.w800)),
+              ),
             ),
           ),
         ]),

@@ -69,9 +69,6 @@ void main() {
     basket.upgradeSlot(GearSlot.weapon);
     a.read(catProgressProvider).gainExp(500);
     a.read(catClassProvider).choose('mage');
-    final look = a.read(wardrobeProvider).unlocked.first;
-    a.read(wardrobeProvider).choose(
-        GearSlot.values.firstWhere((s) => look.startsWith('${s.name}_')), look);
     a
         .read(autoCraftProvider)
         .configure(const AutoCraftRule(on: true, mode: AutoCraftMode.equip));

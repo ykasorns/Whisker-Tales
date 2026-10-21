@@ -1,7 +1,6 @@
-"""Copies game sprites into the app bundle (T-027): Mochi full-body frames
-as-is (anchors are in their pixels) and gear art trimmed to its bounding box
-(gear grips in anchors_mochi.json are fractions of the trimmed image),
-scaled to at most 220 px.
+"""Copies game sprites into the app bundle (T-027, D-024): Mochi's base
+frames and class outfit frames as-is, gear slot icons trimmed to their
+bounding box and scaled to at most 220 px.
 
     python3 tools/sync_sprites.py
 """
@@ -18,6 +17,14 @@ os.makedirs(f'{OUT}/cat', exist_ok=True)
 os.makedirs(f'{OUT}/gear', exist_ok=True)
 for f in FRAMES:
     shutil.copy(f'{ROOT}/assets/raw/frames/mochi2/cat_mochi_{f}.png', f'{OUT}/cat/{f}.png')
+# class outfits (D-024): Mochi drawn in each class's outfit, one file per
+# frame; classes without a folder yet fall back to the frames above
+outfits = 0
+for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/outfit/*/*.png')):
+    cls = os.path.basename(os.path.dirname(src))
+    shutil.copy(src, f'{OUT}/cat/outfit_{cls}_{os.path.basename(src)}')
+    outfits += 1
+# gear: slot icons only (D-024: gear is never drawn on the cat)
 n = 0
 for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/gear/*.png')):
     name = os.path.basename(src)[:-4].replace('gear_', '', 1)
@@ -48,4 +55,4 @@ for src in sorted(glob.glob(f'{ROOT}/assets/raw/backgrounds/*.png')):
 os.makedirs(f'{OUT}/ui', exist_ok=True)
 for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/ui/*.png')):
     shutil.copy(src, f'{OUT}/ui/{os.path.basename(src)}')
-print(f'{len(FRAMES)} cat frames + {n} gear + {m} monster frames + bg + ui → {OUT}')
+print(f'{len(FRAMES)} cat frames + {outfits} outfit frames + {n} gear + {m} monster frames + bg + ui → {OUT}')

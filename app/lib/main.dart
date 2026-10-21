@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wt_core/wt_core.dart';
 
+import 'iap/play_store.dart';
 import 'ui/game_shell.dart';
 import 'l10n/strings.dart';
 import 'modes.dart';
@@ -30,12 +31,16 @@ Future<void> main() async {
     await Hive.initFlutter();
     final box = await Hive.openBox<String>('whisker_tales_save');
     final saves = SaveService(HiveSaveStore(box));
+    // Google Play Billing, listening from boot so no purchase is missed
+    final store = PlayIapStore();
     // a save this build cannot load never stops the app: older slot or a
     // new game, with the broken save kept aside (bootGame)
     final boot = await bootGame(() => ProviderContainer(overrides: [
           ...content.overrides,
           saveServiceProvider.overrideWithValue(saves),
+          iapStoreProvider.overrideWithValue(store),
         ]));
+    boot.container.read(iapServiceProvider)?.start();
     if (boot.error != null) debugPrint('save not loaded: ${boot.error}');
     runApp(UncontrolledProviderScope(
         container: boot.container,
@@ -91,14 +96,13 @@ class _WhiskerTalesAppState extends ConsumerState<WhiskerTalesApp> {
         scaffoldBackgroundColor: const Color(0xFFFFFBF2),
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFF6A83C)),
       ),
-      home: LangScope(
-        lang: widget.lang,
-        child: widget.avatarRules == null
-            ? const Scaffold(body: ColoredBox(color: Colors.black12))
-            : GameShell(
-                avatarRules: widget.avatarRules!,
-                saveFallback: widget.saveFallback),
-      ),
+      // above the Navigator, so dialogs and sheets get the language too
+      builder: (context, child) => LangScope(lang: widget.lang, child: child!),
+      home: widget.avatarRules == null
+          ? const Scaffold(body: ColoredBox(color: Colors.black12))
+          : GameShell(
+              avatarRules: widget.avatarRules!,
+              saveFallback: widget.saveFallback),
     );
   }
 }

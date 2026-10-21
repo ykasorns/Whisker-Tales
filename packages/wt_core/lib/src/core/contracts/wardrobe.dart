@@ -1,57 +1,21 @@
 import 'gear_basket.dart';
 
-/// Save v3 `wardrobe` (GAME_CONTRACT §4.6). `chosen` maps a slot to a style
-/// id or [WardrobeState.hidden]; a slot missing from it follows the worn item.
+/// Save v3 `wardrobe` (GAME_CONTRACT §4.6, D-024): looks knitted so far.
+/// Saves from before D-024 also have `chosen` / `skin` — read and ignored,
+/// since the cat now wears its class outfit.
 class WardrobeState {
-  const WardrobeState({
-    this.unlocked = const [],
-    this.chosen = const {},
-    this.skin = 'base',
-    this.skinsUnlocked = const ['base'],
-  });
-
-  /// Chosen value that hides the slot's look.
-  static const hidden = 'none';
+  const WardrobeState({this.unlocked = const []});
 
   final List<String> unlocked;
-  final Map<GearSlot, String> chosen;
-  final String skin;
-  final List<String> skinsUnlocked;
 
-  Map<String, dynamic> toJson() => {
-        'unlocked': unlocked,
-        'chosen': {for (final e in chosen.entries) e.key.name: e.value},
-        'skin': skin,
-        'skins_unlocked': skinsUnlocked,
-      };
+  Map<String, dynamic> toJson() => {'unlocked': unlocked};
 
   factory WardrobeState.fromJson(Map<String, dynamic> j) {
-    List<String> strings(String k) {
-      final v = j[k];
-      if (v is! List || v.any((e) => e is! String)) {
-        throw FormatException('wardrobe: "$k" must be a list of ids');
-      }
-      return List.unmodifiable(v.cast<String>());
+    final v = j['unlocked'];
+    if (v is! List || v.any((e) => e is! String)) {
+      throw const FormatException('wardrobe: "unlocked" must be a list of ids');
     }
-
-    final chosen = j['chosen'];
-    final skin = j['skin'];
-    if (chosen is! Map<String, dynamic> || skin is! String) {
-      throw const FormatException('wardrobe: needs "chosen" and "skin"');
-    }
-    return WardrobeState(
-      unlocked: strings('unlocked'),
-      skinsUnlocked: strings('skins_unlocked'),
-      skin: skin,
-      chosen: {
-        for (final e in chosen.entries)
-          (GearSlot.fromName(e.key) ??
-              (throw FormatException('wardrobe: unknown slot ${e.key}'))): e
-                  .value is String
-              ? e.value as String
-              : throw FormatException('wardrobe: ${e.key} must be a style id'),
-      },
-    );
+    return WardrobeState(unlocked: List.unmodifiable(v.cast<String>()));
   }
 }
 
@@ -69,22 +33,12 @@ class CollectionEntry {
   final bool unlocked;
 }
 
-/// Wardrobe: looks are separate from power (GDD v0.5 §4.2). Owner:
-/// `wardrobe` (T-045).
+/// Collection book (D-024): every look knitted at least once, kept for
+/// good. Looks are never worn on the cat — it wears its class outfit.
+/// Owner: `wardrobe` (T-045).
 abstract class IWardrobe {
   Set<String> get unlocked;
 
   /// Unlocks a look for good; returns true if it was new.
   bool unlock(String styleId);
-
-  /// Shows [styleId] on [slot]; null = follow the worn item;
-  /// [WardrobeState.hidden] = show nothing.
-  void choose(GearSlot slot, String? styleId);
-
-  /// Art to draw for [slot] (e.g. `dagger_2`, `hat_3`, `icon_bell_1`), or
-  /// null when nothing shows. Weapons follow [classId].
-  String? lookFor(GearSlot slot, String classId);
-
-  String get skin;
-  void chooseSkin(String skinId);
 }

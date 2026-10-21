@@ -58,6 +58,19 @@ class S {
   String get supporterPack => _t('supporter_pack');
   String get supporterDesc => _t('supporter_desc');
   String get askParent => _t('ask_parent');
+  String get gateTitle => _t('gate_title');
+  String gateAsk(String q) => _t('gate_ask').replaceAll('{q}', q);
+  String get gateWrong => _t('gate_wrong');
+  String get gateExpired => _t('gate_expired');
+  String get cancel => _t('cancel');
+  String get shopClosed => _t('shop_closed');
+  String get owned => _t('owned');
+  String get buying => _t('buying');
+  String get bought => _t('bought');
+  String get payPending => _t('pay_pending');
+  String get buyFailed => _t('buy_failed');
+  String get restorePurchases => _t('restore_purchases');
+  String get restoring => _t('restoring');
   String get gradeNames => _t('grades');
   String get lockedLook => _t('locked_look');
   String get welcomeBack => _t('welcome_back');
@@ -73,6 +86,9 @@ class S {
       .replaceAll('{r}', '$r')
       .replaceAll('{l}', '$l')
       .replaceAll('{p}', '$pity');
+  String get classOutfits => _t('class_outfits');
+  String looksFound(int n, int all) =>
+      _t('looks_found').replaceAll('{n}', '$n').replaceAll('{a}', '$all');
   String get saveOlder => _t('save_older');
   String get saveNew => _t('save_new');
   String get libraryTitle => _t('library_title');
@@ -128,7 +144,7 @@ class S {
     'coming_soon': 'เร็ว ๆ นี้',
     'dungeon_soon': 'ดันเจี้ยนเปิดในเวอร์ชันถัดไป',
     'tab.cat': 'แมว',
-    'tab.wardrobe': 'ตู้เสื้อผ้า',
+    'tab.wardrobe': 'สมุดสะสม',
     'tab.pets': 'เพื่อนสัตว์',
     'tab.library': 'ห้องสมุด',
     'class_pick': 'คลาส',
@@ -139,8 +155,21 @@ class S {
     'ads_left': 'เหลือวันนี้ {n}',
     'watch': 'ดู 📺',
     'supporter_pack': 'แพ็กผู้สนับสนุน',
-    'supporter_desc': 'ซ่อนปุ่มโฆษณา + ชุดพิเศษ · ไม่มีของที่ทำให้เก่งขึ้น',
+    'supporter_desc': 'ซ่อนปุ่มโฆษณาทุกจุด · ไม่มีของที่ทำให้เก่งขึ้น',
     'ask_parent': 'ให้ผู้ปกครองช่วยซื้อ',
+    'gate_title': 'สำหรับผู้ปกครอง 👨‍👩‍👧',
+    'gate_ask': '{q} เท่ากับเท่าไร?',
+    'gate_wrong': 'ยังไม่ถูก ลองข้อใหม่นะ',
+    'gate_expired': 'หมดเวลาแล้ว ให้ผู้ปกครองยืนยันอีกครั้งนะ',
+    'cancel': 'ยกเลิก',
+    'shop_closed': 'ร้านยังไม่เปิดในตอนนี้',
+    'owned': 'มีแล้ว ✓',
+    'buying': 'กำลังเปิดหน้าชำระเงิน…',
+    'bought': 'ได้รับแล้ว 🎉 ขอบคุณที่สนับสนุน!',
+    'pay_pending': 'รอการยืนยันการชำระเงิน ได้ของเมื่อจ่ายเสร็จ',
+    'buy_failed': 'ซื้อไม่สำเร็จ ลองใหม่อีกครั้งนะ',
+    'restore_purchases': 'กู้คืนการซื้อ',
+    'restoring': 'กำลังกู้คืนของที่เคยซื้อ…',
     'grades': 'ขาว,เขียว,ฟ้า,ม่วง,ทอง,รุ้ง',
     'locked_look': 'ยังไม่ได้',
     'welcome_back': 'ยินดีต้อนรับกลับ!',
@@ -151,6 +180,8 @@ class S {
     'ad_free': '📺 ฟรี เหลือ {n}',
     'fish_hatch': '🐟 {c} · เหลือ {n}',
     'odds': 'ธรรมดา {c}% · หายาก {r}% · ตำนาน {l}% · การันตีตำนานใน {p} ครั้ง',
+    'class_outfits': 'ชุดประจำคลาส (โมจิใส่ชุดของคลาสที่เลือก)',
+    'looks_found': 'ของที่เคยถักได้ {n}/{a}',
     'save_older':
         'เปิดเซฟล่าสุดไม่ได้ 😿 เลยเล่นต่อจากเซฟก่อนหน้า (เก็บเซฟเดิมสำรองไว้แล้ว)',
     'save_new':
@@ -205,7 +236,7 @@ class S {
     'coming_soon': 'Coming soon',
     'dungeon_soon': 'Dungeons open in the next version',
     'tab.cat': 'Cat',
-    'tab.wardrobe': 'Wardrobe',
+    'tab.wardrobe': 'Collection',
     'tab.pets': 'Pets',
     'tab.library': 'Library',
     'class_pick': 'Class',
@@ -216,8 +247,21 @@ class S {
     'ads_left': '{n} left today',
     'watch': 'Watch 📺',
     'supporter_pack': 'Supporter Pack',
-    'supporter_desc': 'Hides ad buttons + a special outfit · no power',
+    'supporter_desc': 'Hides every ad button · no power',
     'ask_parent': 'Ask a grown-up to buy',
+    'gate_title': 'For grown-ups 👨‍👩‍👧',
+    'gate_ask': 'What is {q}?',
+    'gate_wrong': 'Not quite — here is a new one',
+    'gate_expired': 'Time ran out — please ask a grown-up again',
+    'cancel': 'Cancel',
+    'shop_closed': 'The shop is closed right now',
+    'owned': 'Owned ✓',
+    'buying': 'Opening the payment screen…',
+    'bought': 'Got it 🎉 Thank you for your support!',
+    'pay_pending': 'Waiting for the payment — it arrives once paid',
+    'buy_failed': 'That did not work — please try again',
+    'restore_purchases': 'Restore purchases',
+    'restoring': 'Restoring earlier purchases…',
     'grades': 'White,Green,Blue,Purple,Gold,Rainbow',
     'locked_look': 'Not yet',
     'welcome_back': 'Welcome back!',
@@ -228,6 +272,8 @@ class S {
     'ad_free': '📺 Free · {n} left',
     'fish_hatch': '🐟 {c} · {n} left',
     'odds': 'Common {c}% · Rare {r}% · Legend {l}% · Legend guaranteed in {p}',
+    'class_outfits': "Class outfits (Mochi wears the chosen class's outfit)",
+    'looks_found': 'Looks knitted so far {n}/{a}',
     'save_older':
         "Couldn't open the latest save 😿 so we went on from the one before (the old save is kept)",
     'save_new':

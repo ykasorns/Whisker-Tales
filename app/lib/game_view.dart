@@ -6,6 +6,7 @@ import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart'
     show Colors, TextStyle, FontWeight, Shadow;
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
@@ -62,7 +63,7 @@ class _GameViewState extends ConsumerState<GameView> {
     rules: widget.avatarRules,
     driver: widget.driver,
     loop: ref.read(idleLoopProvider),
-    look: _look,
+    classId: () => ref.read(catClassProvider).current,
     petIcons: () {
       final pets = ref.read(petsProvider);
       if (pets == null) return const [];
@@ -73,21 +74,6 @@ class _GameViewState extends ConsumerState<GameView> {
     },
   );
 
-  (String, Map<String, String?>) _look() {
-    final cls = ref.read(catClassProvider).current;
-    final w = ref.read(wardrobeProvider);
-    return (
-      cls,
-      {
-        'weapon': w.lookFor(GearSlot.weapon, cls),
-        'offHand': w.offHandFor(cls),
-        'hat': w.lookFor(GearSlot.hat, cls),
-        'scarf': w.lookFor(GearSlot.scarf, cls),
-        'bag': w.lookFor(GearSlot.bag, cls),
-      }
-    );
-  }
-
   @override
   Widget build(BuildContext context) => GameWidget(game: _game);
 }
@@ -97,7 +83,7 @@ class BattleGame extends FlameGame {
     required this.rules,
     required this.driver,
     required this.loop,
-    required this.look,
+    required this.classId,
     this.petIcons,
   });
 
@@ -107,7 +93,9 @@ class BattleGame extends FlameGame {
   final AvatarRules rules;
   final GameDriver driver;
   final IdleLoop loop;
-  final (String, Map<String, String?>) Function() look;
+
+  /// The cat's class: Mochi wears its outfit (D-024).
+  final String Function() classId;
 
   late final AvatarComponent mochi;
   late final _Parallax _bg;
@@ -147,19 +135,16 @@ class BattleGame extends FlameGame {
   @override
   Future<void> onLoad() async {
     images.prefix = 'assets/game/';
+    // class outfit frames that exist so far (cat/outfit_<class>_<frame>)
+    final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
+    final outfits = [
+      for (final a in manifest.listAssets())
+        if (a.startsWith('assets/game/cat/outfit_'))
+          a.substring('assets/game/'.length),
+    ];
     await images.loadAll([
       for (final f in _catFrames) 'cat/$f.png',
-      for (final a in [
-        'sword',
-        'shield',
-        'dagger',
-        'bow',
-        'staff',
-        'hat',
-        'scarf',
-        'bag'
-      ])
-        for (final t in [1, 2, 3]) 'gear/${a}_$t.png',
+      ...outfits,
       for (final k in ['eraserslime', 'acorn', 'eraserking'])
         for (final f in _monFrames) 'mon/${k}_$f.png',
       for (final b in [
@@ -186,19 +171,22 @@ class BattleGame extends FlameGame {
     super.onRemove();
   }
 
+  /// `<class>/<frame>` → `cat/outfit_<class>_<frame>` (D-024); a class
+  /// without art yet uses the base frames (its attack pose is
+  /// `bare_<class>`).
   ui.Image? _image(String key) {
-    final file =
-        key.startsWith('base/') ? 'cat/${key.substring(5)}.png' : '$key.png';
-    return images.containsKey(file) ? images.fromCache(file) : null;
+    final slash = key.indexOf('/');
+    final cls = key.substring(0, slash), frame = key.substring(slash + 1);
+    for (final file in [
+      'cat/outfit_${cls}_$frame.png',
+      frame == 'attack' ? 'cat/bare_$cls.png' : 'cat/$frame.png',
+    ]) {
+      if (images.containsKey(file)) return images.fromCache(file);
+    }
+    return null;
   }
 
-  void _applyLook() {
-    final (cls, slots) = look();
-    mochi.setClass(cls);
-    for (final e in slots.entries) {
-      mochi.setGear(e.key, e.value);
-    }
-  }
+  void _applyLook() => mochi.setClass(classId());
 
   @override
   void onGameResize(Vector2 size) {

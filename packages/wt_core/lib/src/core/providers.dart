@@ -204,10 +204,8 @@ final wardrobeRulesProvider = Provider<WardrobeRules>(
     (ref) => throw UnimplementedError('override with loaded WardrobeRules'));
 
 /// Looks, collection book and skins (T-045). Reads gear lazily.
-final Provider<Wardrobe> wardrobeProvider = Provider<Wardrobe>((ref) =>
-    Wardrobe(ref.watch(wardrobeRulesProvider),
-        equipped: (slot) => ref.read(gearBasketProvider).equipped(slot),
-        clearedPage: () => ref.read(idleLoopProvider).state.clearedPage));
+final Provider<Wardrobe> wardrobeProvider =
+    Provider<Wardrobe>((ref) => Wardrobe(ref.watch(wardrobeRulesProvider)));
 
 /// Ad placements + caps (`ads`). Overridden at boot with the loaded rules.
 final adRulesProvider = Provider<AdRules>(
@@ -327,7 +325,6 @@ final Provider<IapService?> iapServiceProvider = Provider<IapService?>((ref) {
     catalog: catalog,
     store: ref.watch(iapStoreProvider),
     gate: ref.watch(parentalGateProvider),
-    grantCosmetics: (sku) => ref.read(wardrobeProvider).grantPurchase(sku),
   );
   ref.onDispose(iap.dispose);
   return iap;

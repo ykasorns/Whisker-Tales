@@ -61,7 +61,7 @@ class GameContent {
   final BuffBook buffs;
   final SkillBook skills;
 
-  /// Mochi anchors + gear grips (T-027) — used by the app's AvatarComponent.
+  /// Mochi's frames and class outfits (D-024) — for the app's AvatarComponent.
   final AvatarRules avatar;
 
   /// Pets roster + hatch numbers (T-038).
@@ -108,7 +108,7 @@ class ContentRepository {
     'design/data/gear_slots.json': 1,
     'design/data/wardrobe.json': 1,
     'design/data/road_events.json': 1,
-    'design/art/anchors_mochi.json': 1,
+    'design/art/mochi_sprites.json': 1,
     'design/data/pets.json': 1,
     'design/data/research.json': 1,
     'design/data/iap.json': 1,
@@ -148,20 +148,8 @@ class ContentRepository {
         () => SkillBook.fromJson(json['design/data/skills.json']!, buffs));
     final wardrobe = parse('design/data/wardrobe.json',
         () => WardrobeRules.fromJson(json['design/data/wardrobe.json']!));
-    final avatar = parse('design/art/anchors_mochi.json',
-        () => AvatarRules.fromJson(json['design/art/anchors_mochi.json']!));
-    for (final art in {
-      ...wardrobe.weaponArt.values,
-      ...wardrobe.offHandArt.values,
-      'hat',
-      'scarf',
-      'bag',
-    }) {
-      if (!avatar.gear.containsKey(art)) {
-        throw ContentError(
-            'design/art/anchors_mochi.json', 'gear has no "$art"');
-      }
-    }
+    final avatar = parse('design/art/mochi_sprites.json',
+        () => AvatarRules.fromJson(json['design/art/mochi_sprites.json']!));
     final pets = parse('design/data/pets.json',
         () => PetsRules.fromJson(b, json['design/data/pets.json']!));
     final research = parse(
@@ -175,22 +163,6 @@ class ContentRepository {
 
     final iap = parse('design/data/iap.json',
         () => IapCatalog.fromJson(json['design/data/iap.json']!));
-    // every SKU unlocks known looks only, and the two lists match
-    final skus = {for (final p in iap.products) p.sku};
-    if (!_sameSet(skus, wardrobe.iap.keys.toSet())) {
-      throw ContentError('design/data/iap.json',
-          'skus $skus must match wardrobe.json iap ${wardrobe.iap.keys}');
-    }
-    for (final e in wardrobe.iap.entries) {
-      for (final id in e.value) {
-        final isStyle = wardrobe.catalog.any((c) => c.$3 == id);
-        if (!wardrobe.skins.containsKey(id) && !isStyle) {
-          throw ContentError('design/data/wardrobe.json',
-              'iap ${e.key} unlocks unknown look "$id"');
-        }
-      }
-    }
-
     // cross-references between files
     final classIds = {for (final c in cat.classes) c.id};
     for (final cls in skills.byClass.keys) {
@@ -206,6 +178,10 @@ class ContentRepository {
       }
     }
     for (final id in classIds) {
+      if (!avatar.classes.contains(id)) {
+        throw ContentError(
+            'design/art/mochi_sprites.json', 'classes has no "$id"');
+      }
       if (!wardrobe.weaponArt.containsKey(id)) {
         throw ContentError(
             'design/data/wardrobe.json', 'weapon_art has no "$id"');
@@ -265,6 +241,3 @@ class ContentRepository {
     return doc;
   }
 }
-
-bool _sameSet(Set<String> a, Set<String> b) =>
-    a.length == b.length && a.containsAll(b);

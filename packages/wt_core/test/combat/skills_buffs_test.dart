@@ -397,4 +397,100 @@ void main() {
       }
     }
   });
+
+  group('review fixes (2026-10-21)', () {
+    List<CombatEvent> runWith(
+        CombatEngine e, CombatSetup s, void Function(CombatEngine) after,
+        {int ms = 20000}) {
+      final out = <CombatEvent>[];
+      e.events.listen(out.add);
+      e.start(s);
+      after(e);
+      e.tick(ms);
+      return out;
+    }
+
+    test('a stunned unit never attacks — not even a counter', () {
+      for (var seed = 0; seed < 30; seed++) {
+        final ev = record(
+            rules,
+            CombatSetup(seed: seed, units: [
+              cat(atk: 20, attrs: {Attribute.stun: 2500}),
+              mon('m', hp: 4000, attrs: {Attribute.counter: 4000}),
+            ]),
+            stepMs: 20000);
+        final stunnedUntil = <String, int>{};
+        for (final e in ev) {
+          if (e is UnitStunned) stunnedUntil[e.unitId] = e.untilMs;
+          if (e is HitResolved) {
+            expect(
+                e.atMs, greaterThanOrEqualTo(stunnedUntil[e.attackerId] ?? 0),
+                reason: 'seed $seed: ${e.attackerId} hit while stunned');
+          }
+        }
+        expect(ev.whereType<UnitStunned>(), isNotEmpty);
+      }
+    });
+
+    test('one unit dying to a dot does not delay the other units\' ticks', () {
+      final tick = buffs['poison'].tickMs;
+      final ev = runWith(
+          engine(),
+          CombatSetup(seed: 1, units: [
+            caster(const [], atk: 100),
+            mon('m0', hp: 1, intervalMs: 100000),
+            mon('m1', hp: 100000, intervalMs: tick),
+          ]), (e) {
+        e.apply('m0', 'poison', sourceId: 'mochi');
+        e.apply('m1', 'poison', sourceId: 'mochi');
+      }, ms: tick);
+      final dot = ev.indexWhere((e) =>
+          e is HitResolved &&
+          e.targetId == 'm1' &&
+          e.source == AttackSource.dot);
+      final attack = ev.indexWhere((e) =>
+          e is HitResolved &&
+          e.attackerId == 'm1' &&
+          e.source == AttackSource.normal);
+      expect(ev.whereType<UnitDefeated>().single.unitId, 'm0');
+      expect(dot, greaterThanOrEqualTo(0));
+      expect(attack, greaterThan(dot)); // buff ticks, then units act
+    });
+
+    test('regen and CDR from a buff given mid-fight take effect', () {
+      final book = withFixture([
+        {
+          'id': 'test_regen',
+          'action': 'attrib',
+          'params': {'attr': 'regen', 'mode': 'add', 'value': 2},
+          'duration_ms': -1,
+        },
+        {
+          'id': 'test_cdr',
+          'action': 'attrib',
+          'params': {'attr': 'cdr', 'mode': 'add', 'value': 50},
+          'duration_ms': -1,
+        },
+      ]);
+      const sk =
+          SkillSpec(id: 'tick', cooldownMs: 10000, target: SkillTarget.self);
+      final ev = runWith(
+          engine(book),
+          CombatSetup(seed: 3, units: [
+            caster(const [sk], hp: 5000),
+            mon('m', hp: 1 << 30, atk: 40, intervalMs: 300),
+          ]), (e) {
+        e.apply('mochi', 'test_regen', sourceId: 'mochi');
+        e.apply('mochi', 'test_cdr', sourceId: 'mochi');
+      }, ms: 30000);
+      expect(
+          ev
+              .whereType<UnitHealed>()
+              .where((h) => h.unitId == 'mochi' && h.cause == HealCause.regen),
+          isNotEmpty);
+      final casts = [for (final c in ev.whereType<SkillCast>()) c.atMs];
+      expect(casts.length, greaterThanOrEqualTo(3));
+      expect(casts[2] - casts[1], 5000); // cooldown × (1 − 50% CDR)
+    });
+  });
 }

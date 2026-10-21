@@ -59,9 +59,9 @@ class _Hud extends ConsumerWidget {
         final wallet = ref.read(walletProvider);
         final cat = ref.read(catProgressProvider);
         final cls = ref.read(catClassProvider);
-        final power = ref
-            .read(powerScoreProvider)
-            .of(cls.combatSpec(extra: ref.read(catExtraStatsProvider)()).stats);
+        // the cat as it fights: gear, pets, research and road events
+        final power =
+            ref.read(powerScoreProvider).of(ref.read(catSpecProvider)().stats);
         final st = loop.state;
         final plan = loop.plan;
         final frontier = st.farmPage == st.clearedPage + 1;

@@ -20,11 +20,15 @@ class FakeAds implements IAdService {
   bool allowed = true;
   AdOutcome outcome = AdOutcome.rewarded;
   final shown = <String>[];
+
+  /// Runs while the ad "plays" (time can pass).
+  void Function()? onShow;
   @override
   bool canShow(String placementId) => allowed;
   @override
   Future<AdOutcome> show(String placementId) async {
     shown.add(placementId);
+    onShow?.call();
     return outcome;
   }
 
@@ -126,27 +130,45 @@ void main() {
     expect(research.levelOf('sharp_claws'), 1);
   });
 
-  test('ad cut = max(30 min, 25% of what is left), soonest task first',
+  test('ad cut = max(30 min, 25% left); the longest desk unless one is picked',
       () async {
     research.restore(const ResearchState(
         levels: {'sharp_claws': 14, 'offline_cap': 3, 'queue_2': 1}));
     research.start('sharp_claws'); // 4 h
-    research.start('offline_cap'); // 1 × 1.6^3 min ≈ 6.6 min
+    research.start('offline_cap'); // 1 × 1.6^3 min ≈ 4.1 min
+    ResearchTask task(String id) =>
+        research.tasks.firstWhere((t) => t.nodeId == id);
+    // no desk picked: the 4 h task, where the ad helps most (25% > 30 min)
     expect(await research.speedUpWithAd(), isTrue);
     expect(ads.shown, ['research_speedup']);
-    // the short one ends first: a 30-min cut finishes it
+    expect(research.remaining(task('sharp_claws')), const Duration(hours: 3));
+    expect(research.levelOf('offline_cap'), 3);
+    // the player picks the short desk: 30 min covers it, done now
+    expect(await research.speedUpWithAd('offline_cap'), isTrue);
     expect(research.levelOf('offline_cap'), 4);
-    final long = research.tasks.single;
-    expect(research.remaining(long), const Duration(hours: 4));
-    expect(await research.speedUpWithAd(), isTrue);
-    expect(research.remaining(research.tasks.single), const Duration(hours: 3));
     // with 40 min left the flat 30 min beats 25%
     time.utc = t0.add(const Duration(hours: 2, minutes: 20));
     expect(
         research.remaining(research.tasks.single), const Duration(minutes: 40));
-    await research.speedUpWithAd();
+    await research.speedUpWithAd('sharp_claws');
     expect(
         research.remaining(research.tasks.single), const Duration(minutes: 10));
+    // a desk that is not running: no ad is shown
+    expect(await research.speedUpWithAd('tough_paws'), isFalse);
+    expect(ads.shown, hasLength(3));
+  });
+
+  test('a desk that finishes during the ad passes the cut on', () async {
+    research.restore(const ResearchState(
+        levels: {'sharp_claws': 14, 'offline_cap': 3, 'queue_2': 1}));
+    research.start('sharp_claws');
+    research.start('offline_cap');
+    ads.onShow = () => time.utc = t0.add(const Duration(minutes: 5));
+    expect(await research.speedUpWithAd('offline_cap'), isTrue);
+    expect(research.levelOf('offline_cap'), 4); // finished by itself
+    // 3 h 55 min left on the other desk: 25% (58 min 45 s) beats 30 min
+    expect(research.remaining(research.tasks.single),
+        const Duration(hours: 2, minutes: 56, seconds: 15));
   });
 
   test('a skipped or capped ad cuts nothing', () async {

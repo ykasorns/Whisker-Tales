@@ -87,7 +87,6 @@ class _Unit {
 
   /// Next cast time per skill (same order as spec.skills).
   late final List<int> nextSkillAt = List.filled(spec.skills.length, 0);
-  late final List<int> skillCdMs = List.filled(spec.skills.length, 0);
 
   int get maxHp => spec.stats.hp;
   bool get isCatSide => spec.side == CombatSide.cat;
@@ -170,26 +169,29 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
     _damage.clear();
     _playerWon = null;
     _started = true;
+    _nextRegenAt = null;
     for (final u in _units) {
       _recompute(u);
       u.nextActAt = u.intervalMs;
-      final cdr = rules.proc(Attribute.cdr, u.eff[Attribute.cdr], 0);
       for (var i = 0; i < u.spec.skills.length; i++) {
-        final cd = u.spec.skills[i].cooldownMs * (kBp - cdr) ~/ kBp;
-        u.skillCdMs[i] = cd < 1 ? 1 : cd;
-        final first = u.skillCdMs[i] * firstCastPct ~/ 100;
+        final first = _cooldown(u, i) * firstCastPct ~/ 100;
         u.nextSkillAt[i] = first < 1 ? 1 : first;
       }
     }
-    _nextRegenAt = _units.any((u) => u.eff[Attribute.regen] > 0)
-        ? rules.regenTickMs
-        : null;
     for (final u in _units) {
       _fire(u, BuffEventKind.waveStart, null, 0);
     }
   }
 
-  /// Effective stats + attack interval from the base spec and buffs.
+  /// Cooldown of skill [i] with the unit's CDR right now (buffs included).
+  int _cooldown(_Unit u, int i) {
+    final cdr = rules.proc(Attribute.cdr, u.eff[Attribute.cdr], 0);
+    final cd = u.spec.skills[i].cooldownMs * (kBp - cdr) ~/ kBp;
+    return cd < 1 ? 1 : cd;
+  }
+
+  /// Effective stats + attack interval from the base spec and buffs. Regen
+  /// ticks start once any unit has regen (from the start or a buff).
   void _recompute(_Unit u) {
     var s = u.spec.stats;
     if (u.buffs.isNotEmpty) {
@@ -226,6 +228,9 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
         rules.proc(Attribute.attackSpeed, s[Attribute.attackSpeed], 0);
     final interval = u.spec.attackIntervalMs * kBp ~/ (kBp + speed);
     u.intervalMs = interval < 1 ? 1 : interval;
+    if (_nextRegenAt == null && s[Attribute.regen] > 0) {
+      _nextRegenAt = _now + rules.regenTickMs;
+    }
   }
 
   @override
@@ -311,7 +316,7 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
 
   void _cast(_Unit u, int i) {
     final skill = u.spec.skills[i];
-    u.nextSkillAt[i] = _now + u.skillCdMs[i];
+    u.nextSkillAt[i] = _now + _cooldown(u, i);
     _emit(SkillCast(atMs: _now, unitId: u.spec.id, skillId: skill.id));
     for (final b in skill.buffsSelf) {
       _applyBuff(u, buffBook[b], u, 0);
@@ -428,7 +433,9 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
         if (isOver) return;
       } else {
         _maybeStun(a, d);
-        if (source == AttackSource.normal && a.targetable) {
+        if (source == AttackSource.normal &&
+            a.targetable &&
+            _now >= d.stunnedUntil) {
           final counter = rules.proc(Attribute.counter,
               d.eff[Attribute.counter], a.eff[Attribute.counterRes]);
           if (counter > 0 && _rng.nextBp() < counter) {
@@ -493,7 +500,9 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
         return;
       case BuffAction.extraHit:
         final t = _targetFor(u);
-        if (t != null) _attack(u, t, AttackSource.extra);
+        if (t != null && _now >= u.stunnedUntil) {
+          _attack(u, t, AttackSource.extra);
+        }
         return;
       case BuffAction.heal:
         _heal(u, mulBp(u.maxHp, def.pctBp), HealCause.regen);
@@ -557,7 +566,8 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
     for (final u in _units) {
       if (!u.alive || u.buffs.isEmpty) continue;
       for (final b in [...u.buffs]) {
-        if (isOver || !u.alive) return;
+        if (isOver) return;
+        if (!u.alive) break; // its buffs went with it; others still tick
         if (b.nextTickAt == t &&
             (b.expiresAt < 0 || b.nextTickAt <= b.expiresAt)) {
           b.nextTickAt = t + b.def.tickMs;
@@ -575,7 +585,8 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
           ));
           if (lost >= 0 && u.hp == 0 && u.alive) {
             _kill(b.source, u);
-            if (isOver || !u.alive) return;
+            if (isOver) return;
+            if (!u.alive) break;
           }
         }
         if (b.expiresAt == t) _removeBuff(u, b);

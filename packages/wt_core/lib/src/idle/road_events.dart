@@ -202,8 +202,12 @@ class RoadEvents implements IRoadEvents {
 
   /// Read lazily: only an ad tap needs it (T-039 owns caps).
   final IAdService Function() ads;
-  final SeededRng _rng;
+  SeededRng _rng;
   final _active = <_Active>[];
+
+  /// Dice state, so road events continue the same sequence after a reload.
+  int get rngState => _rng.state;
+  set rngState(int v) => _rng = SeededRng.fromState(v);
   final _news = StreamController<RoadEventNews>.broadcast(sync: true);
   int _untilNext = 0;
   int _nextUid = 1;
@@ -363,10 +367,10 @@ CombatUnitSpec applyRoadEffects(CombatUnitSpec cat, List<RoadEventDef> events) {
   final ev = s[Attribute.evade] + evade * 100;
   return cat.copyWith(
     attackIntervalMs: cat.attackIntervalMs * 100 ~/ (100 + speed),
-    stats: s.copyWith(
-      atk: s.atk * (100 + atk) ~/ 100,
-      hp: s.hp * (100 + hp) ~/ 100,
-      def: s.def * (100 + def) ~/ 100,
+    stats: s
+        .scaledBp(
+            atk: kBp + atk * 100, hp: kBp + hp * 100, def: kBp + def * 100)
+        .copyWith(
       attrs: {...s.attrs, Attribute.evade: ev < 0 ? 0 : ev},
     ),
   );

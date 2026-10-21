@@ -230,12 +230,9 @@ class Research implements IResearch {
   CombatUnitSpec withBonus(CombatUnitSpec cat) {
     final atk = statBp('atk'), hp = statBp('hp'), def = statBp('def');
     if (atk == 0 && hp == 0 && def == 0) return cat;
-    final s = cat.stats;
     return cat.copyWith(
-        stats: s.copyWith(
-            atk: s.atk * (kBp + atk) ~/ kBp,
-            hp: s.hp * (kBp + hp) ~/ kBp,
-            def: s.def * (kBp + def) ~/ kBp));
+        stats:
+            cat.stats.scaledBp(atk: kBp + atk, hp: kBp + hp, def: kBp + def));
   }
 
   int costOf(ResearchNode node) => rules.costFor(node, levelOf(node.id) + 1);
@@ -305,18 +302,24 @@ class Research implements IResearch {
   bool get canSpeedUp =>
       _tasks.isNotEmpty && ads().canShow(researchSpeedupPlacement);
 
-  /// Cuts the task that ends first (D-020) after a rewarded ad. A cut that
-  /// covers the rest finishes it now.
+  /// Cuts the desk the player picked — [nodeId], or else the task with the
+  /// most time left (D-022) — after a rewarded ad. A cut that covers the
+  /// rest finishes it now. A task that finished while the ad played passes
+  /// the cut to the other desk.
   @override
-  Future<bool> speedUpWithAd() async {
+  Future<bool> speedUpWithAd([String? nodeId]) async {
     tick();
     if (!canSpeedUp) return false;
+    if (nodeId != null && !_tasks.any((t) => t.nodeId == nodeId)) {
+      return false;
+    }
     if (await ads().show(researchSpeedupPlacement) != AdOutcome.rewarded) {
       return false;
     }
+    tick();
     if (_tasks.isEmpty) return false;
-    final task =
-        _tasks.reduce((a, b) => b.endsAtUtc.isBefore(a.endsAtUtc) ? b : a);
+    final task = _tasks.where((t) => t.nodeId == nodeId).firstOrNull ??
+        _tasks.reduce((a, b) => b.endsAtUtc.isAfter(a.endsAtUtc) ? b : a);
     final i = _tasks.indexOf(task);
     _tasks[i] = ResearchTask(
         nodeId: task.nodeId,

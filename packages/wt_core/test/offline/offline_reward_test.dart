@@ -52,6 +52,29 @@ void main() {
     time.utc = time.utc.add(d);
   }
 
+  test('goldfish / EXP find from gear count offline too', () {
+    away(const Duration(hours: 2));
+    final plain = offline().compute(
+        lastSeenUtc: clock.lastSeenUtc,
+        effectiveNowUtc: clock.effectiveNow,
+        cap: rules.capFor(0));
+    final found = OfflineReward(
+            rules: rules,
+            income: income,
+            clock: clock,
+            wallet: wallet,
+            farmPage: () => page,
+            finds: () => (fishBp: 1000, expBp: 500))
+        .compute(
+            lastSeenUtc: clock.lastSeenUtc,
+            effectiveNowUtc: clock.effectiveNow,
+            cap: rules.capFor(0));
+    final fish = plain.reward[Currency.goldfish];
+    expect(found.reward[Currency.goldfish], closeTo(fish * 1.1, 1));
+    expect(found.reward[Currency.yarn], plain.reward[Currency.yarn]);
+    expect(found.exp, closeTo(plain.exp * 1.05, 1));
+  });
+
   test('cap = 8 h + 10 min per research level, up to the max level', () {
     expect(rules.capFor(0), const Duration(hours: 8));
     expect(rules.capFor(3), const Duration(minutes: 510));
@@ -153,6 +176,14 @@ void main() {
           jsonDecode(
                   File('../../design/data/road_events.json').readAsStringSync())
               as Map<String, dynamic>)),
+      gearRulesProvider.overrideWithValue(GearRules.fromJson(
+          b,
+          jsonDecode(
+                  File('../../design/data/gear_slots.json').readAsStringSync())
+              as Map<String, dynamic>,
+          hpPm: 1,
+          atkPm: 1,
+          defPm: 1)),
       walletProvider.overrideWithValue(MemoryWallet()),
     ]);
     addTearDown(c.dispose);

@@ -54,7 +54,12 @@ class IdleLoop implements IIdleLoop {
     this.seed = 0,
     this.hooks = const IdleHooks(),
     this.partners,
+    this.finds,
   });
+
+  /// The cat's goldfish / EXP find right now (gear affixes), applied to
+  /// every wave and boss reward. Null = none.
+  final Finds Function()? finds;
 
   /// Deployed pets fighting beside the cat (T-038); given the cat's spec.
   final List<CombatUnitSpec> Function(CombatUnitSpec cat)? partners;
@@ -77,6 +82,10 @@ class IdleLoop implements IIdleLoop {
   List<CombatUnitSpec> _fightUnits = const [];
   int _fightId = 0;
   final _remMilli = <Currency, int>{};
+  int _expRemMilli = 0;
+
+  /// Page picked during a wave fight; the fight finishes on its own page.
+  int? _nextFarmPage;
 
   int _cleared = 0;
   int _farmPage = 1;
@@ -156,16 +165,24 @@ class IdleLoop implements IIdleLoop {
     _lossStreak = 0;
     _autoBossWait = 0;
     _climbBack = false;
+    _nextFarmPage = null;
     _remMilli.clear();
+    _expRemMilli = 0;
     _walk();
   }
 
-  /// Farms another page (1 … frontier). Takes effect from the next wave.
+  /// Farms another page (1 … frontier). Takes effect from the next wave: a
+  /// wave being fought still pays and counts on its own page.
   void setFarmPage(int page) {
     if (page < 1 || page > _cleared + 1) {
       throw RangeError.range(page, 1, _cleared + 1, 'page');
     }
     if (isBossFight) throw StateError('cannot change page during a boss fight');
+    if (_phase == IdlePhase.fighting) {
+      _nextFarmPage = page;
+      return;
+    }
+    _nextFarmPage = null;
     _climbBack = false;
     if (page == _farmPage) return;
     _farmPage = page;
@@ -336,11 +353,21 @@ class IdleLoop implements IIdleLoop {
     } else {
       _failWave();
     }
+    // walking or resting now, so a page picked during the fight applies
+    if (_nextFarmPage case final p?) setFarmPage(p);
   }
 
   void _finishWave() {
     final page = _farmPage, index = _waveIndex;
-    final paid = _pay(page);
+    final find = finds?.call() ?? (fishBp: 0, expBp: 0);
+    final paid = _pay(page, find.fishBp);
+    final expMilli = _expRemMilli +
+        _fightMonsters *
+            income.expPerKill(page) *
+            1000 *
+            (kBp + find.expBp) ~/
+            kBp;
+    _expRemMilli = expMilli % 1000;
     final reward = hooks.adjustReward?.call(paid) ?? paid;
     _waveIndex++;
     _attempt = 0;
@@ -355,7 +382,7 @@ class IdleLoop implements IIdleLoop {
       page: page,
       waveIndex: index,
       reward: reward,
-      exp: _fightMonsters * income.expPerKill(page),
+      exp: expMilli ~/ 1000,
     ));
     hooks.onWaveCleared?.call(page, index);
     _walk();
@@ -379,7 +406,9 @@ class IdleLoop implements IIdleLoop {
     final page = _cleared + 1;
     final BossResult result;
     if (won) {
-      final fish = rules.perWaveMilli(page)[Currency.goldfish]! *
+      final find = finds?.call() ?? (fishBp: 0, expBp: 0);
+      final fish = IncomeModel.withFind(Currency.goldfish,
+              rules.perWaveMilli(page)[Currency.goldfish]!, find.fishBp) *
           rules.bossFishWaves ~/
           1000;
       result = BossResult(
@@ -391,7 +420,10 @@ class IdleLoop implements IIdleLoop {
               ? rules.eggChapterBoss
               : rules.eggPageBoss,
         }),
-        exp: rules.bossExpKills * income.expPerKill(page),
+        exp: rules.bossExpKills *
+            income.expPerKill(page) *
+            (kBp + find.expBp) ~/
+            kBp,
       );
       _cleared = page;
       _farmPage = page + 1;
@@ -411,11 +443,13 @@ class IdleLoop implements IIdleLoop {
     won ? _walk() : _rest();
   }
 
-  /// Adds one wave of income in thousandths and pays out whole units.
-  RewardBundle _pay(int page) {
+  /// Adds one wave of income in thousandths (goldfish find included) and
+  /// pays out whole units; fractions carry to the next wave.
+  RewardBundle _pay(int page, int fishBp) {
     final paid = <Currency, int>{};
     for (final e in rules.perWaveMilli(page).entries) {
-      final total = (_remMilli[e.key] ?? 0) + e.value;
+      final total = (_remMilli[e.key] ?? 0) +
+          IncomeModel.withFind(e.key, e.value, fishBp);
       paid[e.key] = total ~/ 1000;
       _remMilli[e.key] = total % 1000;
     }

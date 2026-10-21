@@ -1,6 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../ads/ads.dart';
+import '../idle/idle.dart';
 import '../save/save.dart';
 import 'clock/game_clock.dart';
 import 'contracts/age_gate.dart';
@@ -64,15 +67,22 @@ class GameSaver {
         ..._section('profile', const {'flags': [], 'unlocked_cosmetics': []}),
         for (final c in Currency.values) c.name: wallet.balance(c),
       },
-      'idle': {'cleared_page': loop.state.clearedPage, 'book': loop.state.book},
+      'idle': {
+        'cleared_page': loop.state.clearedPage,
+        'book': loop.state.book,
+        'road_rng': _ref.read(roadEventsProvider).rngState,
+      },
       'gear': {
         ..._ref.read(gearBasketProvider).toJson(),
         'auto_craft': _ref.read(autoCraftProvider).rule.toJson(),
       },
       'cat': _ref.read(catClassProvider).snapshot().toJson(),
       'wardrobe': _ref.read(wardrobeProvider).snapshot().toJson(),
-      'pets': _ref.read(petsProvider)?.snapshot().toJson() ??
+      'pets': switch (_ref.read(petsProvider)) {
+        final pets? => {...pets.snapshot().toJson(), 'rng': pets.rngState},
+        null =>
           _section('pets', const {'owned': {}, 'deployed': [], 'pity': 0}),
+      },
       'research': _ref.read(researchProvider)?.snapshot().toJson() ??
           _section('research', const {'levels': {}, 'task': null}),
       'daily': daily,
@@ -95,6 +105,15 @@ class GameSaver {
       },
       'updated_at': clock.effectiveNow.toIso8601String(),
     };
+  }
+
+  /// A new game: this player's knitting, hatching and road-event dice get
+  /// their own start from [seed] (before, every player began on the same
+  /// rolls). Fights stay seeded by page and wave, the same for everyone.
+  void newWorld(int seed) {
+    _ref.read(gearBasketProvider).rngState = mixSeed([seed, 1]);
+    _ref.read(petsProvider)?.rngState = mixSeed([seed, 2]);
+    _ref.read(roadEventsProvider).rngState = mixSeed([seed, 3]);
   }
 
   /// Loads a Save v3 document into every module. Throws [FormatException]
@@ -134,9 +153,14 @@ class GameSaver {
     }
 
     _ref.read(catClassProvider).restore(CatState.fromJson(sec('cat')));
-    final cleared = sec('idle')['cleared_page'];
+    final idle = sec('idle');
+    final cleared = idle['cleared_page'];
     if (cleared is! int) {
       throw const FormatException('save: "idle.cleared_page" missing');
+    }
+    // dice first: restoring the loop starts a walk, where events roll
+    if (idle['road_rng'] case final int rng) {
+      _ref.read(roadEventsProvider).rngState = rng;
     }
     _ref.read(idleLoopProvider).restore(clearedPage: cleared);
 
@@ -158,6 +182,7 @@ class GameSaver {
       final fish = daily['fish_pulls'];
       pets.restore(PetsState.fromJson(sec('pets')),
           fishPulls: fish is int ? fish : 0, dateKey: dateKey);
+      if (sec('pets')['rng'] case final int rng) pets.rngState = rng;
     }
     if (_ref.read(researchProvider) case final r?) {
       r.restore(ResearchState.fromJson(sec('research')));
@@ -224,7 +249,10 @@ class GameBoot {
 /// is written so it never overwrites the save the game runs on.
 ///
 /// Every container from [make] must share one [SaveService].
-Future<GameBoot> bootGame(ProviderContainer Function() make) async {
+///
+/// A new game gets its own dice from [newWorldSeed] (random by default).
+Future<GameBoot> bootGame(ProviderContainer Function() make,
+    {int Function()? newWorldSeed}) async {
   var container = make();
   final saves = container.read(saveServiceProvider);
   final read = await saves.readSlots();
@@ -245,6 +273,9 @@ Future<GameBoot> bootGame(ProviderContainer Function() make) async {
     return GameBoot(container, fallback: BootFallback.olderSave, error: error);
   }
   saves.resumeAfter(read, null);
+  container
+      .read(gameSaverProvider)
+      .newWorld(newWorldSeed?.call() ?? math.Random().nextInt(1 << 32));
   if (read.slots.isEmpty) return GameBoot(container);
   await saves.keepBroken();
   return GameBoot(container, fallback: BootFallback.newGame, error: error);

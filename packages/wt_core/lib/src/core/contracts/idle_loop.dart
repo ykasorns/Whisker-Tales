@@ -113,6 +113,10 @@ abstract class IIdleLoop {
   Future<BossResult> challengeBoss();
 }
 
+/// The cat's goldfish / EXP find (gear affixes `fish_find`, `exp_find`), in
+/// basis points: +800 = +8% goldfish from waves, bosses and offline time.
+typedef Finds = ({int fishBp, int expBp});
+
 /// Income per wave for a page; shared by the online loop and offline rewards
 /// so the two can never drift (T-034, T-035). GDD v0.4 §8, §15.
 abstract class IIncomeModel {
@@ -123,12 +127,14 @@ abstract class IIncomeModel {
   /// One wave's reward in thousandths of a unit.
   Map<Currency, int> perWaveMilli(int page);
 
-  /// Reward for [waves] waves on [page], rounded down once at the end.
-  RewardBundle forWaves(int page, int waves);
+  /// Reward for [waves] waves on [page], rounded down once at the end;
+  /// [fishBp] = goldfish find.
+  RewardBundle forWaves(int page, int waves, {int fishBp = 0});
 
   /// Cat EXP for [waves] waves on [page], using the chapter's average
-  /// monsters per wave (offline); online play counts real kills.
-  int expForWaves(int page, int waves);
+  /// monsters per wave (offline); online play counts real kills. [expBp] =
+  /// EXP find.
+  int expForWaves(int page, int waves, {int expBp = 0});
 
   /// Waves cleared per minute of farming.
   double get wavesPerMinute;

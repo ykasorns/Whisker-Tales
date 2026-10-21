@@ -86,6 +86,13 @@ class StatBlock {
 
   Map<Attribute, int> get attrs => _attrs;
 
+  /// Main stats × (bp / [kBp]), truncated; bonus stats unchanged. The one
+  /// way a % bonus (pets, research, road events, slot level) scales them.
+  StatBlock scaledBp({int hp = kBp, int atk = kBp, int def = kBp}) => copyWith(
+      hp: this.hp * hp ~/ kBp,
+      atk: this.atk * atk ~/ kBp,
+      def: this.def * def ~/ kBp);
+
   StatBlock copyWith(
           {int? hp, int? atk, int? def, Map<Attribute, int>? attrs}) =>
       StatBlock(

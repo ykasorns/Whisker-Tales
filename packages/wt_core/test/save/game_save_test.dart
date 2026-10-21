@@ -188,6 +188,39 @@ void main() {
       return c.read(gameSaverProvider).capture();
     }
 
+    test('a new game gets its own dice; the same seed, the same rolls',
+        () async {
+      final time = Time(t0);
+      Future<ProviderContainer> fresh(int seed) async {
+        final saves = SaveService(MemorySaveStore());
+        final b = await bootGame(
+            () => ProviderContainer(overrides: [
+                  ...world(time),
+                  saveServiceProvider.overrideWithValue(saves),
+                ]),
+            newWorldSeed: () => seed);
+        addTearDown(b.container.dispose);
+        return b.container;
+      }
+
+      Future<List<String>> rolls(ProviderContainer c) async {
+        (c.read(walletProvider) as MemoryWallet)
+            .add(RewardBundle({Currency.yarn: 12, Currency.eggs: 12}));
+        final basket = c.read(gearBasketProvider);
+        final pets = c.read(petsProvider)!;
+        return [
+          for (var i = 0; i < 12; i++)
+            jsonEncode(basket.craft(GearSlot.weapon).item.toJson()),
+          for (var i = 0; i < 12; i++)
+            (await pets.hatch(HatchSource.egg))!.petId,
+        ];
+      }
+
+      final a = await rolls(await fresh(1));
+      expect(await rolls(await fresh(2)), isNot(a));
+      expect(await rolls(await fresh(1)), a);
+    });
+
     test('a save that loads is used as is', () async {
       final time = Time(t0);
       final store = MemorySaveStore();
@@ -245,6 +278,31 @@ void main() {
       expect(
           again.container.read(walletProvider).balance(Currency.goldfish), 7);
     });
+  });
+
+  test('hatching continues the same dice after a reload', () async {
+    final time = Time(t0);
+    final store = MemorySaveStore();
+    final a = game(time, store);
+    addTearDown(a.dispose);
+    final pets = a.read(petsProvider)!;
+    (a.read(walletProvider) as MemoryWallet)
+        .add(RewardBundle({Currency.eggs: 10}));
+    for (var i = 0; i < 3; i++) {
+      await pets.hatch(HatchSource.egg);
+    }
+    await a.read(gameSaverProvider).save();
+    final next = [
+      for (var i = 0; i < 6; i++) (await pets.hatch(HatchSource.egg))!.petId
+    ];
+    final c = game(time, store);
+    addTearDown(c.dispose);
+    await c.read(gameSaverProvider).load();
+    final again = [
+      for (var i = 0; i < 6; i++)
+        (await c.read(petsProvider)!.hatch(HatchSource.egg))!.petId
+    ];
+    expect(again, next);
   });
 
   test('a new day since the save resets the ad caps', () async {

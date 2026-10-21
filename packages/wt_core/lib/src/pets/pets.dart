@@ -318,10 +318,7 @@ class Pets implements IPets {
   CombatUnitSpec withPassive(CombatUnitSpec cat) {
     final bp = passiveBp;
     if (bp == 0) return cat;
-    final s = cat.stats;
-    return cat.copyWith(
-        stats: s.copyWith(
-            hp: s.hp * (kBp + bp) ~/ kBp, atk: s.atk * (kBp + bp) ~/ kBp));
+    return cat.copyWith(stats: cat.stats.scaledBp(hp: kBp + bp, atk: kBp + bp));
   }
 
   /// Deployed pets as partner units for a fight beside [cat].

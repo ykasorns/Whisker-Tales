@@ -14,9 +14,10 @@ abstract class IResearch {
   /// queue is full.
   bool start(String nodeId);
 
-  /// Cuts the running task by max(30 min, 25% of remaining) after a
+  /// Cuts the running task of [nodeId] (default: the one with the most time
+  /// left, where an ad helps most) by max(30 min, 25% of remaining) after a
   /// completed rewarded ad. False if no task is running or no ad is left.
-  Future<bool> speedUpWithAd();
+  Future<bool> speedUpWithAd([String? nodeId]);
 
   Stream<ResearchCompleted> get completed;
 }

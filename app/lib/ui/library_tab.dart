@@ -28,10 +28,10 @@ class LibraryTab extends ConsumerStatefulWidget {
 class _LibraryTabState extends ConsumerState<LibraryTab> {
   bool _busy = false;
 
-  Future<void> _speedUp(Research r) async {
+  Future<void> _speedUp(Research r, String nodeId) async {
     if (_busy) return;
     setState(() => _busy = true);
-    await r.speedUpWithAd();
+    await r.speedUpWithAd(nodeId);
     if (mounted) setState(() => _busy = false);
   }
 
@@ -77,20 +77,8 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
             ),
           ]),
           for (var i = 0; i < r.queueSlots; i++)
-            _desk(s, r, i < r.tasks.length ? r.tasks[i] : null, i),
-          if (r.tasks.isNotEmpty && ads.canShow(researchSpeedupPlacement))
-            GestureDetector(
-              onTap: _busy ? null : () => _speedUp(r),
-              child: Container(
-                height: 48,
-                margin: const EdgeInsets.only(top: 8),
-                alignment: Alignment.center,
-                decoration: inkBox(fill: Palette.sun, radius: 12),
-                child: Text(s.adSpeedUp(r.rules.adCutMin, adsLeft),
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w800)),
-              ),
-            ),
+            _desk(s, r, i < r.tasks.length ? r.tasks[i] : null, i,
+                ad: ads.canShow(researchSpeedupPlacement), adsLeft: adsLeft),
           Row(children: [
             Expanded(
               child:
@@ -109,7 +97,10 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
     ]);
   }
 
-  Widget _desk(S s, Research r, ResearchTask? t, int i) {
+  /// One desk: what it reads, the countdown, and its own 📺 button so the
+  /// player picks which task the ad cuts (D-022).
+  Widget _desk(S s, Research r, ResearchTask? t, int i,
+      {required bool ad, required int adsLeft}) {
     if (t == null) {
       return Padding(
         padding: const EdgeInsets.only(top: 6),
@@ -135,6 +126,19 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
         ]),
         const SizedBox(height: 4),
         LinearProgressIndicator(value: done, color: Palette.teal, minHeight: 8),
+        if (ad)
+          GestureDetector(
+            onTap: _busy ? null : () => _speedUp(r, t.nodeId),
+            child: Container(
+              height: 44,
+              margin: const EdgeInsets.only(top: 6),
+              alignment: Alignment.center,
+              decoration: inkBox(fill: Palette.sun, radius: 12),
+              child: Text(s.adSpeedUp(r.rules.adCutMin, adsLeft),
+                  style: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w800)),
+            ),
+          ),
       ]),
     );
   }

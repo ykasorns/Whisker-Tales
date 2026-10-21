@@ -71,6 +71,7 @@ class OfflineReward implements IOfflineReward {
     required this.farmPage,
     this.grantExp,
     this.offlineCapLevel,
+    this.finds,
   });
 
   final OfflineRules rules;
@@ -86,6 +87,9 @@ class OfflineReward implements IOfflineReward {
 
   /// Level of the library's `offline_cap` node (research), injected.
   final int Function()? offlineCapLevel;
+
+  /// The cat's goldfish / EXP find (gear), same as online waves.
+  final Finds Function()? finds;
 
   OfflineRewardResult? _pending;
 
@@ -105,12 +109,15 @@ class OfflineReward implements IOfflineReward {
     final waves =
         (minutes * income.wavesPerMinute * rules.ratePct / 100).floor();
     final page = farmPage();
+    final find = finds?.call() ?? (fishBp: 0, expBp: 0);
     return OfflineRewardResult(
       creditedMinutes: minutes,
       cappedAtMinutes: capMin,
-      reward: waves == 0 ? RewardBundle.empty : income.forWaves(page, waves),
+      reward: waves == 0
+          ? RewardBundle.empty
+          : income.forWaves(page, waves, fishBp: find.fishBp),
       waves: waves,
-      exp: waves == 0 ? 0 : income.expForWaves(page, waves),
+      exp: waves == 0 ? 0 : income.expForWaves(page, waves, expBp: find.expBp),
     );
   }
 

@@ -250,6 +250,61 @@ void main() {
       }
     });
 
+    test('a page picked mid-fight applies after that wave', () {
+      final l = loop(spec: () => strong)..restore(clearedPage: 4);
+      final waves = <WaveCleared>[];
+      l.events.listen((e) {
+        if (e is WaveCleared) waves.add(e);
+      });
+      while (l.phase != IdlePhase.fighting) {
+        l.tick(50);
+      }
+      l.setFarmPage(2);
+      expect(l.state.farmPage, 5); // still fighting on page 5
+      while (waves.isEmpty) {
+        l.tick(50);
+      }
+      expect(waves.single.page, 5); // paid and counted on its own page
+      expect(l.state.farmPage, 2);
+      expect(l.waveIndex, 0);
+    });
+
+    test('gear finds add goldfish and EXP to every wave and boss', () {
+      ({int fish, int exp}) farm(Finds f) {
+        final l = IdleLoop(
+          rules: rules,
+          income: income,
+          engineFactory: () => CombatEngine(combat),
+          catSpec: () => strong,
+          hpWeightPm: combat.powerWeights.hpPm,
+          atkWeightPm: combat.powerWeights.atkPm,
+          seed: 7,
+          finds: () => f,
+        )
+          ..restore(clearedPage: 8)
+          ..autoBoss = true;
+        var fish = 0, xp = 0;
+        l.events.listen((e) {
+          switch (e) {
+            case WaveCleared(:final reward, :final exp):
+            case BossResult(:final reward, :final exp):
+              fish += reward[Currency.goldfish];
+              xp += exp;
+            case WaveFailed():
+          }
+        });
+        for (var t = 0; t < 20 * 60000; t += 100) {
+          l.tick(100);
+        }
+        return (fish: fish, exp: xp);
+      }
+
+      final plain = farm((fishBp: 0, expBp: 0));
+      final found = farm((fishBp: 800, expBp: 1000));
+      expect(found.fish / plain.fish, closeTo(1.08, 0.01));
+      expect(found.exp / plain.exp, closeTo(1.10, 0.01));
+    });
+
     test('farm page can be chosen up to the frontier', () {
       final l = loop(spec: () => strong)..restore(clearedPage: 4);
       l.setFarmPage(2);

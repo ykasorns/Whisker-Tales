@@ -139,6 +139,32 @@ final incomeModelProvider = Provider<IncomeModel>((ref) => IncomeModel(
     ref.watch(idleRulesProvider),
     expPerKill: ref.watch(catRulesProvider).expPerKill));
 
+/// The cat as it fights right now: class × (level + gear), then road
+/// events, the pet passive and research. The idle loop fights with it and
+/// the UI shows its power and stats from it, so the two never disagree.
+final Provider<CombatUnitSpec Function()> catSpecProvider =
+    Provider<CombatUnitSpec Function()>((ref) => () {
+          final cat = ref.read(roadEventsProvider).apply(ref
+              .read(catClassProvider)
+              .combatSpec(extra: ref.read(catExtraStatsProvider)()));
+          final withPets = ref.read(petsProvider)?.withPassive(cat) ?? cat;
+          return ref.read(researchProvider)?.withBonus(withPets) ?? withPets;
+        });
+
+/// The cat's goldfish / EXP find (gear affixes, capped by `caps_pct`) for
+/// waves, bosses and offline time.
+final findsProvider = Provider<Finds Function()>((ref) {
+  final rules = ref.watch(combatRulesProvider);
+  final spec = ref.watch(catSpecProvider);
+  return () {
+    final s = spec().stats;
+    return (
+      fishBp: rules.proc(Attribute.fishFind, s[Attribute.fishFind], 0),
+      expBp: rules.proc(Attribute.expFind, s[Attribute.expFind], 0),
+    );
+  };
+});
+
 /// The main idle loop (T-034). Rewards go to [walletProvider] and cat EXP
 /// to [catProgressProvider] here.
 final Provider<IdleLoop> idleLoopProvider = Provider<IdleLoop>((ref) {
@@ -148,14 +174,9 @@ final Provider<IdleLoop> idleLoopProvider = Provider<IdleLoop>((ref) {
     rules: ref.watch(idleRulesProvider),
     income: ref.watch(incomeModelProvider),
     engineFactory: ref.watch(combatEngineFactoryProvider),
-    catSpec: () {
-      final cat = road.apply(ref
-          .read(catClassProvider)
-          .combatSpec(extra: ref.read(catExtraStatsProvider)()));
-      final withPets = ref.read(petsProvider)?.withPassive(cat) ?? cat;
-      return ref.read(researchProvider)?.withBonus(withPets) ?? withPets;
-    },
+    catSpec: ref.watch(catSpecProvider),
     partners: (cat) => ref.read(petsProvider)?.partners(cat) ?? const [],
+    finds: ref.watch(findsProvider),
     hpWeightPm: weights.hpPm,
     atkWeightPm: weights.atkPm,
     seed: ref.watch(idleSeedProvider),
@@ -242,6 +263,7 @@ final offlineRewardProvider = Provider<OfflineReward>((ref) => OfflineReward(
       farmPage: () => ref.read(idleLoopProvider).state.farmPage,
       grantExp: (exp) => ref.read(catProgressProvider).gainExp(exp),
       offlineCapLevel: () => ref.read(researchProvider)?.offlineCapLevel ?? 0,
+      finds: ref.watch(findsProvider),
     ));
 
 /// Pet roster + hatch numbers (`pets`, `pets.json`). Null until boot loads

@@ -81,7 +81,7 @@ class _CatTabState extends ConsumerState<_CatTab> {
     final cat = ref.read(catProgressProvider);
     final rules = ref.read(catRulesProvider);
     final skills = ref.read(skillBookProvider);
-    final st = cls.combatSpec(extra: ref.read(catExtraStatsProvider)()).stats;
+    final st = ref.read(catSpecProvider)().stats; // as it fights
     String pct(Attribute a) => '${(st[a] / 100).toStringAsFixed(1)}%';
     final unlocked = cat.level >= rules.classUnlockLevel;
     return ListView(padding: const EdgeInsets.all(16), children: [
@@ -238,7 +238,9 @@ class _EventsPageState extends ConsumerState<EventsPage> {
     final page = ref.read(idleLoopProvider).state.farmPage;
     final waves =
         ((rule.params[minutesKey] ?? 0) * income.wavesPerMinute).floor();
-    final amount = income.forWaves(page, waves)[c];
+    // "N minutes of income": the gear's goldfish find counts, as in waves
+    final amount = income.forWaves(page, waves,
+        fishBp: ref.read(findsProvider)().fishBp)[c];
     ref.read(walletProvider).add(RewardBundle({c: amount < 1 ? 1 : amount}));
     setState(() {});
   }

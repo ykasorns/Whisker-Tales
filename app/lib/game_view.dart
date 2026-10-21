@@ -357,6 +357,12 @@ class _Monster extends PositionComponent {
   bool dead = false;
   double deadT = 0;
 
+  /// Laid out once for every boss, not once per frame.
+  static final _crown = TextPainter(
+      text: const TextSpan(text: '👑', style: TextStyle(fontSize: 22)),
+      textDirection: TextDirection.ltr)
+    ..layout();
+
   /// Extra transparent rows below the feet in some sheets (slicer PAD = 12).
   double get _feetPad => kind == 'eraserslime' ? 24 : 12;
 
@@ -394,13 +400,7 @@ class _Monster extends PositionComponent {
       ui.Rect.fromLTWH(-w / 2, -(im.height - _feetPad) * s, w, im.height * s),
       p,
     );
-    if (boss) {
-      final tp = TextPainter(
-          text: const TextSpan(text: '👑', style: TextStyle(fontSize: 22)),
-          textDirection: TextDirection.ltr)
-        ..layout();
-      tp.paint(c, Offset(-tp.width / 2, -heightPx - 26));
-    }
+    if (boss) _crown.paint(c, Offset(-_crown.width / 2, -heightPx - 26));
   }
 }
 
@@ -411,6 +411,8 @@ class _FloatText extends PositionComponent {
   final Color color;
   final double fontSize;
   double t = 0;
+  TextPainter? _tp;
+  int _step = -1;
 
   @override
   void update(double dt) {
@@ -421,18 +423,25 @@ class _FloatText extends PositionComponent {
 
   @override
   void render(ui.Canvas c) {
-    final tp = TextPainter(
-      text: TextSpan(
-        text: text,
-        style: TextStyle(
-          fontSize: fontSize,
-          fontWeight: FontWeight.w800,
-          color: color.withValues(alpha: (1 - t).clamp(0, 1)),
-          shadows: const [Shadow(color: Palette.paper, blurRadius: 3)],
+    // fades in 10 steps: the text is laid out again when the step changes,
+    // not on every frame (dozens of numbers fly at ×3 speed)
+    final step = ((1 - t).clamp(0.0, 1.0) * 10).ceil();
+    if (step != _step || _tp == null) {
+      _step = step;
+      _tp = TextPainter(
+        text: TextSpan(
+          text: text,
+          style: TextStyle(
+            fontSize: fontSize,
+            fontWeight: FontWeight.w800,
+            color: color.withValues(alpha: step / 10),
+            shadows: const [Shadow(color: Palette.paper, blurRadius: 3)],
+          ),
         ),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
+        textDirection: TextDirection.ltr,
+      )..layout();
+    }
+    final tp = _tp!;
     tp.paint(c, Offset(-tp.width / 2, 0));
   }
 }
@@ -443,19 +452,25 @@ class _Pets extends Component {
   final BattleGame game;
   double t = 0;
 
+  /// Laid-out emoji by icon and size; a handful at most.
+  final _painted = <String, TextPainter>{};
+
   @override
   void update(double dt) => t += dt;
 
   @override
   void render(ui.Canvas c) {
     final icons = game.petIcons?.call() ?? const [];
+    final size = game.size.y * 0.08;
     for (var i = 0; i < icons.length; i++) {
       final hop = (math.sin(t * 8 + i * 1.7)).abs() * game.size.y * 0.02;
-      final tp = TextPainter(
-        text: TextSpan(
-            text: icons[i], style: TextStyle(fontSize: game.size.y * 0.08)),
-        textDirection: TextDirection.ltr,
-      )..layout();
+      final tp = _painted.putIfAbsent(
+          '${icons[i]}@$size',
+          () => TextPainter(
+                text:
+                    TextSpan(text: icons[i], style: TextStyle(fontSize: size)),
+                textDirection: TextDirection.ltr,
+              )..layout());
       final x = game.mochi.position.x - game.size.x * (0.1 + 0.09 * i);
       tp.paint(c, Offset(x - tp.width / 2, game.groundY - tp.height - hop));
     }

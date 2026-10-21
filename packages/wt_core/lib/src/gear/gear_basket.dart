@@ -45,6 +45,10 @@ class GearBasket implements IGearBasket {
 
   int get basketLevel => _level;
 
+  /// Dice state, so knitting continues the same sequence after a reload.
+  int get rngState => _rng.state;
+  set rngState(int v) => _rng = SeededRng.fromState(v);
+
   /// Basket EXP into the current level.
   int get basketExp => _expMilli ~/ 1000;
   int get basketExpToNext => rules.rowFor(_level).expToNext;
@@ -122,9 +126,7 @@ class GearBasket implements IGearBasket {
 
   StatBlock _withSlotLevel(GearItem item) {
     final bp = kBp + rules.slotUpgradeBp * slotLevel(item.slot);
-    final s = item.stats;
-    return s.copyWith(
-        hp: s.hp * bp ~/ kBp, atk: s.atk * bp ~/ kBp, def: s.def * bp ~/ kBp);
+    return item.stats.scaledBp(hp: bp, atk: bp, def: bp);
   }
 
   @override

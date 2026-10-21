@@ -1,3 +1,4 @@
+import '../core/contracts/combat.dart';
 import '../core/contracts/idle_loop.dart';
 import '../core/contracts/rewards.dart';
 import 'idle_rules.dart';
@@ -18,18 +19,28 @@ class IncomeModel implements IIncomeModel {
   RewardBundle perWave(int page) => forWaves(page, 1);
 
   @override
-  RewardBundle forWaves(int page, int waves) {
+  RewardBundle forWaves(int page, int waves, {int fishBp = 0}) {
     if (waves < 0) throw ArgumentError.value(waves, 'waves', 'must be >= 0');
     return RewardBundle({
       for (final e in perWaveMilli(page).entries)
-        e.key: e.value * waves ~/ 1000,
+        e.key: withFind(e.key, e.value, fishBp) * waves ~/ 1000,
     });
   }
 
+  /// [milli] of [c] with the goldfish find applied (other currencies as is).
+  static int withFind(Currency c, int milli, int fishBp) =>
+      c == Currency.goldfish ? milli * (kBp + fishBp) ~/ kBp : milli;
+
   @override
-  int expForWaves(int page, int waves) {
+  int expForWaves(int page, int waves, {int expBp = 0}) {
     final (lo, hi) = rules.monstersByChapter[rules.chapterOf(page) - 1];
-    return waves * (lo + hi) * 500 * expPerKill(page) ~/ 1000;
+    return waves *
+        (lo + hi) *
+        500 *
+        expPerKill(page) ~/
+        1000 *
+        (kBp + expBp) ~/
+        kBp;
   }
 
   @override

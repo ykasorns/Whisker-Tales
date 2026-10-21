@@ -62,6 +62,14 @@ class _GameViewState extends ConsumerState<GameView> {
     driver: widget.driver,
     loop: ref.read(idleLoopProvider),
     look: _look,
+    petIcons: () {
+      final pets = ref.read(petsProvider);
+      if (pets == null) return const [];
+      return [
+        for (final id in pets.deployed.take(pets.deploySlots))
+          pets.rules.byId(id)?.icon ?? '🐾'
+      ];
+    },
   );
 
   (String, Map<String, String?>) _look() {
@@ -84,11 +92,16 @@ class _GameViewState extends ConsumerState<GameView> {
 }
 
 class BattleGame extends FlameGame {
-  BattleGame(
-      {required this.rules,
-      required this.driver,
-      required this.loop,
-      required this.look});
+  BattleGame({
+    required this.rules,
+    required this.driver,
+    required this.loop,
+    required this.look,
+    this.petIcons,
+  });
+
+  /// Deployed pets (T-038), drawn following Mochi.
+  final List<String> Function()? petIcons;
 
   final AvatarRules rules;
   final GameDriver driver;
@@ -161,6 +174,7 @@ class BattleGame extends FlameGame {
     mochi = AvatarComponent(rules: rules, images: _image, priority: 10)
       ..play('walk');
     add(mochi);
+    add(_Pets(this));
     _applyLook();
     _sub = loop.combatEvents.listen(_onCombat);
   }
@@ -419,5 +433,30 @@ class _FloatText extends PositionComponent {
       textDirection: TextDirection.ltr,
     )..layout();
     tp.paint(c, Offset(-tp.width / 2, 0));
+  }
+}
+
+/// Deployed pets hop along behind Mochi (emoji until pet art exists).
+class _Pets extends Component {
+  _Pets(this.game) : super(priority: 9);
+  final BattleGame game;
+  double t = 0;
+
+  @override
+  void update(double dt) => t += dt;
+
+  @override
+  void render(ui.Canvas c) {
+    final icons = game.petIcons?.call() ?? const [];
+    for (var i = 0; i < icons.length; i++) {
+      final hop = (math.sin(t * 8 + i * 1.7)).abs() * game.size.y * 0.02;
+      final tp = TextPainter(
+        text: TextSpan(
+            text: icons[i], style: TextStyle(fontSize: game.size.y * 0.08)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      final x = game.mochi.position.x - game.size.x * (0.1 + 0.09 * i);
+      tp.paint(c, Offset(x - tp.width / 2, game.groundY - tp.height - hop));
+    }
   }
 }

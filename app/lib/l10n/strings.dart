@@ -63,6 +63,23 @@ class S {
   String get welcomeBack => _t('welcome_back');
   String awayFarmed(int min) => _t('away_farmed').replaceAll('{m}', '$min');
   String get claim => _t('claim');
+  String get hatch => _t('hatch');
+  String useEgg(int n) => _t('use_egg').replaceAll('{n}', '$n');
+  String adFree(int n) => _t('ad_free').replaceAll('{n}', '$n');
+  String fishHatch(int cost, int n) =>
+      _t('fish_hatch').replaceAll('{c}', '$cost').replaceAll('{n}', '$n');
+  String odds(int c, int r, int l, int pity) => _t('odds')
+      .replaceAll('{c}', '$c')
+      .replaceAll('{r}', '$r')
+      .replaceAll('{l}', '$l')
+      .replaceAll('{p}', '$pity');
+  String get newPet => _t('new_pet');
+  String get starUp => _t('star_up');
+  String treats(int n) => _t('treats').replaceAll('{n}', '$n');
+  String deploySlots(int used, int all) =>
+      _t('deploy_slots').replaceAll('{u}', '$used').replaceAll('{a}', '$all');
+  String get deployHint => _t('deploy_hint');
+  String get yay => _t('yay');
 
   static const _th = {
     'nav.character': 'ตัวละคร',
@@ -111,6 +128,17 @@ class S {
     'welcome_back': 'ยินดีต้อนรับกลับ!',
     'away_farmed': 'ระหว่างที่ไม่อยู่ โมจิฟาร์มไป {m} นาที',
     'claim': 'รับของ',
+    'hatch': 'ฟักไข่',
+    'use_egg': '🥚 ใช้ไข่ ({n})',
+    'ad_free': '📺 ฟรี เหลือ {n}',
+    'fish_hatch': '🐟 {c} · เหลือ {n}',
+    'odds': 'ธรรมดา {c}% · หายาก {r}% · ตำนาน {l}% · การันตีตำนานใน {p} ครั้ง',
+    'new_pet': 'เพื่อนใหม่!',
+    'star_up': 'ดาวเพิ่ม!',
+    'treats': 'ได้ขนม 🍪 {n}',
+    'deploy_slots': 'ออกรบ {u}/{a}',
+    'deploy_hint': 'แตะเพื่อนเพื่อพาออกรบ / พัก',
+    'yay': 'เย้!',
   };
   static const _en = {
     'nav.character': 'Cat',
@@ -159,6 +187,17 @@ class S {
     'welcome_back': 'Welcome back!',
     'away_farmed': 'Mochi farmed for {m} minutes while you were away',
     'claim': 'Collect',
+    'hatch': 'Hatch',
+    'use_egg': '🥚 Egg ({n})',
+    'ad_free': '📺 Free · {n} left',
+    'fish_hatch': '🐟 {c} · {n} left',
+    'odds': 'Common {c}% · Rare {r}% · Legend {l}% · Legend guaranteed in {p}',
+    'new_pet': 'New friend!',
+    'star_up': 'Star up!',
+    'treats': 'Got treats 🍪 {n}',
+    'deploy_slots': 'In battle {u}/{a}',
+    'deploy_hint': 'Tap a friend to send it to battle / rest',
+    'yay': 'Yay!',
   };
 }
 

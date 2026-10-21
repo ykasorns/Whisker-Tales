@@ -9,6 +9,7 @@ import '../combat/combat.dart';
 import '../gear/gear.dart';
 import '../idle/idle.dart';
 import '../offline/offline_reward.dart';
+import '../pets/pets.dart';
 import '../wardrobe/wardrobe.dart';
 import 'providers.dart';
 
@@ -42,6 +43,7 @@ class GameContent {
     required this.buffs,
     required this.skills,
     required this.avatar,
+    required this.pets,
   });
 
   final CombatRules combat;
@@ -58,6 +60,9 @@ class GameContent {
   /// Mochi anchors + gear grips (T-027) — used by the app's AvatarComponent.
   final AvatarRules avatar;
 
+  /// Pets roster + hatch numbers (T-038).
+  final PetsRules pets;
+
   /// Provider overrides for `ProviderScope` / `ProviderContainer`.
   List<Override> get overrides => [
         combatRulesProvider.overrideWithValue(combat),
@@ -70,6 +75,7 @@ class GameContent {
         offlineRulesProvider.overrideWithValue(offline),
         buffBookProvider.overrideWithValue(buffs),
         skillBookProvider.overrideWithValue(skills),
+        petsRulesProvider.overrideWithValue(pets),
       ];
 }
 
@@ -91,6 +97,7 @@ class ContentRepository {
     'design/data/wardrobe.json': 1,
     'design/data/road_events.json': 1,
     'design/art/anchors_mochi.json': 1,
+    'design/data/pets.json': 1,
   };
 
   Future<GameContent> loadAll() async {
@@ -141,6 +148,8 @@ class ContentRepository {
             'design/art/anchors_mochi.json', 'gear has no "$art"');
       }
     }
+    final pets = parse('design/data/pets.json',
+        () => PetsRules.fromJson(b, json['design/data/pets.json']!));
     final road = parse(
         'design/data/road_events.json',
         () =>
@@ -190,6 +199,7 @@ class ContentRepository {
       buffs: buffs,
       skills: skills,
       avatar: avatar,
+      pets: pets,
     );
   }
 

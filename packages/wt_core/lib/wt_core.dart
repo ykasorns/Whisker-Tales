@@ -33,5 +33,6 @@ export 'src/core/state/game_state.dart';
 export 'src/core/wallet/memory_wallet.dart';
 export 'src/idle/idle.dart';
 export 'src/offline/offline_reward.dart';
+export 'src/pets/pets.dart';
 export 'src/save/save.dart';
 export 'src/wardrobe/wardrobe.dart';

@@ -52,7 +52,11 @@ class IdleLoop implements IIdleLoop {
     required this.atkWeightPm,
     this.seed = 0,
     this.hooks = const IdleHooks(),
+    this.partners,
   });
+
+  /// Deployed pets fighting beside the cat (T-038); given the cat's spec.
+  final List<CombatUnitSpec> Function(CombatUnitSpec cat)? partners;
 
   final IdleRules rules;
   final IncomeModel income;
@@ -247,7 +251,7 @@ class IdleLoop implements IIdleLoop {
       CombatSetup(
         seed: mixSeed([seed, _farmPage, _waveIndex, _attempt]),
         units: [
-          catSpec(),
+          ..._catSide(),
           for (var i = 0; i < k; i++)
             _monster('m$i', power, k, rules.monsterIntervalMs, boss: false),
         ],
@@ -262,13 +266,18 @@ class IdleLoop implements IIdleLoop {
       CombatSetup(
         seed: mixSeed([seed, page, -1, _attempt]),
         units: [
-          catSpec(),
+          ..._catSide(),
           _monster('boss', rules.bossPower(page), 1, rules.bossIntervalMs,
               boss: true),
         ],
         timeLimitMs: rules.bossTimeLimitMs,
       ),
     );
+  }
+
+  List<CombatUnitSpec> _catSide() {
+    final cat = catSpec();
+    return [cat, ...?partners?.call(cat)];
   }
 
   /// One of [count] monsters sharing [power]: HP:ATK split by `hp_share`,

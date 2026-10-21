@@ -6,6 +6,7 @@ import 'clock/game_clock.dart';
 import 'contracts/age_gate.dart';
 import 'contracts/cat_class.dart';
 import 'contracts/gear_basket.dart';
+import 'contracts/pets.dart';
 import 'contracts/rewards.dart';
 import 'contracts/wardrobe.dart';
 import 'providers.dart';
@@ -46,6 +47,8 @@ class GameSaver {
         ...ads.snapshot().toJson()
       else
         'date_key': clock.dateKey,
+      if (_ref.read(petsProvider) case final pets?)
+        'fish_pulls': pets.fishPullsToday,
     };
     final clockJson = clock.snapshot().toJson()..remove('date_key');
     final ent = _section('entitlements', const {'no_ads': false});
@@ -62,7 +65,8 @@ class GameSaver {
       },
       'cat': _ref.read(catClassProvider).snapshot().toJson(),
       'wardrobe': _ref.read(wardrobeProvider).snapshot().toJson(),
-      'pets': _section('pets', const {'owned': {}, 'deployed': [], 'pity': 0}),
+      'pets': _ref.read(petsProvider)?.snapshot().toJson() ??
+          _section('pets', const {'owned': {}, 'deployed': [], 'pity': 0}),
       'research': _section('research', const {'levels': {}, 'task': null}),
       'daily': daily,
       'clock': clockJson,
@@ -139,6 +143,11 @@ class GameSaver {
 
     final ads = _ref.read(adServiceProvider);
     if (ads is AdService) ads.restore(AdDailyState.fromJson(daily));
+    if (_ref.read(petsProvider) case final pets?) {
+      final fish = daily['fish_pulls'];
+      pets.restore(PetsState.fromJson(sec('pets')),
+          fishPulls: fish is int ? fish : 0, dateKey: dateKey);
+    }
     // loading = opening the app: a day that turned since the save resets now
     _ref.read(gameClockProvider).tick();
 

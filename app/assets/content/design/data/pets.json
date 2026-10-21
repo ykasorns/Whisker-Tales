@@ -1,0 +1,14 @@
+{
+  "_doc": "GDD v0.4 §6 (T-038, D-019) — เพื่อนสัตว์ 6 ตัว (ธรรมดา 3 / หายาก 2 / ตำนาน 1) · ตัวเลขพลัง/อัตรา/ราคาอยู่ใน idle_balance_v1.json → pets · ภาพยังไม่มี: ใช้ icon (emoji) ไปก่อน",
+  "schema_version": 1,
+  "attack_interval_ms": 1500,
+  "dup_over_max_cookies": 10,
+  "pets": [
+    { "id": "sparrow", "rarity": "common", "icon": "🐦", "name_th": "นกกระจอกจิ๊บ", "name_en": "Chip the Sparrow" },
+    { "id": "mouse", "rarity": "common", "icon": "🐭", "name_th": "หนูน้อยมุ้งมิ้ง", "name_en": "Mimi the Mouse" },
+    { "id": "frog", "rarity": "common", "icon": "🐸", "name_th": "กบอ๊บอ๊บ", "name_en": "Hop the Frog" },
+    { "id": "hedgehog", "rarity": "rare", "icon": "🦔", "name_th": "เม่นหนามนุ่ม", "name_en": "Puff the Hedgehog" },
+    { "id": "rabbit", "rarity": "rare", "icon": "🐰", "name_th": "กระต่ายดินสอ", "name_en": "Doodle the Rabbit" },
+    { "id": "unicorn", "rarity": "legend", "icon": "🦄", "name_th": "ยูนิคอร์นสายรุ้ง", "name_en": "Rainbow Unicorn" }
+  ]
+}

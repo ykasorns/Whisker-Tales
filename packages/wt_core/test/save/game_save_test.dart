@@ -38,6 +38,8 @@ void main() {
             b, _j('../../design/data/road_events.json'))),
         adRulesProvider.overrideWithValue(AdRules.fromJson(b)),
         offlineRulesProvider.overrideWithValue(OfflineRules.fromBalance(b)),
+        petsRulesProvider.overrideWithValue(
+            PetsRules.fromJson(b, _j('../../design/data/pets.json'))),
         saveServiceProvider.overrideWithValue(SaveService(store)),
       ]);
 
@@ -66,6 +68,12 @@ void main() {
         .read(autoCraftProvider)
         .configure(const AutoCraftRule(on: true, mode: AutoCraftMode.equip));
     await a.read(adServiceProvider).show('pet_hatch');
+    final pets = a.read(petsProvider)!;
+    wallet.add(RewardBundle({Currency.eggs: 5, Currency.goldfish: 1000}));
+    for (var i = 0; i < 5; i++) {
+      await pets.hatch(HatchSource.egg);
+    }
+    await pets.hatch(HatchSource.fish);
     for (var i = 0; i < 300; i++) {
       loop.tick(100);
     }
@@ -78,6 +86,7 @@ void main() {
     expect(r.document, isNotNull);
     final after = c.read(gameSaverProvider).capture();
     for (final k in [
+      'pets',
       'profile',
       'idle',
       'gear',
@@ -92,6 +101,8 @@ void main() {
     expect(c.read(catClassProvider).current, 'mage');
     expect(c.read(adServiceProvider).remainingToday('pet_hatch'), 2);
     expect(c.read(autoCraftProvider).running, isTrue);
+    expect(c.read(petsProvider)!.fishHatchesLeftToday, 4);
+    expect(c.read(petsProvider)!.owned, pets.owned);
   });
 
   test('the offline window survives save/load', () async {
@@ -129,12 +140,9 @@ void main() {
     final a = game(time, store);
     addTearDown(a.dispose);
     final doc = a.read(gameSaverProvider).capture()
-      ..['pets'] = {
-        'owned': {
-          'sparrow': {'stars': 2, 'level': 3}
-        },
-        'deployed': ['sparrow'],
-        'pity': 4
+      ..['research'] = {
+        'levels': {'offline_cap': 2},
+        'task': null
       }
       ..['modes'] = {
         'story': {'best': 7}
@@ -142,7 +150,7 @@ void main() {
       ..['age'] = {'band': 'under13'};
     a.read(gameSaverProvider).restore(doc);
     final again = a.read(gameSaverProvider).capture();
-    expect(again['pets'], doc['pets']);
+    expect(again['research'], doc['research']);
     expect(again['modes'], doc['modes']);
     expect(again['age'], {'band': 'under13'});
   });

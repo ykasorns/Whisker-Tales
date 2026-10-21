@@ -5,6 +5,7 @@ import 'package:wt_core/wt_core.dart';
 import '../l10n/strings.dart';
 import 'home_page.dart';
 import 'palette.dart';
+import 'pets_tab.dart';
 
 Widget _pageTitle(String t) => Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
@@ -50,7 +51,9 @@ class CharacterPage extends ConsumerWidget {
                 valueListenable: refresh,
                 builder: (_, __, ___) => const _CatTab()),
             const _WardrobeTab(),
-            _soon(context, '🐦', s.comingSoon),
+            ValueListenableBuilder(
+                valueListenable: refresh,
+                builder: (_, v, __) => PetsTab(tick: v)),
             _soon(context, '🦉', s.comingSoon),
           ]),
         ),

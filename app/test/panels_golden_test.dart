@@ -69,6 +69,14 @@ void main() {
         expect(tester.takeException(), isNull);
         await expectLater(
             app, matchesGoldenFile('goldens/$lang/${tabs[i]}.png'));
+        if (tabs[i] == 'character') {
+          await tester.tap(find.text(lang == 'en' ? 'Pets' : 'เพื่อนสัตว์'));
+          for (var k = 0; k < 4; k++) {
+            await tester.pump(const Duration(milliseconds: 200));
+          }
+          expect(tester.takeException(), isNull);
+          await expectLater(app, matchesGoldenFile('goldens/$lang/pets.png'));
+        }
       }
       // back home, open the knit sheet
       final labels = find.byWidgetPredicate((w) =>

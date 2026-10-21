@@ -12,6 +12,7 @@ import 'contracts/rewards.dart';
 import '../gear/gear.dart';
 import '../idle/idle.dart';
 import '../offline/offline_reward.dart';
+import '../pets/pets.dart';
 import '../wardrobe/wardrobe.dart';
 import 'contracts/wallet.dart';
 import 'wallet/memory_wallet.dart';
@@ -146,9 +147,13 @@ final Provider<IdleLoop> idleLoopProvider = Provider<IdleLoop>((ref) {
     rules: ref.watch(idleRulesProvider),
     income: ref.watch(incomeModelProvider),
     engineFactory: ref.watch(combatEngineFactoryProvider),
-    catSpec: () => road.apply(ref
-        .read(catClassProvider)
-        .combatSpec(extra: ref.read(catExtraStatsProvider)())),
+    catSpec: () {
+      final cat = road.apply(ref
+          .read(catClassProvider)
+          .combatSpec(extra: ref.read(catExtraStatsProvider)()));
+      return ref.read(petsProvider)?.withPassive(cat) ?? cat;
+    },
+    partners: (cat) => ref.read(petsProvider)?.partners(cat) ?? const [],
     hpWeightPm: weights.hpPm,
     atkWeightPm: weights.atkPm,
     seed: ref.watch(idleSeedProvider),
@@ -235,3 +240,21 @@ final offlineRewardProvider = Provider<OfflineReward>((ref) => OfflineReward(
       farmPage: () => ref.read(idleLoopProvider).state.farmPage,
       grantExp: (exp) => ref.read(catProgressProvider).gainExp(exp),
     ));
+
+/// Pet roster + hatch numbers (`pets`, `pets.json`). Null until boot loads
+/// them (T-003) — then the loop simply has no pets.
+final petsRulesProvider = Provider<PetsRules?>((ref) => null);
+
+/// Pets and hatching (T-038).
+final Provider<Pets?> petsProvider = Provider<Pets?>((ref) {
+  final rules = ref.watch(petsRulesProvider);
+  if (rules == null) return null;
+  return Pets(
+    rules: rules,
+    wallet: ref.watch(walletProvider),
+    ads: () => ref.read(adServiceProvider),
+    clock: ref.watch(gameClockProvider),
+    clearedPage: () => ref.read(idleLoopProvider).state.clearedPage,
+    seed: ref.watch(idleSeedProvider) ^ 0x7E75,
+  );
+});

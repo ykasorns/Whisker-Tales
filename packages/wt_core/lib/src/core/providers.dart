@@ -10,6 +10,7 @@ import 'contracts/combat.dart';
 import 'contracts/idle_loop.dart';
 import 'contracts/rewards.dart';
 import '../gear/gear.dart';
+import '../iap/iap.dart';
 import '../idle/idle.dart';
 import '../offline/offline_reward.dart';
 import '../pets/pets.dart';
@@ -219,8 +220,9 @@ final adNetworkProvider = Provider<AdNetwork>((ref) => FakeAdNetwork());
 final ageBandProvider =
     Provider<AgeBand Function()>((ref) => () => AgeBand.unset);
 
-/// Supporter Pack `no_ads` entitlement (T-025 overrides this).
-final noAdsProvider = Provider<bool Function()>((ref) => () => false);
+/// Supporter Pack `no_ads` entitlement (T-025): from what was bought.
+final noAdsProvider = Provider<bool Function()>(
+    (ref) => () => ref.read(iapServiceProvider)?.hasNoAds ?? false);
 
 /// Rewarded ads with daily caps (T-039) — every placement goes through here.
 final adServiceProvider = Provider<IAdService>((ref) => AdService(
@@ -300,4 +302,33 @@ final Provider<Research?> researchProvider = Provider<Research?>((ref) {
   );
   ref.onDispose(r.dispose);
   return r;
+});
+
+/// What is for sale (`iap.json`). Null until boot loads it — then nothing
+/// can be bought.
+final iapCatalogProvider = Provider<IapCatalog?>((ref) => null);
+
+/// The real store (Google Play Billing) is set by the app at boot. The
+/// default sells and grants nothing, so a build without billing can never
+/// give purchases away.
+final iapStoreProvider =
+    Provider<IapStore>((ref) => const UnavailableIapStore());
+
+/// Grown-up check before buying or restoring (T-025).
+final parentalGateProvider = Provider<ParentalGate>(
+    (ref) => ParentalGate(clock: ref.watch(gameClockProvider)));
+
+/// Purchases: cosmetics + Supporter Pack, behind the parental gate (T-025).
+/// The app calls `start()` once at boot so store events are delivered.
+final Provider<IapService?> iapServiceProvider = Provider<IapService?>((ref) {
+  final catalog = ref.watch(iapCatalogProvider);
+  if (catalog == null) return null;
+  final iap = IapService(
+    catalog: catalog,
+    store: ref.watch(iapStoreProvider),
+    gate: ref.watch(parentalGateProvider),
+    grantCosmetics: (sku) => ref.read(wardrobeProvider).grantPurchase(sku),
+  );
+  ref.onDispose(iap.dispose);
+  return iap;
 });

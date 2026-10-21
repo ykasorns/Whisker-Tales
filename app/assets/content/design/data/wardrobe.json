@@ -7,7 +7,15 @@
   "off_hand_art": { "warrior": "shield", "rogue": "dagger" },
   "skins": [
     { "id": "base", "default": true },
-    { "id": "adventurer", "unlock": "cleared_page", "value": 10 }
+    { "id": "adventurer", "unlock": "cleared_page", "value": 10 },
+    { "id": "pajama", "unlock": "iap" },
+    { "id": "raincoat", "unlock": "iap" },
+    { "id": "explorer", "unlock": "iap" }
   ],
-  "iap": {}
+  "iap": {
+    "supporter_pack": [],
+    "skin_pajama": ["pajama"],
+    "skin_raincoat": ["raincoat"],
+    "skin_explorer": ["explorer"]
+  }
 }

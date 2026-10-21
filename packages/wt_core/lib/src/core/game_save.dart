@@ -61,6 +61,7 @@ class GameSaver {
     };
     final clockJson = clock.snapshot().toJson()..remove('date_key');
     final ent = _section('entitlements', const {'no_ads': false});
+    final iap = _ref.read(iapServiceProvider);
     return {
       'save_version': version,
       'profile': {
@@ -92,10 +93,8 @@ class GameSaver {
             ? (_carry['age'] as Map)['band']
             : _ageNames[_ref.read(ageBandProvider)()],
       },
-      'entitlements': {
-        ...ent,
-        'no_ads': ent['no_ads'] == true || _ref.read(noAdsProvider)(),
-      },
+      // what was bought decides no_ads; a carried flag never sticks on
+      'entitlements': {...ent, ...?iap?.toJson()},
       'modes': _section('modes', const {}),
       'settings': {
         ..._section('settings',
@@ -178,6 +177,9 @@ class GameSaver {
 
     final ads = _ref.read(adServiceProvider);
     if (ads is AdService) ads.restore(AdDailyState.fromJson(daily));
+    if (doc['entitlements'] case final Map<String, dynamic> ent) {
+      _ref.read(iapServiceProvider)?.restoreSaved(ent);
+    }
     if (_ref.read(petsProvider) case final pets?) {
       final fish = daily['fish_pulls'];
       pets.restore(PetsState.fromJson(sec('pets')),

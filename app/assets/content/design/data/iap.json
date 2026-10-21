@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "_doc": "ของที่ขายด้วยเงินจริง (GDD v0.4 §10/§12, D-003, T-025, D-023) — ผ่าน parental gate เท่านั้น · cosmetic = ชุดเต็มตัว (หน้าตาอย่างเดียว ไม่เพิ่มพลัง) · supporter = Supporter Pack: ซ่อนปุ่มโฆษณาทุกจุด ไม่มีรางวัลแทน · ห้ามมีปลาทอง/ไข่/ไหมพรม/ขนม/การเร่งเวลา (validator ไม่รับ field อื่น) · ของที่ปลดต่อ SKU อยู่ใน wardrobe.json → iap · gear_presets/basket_theme = สิทธิ์ที่จองไว้ ยังไม่มีระบบ — ห้ามเขียนในคำอธิบายจนกว่าจะทำ · SKU ต้องสร้างใน Play Console ด้วย id เดียวกัน และเปิดขายชุดเต็มตัวเมื่อมีภาพแล้วเท่านั้น",
+  "products": [
+    {
+      "sku": "supporter_pack",
+      "kind": "supporter",
+      "icon": "💛",
+      "name_th": "Supporter Pack",
+      "name_en": "Supporter Pack",
+      "desc_th": "ซ่อนปุ่มโฆษณาทุกจุดในเกม (ไม่มีรางวัลแทน) และช่วยให้คนทำเกมทำเกมต่อได้",
+      "desc_en": "Hides every ad button in the game (no reward instead) and helps us keep making the game",
+      "entitlements": ["no_ads", "gear_presets", "basket_theme"]
+    },
+    {
+      "sku": "skin_pajama",
+      "kind": "cosmetic",
+      "icon": "🌙",
+      "name_th": "ชุดนอนลายดาว",
+      "name_en": "Starry Pajamas",
+      "desc_th": "ชุดเต็มตัวให้โมจิ — เปลี่ยนแค่หน้าตา ไม่เพิ่มพลัง",
+      "desc_en": "A full outfit for Mochi — looks only, no extra power"
+    },
+    {
+      "sku": "skin_raincoat",
+      "kind": "cosmetic",
+      "icon": "☔",
+      "name_th": "เสื้อกันฝนสีเหลือง",
+      "name_en": "Yellow Raincoat",
+      "desc_th": "ชุดเต็มตัวให้โมจิ — เปลี่ยนแค่หน้าตา ไม่เพิ่มพลัง",
+      "desc_en": "A full outfit for Mochi — looks only, no extra power"
+    },
+    {
+      "sku": "skin_explorer",
+      "kind": "cosmetic",
+      "icon": "🧭",
+      "name_th": "ชุดนักสำรวจ",
+      "name_en": "Little Explorer",
+      "desc_th": "ชุดเต็มตัวให้โมจิ — เปลี่ยนแค่หน้าตา ไม่เพิ่มพลัง",
+      "desc_en": "A full outfit for Mochi — looks only, no extra power"
+    }
+  ]
+}

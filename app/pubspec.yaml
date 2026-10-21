@@ -18,6 +18,7 @@ dependencies:
     path: ../packages/wt_core
   wt_mode_story:
     path: ../packages/wt_mode_story
+  in_app_purchase: ^3.3.1
 
 dev_dependencies:
   flutter_test:

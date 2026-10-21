@@ -31,6 +31,7 @@ export 'src/core/providers.dart';
 export 'src/core/random/seeded_rng.dart';
 export 'src/core/state/game_state.dart';
 export 'src/core/wallet/memory_wallet.dart';
+export 'src/iap/iap.dart';
 export 'src/idle/idle.dart';
 export 'src/offline/offline_reward.dart';
 export 'src/pets/pets.dart';

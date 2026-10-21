@@ -7,6 +7,7 @@ import '../avatar/avatar.dart';
 import '../cat/cat.dart';
 import '../combat/combat.dart';
 import '../gear/gear.dart';
+import '../iap/iap.dart';
 import '../idle/idle.dart';
 import '../offline/offline_reward.dart';
 import '../pets/pets.dart';
@@ -46,6 +47,7 @@ class GameContent {
     required this.avatar,
     required this.pets,
     required this.research,
+    required this.iap,
   });
 
   final CombatRules combat;
@@ -68,6 +70,9 @@ class GameContent {
   /// Owl library tree + timers (T-041).
   final ResearchRules research;
 
+  /// What can be bought (T-025).
+  final IapCatalog iap;
+
   /// Provider overrides for `ProviderScope` / `ProviderContainer`.
   List<Override> get overrides => [
         combatRulesProvider.overrideWithValue(combat),
@@ -82,6 +87,7 @@ class GameContent {
         skillBookProvider.overrideWithValue(skills),
         petsRulesProvider.overrideWithValue(pets),
         researchRulesProvider.overrideWithValue(research),
+        iapCatalogProvider.overrideWithValue(iap),
       ];
 }
 
@@ -105,6 +111,7 @@ class ContentRepository {
     'design/art/anchors_mochi.json': 1,
     'design/data/pets.json': 1,
     'design/data/research.json': 1,
+    'design/data/iap.json': 1,
   };
 
   Future<GameContent> loadAll() async {
@@ -166,6 +173,24 @@ class ContentRepository {
         () =>
             RoadEventRules.fromJson(b, json['design/data/road_events.json']!));
 
+    final iap = parse('design/data/iap.json',
+        () => IapCatalog.fromJson(json['design/data/iap.json']!));
+    // every SKU unlocks known looks only, and the two lists match
+    final skus = {for (final p in iap.products) p.sku};
+    if (!_sameSet(skus, wardrobe.iap.keys.toSet())) {
+      throw ContentError('design/data/iap.json',
+          'skus $skus must match wardrobe.json iap ${wardrobe.iap.keys}');
+    }
+    for (final e in wardrobe.iap.entries) {
+      for (final id in e.value) {
+        final isStyle = wardrobe.catalog.any((c) => c.$3 == id);
+        if (!wardrobe.skins.containsKey(id) && !isStyle) {
+          throw ContentError('design/data/wardrobe.json',
+              'iap ${e.key} unlocks unknown look "$id"');
+        }
+      }
+    }
+
     // cross-references between files
     final classIds = {for (final c in cat.classes) c.id};
     for (final cls in skills.byClass.keys) {
@@ -212,6 +237,7 @@ class ContentRepository {
       avatar: avatar,
       pets: pets,
       research: research,
+      iap: iap,
     );
   }
 
@@ -239,3 +265,6 @@ class ContentRepository {
     return doc;
   }
 }
+
+bool _sameSet(Set<String> a, Set<String> b) =>
+    a.length == b.length && a.containsAll(b);

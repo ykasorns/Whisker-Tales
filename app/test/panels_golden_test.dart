@@ -76,6 +76,13 @@ void main() {
           }
           expect(tester.takeException(), isNull);
           await expectLater(app, matchesGoldenFile('goldens/$lang/pets.png'));
+          await tester.tap(find.text(lang == 'en' ? 'Library' : 'ห้องสมุด'));
+          for (var k = 0; k < 4; k++) {
+            await tester.pump(const Duration(milliseconds: 200));
+          }
+          expect(tester.takeException(), isNull);
+          await expectLater(
+              app, matchesGoldenFile('goldens/$lang/library.png'));
         }
       }
       // back home, open the knit sheet

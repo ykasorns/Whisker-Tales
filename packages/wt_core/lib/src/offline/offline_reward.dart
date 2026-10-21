@@ -70,6 +70,7 @@ class OfflineReward implements IOfflineReward {
     required this.wallet,
     required this.farmPage,
     this.grantExp,
+    this.offlineCapLevel,
   });
 
   final OfflineRules rules;
@@ -82,6 +83,9 @@ class OfflineReward implements IOfflineReward {
 
   /// Gives cat EXP (cat_class), injected so this module does not import it.
   final void Function(int exp)? grantExp;
+
+  /// Level of the library's `offline_cap` node (research), injected.
+  final int Function()? offlineCapLevel;
 
   OfflineRewardResult? _pending;
 
@@ -112,8 +116,9 @@ class OfflineReward implements IOfflineReward {
 
   /// On app open / resume: works out the window from [clock] and keeps it
   /// pending until [claim]. A turned-back clock gives nothing.
-  OfflineRewardResult checkIn({int offlineResearchLevel = 0}) {
-    final cap = rules.capFor(offlineResearchLevel);
+  OfflineRewardResult checkIn({int? offlineResearchLevel}) {
+    final cap =
+        rules.capFor(offlineResearchLevel ?? offlineCapLevel?.call() ?? 0);
     final rolledBack = clock.now().isBefore(clock.maxSeenUtc);
     final result = rolledBack
         ? OfflineRewardResult(

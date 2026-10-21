@@ -40,6 +40,7 @@ class GameDriver {
     _sinceUi += dt;
     if (_sinceUi > 0.25) {
       _sinceUi = 0;
+      _ref.read(researchProvider)?.tick();
       ui$.value++;
     }
   }

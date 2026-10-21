@@ -5,6 +5,7 @@ import 'package:wt_core/wt_core.dart';
 import '../l10n/strings.dart';
 import 'home_page.dart';
 import 'palette.dart';
+import 'library_tab.dart';
 import 'pets_tab.dart';
 
 Widget _pageTitle(String t) => Padding(
@@ -54,7 +55,9 @@ class CharacterPage extends ConsumerWidget {
             ValueListenableBuilder(
                 valueListenable: refresh,
                 builder: (_, v, __) => PetsTab(tick: v)),
-            _soon(context, '🦉', s.comingSoon),
+            ValueListenableBuilder(
+                valueListenable: refresh,
+                builder: (_, v, __) => LibraryTab(tick: v)),
           ]),
         ),
       ]),

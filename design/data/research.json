@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "_doc": "ห้องสมุดนกฮูก (GDD v0.4 §7, T-041, D-020). เวลา/ราคาตามสูตรใน idle_balance_v1.json → research: time = time_base_min × time_growth^(L−1) × time_mult (cap time_cap_min), cost = cost_base × cost_growth^(L−1) × cost_mult. effect: stat (attr atk/hp/def, +stat_node_pct_per_level ต่อเลเวล) · offline_cap (+offline_node_min_per_level นาที) · queue (+1 คิว). requires = [node, level] ทุกข้อ",
+  "nodes": [
+    {
+      "id": "sharp_claws",
+      "icon": "🐾",
+      "name_th": "เล็บคม",
+      "name_en": "Sharp Claws",
+      "effect": "stat",
+      "attr": "atk",
+      "max_level": 20
+    },
+    {
+      "id": "offline_cap",
+      "icon": "🛏️",
+      "name_th": "หมอนนุ่ม",
+      "name_en": "Soft Pillow",
+      "effect": "offline_cap",
+      "max_level": 12
+    },
+    {
+      "id": "fluffy_fur",
+      "icon": "🧶",
+      "name_th": "ขนฟูนุ่ม",
+      "name_en": "Fluffy Fur",
+      "effect": "stat",
+      "attr": "hp",
+      "max_level": 20,
+      "requires": [["sharp_claws", 1]]
+    },
+    {
+      "id": "tough_paws",
+      "icon": "🛡️",
+      "name_th": "อุ้งเท้าแกร่ง",
+      "name_en": "Tough Paws",
+      "effect": "stat",
+      "attr": "def",
+      "max_level": 20,
+      "requires": [["fluffy_fur", 1]]
+    },
+    {
+      "id": "queue_2",
+      "icon": "📚",
+      "name_th": "โต๊ะอ่านตัวที่ 2",
+      "name_en": "Second Desk",
+      "effect": "queue",
+      "max_level": 1,
+      "cost_mult": 5,
+      "time_mult": 10,
+      "requires": [["sharp_claws", 5], ["offline_cap", 3]]
+    }
+  ]
+}

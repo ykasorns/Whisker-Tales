@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,6 +30,7 @@ class _GameShellState extends ConsumerState<GameShell>
   late final GameDriver _driver = GameDriver(ref);
   late final Ticker _ticker;
   late final AppLifecycleListener _life;
+  StreamSubscription<ResearchCompleted>? _researchDone;
   Duration _last = Duration.zero;
 
   @override
@@ -46,12 +49,27 @@ class _GameShellState extends ConsumerState<GameShell>
     _life = AppLifecycleListener(onResume: () {
       if (mounted) showOfflineReward(context, ref);
     });
+    // the only notice the library gives: "research done" (GDD §7), and the
+    // player can switch it off
+    final research = ref.read(researchProvider);
+    _researchDone = research?.completed.listen((e) {
+      if (!mounted || !research.notifyDone) return;
+      final s = S.of(context);
+      final node = research.rules.byId(e.nodeId)!;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Palette.ink,
+        content: Text(
+            s.researchDone(s.lang == 'en' ? node.nameEn : node.nameTh, e.level),
+            style: const TextStyle(fontWeight: FontWeight.w800)),
+      ));
+    });
   }
 
   @override
   void dispose() {
     _ticker.dispose();
     _life.dispose();
+    _researchDone?.cancel();
     super.dispose();
   }
 

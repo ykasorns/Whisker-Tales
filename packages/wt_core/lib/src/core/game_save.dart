@@ -7,6 +7,7 @@ import 'contracts/age_gate.dart';
 import 'contracts/cat_class.dart';
 import 'contracts/gear_basket.dart';
 import 'contracts/pets.dart';
+import 'contracts/research.dart';
 import 'contracts/rewards.dart';
 import 'contracts/wardrobe.dart';
 import 'providers.dart';
@@ -15,8 +16,8 @@ import 'wallet/memory_wallet.dart';
 /// Puts every module's state into one Save v3 document and back
 /// (GAME_CONTRACT §4.6, T-022). Part of the wiring layer, like
 /// `providers.dart`: modules only expose `toJson`/`restore`; this is the one
-/// place that knows them all. Sections no module owns yet (pets, research,
-/// age, modes, settings) are carried through unchanged.
+/// place that knows them all. Sections no module owns yet (age, modes,
+/// settings) are carried through unchanged.
 class GameSaver {
   GameSaver(this._ref);
 
@@ -67,7 +68,8 @@ class GameSaver {
       'wardrobe': _ref.read(wardrobeProvider).snapshot().toJson(),
       'pets': _ref.read(petsProvider)?.snapshot().toJson() ??
           _section('pets', const {'owned': {}, 'deployed': [], 'pity': 0}),
-      'research': _section('research', const {'levels': {}, 'task': null}),
+      'research': _ref.read(researchProvider)?.snapshot().toJson() ??
+          _section('research', const {'levels': {}, 'task': null}),
       'daily': daily,
       'clock': clockJson,
       'age': {
@@ -80,8 +82,12 @@ class GameSaver {
         'no_ads': ent['no_ads'] == true || _ref.read(noAdsProvider)(),
       },
       'modes': _section('modes', const {}),
-      'settings': _section('settings',
-          const {'lang': 'th', 'bgm': true, 'sfx': true, 'speed': 1}),
+      'settings': {
+        ..._section('settings',
+            const {'lang': 'th', 'bgm': true, 'sfx': true, 'speed': 1}),
+        if (_ref.read(researchProvider) case final r?)
+          'notify_research': r.notifyDone,
+      },
       'updated_at': clock.effectiveNow.toIso8601String(),
     };
   }
@@ -147,6 +153,11 @@ class GameSaver {
       final fish = daily['fish_pulls'];
       pets.restore(PetsState.fromJson(sec('pets')),
           fishPulls: fish is int ? fish : 0, dateKey: dateKey);
+    }
+    if (_ref.read(researchProvider) case final r?) {
+      r.restore(ResearchState.fromJson(sec('research')));
+      final settings = doc['settings'];
+      r.notifyDone = settings is! Map || settings['notify_research'] != false;
     }
     // loading = opening the app: a day that turned since the save resets now
     _ref.read(gameClockProvider).tick();

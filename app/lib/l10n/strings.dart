@@ -73,6 +73,22 @@ class S {
       .replaceAll('{r}', '$r')
       .replaceAll('{l}', '$l')
       .replaceAll('{p}', '$pity');
+  String get libraryTitle => _t('library_title');
+  String statNode(String stat, String per, String now) => _t('stat_node')
+      .replaceAll('{s}', _t('stat.$stat'))
+      .replaceAll('{p}', per)
+      .replaceAll('{n}', now);
+  String offlineNode(String cap) => _t('offline_node').replaceAll('{c}', cap);
+  String get queueNode => _t('queue_node');
+  String adSpeedUp(int min, int left) =>
+      _t('ad_speed_up').replaceAll('{m}', '$min').replaceAll('{n}', '$left');
+  String get notifyResearch => _t('notify_research');
+  String deskFree(int i) => _t('desk_free').replaceAll('{i}', '$i');
+  String get maxed => _t('maxed');
+  String get researching => _t('researching');
+  String get queueFull => _t('queue_full');
+  String researchDone(String name, int lv) =>
+      _t('research_done').replaceAll('{x}', name).replaceAll('{lv}', '$lv');
   String get newPet => _t('new_pet');
   String get starUp => _t('star_up');
   String treats(int n) => _t('treats').replaceAll('{n}', '$n');
@@ -133,6 +149,20 @@ class S {
     'ad_free': '📺 ฟรี เหลือ {n}',
     'fish_hatch': '🐟 {c} · เหลือ {n}',
     'odds': 'ธรรมดา {c}% · หายาก {r}% · ตำนาน {l}% · การันตีตำนานใน {p} ครั้ง',
+    'library_title': 'ห้องสมุดนกฮูก',
+    'stat.atk': 'พลังโจมตี',
+    'stat.hp': 'พลังชีวิต',
+    'stat.def': 'พลังป้องกัน',
+    'stat_node': '{s} +{p}%/เลเวล (ตอนนี้ +{n}%)',
+    'offline_node': 'เก็บของตอนออฟไลน์ได้นานขึ้น (ตอนนี้ {c} ชม.)',
+    'queue_node': 'วิจัยได้ 2 อย่างพร้อมกัน',
+    'ad_speed_up': '📺 ดูโฆษณา ลดเวลา {m} นาทีขึ้นไป · เหลือ {n}',
+    'notify_research': '🔔 แจ้งเตือนเมื่อวิจัยเสร็จ',
+    'desk_free': 'โต๊ะ {i} ว่าง — เลือกหัวข้อด้านล่าง',
+    'maxed': 'สูงสุดแล้ว',
+    'researching': 'กำลังวิจัย…',
+    'queue_full': 'โต๊ะเต็ม',
+    'research_done': '🦉 วิจัยเสร็จแล้ว: {x} Lv.{lv}',
     'new_pet': 'เพื่อนใหม่!',
     'star_up': 'ดาวเพิ่ม!',
     'treats': 'ได้ขนม 🍪 {n}',
@@ -192,6 +222,20 @@ class S {
     'ad_free': '📺 Free · {n} left',
     'fish_hatch': '🐟 {c} · {n} left',
     'odds': 'Common {c}% · Rare {r}% · Legend {l}% · Legend guaranteed in {p}',
+    'library_title': 'Owl Library',
+    'stat.atk': 'Attack',
+    'stat.hp': 'Health',
+    'stat.def': 'Defense',
+    'stat_node': '{s} +{p}%/level (now +{n}%)',
+    'offline_node': 'Collect for longer while away (now {c} h)',
+    'queue_node': 'Research 2 things at once',
+    'ad_speed_up': '📺 Watch an ad: {m}+ min faster · {n} left',
+    'notify_research': '🔔 Tell me when research is done',
+    'desk_free': 'Desk {i} is free — pick a topic below',
+    'maxed': 'Maxed',
+    'researching': 'Researching…',
+    'queue_full': 'Desks full',
+    'research_done': '🦉 Research done: {x} Lv.{lv}',
     'new_pet': 'New friend!',
     'star_up': 'Star up!',
     'treats': 'Got treats 🍪 {n}',

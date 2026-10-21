@@ -13,6 +13,7 @@ import '../gear/gear.dart';
 import '../idle/idle.dart';
 import '../offline/offline_reward.dart';
 import '../pets/pets.dart';
+import '../research/research.dart';
 import '../wardrobe/wardrobe.dart';
 import 'contracts/wallet.dart';
 import 'wallet/memory_wallet.dart';
@@ -151,7 +152,8 @@ final Provider<IdleLoop> idleLoopProvider = Provider<IdleLoop>((ref) {
       final cat = road.apply(ref
           .read(catClassProvider)
           .combatSpec(extra: ref.read(catExtraStatsProvider)()));
-      return ref.read(petsProvider)?.withPassive(cat) ?? cat;
+      final withPets = ref.read(petsProvider)?.withPassive(cat) ?? cat;
+      return ref.read(researchProvider)?.withBonus(withPets) ?? withPets;
     },
     partners: (cat) => ref.read(petsProvider)?.partners(cat) ?? const [],
     hpWeightPm: weights.hpPm,
@@ -239,6 +241,7 @@ final offlineRewardProvider = Provider<OfflineReward>((ref) => OfflineReward(
       wallet: ref.watch(walletProvider),
       farmPage: () => ref.read(idleLoopProvider).state.farmPage,
       grantExp: (exp) => ref.read(catProgressProvider).gainExp(exp),
+      offlineCapLevel: () => ref.read(researchProvider)?.offlineCapLevel ?? 0,
     ));
 
 /// Pet roster + hatch numbers (`pets`, `pets.json`). Null until boot loads
@@ -257,4 +260,22 @@ final Provider<Pets?> petsProvider = Provider<Pets?>((ref) {
     clearedPage: () => ref.read(idleLoopProvider).state.clearedPage,
     seed: ref.watch(idleSeedProvider) ^ 0x7E75,
   );
+});
+
+/// Library tree + timer numbers (`research`, `research.json`). Null until
+/// boot loads them (T-003) — then there is no library.
+final researchRulesProvider = Provider<ResearchRules?>((ref) => null);
+
+/// Owl library research (T-041).
+final Provider<Research?> researchProvider = Provider<Research?>((ref) {
+  final rules = ref.watch(researchRulesProvider);
+  if (rules == null) return null;
+  final r = Research(
+    rules: rules,
+    wallet: ref.watch(walletProvider),
+    ads: () => ref.read(adServiceProvider),
+    clock: ref.watch(gameClockProvider),
+  );
+  ref.onDispose(r.dispose);
+  return r;
 });

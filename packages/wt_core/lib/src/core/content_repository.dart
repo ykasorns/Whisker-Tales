@@ -10,6 +10,7 @@ import '../gear/gear.dart';
 import '../idle/idle.dart';
 import '../offline/offline_reward.dart';
 import '../pets/pets.dart';
+import '../research/research.dart';
 import '../wardrobe/wardrobe.dart';
 import 'providers.dart';
 
@@ -44,6 +45,7 @@ class GameContent {
     required this.skills,
     required this.avatar,
     required this.pets,
+    required this.research,
   });
 
   final CombatRules combat;
@@ -63,6 +65,9 @@ class GameContent {
   /// Pets roster + hatch numbers (T-038).
   final PetsRules pets;
 
+  /// Owl library tree + timers (T-041).
+  final ResearchRules research;
+
   /// Provider overrides for `ProviderScope` / `ProviderContainer`.
   List<Override> get overrides => [
         combatRulesProvider.overrideWithValue(combat),
@@ -76,6 +81,7 @@ class GameContent {
         buffBookProvider.overrideWithValue(buffs),
         skillBookProvider.overrideWithValue(skills),
         petsRulesProvider.overrideWithValue(pets),
+        researchRulesProvider.overrideWithValue(research),
       ];
 }
 
@@ -98,6 +104,7 @@ class ContentRepository {
     'design/data/road_events.json': 1,
     'design/art/anchors_mochi.json': 1,
     'design/data/pets.json': 1,
+    'design/data/research.json': 1,
   };
 
   Future<GameContent> loadAll() async {
@@ -150,6 +157,10 @@ class ContentRepository {
     }
     final pets = parse('design/data/pets.json',
         () => PetsRules.fromJson(b, json['design/data/pets.json']!));
+    final research = parse(
+        'design/data/research.json',
+        () => ResearchRules.fromJson(b, json['design/data/research.json']!,
+            ads.placements['research_speedup']?.params ?? const {}));
     final road = parse(
         'design/data/road_events.json',
         () =>
@@ -200,6 +211,7 @@ class ContentRepository {
       skills: skills,
       avatar: avatar,
       pets: pets,
+      research: research,
     );
   }
 

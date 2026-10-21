@@ -40,6 +40,10 @@ void main() {
         offlineRulesProvider.overrideWithValue(OfflineRules.fromBalance(b)),
         petsRulesProvider.overrideWithValue(
             PetsRules.fromJson(b, _j('../../design/data/pets.json'))),
+        researchRulesProvider.overrideWithValue(ResearchRules.fromJson(
+            b,
+            _j('../../design/data/research.json'),
+            AdRules.fromJson(b).placements['research_speedup']!.params)),
         saveServiceProvider.overrideWithValue(SaveService(store)),
       ]);
 
@@ -74,6 +78,11 @@ void main() {
       await pets.hatch(HatchSource.egg);
     }
     await pets.hatch(HatchSource.fish);
+    final research = a.read(researchProvider)!..notifyDone = false;
+    expect(research.start('sharp_claws'), isTrue);
+    time.utc = time.utc.add(const Duration(minutes: 2));
+    research.tick();
+    expect(research.start('offline_cap'), isTrue);
     for (var i = 0; i < 300; i++) {
       loop.tick(100);
     }
@@ -87,6 +96,8 @@ void main() {
     final after = c.read(gameSaverProvider).capture();
     for (final k in [
       'pets',
+      'research',
+      'settings',
       'profile',
       'idle',
       'gear',
@@ -103,6 +114,10 @@ void main() {
     expect(c.read(autoCraftProvider).running, isTrue);
     expect(c.read(petsProvider)!.fishHatchesLeftToday, 4);
     expect(c.read(petsProvider)!.owned, pets.owned);
+    final r2 = c.read(researchProvider)!;
+    expect(r2.levels, {'sharp_claws': 1});
+    expect(r2.tasks.single.nodeId, 'offline_cap');
+    expect(r2.notifyDone, isFalse);
   });
 
   test('the offline window survives save/load', () async {
@@ -140,17 +155,12 @@ void main() {
     final a = game(time, store);
     addTearDown(a.dispose);
     final doc = a.read(gameSaverProvider).capture()
-      ..['research'] = {
-        'levels': {'offline_cap': 2},
-        'task': null
-      }
       ..['modes'] = {
         'story': {'best': 7}
       }
       ..['age'] = {'band': 'under13'};
     a.read(gameSaverProvider).restore(doc);
     final again = a.read(gameSaverProvider).capture();
-    expect(again['research'], doc['research']);
     expect(again['modes'], doc['modes']);
     expect(again['age'], {'band': 'under13'});
   });

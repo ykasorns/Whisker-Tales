@@ -251,19 +251,9 @@ class EventsPage extends ConsumerStatefulWidget {
 }
 
 class _EventsPageState extends ConsumerState<EventsPage> {
-  Future<void> _watch(String placement, Currency c, String minutesKey) async {
-    final ads = ref.read(adServiceProvider);
-    if (await ads.show(placement) != AdOutcome.rewarded) return;
-    final rule = ref.read(adRulesProvider).placements[placement]!;
-    final income = ref.read(incomeModelProvider);
-    final page = ref.read(idleLoopProvider).state.farmPage;
-    final waves =
-        ((rule.params[minutesKey] ?? 0) * income.wavesPerMinute).floor();
-    // "N minutes of income": the gear's goldfish find counts, as in waves
-    final amount = income.forWaves(page, waves,
-        fishBp: ref.read(findsProvider)().fishBp)[c];
-    ref.read(walletProvider).add(RewardBundle({c: amount < 1 ? 1 : amount}));
-    setState(() {});
+  Future<void> _watch(String placement) async {
+    await ref.read(adGiftsProvider).watch(placement);
+    if (mounted) setState(() {});
   }
 
   @override
@@ -307,14 +297,8 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
     return ListView(children: [
       _pageTitle(s.navEvents),
-      row(
-          '🎁',
-          s.dailyGift,
-          'daily_gift',
-          () => _watch(
-              'daily_gift', Currency.goldfish, 'fish_minutes_of_income')),
-      row('🧶', s.yarnBundle, 'yarn_bundle',
-          () => _watch('yarn_bundle', Currency.yarn, 'yarn_minutes_of_income')),
+      row('🎁', s.dailyGift, 'daily_gift', () => _watch('daily_gift')),
+      row('🧶', s.yarnBundle, 'yarn_bundle', () => _watch('yarn_bundle')),
     ]);
   }
 }

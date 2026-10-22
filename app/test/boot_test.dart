@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flame/game.dart';
 import 'package:whisker_tales/game_view.dart';
+import 'package:whisker_tales/debug/telemetry.dart';
 import 'package:whisker_tales/main.dart';
 import 'package:wt_core/wt_core.dart';
 
@@ -69,5 +70,9 @@ void main() {
         .widget<GameWidget<BattleGame>>(find.byType(GameWidget<BattleGame>))
         .game!;
     expect(game.mochi.anim, 'walk');
+  });
+
+  test('dev telemetry is off unless WT_DEBUG is set (never in release)', () {
+    expect(kDebugTelemetry, isFalse);
   });
 }

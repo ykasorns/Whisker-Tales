@@ -4,6 +4,12 @@
 // curve; it does not run the combat engine. All tunables come from
 // design/balance/idle_balance_v1.json.
 //
+// Superseded for decisions by the headless player on the real engine
+// (packages/wt_core/tool/headless_player_test.dart, D-027): this model knows
+// nothing of skills, pets fighting, research, road events or bosses, and on
+// the D-027 numbers it says ~40 days where the real game takes ~12. Kept as
+// a quick rough check only.
+//
 // Usage: dart run bin/sim.dart [path/to/idle_balance_v1.json] [--seeds N] [--extra a,b]
 import 'dart:convert';
 import 'dart:io';

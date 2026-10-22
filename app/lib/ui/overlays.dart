@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
 
+import '../debug/telemetry.dart';
 import '../l10n/strings.dart';
 import 'home_page.dart';
 import 'palette.dart';
@@ -13,6 +14,9 @@ import 'palette.dart';
 Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
   final offline = ref.read(offlineRewardProvider);
   final r = offline.checkIn();
+  if (kDebugTelemetry) {
+    DebugTelemetryOverlay.lastOfflineMinutes = r.creditedMinutes;
+  }
   if (r.creditedMinutes < 1 || !context.mounted) {
     offline.claim(); // nothing to show; still marks the window used
     return;

@@ -9,9 +9,9 @@
   },
   "enemy": {
     "page_power_base": 100,
-    "page_power_growth": 1.18,
+    "page_power_growth": 1.2,
     "page_boss_mult": 1.5,
-    "chapter_boss_mult": 2.2,
+    "chapter_boss_mult": 1.3,
     "_doc_early": "D-011: บอสหน้า 1..early_boss_until_page อ่อนลง early_boss_discount_pct% ลดลงเป็นเส้นตรงจนเต็มหลังหน้านั้น",
     "ASSUMPTION_early_boss_discount_pct": 40,
     "ASSUMPTION_early_boss_until_page": 10,
@@ -24,7 +24,7 @@
   },
   "player": {
     "base_power": 60,
-    "ASSUMPTION_waves_per_minute_online": 3,
+    "ASSUMPTION_waves_per_minute_online": 0.6,
     "offline_rate_vs_online": 1.0
   },
   "gear": {
@@ -49,7 +49,7 @@
     ],
     "ASSUMPTION_slot_upgrade_pct_per_level": 0.04,
     "ASSUMPTION_slot_upgrade_cost_base": 40,
-    "ASSUMPTION_slot_upgrade_cost_growth": 1.16,
+    "ASSUMPTION_slot_upgrade_cost_growth": 1.1,
     "ASSUMPTION_recycle_fish_per_item": 4,
     "recycle_basket_exp": 1,
     "pity_every": 30,
@@ -324,7 +324,7 @@
       "tier": 1,
       "hp": 0.9,
       "def": 0.9,
-      "atk": 0.75,
+      "atk": 0.85,
       "attack_interval_s": 0.6,
       "range": "melee",
       "evade_add": 0.15,

@@ -5,6 +5,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
 
+import '../debug/telemetry.dart';
 import '../game_view.dart';
 import '../l10n/strings.dart';
 import 'home_page.dart';
@@ -98,62 +99,73 @@ class _GameShellState extends ConsumerState<GameShell>
     ];
     return Scaffold(
       backgroundColor: Palette.paper,
-      body: SafeArea(
-        child: Column(children: [
-          Expanded(
-            child: IndexedStack(index: _tab, children: [
-              CharacterPage(refresh: _driver.ui$),
-              const DungeonPage(),
-              HomePage(avatarRules: widget.avatarRules, driver: _driver),
-              const EventsPage(),
-              const ShopPage(),
-            ]),
-          ),
-          Container(
-            decoration: const BoxDecoration(
-              color: Palette.sheet,
-              border: Border(top: BorderSide(color: Palette.ink, width: 2.5)),
+      body: Stack(children: [
+        SafeArea(
+          child: Column(children: [
+            Expanded(
+              child: IndexedStack(index: _tab, children: [
+                CharacterPage(refresh: _driver.ui$),
+                const DungeonPage(),
+                HomePage(avatarRules: widget.avatarRules, driver: _driver),
+                const EventsPage(),
+                const ShopPage(),
+              ]),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(children: [
-              for (var i = 0; i < items.length; i++)
-                Expanded(
-                  child: Semantics(
-                    button: true,
-                    selected: i == _tab,
-                    label: items[i].$2,
-                    child: InkWell(
-                      onTap: () => setState(() => _tab = i),
-                      child: SizedBox(
-                        height: 66,
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              AnimatedScale(
-                                scale: i == _tab ? 1.25 : 1,
-                                duration: const Duration(milliseconds: 150),
-                                child: Text(items[i].$1,
+            Container(
+              decoration: const BoxDecoration(
+                color: Palette.sheet,
+                border: Border(top: BorderSide(color: Palette.ink, width: 2.5)),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(children: [
+                for (var i = 0; i < items.length; i++)
+                  Expanded(
+                    child: Semantics(
+                      button: true,
+                      selected: i == _tab,
+                      label: items[i].$2,
+                      child: InkWell(
+                        onTap: () => setState(() => _tab = i),
+                        child: SizedBox(
+                          height: 66,
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AnimatedScale(
+                                  scale: i == _tab ? 1.25 : 1,
+                                  duration: const Duration(milliseconds: 150),
+                                  child: Text(items[i].$1,
+                                      style: TextStyle(
+                                          fontSize: i == home ? 26 : 22)),
+                                ),
+                                Text(items[i].$2,
                                     style: TextStyle(
-                                        fontSize: i == home ? 26 : 22)),
-                              ),
-                              Text(items[i].$2,
-                                  style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: i == _tab
-                                          ? FontWeight.w800
-                                          : FontWeight.w500,
-                                      color: i == _tab
-                                          ? Palette.ink
-                                          : Palette.inkSoft)),
-                            ]),
+                                        fontSize: 11,
+                                        fontWeight: i == _tab
+                                            ? FontWeight.w800
+                                            : FontWeight.w500,
+                                        color: i == _tab
+                                            ? Palette.ink
+                                            : Palette.inkSoft)),
+                              ]),
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ]),
+              ]),
+            ),
+          ]),
+        ),
+        // dev builds only (T-029); not in the release app
+        if (kDebugTelemetry)
+          Positioned(
+            left: 4,
+            top: 120,
+            child: ValueListenableBuilder<int>(
+                valueListenable: _driver.ui$,
+                builder: (_, v, __) => DebugTelemetryOverlay(tick: v)),
           ),
-        ]),
-      ),
+      ]),
     );
   }
 }

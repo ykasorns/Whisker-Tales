@@ -57,12 +57,12 @@ void main() {
   group('curves from data', () {
     test('P(n) and boss multipliers (GDD v0.4 §15.3)', () {
       expect(rules.wavePower(1), 100);
-      expect(rules.wavePower(10), 444);
+      expect(rules.wavePower(10), 516); // 100 × 1.2^9 (D-027)
       // page boss ×1.5, early-page discount 40% fading over pages 1–10 (D-011)
-      expect(rules.bossPower(5), 221); // 194 × 1.5 × 0.76
-      expect(rules.bossPower(10), 938); // chapter boss 444 × 2.2 × 0.96
+      expect(rules.bossPower(5), 236); // 207 × 1.5 × 0.76
+      expect(rules.bossPower(10), 644); // chapter boss 516 × 1.3 × 0.96
       expect(rules.bossPower(20),
-          (rules.wavePower(20) * 2.2).round()); // no discount after chapter 1
+          (rules.wavePower(20) * 1.3).round()); // no discount after chapter 1
       expect(rules.isChapterBoss(20), isTrue);
     });
 

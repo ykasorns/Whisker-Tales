@@ -160,7 +160,7 @@ class _Run {
   double minutesOnline = 0;
 
   int get worstPage => pageMinutes.entries
-      .fold(MapEntry(0, -1.0), (a, e) => e.value > a.value ? e : a)
+      .fold(const MapEntry(0, -1.0), (a, e) => e.value > a.value ? e : a)
       .key;
 }
 
@@ -218,7 +218,7 @@ Future<_Run> _play(GameContent content, String cls, int seed,
     Duration(hours: 13)
   ];
   const sessionMs = 15 * 60 * 1000, stepMs = 2000;
-  final target = 30;
+  const target = 30;
   for (var day = 0; day < maxDays && loop.state.clearedPage < target; day++) {
     for (final at in sessions) {
       final open =

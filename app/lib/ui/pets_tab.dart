@@ -30,7 +30,7 @@ class _PetsTabState extends ConsumerState<PetsTab> {
   }
 
   Future<void> _showResult(Pets pets, HatchResult r) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     final def = pets.rules.byId(r.petId)!;
     return showDialog(
       context: context,
@@ -86,7 +86,7 @@ class _PetsTabState extends ConsumerState<PetsTab> {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     final pets = ref.read(petsProvider);
     if (pets == null) return const SizedBox();
     final wallet = ref.read(walletProvider);

@@ -1,0 +1,9 @@
+# T-004: UI strings → lib/l10n/app_{th,en}.arb → AppLocalizations (flutter
+# gen-l10n). Content names (pets, skills, research …) come from
+# design/data/*.json name_th/name_en, not from here.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+output-dir: lib/l10n/gen
+nullable-getter: false

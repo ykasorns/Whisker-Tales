@@ -69,7 +69,7 @@ class _GateDialogState extends State<_GateDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     Widget key(String k, {VoidCallback? onTap}) => Expanded(
           child: Padding(
             padding: const EdgeInsets.all(3),
@@ -158,7 +158,7 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
     super.initState();
     _sub = _iap?.news.listen((e) {
       if (!mounted) return;
-      final s = S.of(context);
+      final s = AppLocalizations.of(context);
       setState(() => _status = switch (e.kind) {
             StoreEventKind.purchased => s.bought,
             StoreEventKind.pending => s.payPending,
@@ -175,7 +175,7 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
   }
 
   Future<void> _buy(String sku) async {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     final r = await _iap!.purchase(sku, widget.pass);
     if (!mounted) return;
     if (r == PurchaseStart.needsGate) {
@@ -193,7 +193,7 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     final iap = _iap;
     return SafeArea(
       child: Padding(

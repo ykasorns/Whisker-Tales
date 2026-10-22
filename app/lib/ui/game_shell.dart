@@ -50,7 +50,7 @@ class _GameShellState extends ConsumerState<GameShell>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (widget.saveFallback case final f?) {
-        final s = S.of(context);
+        final s = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           duration: const Duration(seconds: 8),
           backgroundColor: Palette.ink,
@@ -68,7 +68,7 @@ class _GameShellState extends ConsumerState<GameShell>
     final research = ref.read(researchProvider);
     _researchDone = research?.completed.listen((e) {
       if (!mounted || !research.notifyDone) return;
-      final s = S.of(context);
+      final s = AppLocalizations.of(context);
       final node = research.rules.byId(e.nodeId)!;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Palette.ink,
@@ -89,7 +89,7 @@ class _GameShellState extends ConsumerState<GameShell>
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     final items = [
       ('🐱', s.navCharacter),
       ('🏰', s.navDungeon),

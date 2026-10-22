@@ -77,7 +77,7 @@ class AgeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     return PopScope(
       canPop: pass != null, // the first time it cannot be skipped
       child: Scaffold(

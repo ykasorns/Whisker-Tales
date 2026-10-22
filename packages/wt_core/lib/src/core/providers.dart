@@ -336,3 +336,9 @@ final Provider<IapService?> iapServiceProvider = Provider<IapService?>((ref) {
   ref.onDispose(iap.dispose);
   return iap;
 });
+
+/// UI languages (T-004).
+const kLanguages = ['th', 'en'];
+
+/// UI language, saved in `settings.lang`; changes take effect at once.
+final langProvider = StateProvider<String>((ref) => 'th');

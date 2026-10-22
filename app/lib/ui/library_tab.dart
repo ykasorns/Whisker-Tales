@@ -35,14 +35,15 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
     if (mounted) setState(() => _busy = false);
   }
 
-  String _name(S s, ResearchNode n) => s.lang == 'en' ? n.nameEn : n.nameTh;
+  String _name(AppLocalizations s, ResearchNode n) =>
+      s.lang == 'en' ? n.nameEn : n.nameTh;
 
-  String _effect(S s, Research r, ResearchNode n) {
+  String _effect(AppLocalizations s, Research r, ResearchNode n) {
     final lv = r.levelOf(n.id);
     switch (n.effect) {
       case ResearchEffect.stat:
         final per = r.rules.statBpPerLevel / 100;
-        return s.statNode(n.mainStat!, _pct(per), _pct(per * lv));
+        return s.statNode(s.statName(n.mainStat!), _pct(per), _pct(per * lv));
       case ResearchEffect.offlineCap:
         final cap = ref.read(offlineRulesProvider).capFor(lv);
         return s.offlineNode(fmtDur(cap).replaceAll(RegExp(r':\d\d$'), ''));
@@ -56,7 +57,7 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     final r = ref.read(researchProvider);
     if (r == null) return const SizedBox();
     final ads = ref.read(adServiceProvider);
@@ -99,7 +100,7 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
 
   /// One desk: what it reads, the countdown, and its own 📺 button so the
   /// player picks which task the ad cuts (D-022).
-  Widget _desk(S s, Research r, ResearchTask? t, int i,
+  Widget _desk(AppLocalizations s, Research r, ResearchTask? t, int i,
       {required bool ad, required int adsLeft}) {
     if (t == null) {
       return Padding(
@@ -118,7 +119,7 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
       padding: const EdgeInsets.only(top: 6),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Row(children: [
-          Text('${node.icon} ${_name(s, node)} → Lv.${t.toLevel}',
+          Text('${node.icon} ${_name(s, node)} → ${s.level(t.toLevel)}',
               style: const TextStyle(fontWeight: FontWeight.w800)),
           const Spacer(),
           Text('⏱ ${fmtDur(left)}',
@@ -143,7 +144,7 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
     );
   }
 
-  Widget _node(S s, Research r, ResearchNode n) {
+  Widget _node(AppLocalizations s, Research r, ResearchNode n) {
     final lv = r.levelOf(n.id);
     final block = r.blockOf(n.id);
     final label = switch (block) {
@@ -173,7 +174,7 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
         Expanded(
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('${_name(s, n)}  Lv.$lv/${n.maxLevel}',
+            Text('${_name(s, n)}  ${s.level(lv)}/${n.maxLevel}',
                 style: const TextStyle(fontWeight: FontWeight.w800)),
             Text(_effect(s, r, n),
                 style: const TextStyle(fontSize: 12, color: Palette.inkSoft)),

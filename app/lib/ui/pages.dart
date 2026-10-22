@@ -33,7 +33,7 @@ class CharacterPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     return DefaultTabController(
       length: 4,
       child: Column(children: [
@@ -77,7 +77,7 @@ class _CatTab extends ConsumerStatefulWidget {
 class _CatTabState extends ConsumerState<_CatTab> {
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     final lang = s.lang;
     final cls = ref.read(catClassProvider);
     final cat = ref.read(catProgressProvider);
@@ -87,7 +87,7 @@ class _CatTabState extends ConsumerState<_CatTab> {
     String pct(Attribute a) => '${(st[a] / 100).toStringAsFixed(1)}%';
     final unlocked = cat.level >= rules.classUnlockLevel;
     return ListView(padding: const EdgeInsets.all(16), children: [
-      Text('Lv.${cat.level} · ${cls.current}',
+      Text('${s.level(cat.level)} · ${s.className(cls.current)}',
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
       LinearProgressIndicator(
           value: cat.expToNext == 0 ? 1 : cat.exp / cat.expToNext,
@@ -134,7 +134,7 @@ class _CatTabState extends ConsumerState<_CatTab> {
                 decoration: inkBox(
                     fill: c.id == cls.current ? Palette.sun : Palette.paper,
                     radius: 12),
-                child: Text(c.id,
+                child: Text(s.className(c.id),
                     style: const TextStyle(fontWeight: FontWeight.w800)),
               ),
             ),
@@ -152,7 +152,8 @@ class _CatTabState extends ConsumerState<_CatTab> {
                   Text(i?.icon ?? '✨', style: const TextStyle(fontSize: 28)),
               title: Text(lang == 'en' ? (i?.en ?? sk.id) : (i?.th ?? sk.id),
                   style: const TextStyle(fontWeight: FontWeight.w700)),
-              subtitle: Text('${(sk.cooldownMs / 1000).toStringAsFixed(1)} s'),
+              subtitle: Text(
+                  s.cooldownSeconds((sk.cooldownMs / 1000).toStringAsFixed(1))),
             ),
           );
         }),
@@ -168,7 +169,7 @@ class _WardrobeTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     final wd = ref.read(wardrobeProvider);
     final cls = ref.read(catClassProvider).current;
     final wr = ref.read(wardrobeRulesProvider);
@@ -192,7 +193,7 @@ class _WardrobeTab extends ConsumerWidget {
                 Expanded(
                     child: Image.asset('assets/game/cat/bare_${c.id}.png',
                         fit: BoxFit.contain)),
-                Text(c.id,
+                Text(s.className(c.id),
                     style: const TextStyle(
                         fontSize: 11, fontWeight: FontWeight.w700)),
               ]),
@@ -239,7 +240,7 @@ class DungeonPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _soon(context, '🏰🔒', S.of(context).dungeonSoon);
+      _soon(context, '🏰🔒', AppLocalizations.of(context).dungeonSoon);
 }
 
 /// 🎁 Events: daily gift + yarn bundle, rewarded ads only (D-003).
@@ -258,7 +259,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     final ads = ref.read(adServiceProvider);
     Widget row(
         String icon, String title, String placement, VoidCallback onTap) {
@@ -309,7 +310,7 @@ class ShopPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     return ListView(children: [
       _pageTitle(s.navShop),
       Container(
@@ -339,6 +340,14 @@ class ShopPage extends ConsumerWidget {
             ),
           ),
         ]),
+      ),
+      // language, shown in the language it switches to (T-004)
+      Center(
+        child: TextButton(
+          onPressed: () => ref.read(langProvider.notifier).state =
+              s.lang == 'th' ? 'en' : 'th',
+          child: Text(s.switchLanguage),
+        ),
       ),
       // a grown-up can correct the age answer, behind the gate (T-040)
       Center(

@@ -50,7 +50,7 @@ class _Hud extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     return ValueListenableBuilder<int>(
       valueListenable: driver.ui$,
       builder: (context, _, __) {
@@ -80,7 +80,7 @@ class _Hud extends ConsumerWidget {
                 CircleAvatar(
                   radius: 20,
                   backgroundColor: Palette.mochi,
-                  child: Text('Lv${cat.level}',
+                  child: Text(s.level(cat.level),
                       style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
@@ -88,7 +88,7 @@ class _Hud extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('โมจิ · ${cls.current}',
+                  Text(s.catTitle(s.className(cls.current)),
                       style: const TextStyle(fontWeight: FontWeight.w800)),
                   SizedBox(
                     width: 90,
@@ -359,7 +359,7 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     return ValueListenableBuilder<int>(
       valueListenable: driver.ui$,
       builder: (context, _, __) {
@@ -490,7 +490,7 @@ class _Slot extends StatelessWidget {
             border: Border.all(color: Palette.inkSoft, width: 2),
             color: Palette.sheet),
         alignment: Alignment.center,
-        child: Text('🔒\n${S.of(context).unlockAt(unlockPage)}',
+        child: Text('🔒\n${AppLocalizations.of(context).unlockAt(unlockPage)}',
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 9, height: 1.1)),
       );

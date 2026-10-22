@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:whisker_tales/l10n/strings.dart';
 import 'package:whisker_tales/main.dart';
 import 'package:whisker_tales/ui/age_screen.dart';
 import 'package:whisker_tales/ui/game_shell.dart';
@@ -31,7 +32,7 @@ void main() {
       () async => content = await ContentRepository(DiskSource()).loadAll());
 
   Future<ProviderContainer> boot(WidgetTester tester, String lang,
-      {Clock? clock, bool askAge = false}) async {
+      {Clock? clock, bool askAge = false, bool fixedLang = true}) async {
     final c = ProviderContainer(overrides: [
       ...content.overrides,
       saveServiceProvider.overrideWithValue(SaveService(MemorySaveStore())),
@@ -45,7 +46,8 @@ void main() {
     await tester.runAsync(() async {
       await tester.pumpWidget(UncontrolledProviderScope(
           container: c,
-          child: WhiskerTalesApp(avatarRules: content.avatar, lang: lang)));
+          child: WhiskerTalesApp(
+              avatarRules: content.avatar, lang: fixedLang ? lang : null)));
       await Future<void>.delayed(const Duration(seconds: 2));
     });
     await tester.pump(const Duration(milliseconds: 300));
@@ -135,6 +137,23 @@ void main() {
       expect(find.byType(GameShell), findsOneWidget);
     });
   }
+
+  testWidgets('the language switches while playing and is saved',
+      (tester) async {
+    final c = await boot(tester, 'th', fixedLang: false);
+    final th = lookupAppLocalizations(const Locale('th'));
+    final en = lookupAppLocalizations(const Locale('en'));
+    expect(find.text(th.navShop), findsOneWidget);
+    // shop → "🌐 English"
+    await tester.tap(find.text(th.navShop));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text(th.switchLanguage));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(c.read(langProvider), 'en');
+    expect(find.text(en.navShop), findsWidgets);
+    expect(find.text(th.navShop), findsNothing);
+    expect(c.read(gameSaverProvider).capture()['settings']['lang'], 'en');
+  });
 
   testWidgets('welcome back after time away (th)', (tester) async {
     final clock = Clock(DateTime.utc(2026, 10, 20, 2));

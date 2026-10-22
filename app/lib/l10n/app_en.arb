@@ -1,0 +1,313 @@
+{
+  "@@locale": "en",
+  "navCharacter": "Cat",
+  "navDungeon": "Dungeon",
+  "navHome": "Home",
+  "navEvents": "Events",
+  "navShop": "Shop",
+  "autoCraft": "Auto-knit",
+  "betterStash": "Better: keep for me",
+  "betterEquip": "Better: wear now",
+  "knit": "Knit",
+  "noYarn": "Out of yarn — fight for more",
+  "yarnLeft": "Tap the yarn · {n} left",
+  "@yarnLeft": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "chapterPage": "Ch {ch} · Page {p}/10",
+  "@chapterPage": {
+    "placeholders": {
+      "ch": {
+        "type": "int"
+      },
+      "p": {
+        "type": "int"
+      }
+    }
+  },
+  "farm": "Farm {done}/{all}",
+  "@farm": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "all": {
+        "type": "int"
+      }
+    }
+  },
+  "tapForBoss": "Tap to fight the boss!",
+  "fightingBoss": "Boss fight",
+  "auto": "AUTO",
+  "on": "on",
+  "off": "off",
+  "unlockAt": "Page {page}",
+  "@unlockAt": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
+  "pickSlot": "Pick a slot to knit",
+  "worn": "Wearing",
+  "newItem": "New",
+  "equip": "Wear",
+  "recycle": "Recycle +{fish}🐟",
+  "@recycle": {
+    "placeholders": {
+      "fish": {
+        "type": "int"
+      }
+    }
+  },
+  "empty": "Empty",
+  "comingSoon": "Coming soon",
+  "dungeonSoon": "Dungeons open in the next version",
+  "tabCat": "Cat",
+  "tabWardrobe": "Collection",
+  "tabPets": "Pets",
+  "tabLibrary": "Library",
+  "classPick": "Class",
+  "classAt": "Pick a class at Lv.{lv}",
+  "@classAt": {
+    "placeholders": {
+      "lv": {
+        "type": "int"
+      }
+    }
+  },
+  "skills": "Skills (auto)",
+  "dailyGift": "Daily gift",
+  "yarnBundle": "Yarn bundle",
+  "adsLeft": "{n} left today",
+  "@adsLeft": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "watch": "Watch 📺",
+  "supporterPack": "Supporter Pack",
+  "supporterDesc": "Hides every ad button · no power",
+  "askParent": "Ask a grown-up to buy",
+  "gateTitle": "For grown-ups 👨‍👩‍👧",
+  "gateAsk": "What is {q}?",
+  "@gateAsk": {
+    "placeholders": {
+      "q": {
+        "type": "String"
+      }
+    }
+  },
+  "gateWrong": "Not quite — here is a new one",
+  "gateExpired": "Time ran out — please ask a grown-up again",
+  "cancel": "Cancel",
+  "shopClosed": "The shop is closed right now",
+  "owned": "Owned ✓",
+  "buying": "Opening the payment screen…",
+  "bought": "Got it 🎉 Thank you for your support!",
+  "payPending": "Waiting for the payment — it arrives once paid",
+  "buyFailed": "That did not work — please try again",
+  "restorePurchases": "Restore purchases",
+  "restoring": "Restoring earlier purchases…",
+  "gradeNames": "White,Green,Blue,Purple,Gold,Rainbow",
+  "lockedLook": "Not yet",
+  "welcomeBack": "Welcome back!",
+  "awayFarmed": "Mochi farmed for {min} minutes while you were away",
+  "@awayFarmed": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "claim": "Collect",
+  "hatch": "Hatch",
+  "useEgg": "🥚 Egg ({n})",
+  "@useEgg": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "adFree": "📺 Free · {n} left",
+  "@adFree": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "fishHatch": "🐟 {cost} · {n} left",
+  "@fishHatch": {
+    "placeholders": {
+      "cost": {
+        "type": "int"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "odds": "Common {c}% · Rare {r}% · Legend {l}% · Legend guaranteed in {pity}",
+  "@odds": {
+    "placeholders": {
+      "c": {
+        "type": "int"
+      },
+      "r": {
+        "type": "int"
+      },
+      "l": {
+        "type": "int"
+      },
+      "pity": {
+        "type": "int"
+      }
+    }
+  },
+  "askAge": "How old are you?",
+  "changeAge": "👨‍👩‍👧 Change the player's age (grown-ups)",
+  "classOutfits": "Class outfits (Mochi wears the chosen class's outfit)",
+  "looksFound": "Looks knitted so far {n}/{all}",
+  "@looksFound": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "all": {
+        "type": "int"
+      }
+    }
+  },
+  "saveOlder": "Couldn't open the latest save 😿 so we went on from the one before (the old save is kept)",
+  "saveNew": "Couldn't open the save 😿 so a new game started (the old save is kept)",
+  "libraryTitle": "Owl Library",
+  "statNode": "{stat} +{per}%/level (now +{now}%)",
+  "@statNode": {
+    "placeholders": {
+      "stat": {
+        "type": "String"
+      },
+      "per": {
+        "type": "String"
+      },
+      "now": {
+        "type": "String"
+      }
+    }
+  },
+  "offlineNode": "Collect for longer while away (now {cap} h)",
+  "@offlineNode": {
+    "placeholders": {
+      "cap": {
+        "type": "String"
+      }
+    }
+  },
+  "queueNode": "Research 2 things at once",
+  "adSpeedUp": "📺 Watch an ad: {min}+ min faster · {left} left",
+  "@adSpeedUp": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "notifyResearch": "🔔 Tell me when research is done",
+  "deskFree": "Desk {i} is free — pick a topic below",
+  "@deskFree": {
+    "placeholders": {
+      "i": {
+        "type": "int"
+      }
+    }
+  },
+  "maxed": "Maxed",
+  "researching": "Researching…",
+  "queueFull": "Desks full",
+  "researchDone": "🦉 Research done: {name} Lv.{lv}",
+  "@researchDone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "lv": {
+        "type": "int"
+      }
+    }
+  },
+  "newPet": "New friend!",
+  "starUp": "Star up!",
+  "treats": "Got treats 🍪 {n}",
+  "@treats": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "deploySlots": "In battle {used}/{all}",
+  "@deploySlots": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "all": {
+        "type": "int"
+      }
+    }
+  },
+  "deployHint": "Tap a friend to send it to battle / rest",
+  "yay": "Yay!",
+  "statAtk": "Attack",
+  "statHp": "Health",
+  "statDef": "Defense",
+  "switchLanguage": "🌐 ภาษาไทย",
+  "@switchLanguage": {
+    "description": "Shown in the other language: the one it switches to"
+  },
+  "level": "Lv.{lv}",
+  "catTitle": "Mochi · {cls}",
+  "className": "{cls, select, novice{Novice} warrior{Warrior} rogue{Rogue} archer{Archer} mage{Mage} other{{cls}}}",
+  "cooldownSeconds": "Cooldown {sec} s",
+  "@level": {
+    "placeholders": {
+      "lv": {
+        "type": "int"
+      }
+    }
+  },
+  "@catTitle": {
+    "placeholders": {
+      "cls": {
+        "type": "String"
+      }
+    }
+  },
+  "@className": {
+    "description": "Class id → its name",
+    "placeholders": {
+      "cls": {
+        "type": "String"
+      }
+    }
+  },
+  "@cooldownSeconds": {
+    "placeholders": {
+      "sec": {
+        "type": "String"
+      }
+    }
+  }
+}

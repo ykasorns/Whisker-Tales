@@ -10,7 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  # flutter_localizations — added by T-004 alongside l10n.yaml + .arb files
+  flutter_localizations:
+    sdk: flutter
   flame: ^1.18.0
   flutter_riverpod: ^2.5.1
   hive_flutter: ^1.1.0
@@ -20,6 +21,7 @@ dependencies:
     path: ../packages/wt_mode_story
   in_app_purchase: ^3.3.1
   games_services: ^4.1.1
+  intl: any
 
 dev_dependencies:
   flutter_test:
@@ -39,4 +41,4 @@ flutter:
     - assets/game/mon/
     - assets/game/bg/
     - assets/game/ui/
-  # generate: true — enabled by T-004 once l10n.yaml + .arb files exist
+  generate: true # T-004: lib/l10n/*.arb → AppLocalizations

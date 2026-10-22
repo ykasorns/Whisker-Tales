@@ -8,6 +8,8 @@ import 'package:whisker_tales/ui/pages.dart';
 import 'package:whisker_tales/ui/shop.dart';
 import 'package:wt_core/wt_core.dart';
 
+import '_l10n.dart';
+
 class DiskSource implements ContentSource {
   @override
   Future<String> read(String path) async =>
@@ -72,11 +74,10 @@ void main() {
     c.read(iapServiceProvider)!.start();
     await tester.pumpWidget(UncontrolledProviderScope(
       container: c,
-      child: MaterialApp(
-          builder: (_, child) => LangScope(lang: 'en', child: child!),
-          home: const Scaffold(body: ShopPage())),
+      child: localized(const Scaffold(body: ShopPage())),
     ));
-    await tester.tap(find.text('👨‍👩‍👧 ${S.en.askParent}'));
+    await tester.tap(find.text(
+        '👨‍👩‍👧 ${lookupAppLocalizations(const Locale('en')).askParent}'));
     await tester.pump(const Duration(milliseconds: 300));
     return (c, store);
   }
@@ -88,10 +89,12 @@ void main() {
     expect(find.byType(ShopSheet), findsNothing);
     final right = answerOf(tester);
     await type(tester, '${right + 1}');
-    expect(find.text(S.en.gateWrong), findsOneWidget);
+    expect(find.text(lookupAppLocalizations(const Locale('en')).gateWrong),
+        findsOneWidget);
     expect(find.byType(ShopSheet), findsNothing); // still the gate
     // closing the gate opens nothing
-    await tester.tap(find.text(S.en.cancel));
+    await tester
+        .tap(find.text(lookupAppLocalizations(const Locale('en')).cancel));
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.byType(ShopSheet), findsNothing);
     expect(store.bought, isEmpty);
@@ -111,7 +114,8 @@ void main() {
     expect(store.bought, ['supporter_pack']);
     expect(c.read(noAdsProvider)(), isTrue);
     expect(c.read(adServiceProvider).canShow('pet_hatch'), isFalse);
-    expect(find.text(S.en.owned), findsOneWidget);
+    expect(find.text(lookupAppLocalizations(const Locale('en')).owned),
+        findsOneWidget);
   });
 
   test('the shop sheet and purchase calls exist only behind openShop', () {

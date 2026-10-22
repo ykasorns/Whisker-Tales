@@ -98,6 +98,7 @@ class GameSaver {
       'settings': {
         ..._section('settings',
             const {'lang': 'th', 'bgm': true, 'sfx': true, 'speed': 1}),
+        'lang': _ref.read(langProvider),
         if (_ref.read(researchProvider) case final r?)
           'notify_research': r.notifyDone,
       },
@@ -190,6 +191,10 @@ class GameSaver {
       r.restore(ResearchState.fromJson(sec('research')));
       final settings = doc['settings'];
       r.notifyDone = settings is! Map || settings['notify_research'] != false;
+    }
+    if (_map(doc['settings'])['lang'] case final String lang
+        when kLanguages.contains(lang)) {
+      _ref.read(langProvider.notifier).state = lang;
     }
     // loading = opening the app: a day that turned since the save resets now
     _ref.read(gameClockProvider).tick();

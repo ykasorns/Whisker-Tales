@@ -3,9 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:whisker_tales/l10n/strings.dart';
 import 'package:whisker_tales/ui/library_tab.dart';
 import 'package:wt_core/wt_core.dart';
+
+import '_l10n.dart';
 
 class DiskSource implements ContentSource {
   @override
@@ -36,8 +37,7 @@ void main() {
     expect(research.start('offline_cap'), isTrue); // a few minutes
     await tester.pumpWidget(UncontrolledProviderScope(
       container: c,
-      child: const MaterialApp(
-          home: LangScope(lang: 'en', child: Scaffold(body: LibraryTab()))),
+      child: localized(const Scaffold(body: LibraryTab())),
     ));
     final buttons = find.textContaining('📺');
     expect(buttons, findsNWidgets(2));

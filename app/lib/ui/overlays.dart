@@ -21,7 +21,7 @@ Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
     offline.claim(); // nothing to show; still marks the window used
     return;
   }
-  final s = S.of(context);
+  final s = AppLocalizations.of(context);
   await showDialog<void>(
     context: context,
     barrierDismissible: false,

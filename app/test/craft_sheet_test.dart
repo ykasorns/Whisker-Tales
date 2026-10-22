@@ -3,9 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:whisker_tales/l10n/strings.dart';
 import 'package:whisker_tales/ui/craft_sheet.dart';
 import 'package:wt_core/wt_core.dart';
+
+import '_l10n.dart';
 
 class DiskSource implements ContentSource {
   @override
@@ -35,17 +36,15 @@ void main() {
     addTearDown(c.dispose);
     await tester.pumpWidget(UncontrolledProviderScope(
       container: c,
-      child: MaterialApp(
-        home: LangScope(
-          lang: 'th',
-          child: Scaffold(
-            body: Consumer(
-              builder: (context, ref, _) => TextButton(
-                  onPressed: () => showCraftSheet(context, ref),
-                  child: const Text('open')),
-            ),
+      child: localized(
+        Scaffold(
+          body: Consumer(
+            builder: (context, ref, _) => TextButton(
+                onPressed: () => showCraftSheet(context, ref),
+                child: const Text('open')),
           ),
         ),
+        lang: 'th',
       ),
     ));
     await tester.tap(find.text('open'));

@@ -87,7 +87,7 @@ class _CraftSheetState extends ConsumerState<_CraftSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     final basket = _basket;
     final cls = ref.read(catClassProvider).current;
     final wr = ref.read(wardrobeRulesProvider);
@@ -121,12 +121,7 @@ class _CraftSheetState extends ConsumerState<_CraftSheet> {
               ]),
             ),
             const SizedBox(height: 4),
-            Text(
-                '${[
-                  for (var g = 0; g < grades.length; g++)
-                    if (basket.gradeTable[g] > 0)
-                      '${grades[g]} ${basket.gradeTable[g].round()}%'
-                ].join(' · ')} · 💜 ${basket.pityLeft}',
+            Text('${_odds(grades, basket.gradeTable)} · 💜 ${basket.pityLeft}',
                 style: const TextStyle(fontSize: 12, color: Palette.inkSoft)),
             const SizedBox(height: 12),
             Wrap(spacing: 8, runSpacing: 8, children: [
@@ -173,6 +168,12 @@ class _CraftSheetState extends ConsumerState<_CraftSheet> {
   }
 }
 
+/// "white 70% · green 25% …" — grade names from the arb, odds from data.
+String _odds(List<String> grades, List<double> table) => [
+      for (var g = 0; g < grades.length && g < table.length; g++)
+        if (table[g] > 0) '${grades[g]} ${table[g].round()}%'
+    ].join(' · ');
+
 class _Compare extends StatelessWidget {
   const _Compare({
     required this.item,
@@ -192,7 +193,7 @@ class _Compare extends StatelessWidget {
 
   Widget _card(
       BuildContext context, String label, GearItem? g, GearItem? other) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     final grades = s.gradeNames.split(',');
     String arrow(int a, int? b) => b == null
         ? ''
@@ -237,7 +238,7 @@ class _Compare extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context);
+    final s = AppLocalizations.of(context);
     final better = item.isStrictlyBetterThan(worn);
     return Column(children: [
       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

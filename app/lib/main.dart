@@ -60,10 +60,11 @@ Future<void> main() async {
 
 class WhiskerTalesApp extends ConsumerStatefulWidget {
   const WhiskerTalesApp(
-      {super.key, this.avatarRules, this.lang = 'th', this.saveFallback});
+      {super.key, this.avatarRules, this.lang, this.saveFallback});
 
-  /// UI language (`th` / `en`).
-  final String lang;
+  /// Fixed UI language (`th` / `en`) for tests; null = the player's choice
+  /// (`langProvider`, saved in settings).
+  final String? lang;
 
   /// Set when the newest save could not be loaded (told once on screen).
   final BootFallback? saveFallback;
@@ -107,8 +108,10 @@ class _WhiskerTalesAppState extends ConsumerState<WhiskerTalesApp> {
         scaffoldBackgroundColor: const Color(0xFFFFFBF2),
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFF6A83C)),
       ),
-      // above the Navigator, so dialogs and sheets get the language too
-      builder: (context, child) => LangScope(lang: widget.lang, child: child!),
+      // T-004: arb strings; the language switches at runtime (settings)
+      locale: Locale(widget.lang ?? ref.watch(langProvider)),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: widget.avatarRules == null
           ? const Scaffold(body: ColoredBox(color: Colors.black12))
           // first launch: the neutral age screen before anything else

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../ads/ads.dart';
+import '../age/age_gate.dart';
 import '../cat/cat.dart';
 import '../combat/combat.dart';
 import 'clock/game_clock.dart';
@@ -214,9 +215,15 @@ final adRulesProvider = Provider<AdRules>(
 /// The ad SDK seam. A fake until Opus picks a Families-certified SDK.
 final adNetworkProvider = Provider<AdNetwork>((ref) => FakeAdNetwork());
 
-/// Age band from the first-launch screen (T-040 overrides this).
+/// The neutral first-launch age screen (T-040). Changing an answer needs a
+/// live parental-gate pass.
+final ageGateProvider = Provider<AgeGate>((ref) => AgeGate(
+    isParentPass: (pass) =>
+        pass is GatePass && ref.read(parentalGateProvider).isValid(pass)));
+
+/// Age band from the first-launch screen (T-040); unset until answered.
 final ageBandProvider =
-    Provider<AgeBand Function()>((ref) => () => AgeBand.unset);
+    Provider<AgeBand Function()>((ref) => () => ref.read(ageGateProvider).band);
 
 /// Supporter Pack `no_ads` entitlement (T-025): from what was bought.
 final noAdsProvider = Provider<bool Function()>(

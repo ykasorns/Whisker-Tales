@@ -51,6 +51,7 @@ void main() {
       saveServiceProvider.overrideWithValue(SaveService(MemorySaveStore())),
     ]);
     addTearDown(container.dispose);
+    container.read(ageGateProvider).setBand(AgeBand.under13); // asked before
     tester.view.physicalSize = const Size(1080, 2340); // phone, portrait
     tester.view.devicePixelRatio = 2.75;
     addTearDown(tester.view.reset);

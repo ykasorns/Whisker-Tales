@@ -6,7 +6,6 @@ import '../ads/ads.dart';
 import '../idle/idle.dart';
 import '../save/save.dart';
 import 'clock/game_clock.dart';
-import 'contracts/age_gate.dart';
 import 'contracts/cat_class.dart';
 import 'contracts/gear_basket.dart';
 import 'contracts/pets.dart';
@@ -19,7 +18,7 @@ import 'wallet/memory_wallet.dart';
 /// Puts every module's state into one Save v3 document and back
 /// (GAME_CONTRACT §4.6, T-022). Part of the wiring layer, like
 /// `providers.dart`: modules only expose `toJson`/`restore`; this is the one
-/// place that knows them all. Sections no module owns yet (age, modes,
+/// place that knows them all. Sections no module owns yet (modes,
 /// settings) are carried through unchanged.
 class GameSaver {
   GameSaver(this._ref);
@@ -28,11 +27,6 @@ class GameSaver {
   Map<String, dynamic> _carry = {};
 
   static const version = 3;
-  static const _ageNames = {
-    AgeBand.unset: 'unset',
-    AgeBand.under13: 'under13',
-    AgeBand.over13: '13plus',
-  };
 
   Map<String, dynamic> _section(String k, Map<String, dynamic> fallback) {
     final v = _carry[k];
@@ -97,11 +91,7 @@ class GameSaver {
           _section('research', const {'levels': {}, 'task': null}),
       'daily': daily,
       'clock': clockJson,
-      'age': {
-        'band': _carry['age'] is Map
-            ? (_carry['age'] as Map)['band']
-            : _ageNames[_ref.read(ageBandProvider)()],
-      },
+      'age': {'band': _ref.read(ageGateProvider).toJsonBand()},
       // what was bought decides no_ads; a carried flag never sticks on
       'entitlements': {...ent, ...?iap?.toJson()},
       'modes': _section('modes', const {}),
@@ -160,6 +150,7 @@ class GameSaver {
       wallet.add(RewardBundle(balances));
     }
 
+    _ref.read(ageGateProvider).restore(_map(doc['age'])['band']);
     _ref.read(catClassProvider).restore(CatState.fromJson(sec('cat')));
     final idle = sec('idle');
     final cleared = idle['cleared_page'];
@@ -209,7 +200,6 @@ class GameSaver {
         'pets',
         'research',
         'daily',
-        'age',
         'entitlements',
         'modes',
         'settings'
@@ -299,3 +289,6 @@ final saveServiceProvider =
 
 /// Save / load the whole game (T-022).
 final gameSaverProvider = Provider<GameSaver>((ref) => GameSaver(ref));
+
+Map<String, dynamic> _map(Object? v) =>
+    v is Map<String, dynamic> ? v : const {};

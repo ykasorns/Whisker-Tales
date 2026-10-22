@@ -5,6 +5,7 @@ import 'package:wt_core/wt_core.dart';
 import '../l10n/strings.dart';
 import 'home_page.dart';
 import 'palette.dart';
+import 'age_screen.dart';
 import 'library_tab.dart';
 import 'pets_tab.dart';
 import 'shop.dart';
@@ -354,6 +355,19 @@ class ShopPage extends ConsumerWidget {
             ),
           ),
         ]),
+      ),
+      // a grown-up can correct the age answer, behind the gate (T-040)
+      Center(
+        child: TextButton(
+          onPressed: () async {
+            final pass = await showParentalGate(context, ref);
+            if (pass == null || !context.mounted) return;
+            await Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (ctx) => AgeScreen(
+                    pass: pass, onDone: () => Navigator.of(ctx).pop())));
+          },
+          child: Text(s.changeAge),
+        ),
       ),
     ]);
   }

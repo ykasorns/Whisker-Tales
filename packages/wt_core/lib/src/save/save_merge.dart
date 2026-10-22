@@ -10,7 +10,8 @@ enum MergeWinner { local, cloud }
 ///   (an offline window paid on one device is not paid again on the other);
 /// - `daily`: the later `date_key`; on the same day the larger count of each
 ///   quota (ads per placement, ads in total, goldfish hatches);
-/// - `entitlements`: what was bought on either device.
+/// - `entitlements`: what was bought on either device;
+/// - `age`: an answer from either device beats "not asked yet".
 ({Map<String, dynamic> doc, MergeWinner winner}) mergeSaves(
     Map<String, dynamic> local, Map<String, dynamic> cloud) {
   final winner =
@@ -34,8 +35,18 @@ enum MergeWinner { local, cloud }
     'skus': ({..._strings(le['skus']), ..._strings(ce['skus'])}.toList()
       ..sort()),
   };
+  // an age answered on either phone is kept (asked once, D-026)
+  final la = '${_map(local['age'])['band']}',
+      ca = '${_map(cloud['age'])['band']}';
+  final kept = winner == MergeWinner.local ? la : ca;
+  if (!_answered.contains(kept)) {
+    final other = winner == MergeWinner.local ? ca : la;
+    if (_answered.contains(other)) doc['age'] = {'band': other};
+  }
   return (doc: doc, winner: winner);
 }
+
+const _answered = {'under13', '13plus'};
 
 /// > 0: [a] has more progress.
 int _compare(Map<String, dynamic> a, Map<String, dynamic> b) {

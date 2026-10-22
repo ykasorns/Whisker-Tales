@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:whisker_tales/main.dart';
+import 'package:whisker_tales/ui/age_screen.dart';
+import 'package:whisker_tales/ui/game_shell.dart';
 import 'package:wt_core/wt_core.dart';
 
 class DiskSource implements ContentSource {
@@ -29,13 +31,14 @@ void main() {
       () async => content = await ContentRepository(DiskSource()).loadAll());
 
   Future<ProviderContainer> boot(WidgetTester tester, String lang,
-      {Clock? clock}) async {
+      {Clock? clock, bool askAge = false}) async {
     final c = ProviderContainer(overrides: [
       ...content.overrides,
       saveServiceProvider.overrideWithValue(SaveService(MemorySaveStore())),
       if (clock != null) timeSourceProvider.overrideWithValue(clock),
     ]);
     addTearDown(c.dispose);
+    if (!askAge) c.read(ageGateProvider).setBand(AgeBand.under13);
     tester.view.physicalSize = const Size(1080, 2340);
     tester.view.devicePixelRatio = 2.75;
     addTearDown(tester.view.reset);
@@ -103,6 +106,33 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.byType(BottomSheet), findsOneWidget);
       await expectLater(app, matchesGoldenFile('goldens/$lang/knit.png'));
+    });
+  }
+
+  for (final lang in ['th', 'en']) {
+    testWidgets('first launch: the neutral age screen ($lang)', (tester) async {
+      final c = await boot(tester, lang, askAge: true);
+      final app = find.byType(WhiskerTalesApp);
+      expect(find.byType(GameShell), findsNothing); // nothing before it
+      await expectLater(app, matchesGoldenFile('goldens/$lang/age.png'));
+      // the system back gesture cannot skip it
+      expect(await tester.binding.handlePopRoute(), isTrue);
+      expect(find.byType(AgeScreen), findsOneWidget);
+      // 8 → check → ✗ keeps asking; 8 → ✓ answers
+      await tester.tap(find.text('8'));
+      await tester.pump(const Duration(milliseconds: 300));
+      await expectLater(app, matchesGoldenFile('goldens/$lang/age_check.png'));
+      await tester.tap(find.text('✗'));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(c.read(ageGateProvider).needsPrompt, isTrue);
+      await tester.tap(find.text('8'));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.tap(find.text('✓'));
+      await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 300)));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(c.read(ageGateProvider).band, AgeBand.under13);
+      expect(find.byType(GameShell), findsOneWidget);
     });
   }
 

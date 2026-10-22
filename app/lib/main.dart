@@ -6,6 +6,7 @@ import 'package:wt_core/wt_core.dart';
 
 import 'cloud/play_cloud.dart';
 import 'iap/play_store.dart';
+import 'ui/age_screen.dart';
 import 'ui/game_shell.dart';
 import 'l10n/strings.dart';
 import 'modes.dart';
@@ -110,9 +111,15 @@ class _WhiskerTalesAppState extends ConsumerState<WhiskerTalesApp> {
       builder: (context, child) => LangScope(lang: widget.lang, child: child!),
       home: widget.avatarRules == null
           ? const Scaffold(body: ColoredBox(color: Colors.black12))
-          : GameShell(
-              avatarRules: widget.avatarRules!,
-              saveFallback: widget.saveFallback),
+          // first launch: the neutral age screen before anything else
+          : ref.read(ageGateProvider).needsPrompt
+              ? AgeScreen(onDone: () {
+                  ref.read(gameSaverProvider).save(); // answered once
+                  setState(() {});
+                })
+              : GameShell(
+                  avatarRules: widget.avatarRules!,
+                  saveFallback: widget.saveFallback),
     );
   }
 }

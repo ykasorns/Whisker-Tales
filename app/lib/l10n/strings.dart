@@ -86,6 +86,8 @@ class S {
       .replaceAll('{r}', '$r')
       .replaceAll('{l}', '$l')
       .replaceAll('{p}', '$pity');
+  String get askAge => _t('ask_age');
+  String get changeAge => _t('change_age');
   String get classOutfits => _t('class_outfits');
   String looksFound(int n, int all) =>
       _t('looks_found').replaceAll('{n}', '$n').replaceAll('{a}', '$all');
@@ -180,6 +182,8 @@ class S {
     'ad_free': '📺 ฟรี เหลือ {n}',
     'fish_hatch': '🐟 {c} · เหลือ {n}',
     'odds': 'ธรรมดา {c}% · หายาก {r}% · ตำนาน {l}% · การันตีตำนานใน {p} ครั้ง',
+    'ask_age': 'อายุเท่าไหร่?',
+    'change_age': '👨‍👩‍👧 แก้อายุผู้เล่น (ผู้ปกครอง)',
     'class_outfits': 'ชุดประจำคลาส (โมจิใส่ชุดของคลาสที่เลือก)',
     'looks_found': 'ของที่เคยถักได้ {n}/{a}',
     'save_older':
@@ -272,6 +276,8 @@ class S {
     'ad_free': '📺 Free · {n} left',
     'fish_hatch': '🐟 {c} · {n} left',
     'odds': 'Common {c}% · Rare {r}% · Legend {l}% · Legend guaranteed in {p}',
+    'ask_age': 'How old are you?',
+    'change_age': "👨‍👩‍👧 Change the player's age (grown-ups)",
     'class_outfits': "Class outfits (Mochi wears the chosen class's outfit)",
     'looks_found': 'Looks knitted so far {n}/{a}',
     'save_older':

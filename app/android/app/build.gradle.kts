@@ -9,6 +9,10 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
+    buildFeatures {
+        resValues = true // game_services_project_id below
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -23,6 +27,15 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // Play Games Services project id (T-023, D-025): set
+        // `pgsProjectId=<id>` in android/gradle.properties (Play Console →
+        // Play Games Services → Configuration). Empty = no cloud save, the
+        // game stays fully offline.
+        resValue(
+            "string",
+            "game_services_project_id",
+            (project.findProperty("pgsProjectId") as String?) ?: "",
+        )
     }
 
     buildTypes {
@@ -42,4 +55,10 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // PlayGamesSdk.initialize in MainActivity (the games_services plugin
+    // does not initialize the SDK itself)
+    implementation("com.google.android.gms:play-services-games-v2:20.1.2")
 }

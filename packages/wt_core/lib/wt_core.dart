@@ -9,6 +9,7 @@ export 'src/cat/cat.dart';
 export 'src/combat/combat.dart';
 export 'src/gear/gear.dart';
 export 'src/core/clock/game_clock.dart';
+export 'src/core/cloud_sync.dart';
 export 'src/core/content_repository.dart';
 export 'src/core/contracts/ads.dart';
 export 'src/core/game_save.dart';

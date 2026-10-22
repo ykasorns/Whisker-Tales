@@ -19,6 +19,7 @@ dependencies:
   wt_mode_story:
     path: ../packages/wt_mode_story
   in_app_purchase: ^3.3.1
+  games_services: ^4.1.1
 
 dev_dependencies:
   flutter_test:

@@ -193,7 +193,7 @@ packages:
     source: sdk
     version: "0.0.0"
   games_services:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: games_services
       sha256: e968ca9dbca98a4fb0360b93dd00f072b6f018353e45dcb0049659b556c4a87d

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wt_core/wt_core.dart';
 
+import 'cloud/play_cloud.dart';
 import 'iap/play_store.dart';
 import 'ui/game_shell.dart';
 import 'l10n/strings.dart';
@@ -39,8 +40,13 @@ Future<void> main() async {
           ...content.overrides,
           saveServiceProvider.overrideWithValue(saves),
           iapStoreProvider.overrideWithValue(store),
+          cloudStoreProvider.overrideWithValue(const PlayCloudStore()),
         ]));
     boot.container.read(iapServiceProvider)?.start();
+    // cloud save before the game starts: waits at most a few seconds, never
+    // changes the game after it is on screen (T-023)
+    final cloud = await boot.container.read(cloudSyncProvider).sync();
+    debugPrint('cloud save: ${cloud.name}');
     if (boot.error != null) debugPrint('save not loaded: ${boot.error}');
     runApp(UncontrolledProviderScope(
         container: boot.container,
@@ -77,7 +83,11 @@ class _WhiskerTalesAppState extends ConsumerState<WhiskerTalesApp> {
     // Save when the app goes to the background; check the offline window
     // when it comes back (the "welcome back" screen is T-042).
     _lifecycle = AppLifecycleListener(
-      onPause: () => ref.read(gameSaverProvider).save(),
+      // save here, then up to the cloud unless it is further ahead
+      onPause: () => ref
+          .read(gameSaverProvider)
+          .save()
+          .then((_) => ref.read(cloudSyncProvider).push()),
     );
   }
 

@@ -39,14 +39,19 @@ class GameSaver {
     return v is Map<String, dynamic> ? v : fallback;
   }
 
-  /// The whole game as a Save v3 document. Marks the player as seen now.
-  Map<String, dynamic> capture() {
-    // A "welcome back" window still on screen is paid now: marking the
-    // player seen below would otherwise move last_seen past it, and leaving
-    // the app (pause → save) or killing it would lose the reward.
-    final offline = _ref.read(offlineRewardProvider);
-    if (offline.pending != null) offline.claim();
-    final clock = _ref.read(gameClockProvider)..markSeen();
+  /// The whole game as a Save v3 document. Marks the player as seen now,
+  /// unless [asSeen] is false (a look at the save before the game starts,
+  /// e.g. comparing with the cloud: the offline window must stay open).
+  Map<String, dynamic> capture({bool asSeen = true}) {
+    final clock = _ref.read(gameClockProvider);
+    if (asSeen) {
+      // A "welcome back" window still on screen is paid now: marking the
+      // player seen would otherwise move last_seen past it, and leaving the
+      // app (pause → save) or killing it would lose the reward.
+      final offline = _ref.read(offlineRewardProvider);
+      if (offline.pending != null) offline.claim();
+      clock.markSeen();
+    }
     final wallet = _ref.read(walletProvider);
     final loop = _ref.read(idleLoopProvider);
     final ads = _ref.read(adServiceProvider);
@@ -67,6 +72,10 @@ class GameSaver {
       'profile': {
         ..._section('profile', const {'flags': [], 'unlocked_cosmetics': []}),
         for (final c in Currency.values) c.name: wallet.balance(c),
+        // the cloud tie-break after pages (GAME_CONTRACT §4.6)
+        'power': _ref
+            .read(powerScoreProvider)
+            .of(_ref.read(catSpecProvider)().stats),
       },
       'idle': {
         'cleared_page': loop.state.clearedPage,

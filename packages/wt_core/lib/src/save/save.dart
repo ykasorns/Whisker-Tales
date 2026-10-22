@@ -2,3 +2,5 @@
 library;
 
 export 'save_service.dart';
+export 'cloud_store.dart';
+export 'save_merge.dart';

@@ -321,3 +321,11 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 3. **สลับภาษาได้ทันที:** ปุ่ม "🌐 English / 🌐 ภาษาไทย" ในร้านค้า (เขียนด้วยภาษาปลายทาง) → `langProvider` → MaterialApp `locale` · เก็บใน `settings.lang` ของเซฟ · ระบบ (dialog/ปุ่ม Material) ใช้ภาษาตามด้วย
 4. **กันเขียนข้อความตรง ๆ:** test สแกน `app/lib` หา literal ที่มีคำ (ละติน 2 ตัวขึ้นไป หรือไทย) ใน `Text(`/`TextSpan(text:`/`label:`/`tooltip:`/`title:` · ยกเว้น overlay dev และชื่อเกม/หน้าข้อมูลเสียตอน boot (ยังไม่มีภาษา) · `packages/wt_core/lib/src/ui/` ว่างอยู่ ไม่มี UI ใน core
 5. dependency เพิ่ม: `flutter_localizations` (SDK) + `intl` (โค้ดที่ gen-l10n สร้างต้องใช้)
+
+---
+
+## D-029 (2026-10-23) — Opus — class outfit art in (D-024)
+
+1. ภาพชุดประจำคลาส 5 แผ่น (ฝึกหัด นักรบ โจร นักธนู นักเวท) สร้างด้วย ChatGPT ตาม `design/art/outfit_prompts.md` + แนบ `sheet_mochi2_poses.png` → `assets/raw/sheets/sheet_outfit_<class>.png` → ตัด 9 เฟรม/คลาส → `assets/raw/frames/outfit/<class>/` → `app/assets/game/cat/outfit_<class>_<frame>.png`
+2. **ทางที่ได้ผล:** แชทใหม่ทุกแผ่น + prompt เต็ม + แนบ reference — สั่งต่อในแชทเดิมแล้วของเก่าติดมา (พู่หมวกนักรบไปโผล่ในชุดโจร, ลำดับท่าเพี้ยน) · โจรกับนักธนูสั่งใหม่แบบนี้
+3. `sync_sprites.py`: เฟรมชุดย่อ ×0.85 ให้ตัวแมวสูงเท่าเฟรมพื้นฐาน (~291 px) + ลดเหลือ 256 สี — ภาพแมว 9.8 → 3 MB · APK arm64 30.5 MB (เพดานส่ง 31.46 MB — เหลือไม่ถึง 1 MB; รอบหน้าควรบีบภาพพื้นฐาน/พื้นหลังด้วย)

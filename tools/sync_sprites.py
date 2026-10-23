@@ -19,10 +19,18 @@ for f in FRAMES:
     shutil.copy(f'{ROOT}/assets/raw/frames/mochi2/cat_mochi_{f}.png', f'{OUT}/cat/{f}.png')
 # class outfits (D-024): Mochi drawn in each class's outfit, one file per
 # frame; classes without a folder yet fall back to the frames above
+# Generated sheets draw the cat a little larger than the base frames, so
+# they are scaled to the same body size (×0.85 ≈ 291 px tall) and reduced to
+# 256 colours to keep the APK under the 30 MB send limit.
+OUTFIT_SCALE = 0.85
 outfits = 0
 for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/outfit/*/*.png')):
     cls = os.path.basename(os.path.dirname(src))
-    shutil.copy(src, f'{OUT}/cat/outfit_{cls}_{os.path.basename(src)}')
+    im = Image.open(src).convert('RGBA')
+    im = im.resize((round(im.width * OUTFIT_SCALE), round(im.height * OUTFIT_SCALE)),
+                   Image.LANCZOS)
+    im = im.quantize(colors=256, method=Image.Quantize.FASTOCTREE)
+    im.save(f'{OUT}/cat/outfit_{cls}_{os.path.basename(src)}', optimize=True)
     outfits += 1
 # gear: slot icons only (D-024: gear is never drawn on the cat)
 n = 0

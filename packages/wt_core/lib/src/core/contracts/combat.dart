@@ -493,8 +493,48 @@ class ShieldAbsorbed extends CombatEvent {
 
 /// Shared deterministic combat sim used by every mode (GDD v0.4 §4,
 /// GAME_CONTRACT §3 `combat`). Owner: T-007 (engine), T-008 (skills).
+/// One skill's timer as the screen shows it (read-only).
+class SkillView {
+  const SkillView({
+    required this.id,
+    required this.remainingMs,
+    required this.totalMs,
+  });
+  final String id;
+
+  /// Game time until the next cast; 0 = ready.
+  final int remainingMs;
+
+  /// The skill's cooldown with the caster's CDR right now.
+  final int totalMs;
+}
+
+/// One unit of the running fight as the screen shows it: bars, shields and
+/// skill timers (read-only — nothing here feeds back into the sim).
+class UnitView {
+  const UnitView({
+    required this.id,
+    required this.side,
+    required this.isBoss,
+    required this.isPartner,
+    required this.hp,
+    required this.maxHp,
+    required this.shield,
+    required this.alive,
+    this.skills = const [],
+  });
+  final String id;
+  final CombatSide side;
+  final bool isBoss, isPartner, alive;
+  final int hp, maxHp, shield;
+  final List<SkillView> skills;
+}
+
 abstract class ICombatEngine {
   void start(CombatSetup setup);
+
+  /// Every unit right now (cat side first). Read-only; empty by default.
+  List<UnitView> get view => const [];
 
   /// Advances the sim by [dtMs] milliseconds of game time. Any split of the
   /// same total time gives the same events.

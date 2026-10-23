@@ -183,6 +183,32 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
     }
   }
 
+  @override
+  List<UnitView> get view => [
+        for (final u in _units)
+          UnitView(
+            id: u.spec.id,
+            side: u.spec.side,
+            isBoss: u.spec.isBoss,
+            isPartner: u.spec.isPartner,
+            hp: u.hp,
+            maxHp: u.maxHp,
+            shield: u.buffs
+                .where((b) => b.def.action == BuffAction.shield)
+                .fold(0, (a, b) => a + b.shieldLeft),
+            alive: u.alive,
+            skills: [
+              for (var i = 0; i < u.spec.skills.length; i++)
+                SkillView(
+                  id: u.spec.skills[i].id,
+                  remainingMs:
+                      u.nextSkillAt[i] > _now ? u.nextSkillAt[i] - _now : 0,
+                  totalMs: _cooldown(u, i),
+                ),
+            ],
+          ),
+      ];
+
   /// Cooldown of skill [i] with the unit's CDR right now (buffs included).
   int _cooldown(_Unit u, int i) {
     final cdr = rules.proc(Attribute.cdr, u.eff[Attribute.cdr], 0);

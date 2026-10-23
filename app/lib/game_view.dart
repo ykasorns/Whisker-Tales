@@ -70,6 +70,10 @@ class _GameViewState extends ConsumerState<GameView> {
     loop: ref.read(idleLoopProvider),
     chapters: ref.read(chapterBookProvider),
     classId: () => ref.read(catClassProvider).current,
+    skillName: (id) {
+      final i = ref.read(skillBookProvider).info[id];
+      return ref.read(langProvider) == 'en' ? (i?.en ?? id) : (i?.th ?? id);
+    },
     pets: () {
       final pets = ref.read(petsProvider);
       if (pets == null) return const [];
@@ -91,8 +95,12 @@ class BattleGame extends FlameGame {
     required this.loop,
     required this.chapters,
     required this.classId,
+    this.skillName,
     this.pets,
   });
+
+  /// Localised skill name shown over the caster (YK 2026-10-23).
+  final String Function(String id)? skillName;
 
   /// Deployed pets (T-038), drawn following Mochi.
   final List<({String id, String icon})> Function()? pets;
@@ -166,8 +174,10 @@ class BattleGame extends FlameGame {
           a.substring('assets/game/'.length),
     ];
     await images.loadAll([
-      ...iconFrames
-          .where((a) => a.endsWith('/crown.png') || a.endsWith('/evade.png')),
+      ...iconFrames.where((a) =>
+          a.endsWith('/crown.png') ||
+          a.endsWith('/evade.png') ||
+          rules.projectiles.values.any((p) => a.endsWith('/${p.icon}.png'))),
       for (final f in _catFrames) 'cat/$f.png',
       ...outfits,
       ...petFrames,
@@ -184,6 +194,7 @@ class BattleGame extends FlameGame {
       ..play('walk');
     add(mochi);
     add(_Pets(this));
+    add(_HpBars(this));
     _applyLook();
     _sub = loop.combatEvents.listen(_onCombat);
   }
@@ -305,15 +316,35 @@ class BattleGame extends FlameGame {
           _attackT = 0.25;
         }
         if (target != null) {
-          target.flash = 0.15;
-          _float(
-              outcome == HitOutcome.dodge ? '·' : '$damage',
-              target.position + Vector2(0, -target.heightPx - 8),
-              outcome == HitOutcome.crit
-                  ? Palette.coral
-                  : source == AttackSource.skill
-                      ? const Color(0xFFE8742B)
-                      : Palette.ink);
+          void land() {
+            target.flash = 0.15;
+            _float(
+                outcome == HitOutcome.dodge ? '·' : '$damage',
+                target.position + Vector2(0, -target.heightPx - 8),
+                outcome == HitOutcome.crit
+                    ? Palette.coral
+                    : source == AttackSource.skill
+                        ? const Color(0xFFE8742B)
+                        : Palette.ink);
+          }
+
+          final shot = attackerId == 'mochi' && source == AttackSource.normal
+              ? rules.projectiles[classId()]
+              : null;
+          final art = shot == null ? null : 'icon/${shot.icon}.png';
+          if (shot != null && art != null && images.containsKey(art)) {
+            // the arrow flies first; the hit lands when it arrives
+            add(_Projectile(
+                images.fromCache(art),
+                mochi.position +
+                    Vector2(size.y * shot.muzzleX, size.y * shot.muzzleY),
+                target.position + Vector2(0, -target.heightPx * 0.5),
+                shot.flightMs / 1000,
+                size.y * shot.length,
+                land));
+          } else {
+            land();
+          }
         } else if (targetId == 'mochi') {
           _monsters[attackerId]?.attackT = 0.3;
           _float(
@@ -324,17 +355,28 @@ class BattleGame extends FlameGame {
         }
       case UnitDefeated(:final unitId):
         _monsters[unitId]?.dead = true;
-      case SkillCast():
-        _attackT = 0.35;
+      case SkillCast(:final unitId, :final skillId):
+        if (unitId == 'mochi') _attackT = 0.35;
+        final label = skillName?.call(skillId);
+        if (label != null) {
+          final isMochi = unitId == 'mochi';
+          final at = isMochi
+              ? mochi.position + Vector2(0, -size.y * 0.33)
+              : (_monsters[unitId]?.position ?? mochi.position) +
+                  Vector2(0, -size.y * 0.25);
+          _float(label, at, isMochi ? const Color(0xFFE8742B) : Palette.plum,
+              scale: 1.25);
+        }
       default:
     }
   }
 
-  void _float(String text, Vector2 at, Color color, {String? icon}) {
+  void _float(String text, Vector2 at, Color color,
+      {String? icon, double scale = 1}) {
     final im = icon != null && images.containsKey(icon)
         ? images.fromCache(icon)
         : null;
-    add(_FloatText(text, at, color, size.y * 0.06, image: im));
+    add(_FloatText(text, at, color, size.y * 0.06 * scale, image: im));
   }
 }
 
@@ -432,10 +474,10 @@ class _Monster extends PositionComponent {
         c.drawImageRect(
             im,
             ui.Rect.fromLTWH(0, 0, im.width.toDouble(), im.height.toDouble()),
-            ui.Rect.fromLTWH(-15, -heightPx - 34, 30, 30),
+            ui.Rect.fromLTWH(-15, -heightPx - 54, 30, 30),
             ui.Paint()..filterQuality = ui.FilterQuality.medium);
       } else {
-        _crown.paint(c, Offset(-_crown.width / 2, -heightPx - 26));
+        _crown.paint(c, Offset(-_crown.width / 2, -heightPx - 46));
       }
     }
   }
@@ -494,6 +536,110 @@ class _FloatText extends PositionComponent {
     }
     final tp = _tp!;
     tp.paint(c, Offset(-tp.width / 2, 0));
+  }
+}
+
+/// A shot in flight (the archer's arrow): flies in a straight line from the
+/// bow to the target, turned the way it travels, then calls [onArrive].
+class _Projectile extends PositionComponent {
+  _Projectile(this.image, Vector2 from, this.to, this.flight, this.length,
+      this.onArrive)
+      : from = from.clone(),
+        super(position: from.clone(), priority: 16);
+
+  final ui.Image image;
+  final Vector2 from, to;
+  final double flight, length;
+  final void Function() onArrive;
+  double t = 0;
+
+  @override
+  void update(double dt) {
+    t += dt;
+    final k = (t / flight).clamp(0.0, 1.0);
+    position = from + (to - from) * k;
+    angle = math.atan2(to.y - from.y, to.x - from.x);
+    if (t >= flight) {
+      onArrive();
+      removeFromParent();
+    }
+  }
+
+  @override
+  void render(ui.Canvas c) {
+    final w = length, h = length * image.height / image.width;
+    c.drawImageRect(
+        image,
+        ui.Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+        ui.Rect.fromLTWH(-w / 2, -h / 2, w, h),
+        ui.Paint()..filterQuality = ui.FilterQuality.medium);
+  }
+}
+
+/// Health bars over Mochi, every monster and the boss (YK 2026-10-23: "can't
+/// tell how a fight is going"), read from the engine's fight view (D-038).
+/// The bar drains smoothly, and a pale-blue stripe shows a shield.
+class _HpBars extends Component {
+  _HpBars(this.game) : super(priority: 18);
+  final BattleGame game;
+
+  /// Displayed fraction per unit (eases toward the real value).
+  final _shown = <String, double>{};
+
+  @override
+  void update(double dt) {
+    final k = math.min(1.0, dt * 8);
+    final view = game.loop.fightView;
+    for (final u in view) {
+      final target = u.maxHp == 0 ? 0.0 : u.hp / u.maxHp;
+      final cur = _shown[u.id] ?? target;
+      _shown[u.id] = cur + (target - cur) * k;
+    }
+    if (view.isEmpty) _shown.clear();
+  }
+
+  @override
+  void render(ui.Canvas c) {
+    final u = game.size.y;
+    for (final v in game.loop.fightView) {
+      if (!v.alive || v.isPartner) continue;
+      final mon = game._monsters[v.id];
+      final Offset top;
+      final double w;
+      if (v.side == CombatSide.cat) {
+        w = u * 0.2;
+        top = Offset(game.mochi.position.x, game.mochi.position.y - u * 0.285);
+      } else if (mon != null && !mon.dead) {
+        w = mon.boss ? u * 0.3 : u * 0.13;
+        top = Offset(mon.position.x, mon.position.y - mon.heightPx - 8);
+      } else {
+        continue;
+      }
+      final h = v.isBoss ? u * 0.026 : u * 0.018;
+      final frac = (_shown[v.id] ?? 1).clamp(0.0, 1.0);
+      final box = ui.RRect.fromLTRBR(top.dx - w / 2, top.dy - h, top.dx + w / 2,
+          top.dy, Radius.circular(h / 2));
+      c.drawRRect(box, ui.Paint()..color = Palette.paper);
+      final fill = v.side == CombatSide.cat ? Palette.lime : Palette.coral;
+      if (frac > 0) {
+        c.save();
+        c.clipRRect(box);
+        c.drawRect(ui.Rect.fromLTWH(box.left, box.top, w * frac, h),
+            ui.Paint()..color = fill);
+        if (v.shield > 0) {
+          final s = (v.shield / v.maxHp).clamp(0.0, 1.0);
+          c.drawRect(ui.Rect.fromLTWH(box.left, box.top, w * s, h * 0.45),
+              ui.Paint()..color = const Color(0xCC9ADCEB));
+        }
+        c.restore();
+      }
+      c.drawRRect(
+          box,
+          ui.Paint()
+            ..style = ui.PaintingStyle.stroke
+            ..strokeWidth = 2
+            ..color = Palette.ink);
+    }
   }
 }
 

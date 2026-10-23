@@ -34,6 +34,7 @@ class HomePage extends ConsumerWidget {
           Positioned.fill(
               child: GameView(avatarRules: avatarRules, driver: driver)),
           Positioned.fill(child: _Hud(driver: driver)),
+          const Positioned.fill(child: FailCard()),
         ]),
       ),
       Expanded(
@@ -209,7 +210,8 @@ class _Hud extends ConsumerWidget {
               ),
             ]),
           ),
-          const Positioned(left: 10, bottom: 10, child: SkillBar()),
+          Positioned(
+              left: 10, bottom: 10, child: SkillBar(speed: () => driver.speed)),
           // speed button (bottom-right of the scene)
           Positioned(
             right: 10,

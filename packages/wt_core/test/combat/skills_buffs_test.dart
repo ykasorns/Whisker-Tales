@@ -103,6 +103,39 @@ void main() {
           [1125, 3375, 5625, 7875]);
     });
 
+    test('the fight view: skill timers, HP and shields, read-only (D-038)', () {
+      final e = engine();
+      final setup = CombatSetup(seed: 1, units: [
+        caster([skill('fireball')], attrs: {Attribute.cdr: 2500}),
+        mon('dummy', hp: 5000, atk: 0, intervalMs: 1 << 30),
+      ]);
+      final out = <CombatEvent>[];
+      e.events.listen(out.add);
+      e.start(setup);
+      var v = e.view.firstWhere((u) => u.id == 'mochi');
+      // cooldown 3 s with 25 % CDR = 2.25 s; the first cast comes at 50 % of it
+      expect(v.skills.single.totalMs, 2250);
+      expect(v.skills.single.remainingMs, 1125);
+      e.tick(1000);
+      v = e.view.firstWhere((u) => u.id == 'mochi');
+      expect(v.skills.single.remainingMs, 125);
+      e.tick(125); // cast: timer starts over
+      v = e.view.firstWhere((u) => u.id == 'mochi');
+      expect(v.skills.single.remainingMs, 2250);
+      final dummy = e.view.firstWhere((u) => u.id == 'dummy');
+      expect(dummy.maxHp, 5000);
+      expect(dummy.hp, lessThan(5000)); // the fireball landed
+      expect(dummy.alive, isTrue);
+      expect(dummy.side, CombatSide.enemy);
+      // reading the view never changes the fight
+      final plain = <CombatEvent>[];
+      final e2 = engine();
+      e2.events.listen(plain.add);
+      e2.start(setup);
+      e2.tick(1125);
+      expect(out, plain);
+    });
+
     test('skills cannot be dodged; skill damage and crits scale', () {
       final ev = run(
           engine(),

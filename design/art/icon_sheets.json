@@ -98,5 +98,17 @@
    "ev_bees",
    "ev_mud"
   ]
+ },
+ "sheet_icons_6_class": {
+  "cols": 3,
+  "rows": 2,
+  "ids": [
+   "class_novice",
+   "class_warrior",
+   "class_rogue",
+   "class_archer",
+   "class_mage",
+   "arrow"
+  ]
  }
 }

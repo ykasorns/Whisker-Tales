@@ -365,6 +365,28 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get failTitle => 'Fail!';
+
+  @override
+  String get failBoss =>
+      'The boss won this time. Mochi loses nothing — try again!';
+
+  @override
+  String get failWave => 'Mochi needs a rest. Nothing is lost!';
+
+  @override
+  String get tipKnit => 'Tip: knit new gear to get stronger';
+
+  @override
+  String get tipLevel => 'Tip: farm a page to level Mochi up';
+
+  @override
+  String get tipLibrary => 'Tip: study in the Owl Library for permanent boosts';
+
+  @override
+  String get tipPets => 'Tip: hatch pets, they fight beside Mochi';
+
+  @override
   String get switchLanguage => '🌐 ภาษาไทย';
 
   @override

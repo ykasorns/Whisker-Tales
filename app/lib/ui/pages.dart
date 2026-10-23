@@ -88,8 +88,12 @@ class _CatTabState extends ConsumerState<_CatTab> {
     String pct(Attribute a) => '${(st[a] / 100).toStringAsFixed(1)}%';
     final unlocked = cat.level >= rules.classUnlockLevel;
     return ListView(padding: const EdgeInsets.all(16), children: [
-      IconText('${s.level(cat.level)} · ${s.className(cls.current)}',
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+      Row(children: [
+        IconText('${s.level(cat.level)} · ${s.className(cls.current)}',
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+        const SizedBox(width: 8),
+        GameIcon.classEmblem(cls.current, size: 34),
+      ]),
       LinearProgressIndicator(
           value: cat.expToNext == 0 ? 1 : cat.exp / cat.expToNext,
           color: Palette.teal,
@@ -135,8 +139,13 @@ class _CatTabState extends ConsumerState<_CatTab> {
                 decoration: inkBox(
                     fill: c.id == cls.current ? Palette.sun : Palette.paper,
                     radius: 12),
-                child: IconText(s.className(c.id),
-                    style: const TextStyle(fontWeight: FontWeight.w800)),
+                child: Row(children: [
+                  GameIcon.classEmblem(c.id, size: 30),
+                  const SizedBox(width: 8),
+                  Flexible(
+                      child: IconText(s.className(c.id),
+                          style: const TextStyle(fontWeight: FontWeight.w800))),
+                ]),
               ),
             ),
           ),

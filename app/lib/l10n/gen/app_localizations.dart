@@ -716,6 +716,48 @@ abstract class AppLocalizations {
   /// **'Guarantee in {n}'**
   String pityLabel(int n);
 
+  /// No description provided for @failTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fail!'**
+  String get failTitle;
+
+  /// No description provided for @failBoss.
+  ///
+  /// In en, this message translates to:
+  /// **'The boss won this time. Mochi loses nothing — try again!'**
+  String get failBoss;
+
+  /// No description provided for @failWave.
+  ///
+  /// In en, this message translates to:
+  /// **'Mochi needs a rest. Nothing is lost!'**
+  String get failWave;
+
+  /// No description provided for @tipKnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: knit new gear to get stronger'**
+  String get tipKnit;
+
+  /// No description provided for @tipLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: farm a page to level Mochi up'**
+  String get tipLevel;
+
+  /// No description provided for @tipLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: study in the Owl Library for permanent boosts'**
+  String get tipLibrary;
+
+  /// No description provided for @tipPets.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: hatch pets, they fight beside Mochi'**
+  String get tipPets;
+
   /// Shown in the other language: the one it switches to
   ///
   /// In en, this message translates to:

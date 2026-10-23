@@ -1,7 +1,32 @@
 {
   "schema_version": 1,
-  "_doc": "D-024 — โมจิวาดมาพร้อมชุดของคลาสในภาพเดียว (ไม่แปะอุปกรณ์ทับอีกแล้ว) · ภาพ: app/assets/game/cat/outfit_<class>_<frame>.png (sync_sprites.py จาก assets/raw/frames/outfit/<class>/<frame>.png) · คลาสที่ยังไม่มีภาพใช้ภาพพื้นฐาน cat/<frame>.png (ท่าตี = cat/bare_<class>.png) · คลาสขั้นที่ 2 (content v1.1) เพิ่ม id ที่นี่พร้อมภาพ · ground_pad_px = ระยะเท้าเหนือขอบล่างของภาพ (slicer PAD)",
+  "_doc": "D-024 — โมจิวาดมาพร้อมชุดของคลาสในภาพเดียว (ไม่แปะอุปกรณ์ทับอีกแล้ว) · ภาพ: app/assets/game/cat/outfit_<class>_<frame>.png (sync_sprites.py จาก assets/raw/frames/outfit/<class>/<frame>.png) · คลาสที่ยังไม่มีภาพใช้ภาพพื้นฐาน cat/<frame>.png (ท่าตี = cat/bare_<class>.png) · คลาสขั้นที่ 2 (content v1.1) เพิ่ม id ที่นี่พร้อมภาพ · ground_pad_px = ระยะเท้าเหนือขอบล่างของภาพ (slicer PAD) · projectiles = ลูกที่พุ่งจากคลาสไปหามอนตอนตีธรรมดา (D-038): icon = ภาพใน assets/game/icon, flight_ms = เวลาบิน, muzzle_x/y = จุดปล่อยจากโมจิ (หน่วย = ความสูงฉาก), length = ความยาวลูก (หน่วยเดียวกัน)",
   "ground_pad_px": 12,
-  "frames": ["idle", "walk_f1", "walk_f2", "walk_f3", "attack", "dodge", "hurt", "victory", "sleep"],
-  "classes": ["novice", "warrior", "rogue", "archer", "mage"]
+  "frames": [
+    "idle",
+    "walk_f1",
+    "walk_f2",
+    "walk_f3",
+    "attack",
+    "dodge",
+    "hurt",
+    "victory",
+    "sleep"
+  ],
+  "classes": [
+    "novice",
+    "warrior",
+    "rogue",
+    "archer",
+    "mage"
+  ],
+  "projectiles": {
+    "archer": {
+      "icon": "arrow",
+      "flight_ms": 150,
+      "muzzle_x": 0.2,
+      "muzzle_y": -0.13,
+      "length": 0.13
+    }
+  }
 }

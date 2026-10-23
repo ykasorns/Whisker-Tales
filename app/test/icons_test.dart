@@ -64,6 +64,8 @@ void main() {
     final ids = <String>{
       ...(j['emoji'] as Map<String, dynamic>).values.cast<String>(),
       ...(j['skills'] as List).cast<String>(),
+      ...(j['classes'] as List).map((c) => 'class_$c'),
+      ...(j['projectiles'] as List).cast<String>(),
       ...(j['events'] as List).map((e) => 'ev_$e'),
     };
     final absent = [

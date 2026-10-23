@@ -364,6 +364,27 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
+  String get failTitle => 'แพ้แล้ว!';
+
+  @override
+  String get failBoss => 'บอสชนะรอบนี้ โมจิไม่เสียอะไร ลองใหม่นะ!';
+
+  @override
+  String get failWave => 'โมจิต้องพักสักครู่ ไม่เสียอะไรเลย!';
+
+  @override
+  String get tipKnit => 'เคล็ดลับ: ถักอุปกรณ์ใหม่ให้โมจิแกร่งขึ้น';
+
+  @override
+  String get tipLevel => 'เคล็ดลับ: ฟาร์มหน้าเดิมเพื่อเก็บเลเวล';
+
+  @override
+  String get tipLibrary => 'เคล็ดลับ: ไปเรียนที่ห้องสมุดนกฮูก ได้พลังถาวร';
+
+  @override
+  String get tipPets => 'เคล็ดลับ: ฟักเพื่อนสัตว์ให้มาช่วยสู้';
+
+  @override
   String get switchLanguage => '🌐 English';
 
   @override

@@ -12,6 +12,7 @@ class IconRegistry {
 
   static Map<String, String> _emoji = const {};
   static Set<String> _skills = const {}, _events = const {};
+  static Set<String> _classes = const {};
   static RegExp? _re;
 
   /// Reads `icons.json` from the bundle. Called at boot; until then (and in
@@ -30,6 +31,7 @@ class IconRegistry {
     };
     _skills = {...(j['skills'] as List).cast<String>()};
     _events = {...(j['events'] as List).cast<String>()};
+    _classes = {...((j['classes'] as List?) ?? const []).cast<String>()};
     final keys = _emoji.keys.toList()
       ..sort((a, b) => b.length.compareTo(a.length));
     _re = keys.isEmpty
@@ -39,7 +41,7 @@ class IconRegistry {
 
   static void reset() {
     _emoji = const {};
-    _skills = _events = const {};
+    _skills = _events = _classes = const {};
     _re = null;
   }
 
@@ -49,6 +51,10 @@ class IconRegistry {
   /// Art for a skill / road event by its own id, else the data's emoji.
   static String? skillArt(String id) => _skills.contains(id) ? id : null;
   static String? eventArt(String id) => _events.contains(id) ? 'ev_$id' : null;
+
+  /// The class emblem, or null when the class has none yet.
+  static String? classArt(String id) =>
+      _classes.contains(id) ? 'class_$id' : null;
 }
 
 /// One painted icon, [size] square. [name] is a file id (`fish`) or an
@@ -63,6 +69,12 @@ class GameIcon extends StatelessWidget {
   /// Skill art by id; the data's [emoji] when it has no art of its own.
   factory GameIcon.skill(String id, String emoji, {double size = 28}) =>
       GameIcon(IconRegistry.skillArt(id) ?? emoji, size: size, fallback: emoji);
+
+  /// The class's round emblem (nothing at all while it has none).
+  static Widget classEmblem(String id, {double size = 24}) {
+    final art = IconRegistry.classArt(id);
+    return art == null ? const SizedBox.shrink() : GameIcon(art, size: size);
+  }
 
   factory GameIcon.event(String id, String emoji, {double size = 20}) =>
       GameIcon(IconRegistry.eventArt(id) ?? emoji, size: size, fallback: emoji);

@@ -129,6 +129,10 @@ class IdleLoop implements IIdleLoop {
   /// Units of the current fight (cat side first); empty between fights.
   List<CombatUnitSpec> get fightUnits => _fightUnits;
 
+  /// Health, shields and skill timers of the running fight, for the bars and
+  /// skill circles (D-038). Read-only; empty between fights.
+  List<UnitView> get fightView => _engine?.view ?? const [];
+
   /// Changes every time a fight starts.
   int get fightId => _fightId;
 

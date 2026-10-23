@@ -287,6 +287,13 @@
   "curEggs": "Eggs",
   "pityLabel": "Guarantee in {n}",
   "@pityLabel": {"placeholders": {"n": {"type": "int"}}},
+  "failTitle": "Fail!",
+  "failBoss": "The boss won this time. Mochi loses nothing — try again!",
+  "failWave": "Mochi needs a rest. Nothing is lost!",
+  "tipKnit": "Tip: knit new gear to get stronger",
+  "tipLevel": "Tip: farm a page to level Mochi up",
+  "tipLibrary": "Tip: study in the Owl Library for permanent boosts",
+  "tipPets": "Tip: hatch pets, they fight beside Mochi",
   "switchLanguage": "🌐 ภาษาไทย",
   "@switchLanguage": {
     "description": "Shown in the other language: the one it switches to"

@@ -43,4 +43,4 @@ loader + validator ต้องรองรับไฟล์ v2: `buffs.json` (
 ---
 ## ตรวจรับ (2026-10-23, Opus) → done
 - ✓ JSON ผิด schema / field หาย / schema_version ผิด → error ชื่อไฟล์+field: `content_repository_test.dart` 6 tests · `content_sync_test` กันไฟล์ใน app ไม่ตรง design/
-- หนี้เดิม: relics/talents/monsters/events ของโหมดท้าทาย = T-026 (กลุ่ม B) · pets/research ทำแล้ว (T-038/T-041) · หน้า/มอนต่อบท → T-043 (`chapters` ใน pages ของ balance, D-032)
+- หนี้เดิม: relics/talents/monsters/events ของโหมดท้าทาย = T-026 (กลุ่ม B) · pets/research ทำแล้ว (T-038/T-041) · หน้า/มอนต่อบท → T-043 (`design/data/chapters.json`, D-032)

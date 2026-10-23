@@ -9,8 +9,10 @@ import 'package:wt_core/wt_core.dart';
 ///
 /// AdMob is on Google Play's Families self-certified ads SDK list. Every
 /// request is rated G; under-13 / unknown age gets child treatment, and no
-/// request is personalized (D-014). The SDK starts on the first ad, after
-/// the age flags are set, so nothing is sent before then.
+/// request is personalized (D-014). We start the SDK and request ads only
+/// on the first ad, after the age flags are set; app measurement waits for
+/// that too (manifest `DELAY_APP_MEASUREMENT_INIT`). The SDK's own startup
+/// provider still loads with the app.
 class AdMobNetwork implements AdNetwork {
   AdMobNetwork({String? unitId})
       : unitId = unitId ??
@@ -45,11 +47,18 @@ class AdMobNetwork implements AdNetwork {
       adUnitId: unitId,
       request: gma.AdRequest(nonPersonalizedAds: request.nonPersonalized),
       rewardedAdLoadCallback: gma.RewardedAdLoadCallback(
-        onAdLoaded: loaded.complete,
-        onAdFailedToLoad: (_) => loaded.complete(null),
+        // an ad that arrives after the timeout is never shown: free it
+        onAdLoaded: (ad) =>
+            loaded.isCompleted ? ad.dispose() : loaded.complete(ad),
+        onAdFailedToLoad: (_) {
+          if (!loaded.isCompleted) loaded.complete(null);
+        },
       ),
     );
-    final ad = await loaded.future.timeout(loadTimeout, onTimeout: () => null);
+    final ad = await loaded.future.timeout(loadTimeout, onTimeout: () {
+      loaded.complete(null); // a late load now disposes itself
+      return null;
+    });
     if (ad == null) return AdNetworkResult.failed;
 
     final done = Completer<AdNetworkResult>();

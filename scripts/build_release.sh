@@ -6,9 +6,11 @@
 #   scripts/build_release.sh --arm64-only   # bundle for 64-bit ARM phones only
 #   scripts/build_release.sh --skip-tests
 #
-# Release values (none are committed):
-#   app/android/key.properties   upload keystore (see RELEASE_CHECKLIST.md)
-#   app/android/gradle.properties: admobAppId=…  pgsProjectId=…
+# Release values:
+#   app/android/key.properties   upload keystore (git-ignored, see RELEASE_CHECKLIST.md)
+#   app/android/gradle.properties: admobAppId=…  pgsProjectId=…  (tracked;
+#     these ids are public in the app anyway — or put them in
+#     ~/.gradle/gradle.properties to keep them out of the repo)
 #   env ADMOB_REWARDED_ID=ca-app-pub-…/…   rewarded ad unit
 # Anything missing is reported; the build still runs with test values so a
 # test build never needs the real keys.

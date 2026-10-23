@@ -41,9 +41,9 @@ class RecOut implements AudioOutput {
 /// T-024 AC: scene changes crossfade without a jump; mute works at once,
 /// everywhere; both switches are saved.
 void main() {
-  final rules = AudioRules.fromJson(jsonDecode(
-          File('../../design/data/audio.json').readAsStringSync())
-      as Map<String, dynamic>);
+  final rules = AudioRules.fromJson(
+      jsonDecode(File('../../design/data/audio.json').readAsStringSync())
+          as Map<String, dynamic>);
   late RecOut out;
   late AudioService audio;
   var now = 0;
@@ -159,8 +159,7 @@ void main() {
 
   test('both switches are saved in settings and come back', () async {
     final content = await ContentRepository(_Disk()).loadAll();
-    ProviderContainer make(SaveService saves) =>
-        ProviderContainer(overrides: [
+    ProviderContainer make(SaveService saves) => ProviderContainer(overrides: [
           ...content.overrides,
           saveServiceProvider.overrideWithValue(saves),
         ]);

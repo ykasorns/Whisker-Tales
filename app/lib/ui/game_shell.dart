@@ -64,6 +64,12 @@ class _GameShellState extends ConsumerState<GameShell>
     _life = AppLifecycleListener(
       onResume: () {
         ref.read(audioServiceProvider).resume();
+        // back from a rewarded ad: settle the moment quietly, no welcome back
+        final ads = ref.read(adServiceProvider);
+        if (ads is AdService && ads.showingOrJustShown()) {
+          ref.read(offlineRewardProvider).claim();
+          return;
+        }
         if (mounted) showOfflineReward(context, ref);
       },
       onPause: () => ref.read(audioServiceProvider).pause(),

@@ -55,4 +55,5 @@ FarmPanel / CraftPanel / HatchPanel / ResearchPanel / OfflineRewardSheet
 ---
 ## ตรวจรับ (2026-10-23, Opus) → done
 - ✓ ปุ่ม 📺 + จำนวนเหลือ (`library_tab_test`, golden) · ✓ อัตราเกรด/ฟักแสดงก่อนกด (craft_sheet `_odds`, pets_tab) · ✓ golden ทุก panel TH/EN (`panels_golden_test`)
+- ✓ ปุ่มหลัก ≥ 72: ท้าบอส 72×72 (`_BossButton`), ก้อนไหมพรม 84 (`YarnBall`) อยู่โซนล่างใต้นิ้วโป้ง · ทุกปุ่มมีไอคอนนำ ตัวหนังสือรอง (ตรวจจากโค้ด `home_page.dart`, ไม่มี test วัดขนาด) · ปุ่มเร่ง 64×44 เป็นปุ่มรอง
 - ⚠ golden ใช้ฟอนต์ทดสอบ ตรวจเลย์เอาต์ไม่ใช่ตัวอักษร (ตามที่ส่งงาน) — ยอมรับ

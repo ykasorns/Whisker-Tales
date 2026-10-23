@@ -131,6 +131,14 @@ class AdService implements IAdService {
   final _used = <String, int>{};
   int _total = 0;
   bool _showing = false;
+  DateTime? _endedAt;
+
+  /// An ad is on screen, or one closed within [within]. Watching an ad
+  /// sends the app to the background for a moment; coming back from it is
+  /// not "time away" (no welcome-back screen for it).
+  bool showingOrJustShown({Duration within = const Duration(seconds: 5)}) =>
+      _showing ||
+      (_endedAt != null && clock.effectiveNow.difference(_endedAt!) <= within);
 
   void _rollIfNewDay() {
     final today = clock.dateKey;
@@ -177,6 +185,7 @@ class AdService implements IAdService {
       ));
     } finally {
       _showing = false;
+      _endedAt = clock.effectiveNow;
     }
     switch (result) {
       case AdNetworkResult.completed:

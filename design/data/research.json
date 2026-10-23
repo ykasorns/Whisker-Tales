@@ -202,7 +202,7 @@
       "name_en": "Cat Nap",
       "effect": "bonus",
       "attr": "regen",
-      "pct_per_level": 0.025,
+      "pct_per_level": 0.03,
       "max_level": 10,
       "cost_mult": 3,
       "time_mult": 3,

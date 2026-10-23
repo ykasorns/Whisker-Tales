@@ -43,6 +43,10 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id" />
+        <!-- No app measurement before the SDK is started (first ad). -->
+        <meta-data
+            android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT"
+            android:value="true" />
         <!-- Play Games Services (T-023): cloud save. Empty id = off. -->
         <meta-data
             android:name="com.google.android.gms.games.APP_ID"

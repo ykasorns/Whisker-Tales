@@ -54,19 +54,24 @@ def full_icon(size: int, radius: float) -> Image.Image:
     return canvas.resize((size, size), Image.LANCZOS)
 
 
+def save_small(im: Image.Image, path: str):
+    """256 colours like the sprites (D-030): same look, a fraction of the size."""
+    im.quantize(colors=256, method=Image.Quantize.FASTOCTREE).save(path, optimize=True)
+
+
 def write_android():
     for d, k in DENSITY.items():
         os.makedirs(f'{RES}/mipmap-{d}', exist_ok=True)
-        full_icon(round(48 * k), 0.22).save(f'{RES}/mipmap-{d}/ic_launcher.png', optimize=True)
+        save_small(full_icon(round(48 * k), 0.22), f'{RES}/mipmap-{d}/ic_launcher.png')
         fg = foreground(round(108 * k))
-        fg.save(f'{RES}/mipmap-{d}/ic_launcher_foreground.png', optimize=True)
+        save_small(fg, f'{RES}/mipmap-{d}/ic_launcher_foreground.png')
         # themed (Android 13+) icon: Mochi's silhouette
         mono = Image.new('RGBA', fg.size, (0, 0, 0, 0))
         mono.putalpha(fg.getchannel('A'))
         mono.save(f'{RES}/mipmap-{d}/ic_launcher_monochrome.png', optimize=True)
         # splash art (pre-12 launch_background + 12+ splash icon): Mochi on paper
         os.makedirs(f'{RES}/drawable-{d}', exist_ok=True)
-        fit(mochi_bust(), round(160 * k)).save(f'{RES}/drawable-{d}/splash_mochi.png', optimize=True)
+        save_small(fit(mochi_bust(), round(160 * k)), f'{RES}/drawable-{d}/splash_mochi.png')
     os.makedirs(f'{RES}/mipmap-anydpi-v26', exist_ok=True)
     with open(f'{RES}/mipmap-anydpi-v26/ic_launcher.xml', 'w') as f:
         f.write('''<?xml version="1.0" encoding="utf-8"?>

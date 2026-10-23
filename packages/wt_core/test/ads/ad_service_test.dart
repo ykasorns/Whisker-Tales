@@ -139,6 +139,17 @@ void main() {
     expect(await first, AdOutcome.rewarded);
   });
 
+  test('coming back from an ad is not time away (welcome back)', () async {
+    final s = service();
+    expect(s.showingOrJustShown(), isFalse);
+    final first = s.show('pet_hatch');
+    expect(s.showingOrJustShown(), isTrue); // on screen
+    await first;
+    expect(s.showingOrJustShown(), isTrue); // just closed
+    time.utc = time.utc.add(const Duration(seconds: 6));
+    expect(s.showingOrJustShown(), isFalse);
+  });
+
   test('daily counters save and load; an old day is dropped', () async {
     final s = service();
     await watchAll(s, 'pet_hatch');

@@ -238,13 +238,18 @@ class BattleGame extends FlameGame {
 
   /// Mochi stands further right so the pets have room on her left (YK
   /// 2026-10-23: they were hidden behind her).
-  static const _mochiX = 0.40;
+  static const _mochiX = 0.33;
+
+  /// Characters are drawn smaller so the scene is not crowded and monsters
+  /// stay on screen (YK 2026-10-23: Mochi 0.27 → 0.22 of the scene height,
+  /// monsters 0.19 → 0.155, bosses 0.3 → 0.25).
+  static const _mochiHeight = 0.22;
 
   void _layout() {
     mochi
       ..position = Vector2(size.x * _mochiX, groundY)
       // a bit smaller so the scene breathes (YK 2026-10-23, D-030)
-      ..frameScale = size.y * 0.27 / 335;
+      ..frameScale = size.y * _mochiHeight / 335;
   }
 
   @override
@@ -276,16 +281,16 @@ class BattleGame extends FlameGame {
     final enemies =
         loop.fightUnits.where((u) => u.side == CombatSide.enemy).toList();
     const spots = {
-      1: [0.78],
-      2: [0.70, 0.90],
-      3: [0.66, 0.80, 0.93]
+      1: [0.76],
+      2: [0.66, 0.84],
+      3: [0.6, 0.74, 0.88]
     };
     for (var i = 0; i < enemies.length; i++) {
       final e = enemies[i];
       final xs = spots[enemies.length] ??
           [
             for (var j = 0; j < enemies.length; j++)
-              0.56 + 0.38 * j / (enemies.length - 1)
+              0.55 + 0.33 * j / (enemies.length - 1)
           ];
       final page = loop.state.farmPage;
       final mons = chapters.of(loop.rules, page).monsters;
@@ -294,7 +299,7 @@ class BattleGame extends FlameGame {
           : mons[(loop.fightId + i) % mons.length];
       final m = _Monster(this, kind, boss: e.isBoss)
         ..position = Vector2(size.x * xs[i], groundY)
-        ..heightPx = size.y * (e.isBoss ? 0.3 : 0.19 - i * 0.009);
+        ..heightPx = size.y * (e.isBoss ? 0.25 : 0.155 - i * 0.008);
       _monsters[e.id] = m;
       add(m);
     }
@@ -357,7 +362,7 @@ class BattleGame extends FlameGame {
           _monsters[attackerId]?.attackT = 0.3;
           _float(
               outcome == HitOutcome.dodge ? '💨' : '-$damage',
-              mochi.position + Vector2(-10, -size.y * 0.3),
+              mochi.position + Vector2(-10, -size.y * 0.25),
               outcome == HitOutcome.dodge ? Palette.plum : Palette.coral,
               icon: outcome == HitOutcome.dodge ? 'icon/evade.png' : null);
         }
@@ -371,7 +376,7 @@ class BattleGame extends FlameGame {
           final petSpot =
               unitId.startsWith('pet_') ? _petSpots[unitId.substring(4)] : null;
           final at = isMochi
-              ? mochi.position + Vector2(0, -size.y * 0.33)
+              ? mochi.position + Vector2(0, -size.y * 0.28)
               : petSpot != null
                   ? Vector2(petSpot.dx, petSpot.dy - size.y * 0.04)
                   : (_monsters[unitId]?.position ?? mochi.position) +
@@ -626,10 +631,10 @@ class _HpBars extends Component {
       final Offset top;
       final double w;
       if (v.side == CombatSide.cat) {
-        w = u * 0.2;
-        top = Offset(game.mochi.position.x, game.mochi.position.y - u * 0.285);
+        w = u * 0.17;
+        top = Offset(game.mochi.position.x, game.mochi.position.y - u * 0.235);
       } else if (mon != null && !mon.dead) {
-        w = mon.boss ? u * 0.3 : u * 0.13;
+        w = mon.boss ? u * 0.25 : u * 0.11;
         top = Offset(mon.position.x, mon.position.y - mon.heightPx - 8);
       } else {
         continue;
@@ -687,10 +692,10 @@ class _Pets extends Component {
       // a staggered formation to Mochi's left, clear of her body: the
       // front row stands on the ground, the back row a step higher and smaller
       final back = i.isOdd;
-      final h = u * (back ? 0.078 : 0.088);
+      final h = u * (back ? 0.066 : 0.074);
       final hop = (math.sin(t * 8 + i * 1.7)).abs() * u * 0.02;
-      final lift = back ? u * 0.03 : 0.0;
-      final x = game.mochi.position.x - u * (0.165 + 0.075 * i);
+      final lift = back ? u * 0.025 : 0.0;
+      final x = game.mochi.position.x - u * (0.135 + 0.062 * i);
       game._petSpots[p.id] = Offset(x, game.groundY - h - hop - lift);
       final pose = (game._petAttack[p.id] ?? 0) > 0 ? 'attack' : 'idle';
       final key = 'pet/${p.id}_$pose.png';

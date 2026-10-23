@@ -129,7 +129,7 @@ class _Hud extends ConsumerWidget {
           // reaches Mochi's health bar)
           Positioned.fill(
             child: LayoutBuilder(builder: (context, area) {
-              final room = (area.maxHeight * 0.545 - 88).clamp(60.0, 400.0);
+              final room = (area.maxHeight * 0.595 - 88).clamp(60.0, 400.0);
               return Align(
                 alignment: Alignment.topCenter,
                 child: Padding(

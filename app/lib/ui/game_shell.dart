@@ -11,6 +11,7 @@ import '../l10n/strings.dart';
 import 'home_page.dart';
 import 'overlays.dart';
 import 'pages.dart';
+import 'away_tracker.dart';
 import 'game_icon.dart';
 import 'palette.dart';
 
@@ -35,6 +36,7 @@ class _GameShellState extends ConsumerState<GameShell>
   late final GameDriver _driver = GameDriver(ref);
   late final Ticker _ticker;
   late final AppLifecycleListener _life;
+  final _away = AwayTracker();
   StreamSubscription<ResearchCompleted>? _researchDone;
   final _sounds = <StreamSubscription<Object>>[];
   Duration _last = Duration.zero;
@@ -64,17 +66,22 @@ class _GameShellState extends ConsumerState<GameShell>
       showOfflineReward(context, ref);
     });
     _life = AppLifecycleListener(
+      onInactive: () => _away.left(DateTime.now()),
+      onHide: () => _away.left(DateTime.now()),
       onResume: () {
         ref.read(audioServiceProvider).resume();
-        // back from a rewarded ad: settle the moment quietly, no welcome back
-        final ads = ref.read(adServiceProvider);
-        if (ads is AdService && ads.showingOrJustShown()) {
-          ref.read(offlineRewardProvider).claim();
+        // only a real absence opens "welcome back": a screenshot, a dialog or
+        // a rewarded ad blinks the app, and the time was spent playing
+        if (!_away.back(DateTime.now())) {
+          ref.read(gameClockProvider).markSeen();
           return;
         }
         if (mounted) showOfflineReward(context, ref);
       },
-      onPause: () => ref.read(audioServiceProvider).pause(),
+      onPause: () {
+        _away.left(DateTime.now());
+        ref.read(audioServiceProvider).pause();
+      },
     );
     _listenForSounds();
     // the only notice the library gives: "research done" (GDD §7), and the

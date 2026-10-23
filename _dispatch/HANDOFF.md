@@ -1,4 +1,4 @@
-# HANDOFF — Whisker Tales (2026-10-23)
+# HANDOFF — Whisker Tales (updated 2026-10-23, after D-041, last commit 6e8e3ea)
 
 Read this first if you are a new session or a different model picking up the work.
 For background, also read `DECISIONS.md` (D-001 … D-035), `_contract/GAME_CONTRACT.md`, `_contract/GDD_WhiskerTales_v0.5.md` and `RELEASE_CHECKLIST.md`.
@@ -49,21 +49,25 @@ For background, also read `DECISIONS.md` (D-001 … D-035), `_contract/GAME_CONT
 | `scripts/build_release.sh` | Release build: AAB or `--apk`, plus `--arm64-only` and `--skip-tests`. |
 | `_dispatch/{todo,done}/` | Task cards. `review/` is empty now. |
 
-## 2. Status: Group A (launch prep) is done on the code side
+## 2. Status
 
-| Item | Commit | Decision |
-|---|---|---|
-| A5: 24 review cards signed off (AC → test evidence), T-009 deleted | 4605c3e | — |
-| A4: T-043 content. `chapters.json` drives monsters, bosses and scenery per chapter. Owl library 5 → 23 nodes (new `bonus` effect = secondary stat per level). Balance re-tuned on the headless player: book 1 = **day 13.0** (target 14±2), no-ads +9.3%. | f4a693f, 2ffb57b | D-032 |
-| A1: real ads with **Google AdMob** (Families self-certified). Rated G, child treatment under 13 or when age is unknown, never personalized. AD_ID and Privacy Sandbox permissions removed. Test IDs are the defaults. | 675c66e, f51cc9e | D-033 |
-| A3: T-024 audio. Synthesised in-house; farm/boss music crossfade, 9 SFX, 🎵/🔊 switches on the shop page, saved in settings. | 3b38915 | D-034 |
-| A2: T-030 store readiness. Icon (adaptive + themed), splash, signing via `key.properties`, release script, privacy policy TH/EN draft, `RELEASE_CHECKLIST.md`. | b2146ba, f51cc9e | D-035 |
-| Chapter 2–3 art (monsters, bosses, faces, backgrounds) | 8ad896f | D-031 |
+**Group A (launch prep) is done on the code side**, and since then YK tested on a real phone (Samsung SM-S948B, Android 17) and everything below was built from his feedback. Latest APK arm64 ≈ 28.1 MB (send limit 31,457,280). Tests: wt_core 295, app 43, `flutter analyze` clean in both.
 
-- Latest builds:
-  - APK arm64: 27.2 MB (the 30 MB send-to-YK limit is 31,457,280 bytes)
-  - AAB arm64: 30.8 MB
-- Tests: wt_core 291 and app 21, all green. `flutter analyze` reports 0 issues in both packages.
+| Decision | What |
+|---|---|
+| D-031 | Chapter 2–3 monsters, bosses, scenery |
+| D-032 | `chapters.json`; owl library 23 nodes (new `bonus` effect) |
+| D-033 | Real ads: Google AdMob (Families-safe, test IDs by default) |
+| D-034 | Audio (synthesised in-house), 🎵/🔊 switches |
+| D-035 | Store readiness: icon/splash, signing, `scripts/build_release.sh`, privacy policy draft, `RELEASE_CHECKLIST.md` |
+| D-036 | Launch crash fixed (R8 removed Room's constructor → `proguard-rules.pro`); on-screen crash report for TEST builds only |
+| D-037 | All UI icons are painted art (70 icons), `IconText`/`GameIcon`, coverage tests |
+| D-038 | Phone-test round 1: knit pop fades out, new alternating walk frames (5 classes), HP bars, skill cooldown circles + names, Fail card, archer arrow, class emblems, words next to icons, pets no longer hidden |
+| D-039 | Pets: tap for stats, passive + active skill per pet (balance: book 1 = day 12.2, lower bound of the 14±2 target is 12) |
+| D-040 | Home panel v2: gear shelf 2×4, two switches, animated yarn basket |
+| D-041 | No welcome-back after a screenshot/ad (`AwayTracker`); characters smaller, monsters stay on screen |
+
+Verification commands are in §6; the last full run before this note was green.
 
 ## 3. What only YK can do (all listed in `RELEASE_CHECKLIST.md`)
 
@@ -81,19 +85,13 @@ For background, also read `DECISIONS.md` (D-001 … D-035), `_contract/GAME_CONT
 
 ## 4. Known gaps / never verified
 
-- **Nothing has run on a real device or emulator.** This Mac has no emulator, and only about 12 GB of disk is free.
-- Untested on device:
-  - AdMob test ads
-  - Audio levels and feel
-  - The icon and splash on a launcher
-  - 60 fps (T-027)
-  - The purchase flow
-  - Cloud save
-- YK will test these from the APK (checklist §6).
-- **EEA/UK:** AdMob may need a UMP consent form even for non-personalized ads. It is not needed if the game launches in Thailand only. Build it if YK opens the EEA (D-033).
-- T-041: an Android system notification for "research done" while the app is closed is deferred to v1.1. In-game notice only for now.
-- `MobileAdsInitProvider` (Google's) still loads at app launch. We delay measurement and only init and request on the first ad.
-- Research `bonus` values are ASSUMPTION. Tune in playtest with `cd packages/wt_core && flutter test tool/headless_player_test.dart`, which writes `tools/balance_sim/headless_report.txt`. Both targets must PASS.
+- **Do before Play:** remove the test crash screen (`WtApp.java`, `CrashActivity.java`, manifest `android:name=".WtApp"` + the `.CrashActivity` entry — see RELEASE_CHECKLIST §3) or replace it with a friendly message.
+- **Purple art may be washed out:** the magenta key desaturated saturated purples (found on icons, fixed there with `--spill-start 110`). Gear set 2 (blue–purple) and other purple sprites were **not checked**; re-slice them with the higher value if they look grey.
+- **Not yet tried on a phone** (YK tests from APKs): ads (test ads only), audio feel, the Supporter Pack purchase, 60 fps, cloud save, the newest D-039/D-040/D-041 changes (pet skill circles, yarn basket animation, smaller characters).
+- If Android kills the app often after short backgrounding, memory use is high (Flame image cache); measure later. (`reason=3` in the crash screen was a normal background kill, now filtered.)
+- EEA/UK: AdMob may need a UMP consent form even for non-personalized ads (not needed if the first release is Thailand only).
+- T-041: Android system notification for "research done" while the app is closed → v1.1.
+- Balance is a set of ASSUMPTIONs; re-run `flutter test tool/headless_player_test.dart` (in `packages/wt_core`) after any power change. Both targets must PASS.
 
 ## 5. Next: Group B (story challenge mode), still in todo
 

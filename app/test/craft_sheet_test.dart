@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:whisker_tales/ui/craft_sheet.dart';
+import 'package:whisker_tales/ui/game_icon.dart';
 import 'package:wt_core/wt_core.dart';
 
 import '_l10n.dart';
@@ -68,7 +69,8 @@ void main() {
     await knitFirstSlot(tester);
     expect(c.read(walletProvider).balance(Currency.yarn), yarn - 1);
     expect(basket.isPending('g1'), isTrue);
-    await tester.tap(find.byIcon(Icons.close));
+    await tester
+        .tap(find.byWidgetPredicate((w) => w is GameIcon && w.name == 'cross'));
     await settle(tester);
     expect(find.byType(BottomSheet), findsNothing);
     expect(basket.isPending('g1'), isFalse);

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
 
 import '../l10n/strings.dart';
+import 'game_icon.dart';
 import 'palette.dart';
 
 /// 🐦 Pets (GDD v0.4 §6, T-038): hatch (egg / ad / goldfish, odds always
@@ -52,10 +53,10 @@ class _PetsTabState extends ConsumerState<PetsTab> {
               builder: (_, v, child) => Transform.scale(scale: v, child: child),
               child: PetPicture(id: def.id, icon: def.icon, size: 110),
             ),
-            Text(s.lang == 'en' ? def.nameEn : def.nameTh,
+            IconText(s.lang == 'en' ? def.nameEn : def.nameTh,
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-            Text(
+            IconText(
                 r.isNew
                     ? s.newPet
                     : r.cookies > 0
@@ -64,7 +65,7 @@ class _PetsTabState extends ConsumerState<PetsTab> {
                 style: TextStyle(
                     color: _rarityColor(r.rarity),
                     fontWeight: FontWeight.w800)),
-            Text('★' * r.stars,
+            IconText('★' * r.stars,
                 style: const TextStyle(fontSize: 22, color: Palette.sun)),
             const SizedBox(height: 12),
             GestureDetector(
@@ -73,7 +74,7 @@ class _PetsTabState extends ConsumerState<PetsTab> {
                 height: 52,
                 alignment: Alignment.center,
                 decoration: inkBox(fill: Palette.lime),
-                child: Text(s.yay,
+                child: IconText(s.yay,
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w800)),
               ),
@@ -106,7 +107,7 @@ class _PetsTabState extends ConsumerState<PetsTab> {
                 alignment: Alignment.center,
                 margin: const EdgeInsets.all(4),
                 decoration: inkBox(fill: fill, radius: 12),
-                child: Text(label,
+                child: IconText(label,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                         fontSize: 13, fontWeight: FontWeight.w800)),
@@ -120,11 +121,11 @@ class _PetsTabState extends ConsumerState<PetsTab> {
         padding: const EdgeInsets.all(12),
         decoration: inkBox(fill: const Color(0xFFFFF3D6)),
         child: Column(children: [
-          const Text('🥚', style: TextStyle(fontSize: 64)),
-          Text(s.hatch,
+          const IconText('🥚', style: TextStyle(fontSize: 64)),
+          IconText(s.hatch,
               style:
                   const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-          Text(
+          IconText(
             s.odds(
                 rates[PetRarity.common]!.round(),
                 rates[PetRarity.rare]!.round(),
@@ -148,7 +149,7 @@ class _PetsTabState extends ConsumerState<PetsTab> {
         ]),
       ),
       const SizedBox(height: 12),
-      Text(
+      IconText(
           '${s.deploySlots(pets.deployed.length, pets.deploySlots)} · ${s.deployHint}',
           style: const TextStyle(fontWeight: FontWeight.w700)),
       const SizedBox(height: 8),
@@ -187,11 +188,12 @@ class _PetsTabState extends ConsumerState<PetsTab> {
                         Opacity(
                           opacity: stars == null ? 0.25 : 1,
                           child: stars == null
-                              ? const Text('❔', style: TextStyle(fontSize: 36))
+                              ? const IconText('❔',
+                                  style: TextStyle(fontSize: 36))
                               : PetPicture(
                                   id: def.id, icon: def.icon, size: 48),
                         ),
-                        Text(
+                        IconText(
                             stars == null
                                 ? ''
                                 : (s.lang == 'en' ? def.nameEn : def.nameTh),
@@ -199,7 +201,7 @@ class _PetsTabState extends ConsumerState<PetsTab> {
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                                 fontSize: 11, fontWeight: FontWeight.w700)),
-                        Text(stars == null ? '' : '★' * stars,
+                        IconText(stars == null ? '' : '★' * stars,
                             style: const TextStyle(color: Palette.sun)),
                       ]),
                 ),
@@ -225,6 +227,6 @@ class PetPicture extends StatelessWidget {
         child: Image.asset('assets/game/pet/${id}_idle.png',
             fit: BoxFit.contain,
             errorBuilder: (_, __, ___) =>
-                Text(icon, style: TextStyle(fontSize: size * 0.75))),
+                IconText(icon, style: TextStyle(fontSize: size * 0.75))),
       );
 }

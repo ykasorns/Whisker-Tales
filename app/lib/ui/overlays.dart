@@ -7,6 +7,7 @@ import 'package:wt_core/wt_core.dart';
 import '../debug/telemetry.dart';
 import '../l10n/strings.dart';
 import 'home_page.dart';
+import 'game_icon.dart';
 import 'palette.dart';
 
 /// "Welcome back" (GDD v0.4 §8): what Mochi farmed while away. One button,
@@ -34,11 +35,12 @@ Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
         padding: const EdgeInsets.all(20),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Image.asset('assets/game/cat/sleep.png', height: 110),
-          Text(s.welcomeBack,
+          IconText(s.welcomeBack,
               style:
                   const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          Text(s.awayFarmed(r.creditedMinutes), textAlign: TextAlign.center),
+          IconText(s.awayFarmed(r.creditedMinutes),
+              textAlign: TextAlign.center),
           const SizedBox(height: 12),
           Wrap(spacing: 14, children: [
             for (final (icon, v) in [
@@ -48,7 +50,7 @@ Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
               ('⭐ EXP', r.exp),
             ])
               if (v > 0)
-                Text('$icon +${fmtNum(v)}',
+                IconText('$icon +${fmtNum(v)}',
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w800)),
           ]),
@@ -62,7 +64,7 @@ Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
               height: 56,
               alignment: Alignment.center,
               decoration: inkBox(fill: Palette.lime),
-              child: Text(s.claim,
+              child: IconText(s.claim,
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.w800)),
             ),
@@ -116,7 +118,8 @@ class RoadChips extends ConsumerWidget {
                   width: 2),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Text('${d.icon}${badge(d)} ·${a.wavesLeft}',
+              GameIcon.event(d.id, d.icon, size: 18),
+              IconText('${badge(d)} ·${a.wavesLeft}',
                   style: const TextStyle(
                       fontSize: 12, fontWeight: FontWeight.w700)),
               if (ad) ...[
@@ -128,7 +131,7 @@ class RoadChips extends ConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     decoration: inkBox(radius: 6, width: 1.5),
-                    child: Text(good ? '📺×2' : '📺✖',
+                    child: IconText(good ? '📺×2' : '📺✖',
                         style: const TextStyle(fontSize: 11)),
                   ),
                 ),
@@ -196,8 +199,7 @@ class _SkillBarState extends ConsumerState<SkillBar> {
                     spreadRadius: 4)
               ],
             ),
-            child: Text(info[sk.id]?.icon ?? '✨',
-                style: const TextStyle(fontSize: 20)),
+            child: GameIcon.skill(sk.id, info[sk.id]?.icon ?? '✨', size: 28),
           ),
         ),
     ]);

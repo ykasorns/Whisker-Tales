@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:whisker_tales/l10n/strings.dart';
+import 'package:whisker_tales/ui/game_icon.dart';
 import 'package:whisker_tales/main.dart';
 import 'package:whisker_tales/ui/age_screen.dart';
 import 'package:whisker_tales/ui/game_shell.dart';
 import 'package:wt_core/wt_core.dart';
+
+import '_l10n.dart';
 
 class DiskSource implements ContentSource {
   @override
@@ -28,8 +31,10 @@ class Clock implements TimeSource {
 /// test font (boxes); these guard layout, not wording.
 void main() {
   late GameContent content;
-  setUpAll(
-      () async => content = await ContentRepository(DiskSource()).loadAll());
+  setUpAll(() async {
+    content = await ContentRepository(DiskSource()).loadAll();
+    await IconRegistry.load(); // painted icons, as in the app (D-037)
+  });
 
   Future<ProviderContainer> boot(WidgetTester tester, String lang,
       {Clock? clock, bool askAge = false, bool fixedLang = true}) async {
@@ -124,12 +129,12 @@ void main() {
       await tester.tap(find.text('8'));
       await tester.pump(const Duration(milliseconds: 300));
       await expectLater(app, matchesGoldenFile('goldens/$lang/age_check.png'));
-      await tester.tap(find.text('✗'));
+      await tester.tap(findLabel('✗'));
       await tester.pump(const Duration(milliseconds: 300));
       expect(c.read(ageGateProvider).needsPrompt, isTrue);
       await tester.tap(find.text('8'));
       await tester.pump(const Duration(milliseconds: 300));
-      await tester.tap(find.text('✓'));
+      await tester.tap(findLabel('✓'));
       await tester.runAsync(
           () => Future<void>.delayed(const Duration(milliseconds: 300)));
       await tester.pump(const Duration(milliseconds: 300));
@@ -147,7 +152,7 @@ void main() {
     // shop → "🌐 English"
     await tester.tap(find.text(th.navShop));
     await tester.pump(const Duration(milliseconds: 300));
-    await tester.tap(find.text(th.switchLanguage));
+    await tester.tap(findLabel(th.switchLanguage));
     await tester.pump(const Duration(milliseconds: 300));
     expect(c.read(langProvider), 'en');
     expect(find.text(en.navShop), findsWidgets);

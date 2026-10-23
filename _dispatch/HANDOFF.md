@@ -114,6 +114,10 @@ Cards and their order (≈ 8 work chunks):
 
 Not for v1.0: T-032 (endless, P2) and HOLD_T-047 (dungeon, v1.1).
 
+## 5b. Icons (D-037) — how to add or redo one
+
+All UI icons are painted art, not emoji. To add an icon: draw it (sheet prompt style in `design/art/icon_prompts.md`; same ChatGPT chat; send the prompt by JS `document.execCommand('insertText')` into the composer — typing with newlines sends the message early) → save as `assets/raw/sheets/<sheet>.png` and list the ids in `design/art/icon_sheets.json` → `python3 -I tools/slice_icon_sheet.py <sheet>` → `python3 tools/sync_sprites.py` → map the emoji in `design/art/icons.json` (or add to `keep_as_text`) → `bash tools/sync_content.sh`. Draw with `IconText` / `GameIcon`, never `Text` with an emoji or `Icons.*` (tests fail). Purple art needs the slicer's `--spill-start 110`, already set in `slice_icon_sheet.py`.
+
 ## 6. Commands
 
 ```bash

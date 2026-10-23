@@ -43,7 +43,7 @@ def estimate_background(rgb: np.ndarray) -> np.ndarray:
     return np.median(border, axis=0)
 
 
-def remove_background(rgb: np.ndarray, bg: np.ndarray) -> np.ndarray:
+def remove_background(rgb: np.ndarray, bg: np.ndarray, spill_start: int = SPILL_START) -> np.ndarray:
     """RGBA with the magenta background keyed out and magenta spill removed.
 
     1. Pixels within BG_CLEAR of the background colour become transparent.
@@ -59,7 +59,7 @@ def remove_background(rgb: np.ndarray, bg: np.ndarray) -> np.ndarray:
 
     bg_tint = min(bg[0], bg[2]) - bg[1]  # ≈ 247 for #FF00FF-ish backgrounds
     tint = np.minimum(rgbf[..., 0], rgbf[..., 2]) - rgbf[..., 1]
-    ramp = np.clip((tint - SPILL_START) / SPILL_RAMP, 0.0, 1.0)
+    ramp = np.clip((tint - spill_start) / SPILL_RAMP, 0.0, 1.0)
     share = np.clip(tint / bg_tint, 0.0, 1.0) * ramp  # fraction of background
 
     alpha = np.where(dist < BG_CLEAR, 0.0, 1.0 - share)
@@ -206,16 +206,22 @@ def main() -> int:
     p.add_argument("--names", required=True, help="comma-separated, left→right, top→bottom")
     p.add_argument("--out", required=True)
     p.add_argument("--align", choices=["ground", "center", "feet"], default="center")
+    p.add_argument("--spill-start", type=int, default=SPILL_START,
+                   help="magenta tint where spill removal starts; raise it for purple art "
+                        "(default keeps plum, a saturated purple needs ~100)")
+    p.add_argument("--last-row-cols", type=int, default=0,
+                   help="the last row has fewer frames (the rest of its cells stay empty)")
     args = p.parse_args()
+    last_cols = args.last_row_cols or args.cols
 
     names = [n.strip() for n in args.names.split(",") if n.strip()]
-    if len(names) != args.cols * args.rows:
+    if len(names) != args.cols * (args.rows - 1) + last_cols:
         print(f"ERROR: {len(names)} names for a {args.cols}x{args.rows} layout", file=sys.stderr)
         return 2
 
     rgb = np.asarray(Image.open(args.sheet).convert("RGB"))
     bg = estimate_background(rgb)
-    rgba = remove_background(rgb, bg)
+    rgba = remove_background(rgb, bg, args.spill_start)
     solid = rgba[..., 3] > 32
     print(f"sheet {args.sheet}: {rgb.shape[1]}x{rgb.shape[0]}, background {tuple(int(c) for c in bg)}")
 
@@ -228,14 +234,15 @@ def main() -> int:
     for r, (y0, y1) in enumerate(row_spans):
         band = solid[y0:y1]
         profile = band.sum(axis=0)
+        n_cols = last_cols if r == args.rows - 1 else args.cols
         col_spans = runs(profile)
-        touching = len(col_spans) < args.cols
+        touching = len(col_spans) < n_cols
         if touching:
-            col_spans = split_to(col_spans, args.cols, profile, f"row {r + 1}")
-        col_spans = merge_to(col_spans, args.cols)
+            col_spans = split_to(col_spans, n_cols, profile, f"row {r + 1}")
+        col_spans = merge_to(col_spans, n_cols)
         owner = assign_owners(band, col_spans, touching)
         row_frames = []
-        for c in range(args.cols):
+        for c in range(n_cols):
             mine = owner == c
             ys, xs = np.nonzero(mine & band)
             mask = np.zeros_like(solid)

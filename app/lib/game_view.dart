@@ -160,7 +160,14 @@ class BattleGame extends FlameGame {
         if (a.startsWith('assets/game/pet/'))
           a.substring('assets/game/'.length),
     ];
+    final iconFrames = [
+      for (final a in manifest.listAssets())
+        if (a.startsWith('assets/game/icon/') && a.endsWith('.png'))
+          a.substring('assets/game/'.length),
+    ];
     await images.loadAll([
+      ...iconFrames
+          .where((a) => a.endsWith('/crown.png') || a.endsWith('/evade.png')),
       for (final f in _catFrames) 'cat/$f.png',
       ...outfits,
       ...petFrames,
@@ -308,7 +315,8 @@ class BattleGame extends FlameGame {
           _float(
               outcome == HitOutcome.dodge ? '💨' : '-$damage',
               mochi.position + Vector2(-10, -size.y * 0.3),
-              outcome == HitOutcome.dodge ? Palette.plum : Palette.coral);
+              outcome == HitOutcome.dodge ? Palette.plum : Palette.coral,
+              icon: outcome == HitOutcome.dodge ? 'icon/evade.png' : null);
         }
       case UnitDefeated(:final unitId):
         _monsters[unitId]?.dead = true;
@@ -318,8 +326,11 @@ class BattleGame extends FlameGame {
     }
   }
 
-  void _float(String text, Vector2 at, Color color) {
-    add(_FloatText(text, at, color, size.y * 0.06));
+  void _float(String text, Vector2 at, Color color, {String? icon}) {
+    final im = icon != null && images.containsKey(icon)
+        ? images.fromCache(icon)
+        : null;
+    add(_FloatText(text, at, color, size.y * 0.06, image: im));
   }
 }
 
@@ -410,14 +421,29 @@ class _Monster extends PositionComponent {
       ui.Rect.fromLTWH(-w / 2, -(im.height - _feetPad) * s, w, im.height * s),
       p,
     );
-    if (boss) _crown.paint(c, Offset(-_crown.width / 2, -heightPx - 26));
+    if (boss) {
+      const key = 'icon/crown.png';
+      if (game.images.containsKey(key)) {
+        final im = game.images.fromCache(key);
+        c.drawImageRect(
+            im,
+            ui.Rect.fromLTWH(0, 0, im.width.toDouble(), im.height.toDouble()),
+            ui.Rect.fromLTWH(-15, -heightPx - 34, 30, 30),
+            ui.Paint()..filterQuality = ui.FilterQuality.medium);
+      } else {
+        _crown.paint(c, Offset(-_crown.width / 2, -heightPx - 26));
+      }
+    }
   }
 }
 
 class _FloatText extends PositionComponent {
-  _FloatText(this.text, Vector2 at, this.color, this.fontSize)
+  _FloatText(this.text, Vector2 at, this.color, this.fontSize, {this.image})
       : super(position: at.clone(), priority: 20);
   final String text;
+
+  /// Painted icon drawn instead of [text] (the dodge swoosh).
+  final ui.Image? image;
   final Color color;
   final double fontSize;
   double t = 0;
@@ -436,6 +462,17 @@ class _FloatText extends PositionComponent {
     // fades in 10 steps: the text is laid out again when the step changes,
     // not on every frame (dozens of numbers fly at ×3 speed)
     final step = ((1 - t).clamp(0.0, 1.0) * 10).ceil();
+    if (image case final im?) {
+      final s = fontSize * 1.4;
+      c.drawImageRect(
+          im,
+          ui.Rect.fromLTWH(0, 0, im.width.toDouble(), im.height.toDouble()),
+          ui.Rect.fromLTWH(-s / 2, 0, s, s),
+          ui.Paint()
+            ..filterQuality = ui.FilterQuality.medium
+            ..color = Colors.white.withValues(alpha: step / 10));
+      return;
+    }
     if (step != _step || _tp == null) {
       _step = step;
       _tp = TextPainter(

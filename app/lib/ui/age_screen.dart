@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
 
 import '../l10n/strings.dart';
+import 'game_icon.dart';
 import 'palette.dart';
 
 /// Neutral age screen (GDD v0.4 §14, T-040, D-026): every age looks the
@@ -32,7 +33,7 @@ class AgeScreen extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Text('🎂 ${_label(age)}',
+            IconText('🎂 ${_label(age)}',
                 style:
                     const TextStyle(fontSize: 48, fontWeight: FontWeight.w800)),
             const SizedBox(height: 16),
@@ -50,7 +51,7 @@ class AgeScreen extends ConsumerWidget {
                         height: 64,
                         alignment: Alignment.center,
                         decoration: inkBox(fill: fill, radius: 16),
-                        child: Text(mark,
+                        child: IconText(mark,
                             style: const TextStyle(
                                 fontSize: 32, fontWeight: FontWeight.w800)),
                       ),
@@ -90,10 +91,11 @@ class AgeScreen extends ConsumerWidget {
                 Align(
                     alignment: Alignment.topRight,
                     child: IconButton(
-                        onPressed: onDone, icon: const Icon(Icons.close))),
+                        onPressed: onDone,
+                        icon: const GameIcon('cross', size: 28))),
               const SizedBox(height: 12),
-              const Text('🎂', style: TextStyle(fontSize: 72)),
-              Text(s.askAge,
+              const IconText('🎂', style: TextStyle(fontSize: 72)),
+              IconText(s.askAge,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontSize: 24, fontWeight: FontWeight.w800)),
@@ -118,13 +120,13 @@ class AgeScreen extends ConsumerWidget {
                               child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(_label(age),
+                                    IconText(_label(age),
                                         style: const TextStyle(
                                             fontSize: 30,
                                             fontWeight: FontWeight.w800)),
                                     // dots to count for the youngest
                                     if (age <= 6)
-                                      Text('●' * age,
+                                      IconText('●' * age,
                                           style: const TextStyle(
                                               fontSize: 9,
                                               color: Palette.inkSoft)),

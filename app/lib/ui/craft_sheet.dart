@@ -4,6 +4,7 @@ import 'package:wt_core/wt_core.dart';
 
 import '../l10n/strings.dart';
 import 'home_page.dart';
+import 'game_icon.dart';
 import 'palette.dart';
 
 /// Knit flow (GDD v0.4 §3, D-010): pick a slot → the yarn ball wiggles →
@@ -102,12 +103,12 @@ class _CraftSheetState extends ConsumerState<_CraftSheet> {
             YarnBall(size: 52, wiggle: _wiggle),
             const SizedBox(width: 8),
             Expanded(
-                child: Text(item == null ? s.pickSlot : s.newItem,
+                child: IconText(item == null ? s.pickSlot : s.newItem,
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w800))),
             IconButton(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.close)),
+                icon: const GameIcon('cross', size: 28)),
           ]),
           if (item == null) ...[
             // grade odds, always shown before knitting
@@ -122,7 +123,8 @@ class _CraftSheetState extends ConsumerState<_CraftSheet> {
               ]),
             ),
             const SizedBox(height: 4),
-            Text('${_odds(grades, basket.gradeTable)} · 💜 ${basket.pityLeft}',
+            IconText(
+                '${_odds(grades, basket.gradeTable)} · 💜 ${basket.pityLeft}',
                 style: const TextStyle(fontSize: 12, color: Palette.inkSoft)),
             const SizedBox(height: 12),
             Wrap(spacing: 8, runSpacing: 8, children: [
@@ -210,10 +212,11 @@ class _Compare extends StatelessWidget {
             border: g == null ? Palette.inkSoft : Palette.grades[g.grade],
             width: 3),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label,
+          IconText(label,
               style: const TextStyle(fontSize: 12, color: Palette.inkSoft)),
           if (g == null)
-            Text(s.empty, style: const TextStyle(fontWeight: FontWeight.w800))
+            IconText(s.empty,
+                style: const TextStyle(fontWeight: FontWeight.w800))
           else ...[
             Row(children: [
               SizedBox(
@@ -222,14 +225,16 @@ class _Compare extends StatelessWidget {
                   child: Image.asset(
                       'assets/game/${FarmPanel.slotArt(g.slot, g, cls, wr)}.png')),
               const SizedBox(width: 6),
-              Text(grades[g.grade],
+              IconText(grades[g.grade],
                   style: const TextStyle(fontWeight: FontWeight.w800)),
             ]),
-            Text('⚔️ ${g.stats.atk}${arrow(g.stats.atk, other?.stats.atk)}'),
-            Text('❤️ ${g.stats.hp}${arrow(g.stats.hp, other?.stats.hp)}'),
-            Text('🛡️ ${g.stats.def}${arrow(g.stats.def, other?.stats.def)}'),
+            IconText(
+                '⚔️ ${g.stats.atk}${arrow(g.stats.atk, other?.stats.atk)}'),
+            IconText('❤️ ${g.stats.hp}${arrow(g.stats.hp, other?.stats.hp)}'),
+            IconText(
+                '🛡️ ${g.stats.def}${arrow(g.stats.def, other?.stats.def)}'),
             for (final e in g.stats.attrs.entries)
-              Text('✦ ${e.key.key} +${(e.value / 100).toStringAsFixed(1)}%',
+              IconText('✦ ${e.key.key} +${(e.value / 100).toStringAsFixed(1)}%',
                   style: const TextStyle(fontSize: 12)),
           ],
         ]),
@@ -246,7 +251,7 @@ class _Compare extends StatelessWidget {
         _card(context, s.worn, worn, null),
         const Padding(
             padding: EdgeInsets.all(6),
-            child: Text('→', style: TextStyle(fontSize: 22))),
+            child: IconText('→', style: TextStyle(fontSize: 22))),
         _card(context, '${s.newItem}${better ? ' ✨' : ''}', item, worn),
       ]),
       const SizedBox(height: 12),
@@ -277,7 +282,7 @@ class _Big extends StatelessWidget {
           height: 56,
           alignment: Alignment.center,
           decoration: inkBox(fill: color),
-          child: Text(label,
+          child: IconText(label,
               style:
                   const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
         ),

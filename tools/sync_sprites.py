@@ -70,6 +70,17 @@ for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/pets/*.png')):
     s = 200 / im.height
     im.resize((round(im.width * s), 200), Image.LANCZOS).save(
         f'{OUT}/pet/{os.path.basename(src)}', optimize=True)
+# UI icons (D-037): painted replacements for the emoji — trimmed, ≤ 128 px
+os.makedirs(f'{OUT}/icon', exist_ok=True)
+for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/icon/*.png')):
+    name = os.path.basename(src)[:-4].replace('icon_', '', 1)
+    im = Image.open(src).convert('RGBA')
+    im = im.crop(im.getbbox())
+    pad = round(max(im.size) * 0.04)  # a hair of room so outlines are not cut
+    sq = Image.new('RGBA', (max(im.size) + 2 * pad,) * 2, (0, 0, 0, 0))
+    sq.alpha_composite(im, ((sq.width - im.width) // 2, (sq.height - im.height) // 2))
+    s = min(1, 128 / sq.width)
+    sq.resize((round(sq.width * s),) * 2, Image.LANCZOS).save(f'{OUT}/icon/{name}.png', optimize=True)
 # boss faces for the challenge button
 os.makedirs(f'{OUT}/ui', exist_ok=True)
 for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/ui/*.png')):

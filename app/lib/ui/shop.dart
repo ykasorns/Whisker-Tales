@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
 
 import '../l10n/strings.dart';
+import 'game_icon.dart';
 import 'palette.dart';
 
 /// The only way into buying (T-025): the parental gate first, then the
@@ -80,7 +81,7 @@ class _GateDialogState extends State<_GateDialog> {
                 alignment: Alignment.center,
                 decoration: inkBox(
                     fill: k == '✓' ? Palette.lime : Palette.paper, radius: 10),
-                child: Text(k,
+                child: IconText(k,
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.w800)),
               ),
@@ -95,7 +96,7 @@ class _GateDialogState extends State<_GateDialog> {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(s.gateTitle,
+          IconText(s.gateTitle,
               style:
                   const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
@@ -104,14 +105,14 @@ class _GateDialogState extends State<_GateDialog> {
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 16)),
           if (_wrong)
-            Text(s.gateWrong, style: const TextStyle(color: Palette.coral)),
+            IconText(s.gateWrong, style: const TextStyle(color: Palette.coral)),
           const SizedBox(height: 8),
           Container(
             height: 44,
             width: double.infinity,
             alignment: Alignment.center,
             decoration: inkBox(fill: Palette.sheet, radius: 10),
-            child: Text(_typed,
+            child: IconText(_typed,
                 style:
                     const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
           ),
@@ -129,7 +130,7 @@ class _GateDialogState extends State<_GateDialog> {
           ]),
           TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(s.cancel)),
+              child: IconText(s.cancel)),
         ]),
       ),
     );
@@ -181,7 +182,7 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
     if (r == PurchaseStart.needsGate) {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(s.gateExpired)));
+          .showSnackBar(SnackBar(content: IconText(s.gateExpired)));
       return;
     }
     setState(() => _status = switch (r) {
@@ -205,12 +206,12 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
             return Column(mainAxisSize: MainAxisSize.min, children: [
               Row(children: [
                 Expanded(
-                    child: Text(s.navShop,
+                    child: IconText(s.navShop,
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.w800))),
                 IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close)),
+                    icon: const GameIcon('cross', size: 28)),
               ]),
               if (snap.connectionState != ConnectionState.done)
                 const Padding(
@@ -219,7 +220,7 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
               else if (iap == null || sold.isEmpty)
                 Padding(
                     padding: const EdgeInsets.all(24),
-                    child: Text(s.shopClosed, textAlign: TextAlign.center))
+                    child: IconText(s.shopClosed, textAlign: TextAlign.center))
               else
                 for (final sp in sold)
                   if (iap.catalog.bySku(sp.sku) case final p?)
@@ -228,22 +229,22 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
                       padding: const EdgeInsets.all(12),
                       decoration: inkBox(fill: const Color(0xFFFFF3D6)),
                       child: Row(children: [
-                        Text(p.icon, style: const TextStyle(fontSize: 36)),
+                        IconText(p.icon, style: const TextStyle(fontSize: 36)),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(s.lang == 'en' ? p.nameEn : p.nameTh,
+                                IconText(s.lang == 'en' ? p.nameEn : p.nameTh,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.w800)),
-                                Text(s.lang == 'en' ? p.descEn : p.descTh,
+                                IconText(s.lang == 'en' ? p.descEn : p.descTh,
                                     style: const TextStyle(fontSize: 12)),
                               ]),
                         ),
                         const SizedBox(width: 8),
                         iap.owned.contains(p.sku)
-                            ? Text(s.owned,
+                            ? IconText(s.owned,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w800))
                             : GestureDetector(
@@ -253,7 +254,7 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
                                       horizontal: 12, vertical: 10),
                                   decoration:
                                       inkBox(fill: Palette.lime, radius: 12),
-                                  child: Text(sp.price,
+                                  child: IconText(sp.price,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w800)),
                                 ),
@@ -263,7 +264,7 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
               if (_status case final st?)
                 Padding(
                     padding: const EdgeInsets.all(8),
-                    child: Text(st,
+                    child: IconText(st,
                         style: const TextStyle(fontWeight: FontWeight.w700))),
               if (iap != null)
                 TextButton(
@@ -271,7 +272,7 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
                     await iap.restore(widget.pass);
                     if (mounted) setState(() => _status = s.restoring);
                   },
-                  child: Text(s.restorePurchases),
+                  child: IconText(s.restorePurchases),
                 ),
             ]);
           },

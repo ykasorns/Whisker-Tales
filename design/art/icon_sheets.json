@@ -1,0 +1,102 @@
+{
+ "sheet_icons_1_hud": {
+  "cols": 5,
+  "rows": 3,
+  "ids": [
+   "fish",
+   "yarn",
+   "egg",
+   "cookie",
+   "heart",
+   "sword",
+   "shield",
+   "evade",
+   "crit",
+   "sparkle",
+   "lock",
+   "ad",
+   "stopwatch",
+   "hourglass",
+   "star"
+  ]
+ },
+ "sheet_icons_2_ui": {
+  "cols": 5,
+  "rows": 3,
+  "ids": [
+   "bell",
+   "music",
+   "sound",
+   "globe",
+   "cake",
+   "family",
+   "supporter",
+   "crown",
+   "paw",
+   "owl",
+   "check",
+   "cross",
+   "gift",
+   "bolt",
+   "question"
+  ]
+ },
+ "sheet_icons_3_misc": {
+  "cols": 5,
+  "rows": 3,
+  "ids": [
+   "pity",
+   "sadcat",
+   "party",
+   "bed",
+   "books",
+   "eyes",
+   "victory",
+   "dizzy",
+   "whisker",
+   "angrycat",
+   "zzz",
+   "milk",
+   "openbook",
+   "scroll",
+   "dagger"
+  ]
+ },
+ "sheet_icons_4_skills": {
+  "cols": 5,
+  "rows": 3,
+  "ids": [
+   "shield_bash",
+   "iron_wall",
+   "war_cry",
+   "twin_strike",
+   "poison_blade",
+   "shadow_step",
+   "power_shot",
+   "arrow_rain",
+   "eagle_eye",
+   "fireball",
+   "frost_nova",
+   "meteor",
+   "coat",
+   "rock"
+  ]
+ },
+ "sheet_icons_5_nav": {
+  "cols": 4,
+  "rows": 3,
+  "ids": [
+   "nav_cat",
+   "nav_castle",
+   "nav_home",
+   "nav_shop",
+   "ev_grilled_fish",
+   "ev_tailwind",
+   "ev_rainbow",
+   "ev_fish_bag",
+   "ev_drizzle",
+   "ev_bees",
+   "ev_mud"
+  ]
+ }
+}

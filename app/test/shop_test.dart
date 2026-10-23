@@ -58,7 +58,7 @@ void main() {
       await tester.tap(find.text(d).last);
       await tester.pump();
     }
-    await tester.tap(find.text('✓'));
+    await tester.tap(findLabel('✓'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
   }
@@ -76,7 +76,7 @@ void main() {
       container: c,
       child: localized(const Scaffold(body: ShopPage())),
     ));
-    await tester.tap(find.text(
+    await tester.tap(findLabel(
         '👨‍👩‍👧 ${lookupAppLocalizations(const Locale('en')).askParent}'));
     await tester.pump(const Duration(milliseconds: 300));
     return (c, store);

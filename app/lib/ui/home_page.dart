@@ -9,6 +9,7 @@ import '../game_view.dart';
 import '../l10n/strings.dart';
 import 'craft_sheet.dart';
 import 'overlays.dart';
+import 'game_icon.dart';
 import 'palette.dart';
 
 String fmtNum(int n) => n >= 1000000
@@ -80,7 +81,7 @@ class _Hud extends ConsumerWidget {
                 CircleAvatar(
                   radius: 20,
                   backgroundColor: Palette.mochi,
-                  child: Text(s.level(cat.level),
+                  child: IconText(s.level(cat.level),
                       style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
@@ -88,7 +89,7 @@ class _Hud extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(s.catTitle(s.className(cls.current)),
+                  IconText(s.catTitle(s.className(cls.current)),
                       style: const TextStyle(fontWeight: FontWeight.w800)),
                   SizedBox(
                     width: 90,
@@ -98,7 +99,7 @@ class _Hud extends ConsumerWidget {
                         backgroundColor: Palette.sheet,
                         minHeight: 5),
                   ),
-                  Text('🐾 ${fmtNum(power)}',
+                  IconText('🐾 ${fmtNum(power)}',
                       style: const TextStyle(fontWeight: FontWeight.w700)),
                 ]),
               ]),
@@ -110,10 +111,11 @@ class _Hud extends ConsumerWidget {
             top: 10,
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text('🐟 ${fmtNum(wallet.balance(Currency.goldfish))}',
+              IconText('🐟 ${fmtNum(wallet.balance(Currency.goldfish))}',
                   style: _bold),
-              Text('🧶 ${fmtNum(wallet.balance(Currency.yarn))}', style: _bold),
-              Text('🥚 ${wallet.balance(Currency.eggs)}', style: _bold),
+              IconText('🧶 ${fmtNum(wallet.balance(Currency.yarn))}',
+                  style: _bold),
+              IconText('🥚 ${wallet.balance(Currency.eggs)}', style: _bold),
               const RoadChips(),
             ]),
           ),
@@ -126,7 +128,7 @@ class _Hud extends ConsumerWidget {
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                 decoration: inkBox(radius: 10),
                 child: Column(children: [
-                  Text(
+                  IconText(
                       s.chapterPage(rules.chapterOf(st.farmPage),
                           rules.pageInChapter(st.farmPage)),
                       style: _bold),
@@ -177,7 +179,8 @@ class _Hud extends ConsumerWidget {
                     decoration: inkBox(
                         fill: loop.autoBoss ? Palette.coral : Palette.paper,
                         radius: 12),
-                    child: Text('${s.auto}\n${loop.autoBoss ? s.on : s.off}',
+                    child: IconText(
+                        '${s.auto}\n${loop.autoBoss ? s.on : s.off}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontWeight: FontWeight.w800,
@@ -191,7 +194,7 @@ class _Hud extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
                 decoration: inkBox(radius: 8, width: 2),
-                child: Text(
+                child: IconText(
                     boss
                         ? s.fightingBoss
                         : ready && frontier
@@ -223,7 +226,7 @@ class _Hud extends ConsumerWidget {
                   alignment: Alignment.center,
                   decoration: inkBox(
                       fill: driver.speed > 1 ? Palette.sun : Palette.paper),
-                  child: Text(
+                  child: IconText(
                       '▶ x${driver.speed == driver.speed.roundToDouble() ? driver.speed.toInt() : driver.speed}',
                       style: _bold),
                 ),
@@ -443,11 +446,11 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                Text(s.knit,
+                                IconText(s.knit,
                                     style: const TextStyle(
                                         fontSize: 22,
                                         fontWeight: FontWeight.w800)),
-                                Text(yarn < 1 ? s.noYarn : s.yarnLeft(yarn),
+                                IconText(yarn < 1 ? s.noYarn : s.yarnLeft(yarn),
                                     style: const TextStyle(
                                         color: Palette.inkSoft,
                                         fontWeight: FontWeight.w600)),
@@ -490,7 +493,8 @@ class _Slot extends StatelessWidget {
             border: Border.all(color: Palette.inkSoft, width: 2),
             color: Palette.sheet),
         alignment: Alignment.center,
-        child: Text('🔒\n${AppLocalizations.of(context).unlockAt(unlockPage)}',
+        child: IconText(
+            '🔒\n${AppLocalizations.of(context).unlockAt(unlockPage)}',
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 9, height: 1.1)),
       );
@@ -514,7 +518,7 @@ class _Slot extends StatelessWidget {
           const Positioned(
               right: -6,
               top: -6,
-              child: Text('✨', style: TextStyle(fontSize: 14))),
+              child: IconText('✨', style: TextStyle(fontSize: 14))),
       ]),
     );
   }
@@ -535,11 +539,18 @@ class _Toggle extends StatelessWidget {
           decoration:
               inkBox(fill: on ? Palette.lime : Palette.paper, radius: 12),
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(on ? Icons.circle : Icons.circle_outlined,
-                size: 12, color: Palette.ink),
+            // AUTO state: a painted check when on, an empty ring when off
+            on
+                ? const GameIcon('check', size: 16)
+                : Container(
+                    width: 12,
+                    height: 12,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Palette.ink, width: 2))),
             const SizedBox(width: 6),
             Flexible(
-                child: Text(label,
+                child: IconText(label,
                     maxLines: 2,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
@@ -641,11 +652,12 @@ class KnitPop extends StatelessWidget {
                     if (v < 0.5)
                       const Positioned(
                           top: -14,
-                          child: Text('✨', style: TextStyle(fontSize: 18))),
+                          child: IconText('✨', style: TextStyle(fontSize: 18))),
                     if (!kept && v > 0.6)
                       const Positioned(
                           right: -18,
-                          child: Text('🐟', style: TextStyle(fontSize: 18))),
+                          child:
+                              IconText('🐟', style: TextStyle(fontSize: 18))),
                   ]),
             ),
           ),

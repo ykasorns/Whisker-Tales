@@ -4,6 +4,7 @@ import 'package:wt_core/wt_core.dart';
 
 import '../l10n/strings.dart';
 import 'home_page.dart';
+import 'game_icon.dart';
 import 'palette.dart';
 
 /// `1:05:09` / `4:07` — timers read the same in both languages.
@@ -73,10 +74,10 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
         child:
             Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(children: [
-            const Text('🦉', style: TextStyle(fontSize: 44)),
+            const IconText('🦉', style: TextStyle(fontSize: 44)),
             const SizedBox(width: 8),
             Expanded(
-              child: Text(s.libraryTitle,
+              child: IconText(s.libraryTitle,
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.w800)),
             ),
@@ -86,8 +87,8 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
                 ad: ads.canShow(researchSpeedupPlacement), adsLeft: adsLeft),
           Row(children: [
             Expanded(
-              child:
-                  Text(s.notifyResearch, style: const TextStyle(fontSize: 13)),
+              child: IconText(s.notifyResearch,
+                  style: const TextStyle(fontSize: 13)),
             ),
             Switch(
               value: r.notifyDone,
@@ -109,7 +110,7 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
     if (t == null) {
       return Padding(
         padding: const EdgeInsets.only(top: 6),
-        child: Text(s.deskFree(i + 1),
+        child: IconText(s.deskFree(i + 1),
             style: const TextStyle(color: Palette.inkSoft)),
       );
     }
@@ -123,10 +124,10 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
       padding: const EdgeInsets.only(top: 6),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Row(children: [
-          Text('${node.icon} ${_name(s, node)} → ${s.level(t.toLevel)}',
+          IconText('${node.icon} ${_name(s, node)} → ${s.level(t.toLevel)}',
               style: const TextStyle(fontWeight: FontWeight.w800)),
           const Spacer(),
-          Text('⏱ ${fmtDur(left)}',
+          IconText('⏱ ${fmtDur(left)}',
               style: const TextStyle(fontWeight: FontWeight.w800)),
         ]),
         const SizedBox(height: 4),
@@ -139,7 +140,7 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
               margin: const EdgeInsets.only(top: 6),
               alignment: Alignment.center,
               decoration: inkBox(fill: Palette.sun, radius: 12),
-              child: Text(s.adSpeedUp(r.rules.adCutMin, adsLeft),
+              child: IconText(s.adSpeedUp(r.rules.adCutMin, adsLeft),
                   style: const TextStyle(
                       fontSize: 13, fontWeight: FontWeight.w800)),
             ),
@@ -172,15 +173,15 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
               : Palette.paper,
           radius: 14),
       child: Row(children: [
-        Text(block == ResearchBlock.locked ? '🔒' : n.icon,
+        IconText(block == ResearchBlock.locked ? '🔒' : n.icon,
             style: const TextStyle(fontSize: 32)),
         const SizedBox(width: 10),
         Expanded(
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('${_name(s, n)}  ${s.level(lv)}/${n.maxLevel}',
+            IconText('${_name(s, n)}  ${s.level(lv)}/${n.maxLevel}',
                 style: const TextStyle(fontWeight: FontWeight.w800)),
-            Text(_effect(s, r, n),
+            IconText(_effect(s, r, n),
                 style: const TextStyle(fontSize: 12, color: Palette.inkSoft)),
           ]),
         ),
@@ -195,7 +196,7 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
               decoration: inkBox(
                   fill: block == null ? Palette.lime : Palette.paper,
                   radius: 12),
-              child: Text(label,
+              child: IconText(label,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontSize: 12, fontWeight: FontWeight.w800)),

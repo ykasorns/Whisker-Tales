@@ -45,7 +45,7 @@ void main() {
     ));
     final en = lookupAppLocalizations(const Locale('en'));
     Finder switchOf(String label) => find.descendant(
-        of: find.ancestor(of: find.text(label), matching: find.byType(Row)),
+        of: find.ancestor(of: findLabel(label), matching: find.byType(Row)),
         matching: find.byType(Switch));
 
     await tester.tap(switchOf(en.music));

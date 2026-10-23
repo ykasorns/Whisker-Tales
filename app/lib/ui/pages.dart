@@ -4,6 +4,7 @@ import 'package:wt_core/wt_core.dart';
 
 import '../l10n/strings.dart';
 import 'home_page.dart';
+import 'game_icon.dart';
 import 'palette.dart';
 import 'age_screen.dart';
 import 'library_tab.dart';
@@ -12,15 +13,15 @@ import 'shop.dart';
 
 Widget _pageTitle(String t) => Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Text(t,
+      child: IconText(t,
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
     );
 
 Widget _soon(BuildContext context, String icon, String text) => Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Text(icon, style: const TextStyle(fontSize: 64)),
+        IconText(icon, style: const TextStyle(fontSize: 64)),
         const SizedBox(height: 8),
-        Text(text,
+        IconText(text,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
       ]),
@@ -87,7 +88,7 @@ class _CatTabState extends ConsumerState<_CatTab> {
     String pct(Attribute a) => '${(st[a] / 100).toStringAsFixed(1)}%';
     final unlocked = cat.level >= rules.classUnlockLevel;
     return ListView(padding: const EdgeInsets.all(16), children: [
-      Text('${s.level(cat.level)} · ${s.className(cls.current)}',
+      IconText('${s.level(cat.level)} · ${s.className(cls.current)}',
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
       LinearProgressIndicator(
           value: cat.expToNext == 0 ? 1 : cat.exp / cat.expToNext,
@@ -108,13 +109,13 @@ class _CatTabState extends ConsumerState<_CatTab> {
             padding: const EdgeInsets.all(8),
             decoration: inkBox(radius: 10, width: 2),
             child: Column(children: [
-              Text(k, style: const TextStyle(fontSize: 12)),
-              Text(v, style: const TextStyle(fontWeight: FontWeight.w800))
+              IconText(k, style: const TextStyle(fontSize: 12)),
+              IconText(v, style: const TextStyle(fontWeight: FontWeight.w800))
             ]),
           ),
       ]),
       _pageTitle(s.classPick),
-      if (!unlocked) Text(s.classAt(rules.classUnlockLevel)),
+      if (!unlocked) IconText(s.classAt(rules.classUnlockLevel)),
       Wrap(spacing: 8, runSpacing: 8, children: [
         for (final c in rules.classes.where((c) => c.tier == 1))
           GestureDetector(
@@ -134,7 +135,7 @@ class _CatTabState extends ConsumerState<_CatTab> {
                 decoration: inkBox(
                     fill: c.id == cls.current ? Palette.sun : Palette.paper,
                     radius: 12),
-                child: Text(s.className(c.id),
+                child: IconText(s.className(c.id),
                     style: const TextStyle(fontWeight: FontWeight.w800)),
               ),
             ),
@@ -148,11 +149,11 @@ class _CatTabState extends ConsumerState<_CatTab> {
           return Opacity(
             opacity: open ? 1 : 0.4,
             child: ListTile(
-              leading:
-                  Text(i?.icon ?? '✨', style: const TextStyle(fontSize: 28)),
-              title: Text(lang == 'en' ? (i?.en ?? sk.id) : (i?.th ?? sk.id),
+              leading: GameIcon.skill(sk.id, i?.icon ?? '✨', size: 36),
+              title: IconText(
+                  lang == 'en' ? (i?.en ?? sk.id) : (i?.th ?? sk.id),
                   style: const TextStyle(fontWeight: FontWeight.w700)),
-              subtitle: Text(
+              subtitle: IconText(
                   s.cooldownSeconds((sk.cooldownMs / 1000).toStringAsFixed(1))),
             ),
           );
@@ -176,7 +177,7 @@ class _WardrobeTab extends ConsumerWidget {
     final classes = ref.read(catRulesProvider).classes;
     final found = wd.collection.where((e) => e.unlocked).length;
     return ListView(padding: const EdgeInsets.all(12), children: [
-      Text(s.classOutfits,
+      IconText(s.classOutfits,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
       const SizedBox(height: 6),
       SizedBox(
@@ -193,7 +194,7 @@ class _WardrobeTab extends ConsumerWidget {
                 Expanded(
                     child: Image.asset('assets/game/cat/bare_${c.id}.png',
                         fit: BoxFit.contain)),
-                Text(s.className(c.id),
+                IconText(s.className(c.id),
                     style: const TextStyle(
                         fontSize: 11, fontWeight: FontWeight.w700)),
               ]),
@@ -201,7 +202,7 @@ class _WardrobeTab extends ConsumerWidget {
         ]),
       ),
       const SizedBox(height: 12),
-      Text(s.looksFound(found, wd.collection.length),
+      IconText(s.looksFound(found, wd.collection.length),
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
       const SizedBox(height: 6),
       GridView.count(
@@ -269,16 +270,16 @@ class _EventsPageState extends ConsumerState<EventsPage> {
         padding: const EdgeInsets.all(12),
         decoration: inkBox(),
         child: Row(children: [
-          Text(icon, style: const TextStyle(fontSize: 40)),
+          IconText(icon, style: const TextStyle(fontSize: 40)),
           const SizedBox(width: 12),
           Expanded(
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                Text(title,
+                IconText(title,
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w800)),
-                Text(s.adsLeft(left),
+                IconText(s.adsLeft(left),
                     style: const TextStyle(color: Palette.inkSoft)),
               ])),
           if (left > 0)
@@ -288,7 +289,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: inkBox(fill: Palette.sun, radius: 12),
-                child: Text(s.watch,
+                child: IconText(s.watch,
                     style: const TextStyle(fontWeight: FontWeight.w800)),
               ),
             ),
@@ -318,11 +319,11 @@ class ShopPage extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         decoration: inkBox(fill: const Color(0xFFFFF3D6)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('💛 ${s.supporterPack}',
+          IconText('💛 ${s.supporterPack}',
               style:
                   const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
           const SizedBox(height: 4),
-          Text(s.supporterDesc),
+          IconText(s.supporterDesc),
           const SizedBox(height: 12),
           // the parental gate comes first, always (T-025)
           Semantics(
@@ -334,7 +335,7 @@ class ShopPage extends ConsumerWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: inkBox(fill: Palette.lime, radius: 12),
-                child: Text('👨‍👩‍👧 ${s.askParent}',
+                child: IconText('👨‍👩‍👧 ${s.askParent}',
                     style: const TextStyle(fontWeight: FontWeight.w800)),
               ),
             ),
@@ -348,7 +349,7 @@ class ShopPage extends ConsumerWidget {
         child: TextButton(
           onPressed: () => ref.read(langProvider.notifier).state =
               s.lang == 'th' ? 'en' : 'th',
-          child: Text(s.switchLanguage),
+          child: IconText(s.switchLanguage),
         ),
       ),
       // a grown-up can correct the age answer, behind the gate (T-040)
@@ -361,7 +362,7 @@ class ShopPage extends ConsumerWidget {
                 builder: (ctx) => AgeScreen(
                     pass: pass, onDone: () => Navigator.of(ctx).pop())));
           },
-          child: Text(s.changeAge),
+          child: IconText(s.changeAge),
         ),
       ),
     ]);
@@ -384,7 +385,7 @@ class _SoundSwitchesState extends ConsumerState<_SoundSwitches> {
     Widget row(String label, bool on, void Function(bool) set) => Row(
           children: [
             Expanded(
-                child: Text(label,
+                child: IconText(label,
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.w800))),
             Switch(

@@ -11,6 +11,7 @@ import '../l10n/strings.dart';
 import 'home_page.dart';
 import 'overlays.dart';
 import 'pages.dart';
+import 'game_icon.dart';
 import 'palette.dart';
 
 /// The app's frame (D-018): pages above, 5-button menu below. The game
@@ -55,7 +56,8 @@ class _GameShellState extends ConsumerState<GameShell>
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           duration: const Duration(seconds: 8),
           backgroundColor: Palette.ink,
-          content: Text(f == BootFallback.olderSave ? s.saveOlder : s.saveNew,
+          content: IconText(
+              f == BootFallback.olderSave ? s.saveOlder : s.saveNew,
               style: const TextStyle(fontWeight: FontWeight.w800)),
         ));
       }
@@ -84,7 +86,7 @@ class _GameShellState extends ConsumerState<GameShell>
       final node = research.rules.byId(e.nodeId)!;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Palette.ink,
-        content: Text(
+        content: IconText(
             s.researchDone(s.lang == 'en' ? node.nameEn : node.nameTh, e.level),
             style: const TextStyle(fontWeight: FontWeight.w800)),
       ));
@@ -181,11 +183,11 @@ class _GameShellState extends ConsumerState<GameShell>
                                 AnimatedScale(
                                   scale: i == _tab ? 1.25 : 1,
                                   duration: const Duration(milliseconds: 150),
-                                  child: Text(items[i].$1,
+                                  child: IconText(items[i].$1,
                                       style: TextStyle(
                                           fontSize: i == home ? 26 : 22)),
                                 ),
-                                Text(items[i].$2,
+                                IconText(items[i].$2,
                                     style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: i == _tab

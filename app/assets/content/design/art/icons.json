@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "_doc": "ไอคอนในเกม (D-037): อีโมจิ → ไฟล์ภาพ app/assets/game/icon/<id>.png วาดจาก ChatGPT ตาม design/art/icon_prompts.md · ข้อความที่มีอีโมจิเหล่านี้ (ใน arb / design/data) จะถูกแสดงเป็นภาพเอง ผ่าน IconText · อีโมจิที่ไม่อยู่ในรายการนี้ต้องอยู่ใน keep_as_text (test เช็ก) · skill_<id> / ev_<id> = ภาพเฉพาะของสกิล/เหตุการณ์ (ใช้แทนอีโมจิในข้อมูล เพราะอีโมจิตัวเดียวกันมีหลายความหมาย)",
+  "emoji": {
+    "🐟": "fish", "🧶": "yarn", "🥚": "egg", "🍪": "cookie",
+    "❤️": "heart", "⚔️": "sword", "🛡️": "shield", "💨": "evade", "💥": "crit", "✨": "sparkle",
+    "🔒": "lock", "📺": "ad", "⏱": "stopwatch", "⏳": "hourglass", "⭐": "star",
+    "🔔": "bell", "🎵": "music", "🔊": "sound", "🌐": "globe", "🎂": "cake", "👨‍👩‍👧": "family",
+    "💛": "supporter", "👑": "crown", "🐾": "paw", "🦉": "owl", "✓": "check",
+    "✗": "cross", "✖": "cross", "✕": "cross", "🎁": "gift", "⚡": "bolt", "❔": "question",
+    "💜": "pity", "😿": "sadcat", "🎉": "party", "🛏️": "bed", "📚": "books", "👀": "eyes",
+    "✌️": "victory", "💫": "dizzy", "〰️": "whisker", "😾": "angrycat", "💤": "zzz", "🥛": "milk",
+    "📖": "openbook", "📜": "scroll", "🗡️": "dagger", "🧥": "coat", "🪨": "rock",
+    "🐱": "nav_cat", "🏰": "nav_castle", "🏠": "nav_home", "🛒": "nav_shop"
+  },
+  "skills": ["shield_bash", "iron_wall", "war_cry", "twin_strike", "poison_blade", "shadow_step", "power_shot", "arrow_rain", "eagle_eye", "fireball", "frost_nova", "meteor"],
+  "events": ["grilled_fish", "tailwind", "rainbow", "fish_bag", "drizzle", "bees", "mud"],
+  "keep_as_text": ["★", "▶", "🐦", "🐭", "🐸", "🦔", "🐰", "🦄"]
+}

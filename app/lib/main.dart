@@ -9,6 +9,7 @@ import 'audio/player_output.dart';
 import 'cloud/play_cloud.dart';
 import 'iap/play_store.dart';
 import 'ui/age_screen.dart';
+import 'ui/game_icon.dart';
 import 'ui/game_shell.dart';
 import 'l10n/strings.dart';
 import 'modes.dart';
@@ -32,6 +33,11 @@ Future<void> main() async {
   try {
     final content =
         await ContentRepository(const AssetContentSource()).loadAll();
+    try {
+      await IconRegistry.load(); // painted icons replace the emoji (D-037)
+    } catch (e) {
+      debugPrint('icons.json not loaded, showing emoji: $e'); // never a hole
+    }
     await Hive.initFlutter();
     final box = await Hive.openBox<String>('whisker_tales_save');
     final saves = SaveService(HiveSaveStore(box));

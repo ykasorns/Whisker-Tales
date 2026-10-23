@@ -338,3 +338,10 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 2. **ภาพเพื่อนสัตว์ 6 ตัว × (ยืน/โจมตี)** จาก ChatGPT (`sheet_pets.png`, prompt `design/art/pet_prompts.md`) → `app/assets/game/pet/<id>_<idle|attack>.png` สูง 200 px · ในฉากใช้ท่าโจมตีตอนเพื่อนตีมอน · แท็บเพื่อนสัตว์/ผลฟักไข่ใช้ภาพ (`PetPicture`) — ไม่มีภาพ = emoji เหมือนเดิม
 3. **APK 30.5 → 23.2 MB:** `sync_sprites.py` ลดทุก sprite เหลือ 256 สี (ยกเว้นพื้นหลังที่ระบายสี จะเป็นแถบ) · หน้าบอสในปุ่มย่อเหลือ 160 px · ภาพเกมรวม 11.8 → ~4.8 MB · ภาพยังคมเหมือนเดิม (ตรวจแล้ว)
 4. build release บน Mac 8 GB: ถ้า AOT snapshotter โดน kill (-9) ให้ปิดแท็บ/แอปที่กินแรม หรือ build `--target-platform android-arm64` อย่างเดียว
+
+## D-031 (2026-10-23) — YK/Opus — chapter 2–3 monsters, bosses and scenery
+
+1. **ภาพบท 2–3 จาก ChatGPT** (แชท "สร้างสไปรต์ชีตลูกแมว" ต่อเนื่องจากชุดก่อน ตามที่ YK ขอ, prompt `design/art/character_prompts.md`): บท 2 ทะเลสาบหมึก = ค้างคาวหมึก `inkbat`, หอยทากสีเทียน `crayonsnail`, บอสปูเหลาดินสอ `sharpcrab` · บท 3 ป่ากระดาษ = เม่นขี้กบ `shavinghog`, ด้วงคลิป `clipbeetle`, บอสหมาป่ากระดาษ `paperwolf` · หน้าบอสในปุ่มครบทุกตัว · ฉากไกล/กลางของทั้งสองบท
+2. **ฉากตามบท** (`app/lib/chapter_art.dart`): มอน บอส หน้าบอส และฉากเลือกตาม `chapterOf(หน้า)` · หน้า 10 ของบท = บอสประจำบท หน้าอื่น = มอนตัวแรกของบทตัวใหญ่ (เหมือนบท 1) · เล่ม 2 ขึ้นไปใช้ภาพเล่ม 1 วนไปก่อนจนกว่าจะมีชุดของตัวเอง
+3. **เครื่องมือ** `tools/sprite_slicer/tile_background.py`: เอาฟ้าชมพูออกแบบเดียวกับ slicer แล้ว cross-fade ขอบขวาเข้าขอบซ้าย 8% ให้ต่อกันไม่มีรอย · ค้างคาวตัดแบบ `--align ground` (บินลอยคงความสูง) ตัวอื่น `--align feet`
+4. APK arm64 = 26.5 MB (ฉากเพิ่ม 4 ชั้น ~1.3 MB, มอน 54 เฟรม)

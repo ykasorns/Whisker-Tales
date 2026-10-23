@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
 
+import '../chapter_art.dart';
 import '../game_view.dart';
 import '../l10n/strings.dart';
 import 'craft_sheet.dart';
@@ -162,9 +163,7 @@ class _Hud extends ConsumerWidget {
                       progress:
                           boss ? 1 : math.min(1, loop.waveIndex / plan.waves),
                       ready: ready && frontier,
-                      face: (st.clearedPage + 1) % 10 == 0
-                          ? 'eraserking'
-                          : 'eraserslime',
+                      face: ChapterArt.bossOf(rules, st.clearedPage + 1),
                     ),
                   ),
                 ),

@@ -11,6 +11,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
 
+import 'chapter_art.dart';
 import 'ui/palette.dart';
 
 /// Drives the game while the app is open: the idle loop, auto-knit and the
@@ -154,15 +155,12 @@ class BattleGame extends FlameGame {
       for (final f in _catFrames) 'cat/$f.png',
       ...outfits,
       ...petFrames,
-      for (final k in ['eraserslime', 'acorn', 'eraserking'])
+      for (final k in ChapterArt.kinds)
         for (final f in _monFrames) 'mon/${k}_$f.png',
-      for (final b in [
-        'bg_book1_L0_sky',
-        'bg_book1_ch1_L1_far',
-        'bg_book1_ch1_L2_mid',
-        'bg_book1_L3_ground'
-      ])
-        'bg/$b.png',
+      'bg/bg_book1_L0_sky.png',
+      'bg/bg_book1_L3_ground.png',
+      for (final a in ChapterArt.all)
+        for (final l in ['L1_far', 'L2_mid']) 'bg/bg_book1_${a.layer}_$l.png',
     ]);
     _bg = _Parallax(this);
     add(_bg);
@@ -250,13 +248,11 @@ class BattleGame extends FlameGame {
             for (var j = 0; j < enemies.length; j++)
               0.56 + 0.38 * j / (enemies.length - 1)
           ];
+      final page = loop.state.farmPage;
+      final mons = ChapterArt.of(loop.rules, page).monsters;
       final kind = e.isBoss
-          ? (loop.state.clearedPage + 1) % 10 == 0
-              ? 'eraserking'
-              : 'eraserslime'
-          : (loop.fightId + i).isEven
-              ? 'eraserslime'
-              : 'acorn';
+          ? ChapterArt.bossOf(loop.rules, page)
+          : mons[(loop.fightId + i) % mons.length];
       final m = _Monster(this, kind, boss: e.isBoss)
         ..position = Vector2(size.x * xs[i], groundY)
         ..heightPx = size.y * (e.isBoss ? 0.3 : 0.19 - i * 0.009);
@@ -341,8 +337,12 @@ class _Parallax extends Component {
   void render(ui.Canvas c) {
     final s = game.size, gy = game.groundY;
     _tile('bg/bg_book1_L0_sky.png', 0.05, s.y, s.y, c);
-    _tile('bg/bg_book1_ch1_L1_far.png', 0.2, s.y * 0.62, gy + s.y * 0.04, c);
-    _tile('bg/bg_book1_ch1_L2_mid.png', 0.5, s.y * 0.6, gy + s.y * 0.06, c);
+    final layer =
+        ChapterArt.of(game.loop.rules, game.loop.state.farmPage).layer;
+    _tile(
+        'bg/bg_book1_${layer}_L1_far.png', 0.2, s.y * 0.62, gy + s.y * 0.04, c);
+    _tile(
+        'bg/bg_book1_${layer}_L2_mid.png', 0.5, s.y * 0.6, gy + s.y * 0.06, c);
     final hg = (s.y - gy) / 0.3;
     _tile('bg/bg_book1_L3_ground.png', 1, hg, gy + 0.3 * hg, c);
   }

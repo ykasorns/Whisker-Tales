@@ -46,9 +46,11 @@ for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/gear/*.png')):
 # monsters + bosses (feet-aligned frames, as sliced)
 os.makedirs(f'{OUT}/mon', exist_ok=True)
 m = 0
-for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/eraserslime/*.png') +
-                  glob.glob(f'{ROOT}/assets/raw/frames/acorn/*.png') +
-                  glob.glob(f'{ROOT}/assets/raw/frames/eraserking/*.png')):
+MONSTERS = ['eraserslime', 'acorn', 'eraserking',   # book 1 chapter 1
+            'inkbat', 'crayonsnail', 'sharpcrab',    # chapter 2
+            'shavinghog', 'clipbeetle', 'paperwolf']  # chapter 3
+for src in sorted(f for k in MONSTERS
+                  for f in glob.glob(f'{ROOT}/assets/raw/frames/{k}/*.png')):
     name = os.path.basename(src)[:-4].replace('mon_', '').replace('boss_', '')
     shutil.copy(src, f'{OUT}/mon/{name}.png')
     m += 1

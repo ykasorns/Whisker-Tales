@@ -5,6 +5,7 @@ library wt_core;
 
 export 'src/ads/ads.dart';
 export 'src/age/age_gate.dart';
+export 'src/audio/audio.dart';
 export 'src/avatar/avatar.dart';
 export 'src/cat/cat.dart';
 export 'src/combat/combat.dart';

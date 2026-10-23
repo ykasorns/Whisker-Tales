@@ -15,6 +15,7 @@ import '../iap/iap.dart';
 import '../idle/idle.dart';
 import '../offline/offline_reward.dart';
 import '../pets/pets.dart';
+import '../audio/audio.dart';
 import '../research/research.dart';
 import '../wardrobe/wardrobe.dart';
 import 'contracts/wallet.dart';
@@ -347,3 +348,14 @@ const kLanguages = ['th', 'en'];
 
 /// UI language, saved in `settings.lang`; changes take effect at once.
 final langProvider = StateProvider<String>((ref) => 'th');
+
+/// Music + effect files and volumes (`audio.json`, T-024). Overridden at
+/// boot with the loaded rules; silent (no files) until then.
+final audioRulesProvider = Provider<AudioRules>((ref) => AudioRules.none);
+
+/// The sound device; the app overrides it with real playback.
+final audioOutputProvider = Provider<AudioOutput>((ref) => SilentAudioOutput());
+
+/// Music and effects (T-024). Its two switches are saved in `settings`.
+final audioServiceProvider = Provider<AudioService>((ref) => AudioService(
+    ref.watch(audioRulesProvider), ref.watch(audioOutputProvider)));

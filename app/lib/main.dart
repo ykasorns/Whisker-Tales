@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wt_core/wt_core.dart';
 
 import 'ads/admob_network.dart';
+import 'audio/player_output.dart';
 import 'cloud/play_cloud.dart';
 import 'iap/play_store.dart';
 import 'ui/age_screen.dart';
@@ -45,6 +46,8 @@ Future<void> main() async {
           cloudStoreProvider.overrideWithValue(const PlayCloudStore()),
           // AdMob rewarded ads (D-033); caps and age flags stay in AdService
           adNetworkProvider.overrideWithValue(AdMobNetwork()),
+          // real playback of music + effects (T-024)
+          audioOutputProvider.overrideWithValue(PlayerAudioOutput()),
         ]));
     boot.container.read(iapServiceProvider)?.start();
     // cloud save before the game starts: waits at most a few seconds, never

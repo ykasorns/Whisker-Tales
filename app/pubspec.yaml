@@ -23,6 +23,7 @@ dependencies:
   games_services: ^4.1.1
   intl: any
   google_mobile_ads: ^9.2.0
+  audioplayers: ^6.8.1
 
 dev_dependencies:
   flutter_test:
@@ -43,4 +44,6 @@ flutter:
     - assets/game/bg/
     - assets/game/ui/
     - assets/game/pet/
+    # Music + effects, made by tools/audio/make_sounds.py (T-024)
+    - assets/audio/
   generate: true # T-004: lib/l10n/*.arb → AppLocalizations

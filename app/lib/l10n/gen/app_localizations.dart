@@ -638,6 +638,18 @@ abstract class AppLocalizations {
   /// **'Defense'**
   String get statDef;
 
+  /// No description provided for @music.
+  ///
+  /// In en, this message translates to:
+  /// **'🎵 Music'**
+  String get music;
+
+  /// No description provided for @sounds.
+  ///
+  /// In en, this message translates to:
+  /// **'🔊 Sounds'**
+  String get sounds;
+
   /// Shown in the other language: the one it switches to
   ///
   /// In en, this message translates to:

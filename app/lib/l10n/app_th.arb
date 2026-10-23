@@ -90,6 +90,8 @@
   "statAtk": "พลังโจมตี",
   "statHp": "พลังชีวิต",
   "statDef": "พลังป้องกัน",
+  "music": "🎵 เพลง",
+  "sounds": "🔊 เสียงเอฟเฟกต์",
   "switchLanguage": "🌐 English",
   "level": "Lv.{lv}",
   "catTitle": "โมจิ · {cls}",

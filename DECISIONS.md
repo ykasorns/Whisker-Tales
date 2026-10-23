@@ -361,3 +361,11 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 4. **Manifest:** ถอด `com.google.android.gms.permission.AD_ID` + สิทธิ์ Privacy Sandbox (`ACCESS_ADSERVICES_AD_ID/ATTRIBUTION/TOPICS`) ด้วย `tools:node="remove"` (ตรวจใน merged manifest แล้ว) · `APPLICATION_ID` จาก gradle property `admobAppId` · หน่วยโฆษณาจาก `--dart-define=ADMOB_REWARDED_ID` · ค่าเริ่มต้น = **รหัสตัวอย่างของ Google (โฆษณาทดสอบเท่านั้น)**
 5. APK ยังต่ำกว่า 30 MB: ฉากหลังเปลี่ยนเป็น WebP (3.0 → 0.6 MB) → APK arm64 **26.5 MB** รวม SDK โฆษณา
 6. **ยังไม่ได้ลองบนเครื่องจริง** (เครื่องนี้ไม่มี emulator) → ลองกดปุ่ม 📺 ใน APK บนมือถือจริงตอน Internal testing · **EEA/UK:** AdMob อาจต้องใช้ฟอร์มความยินยอม UMP แม้ non-personalized — ตัดสินตอนเลือกประเทศที่เปิดขาย (ถ้าเปิดแค่ไทยยังไม่ต้อง) → RELEASE_CHECKLIST
+
+## D-034 (2026-10-23) — Opus — เสียง (T-024)
+
+1. **เสียงทั้งหมดสังเคราะห์เอง** ด้วย `tools/audio/make_sounds.py` (numpy + ffmpeg → Ogg Vorbis) — ไม่มี sample/เพลงของคนอื่น จึงไม่มีลิขสิทธิ์ต้องตาม · โทนนุ่ม (sine/triangle/มาริมบา) ไม่มีเสียงแหลมกระแทก ระดับสูงสุด −3 dBFS · เพลงวนเป็นห้องเต็ม (ต่อกันไม่มีช่องว่าง) · รวม ~230 KB
+2. **เพลง 2 ชิ้น:** `farm` (ทุ่ง 112 BPM, C pentatonic) · `boss` (136 BPM) — สลับอัตโนมัติตอนเริ่ม/จบการสู้บอส แบบ crossfade 900 ms (เวลาจริง ไม่เร่งตามปุ่ม ×2) · **เสียงเอฟเฟกต์ 9:** ตี / คริ / มอนแพ้ / เก็บปลา(จบคลื่น) / ถัก / ฟักไข่ / ชนะบอส / เลเวลอัป / แตะ
+3. **wt_core `AudioService`** (contract `IAudioService`) + ข้อมูล `design/data/audio.json` (ไฟล์ ระดับเสียง เวลา crossfade, เสียงเดียวกันห่าง ≥ 90 ms กันตีรัวเป็นเสียงแตก) · แอปใช้ `audioplayers`: เพลง 2 ช่อง + เอฟเฟกต์ 4 ช่องแบบ low-latency ที่**ไม่แย่ง audio focus** (เสียงเอฟเฟกต์ไม่ทำให้เพลงหยุด)
+4. **สวิตช์ 🎵 เพลง / 🔊 เสียงเอฟเฟกต์** ในหน้าร้าน (ที่เดียวกับปุ่มภาษา) — ปิดแล้วเงียบทันที · เซฟใน `settings.bgm` / `settings.sfx` · แอปไปพื้นหลัง = หยุดเพลง กลับมา = เล่นต่อ
+5. **ยังไม่ได้ฟังบนเครื่องจริง** (ไม่มี emulator) — ตรวจระดับเสียงด้วย ffmpeg volumedetect แล้ว · YK ฟังใน APK แล้วบอกได้ว่าอยากให้เพลงเปลี่ยนอารมณ์ไหน (แก้ตัวเลขในสคริปต์แล้วรันใหม่)

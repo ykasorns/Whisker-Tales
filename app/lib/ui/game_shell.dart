@@ -35,6 +35,7 @@ class _GameShellState extends ConsumerState<GameShell>
   late final Ticker _ticker;
   late final AppLifecycleListener _life;
   StreamSubscription<ResearchCompleted>? _researchDone;
+  final _sounds = <StreamSubscription<Object>>[];
   Duration _last = Duration.zero;
 
   @override
@@ -60,9 +61,14 @@ class _GameShellState extends ConsumerState<GameShell>
       }
       showOfflineReward(context, ref);
     });
-    _life = AppLifecycleListener(onResume: () {
-      if (mounted) showOfflineReward(context, ref);
-    });
+    _life = AppLifecycleListener(
+      onResume: () {
+        ref.read(audioServiceProvider).resume();
+        if (mounted) showOfflineReward(context, ref);
+      },
+      onPause: () => ref.read(audioServiceProvider).pause(),
+    );
+    _listenForSounds();
     // the only notice the library gives: "research done" (GDD §7), and the
     // player can switch it off
     final research = ref.read(researchProvider);
@@ -79,8 +85,43 @@ class _GameShellState extends ConsumerState<GameShell>
     });
   }
 
+  /// Game moments that make a sound (T-024). Effects the player triggers
+  /// (knit, hatch) play where the tap happens.
+  void _listenForSounds() {
+    final audio = ref.read(audioServiceProvider);
+    final loop = ref.read(idleLoopProvider);
+    _sounds
+      ..add(loop.combatEvents.listen((e) {
+        switch (e) {
+          case HitResolved(:final attackerId, :final outcome, :final damage)
+              when damage > 0 &&
+                  (attackerId == 'mochi' || attackerId.startsWith('pet_')):
+            audio.playSfx(outcome == HitOutcome.crit ? 'crit' : 'hit');
+          case UnitDefeated(:final unitId) when unitId != 'mochi':
+            audio.playSfx('defeat');
+          default:
+        }
+      }))
+      ..add(loop.events.listen((e) {
+        switch (e) {
+          case BossResult(won: true):
+            audio.playSfx('win');
+          case WaveCleared():
+            audio.playSfx('coin');
+          default:
+        }
+      }))
+      ..add(ref
+          .read(catProgressProvider)
+          .levelUps
+          .listen((_) => audio.playSfx('level_up')));
+  }
+
   @override
   void dispose() {
+    for (final s in _sounds) {
+      s.cancel();
+    }
     _ticker.dispose();
     _life.dispose();
     _researchDone?.cancel();

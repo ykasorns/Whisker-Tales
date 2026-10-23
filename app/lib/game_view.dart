@@ -26,6 +26,11 @@ class GameDriver {
   double _sinceUi = 0;
 
   void tick(double dt) {
+    // music follows the scene (T-024): the boss track while a boss fight
+    // runs, crossfading in real time whatever the game speed
+    final audio = _ref.read(audioServiceProvider);
+    audio.playBgm(_ref.read(idleLoopProvider).isBossFight ? 'boss' : 'farm');
+    audio.tick((dt * 1000).round());
     _carryMs += dt * 1000 * speed;
     final ms = _carryMs.floor();
     _carryMs -= ms;

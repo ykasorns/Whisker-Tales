@@ -341,6 +341,8 @@ class ShopPage extends ConsumerWidget {
           ),
         ]),
       ),
+      // music and effects, each off at once and saved (T-024)
+      const _SoundSwitches(),
       // language, shown in the language it switches to (T-004)
       Center(
         child: TextButton(
@@ -363,5 +365,41 @@ class ShopPage extends ConsumerWidget {
         ),
       ),
     ]);
+  }
+}
+
+/// 🎵 / 🔊 switches (T-024): take effect at once, saved in settings.
+class _SoundSwitches extends ConsumerStatefulWidget {
+  const _SoundSwitches();
+
+  @override
+  ConsumerState<_SoundSwitches> createState() => _SoundSwitchesState();
+}
+
+class _SoundSwitchesState extends ConsumerState<_SoundSwitches> {
+  @override
+  Widget build(BuildContext context) {
+    final s = AppLocalizations.of(context);
+    final audio = ref.read(audioServiceProvider);
+    Widget row(String label, bool on, void Function(bool) set) => Row(
+          children: [
+            Expanded(
+                child: Text(label,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w800))),
+            Switch(
+              value: on,
+              activeThumbColor: Palette.teal,
+              onChanged: (v) => setState(() => set(v)),
+            ),
+          ],
+        );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+      child: Column(children: [
+        row(s.music, audio.bgmEnabled, audio.setBgmEnabled),
+        row(s.sounds, audio.sfxEnabled, audio.setSfxEnabled),
+      ]),
+    );
   }
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../ads/ads.dart';
+import '../audio/audio.dart';
 import '../avatar/avatar.dart';
 import '../cat/cat.dart';
 import '../combat/combat.dart';
@@ -49,6 +50,7 @@ class GameContent {
     required this.research,
     required this.iap,
     required this.chapters,
+    required this.audio,
   });
 
   final CombatRules combat;
@@ -77,6 +79,9 @@ class GameContent {
   /// Monsters, bosses and scenery per chapter (D-032).
   final ChapterBook chapters;
 
+  /// Music + effects (T-024).
+  final AudioRules audio;
+
   /// Provider overrides for `ProviderScope` / `ProviderContainer`.
   List<Override> get overrides => [
         combatRulesProvider.overrideWithValue(combat),
@@ -93,6 +98,7 @@ class GameContent {
         researchRulesProvider.overrideWithValue(research),
         iapCatalogProvider.overrideWithValue(iap),
         chapterBookProvider.overrideWithValue(chapters),
+        audioRulesProvider.overrideWithValue(audio),
       ];
 }
 
@@ -118,6 +124,7 @@ class ContentRepository {
     'design/data/research.json': 1,
     'design/data/iap.json': 1,
     'design/data/chapters.json': 1,
+    'design/data/audio.json': 1,
   };
 
   Future<GameContent> loadAll() async {
@@ -169,6 +176,8 @@ class ContentRepository {
 
     final chapters = parse('design/data/chapters.json',
         () => ChapterBook.fromJson(json['design/data/chapters.json']!, idle));
+    final audio = parse('design/data/audio.json',
+        () => AudioRules.fromJson(json['design/data/audio.json']!));
     final iap = parse('design/data/iap.json',
         () => IapCatalog.fromJson(json['design/data/iap.json']!));
     // cross-references between files
@@ -223,6 +232,7 @@ class ContentRepository {
       research: research,
       iap: iap,
       chapters: chapters,
+      audio: audio,
     );
   }
 

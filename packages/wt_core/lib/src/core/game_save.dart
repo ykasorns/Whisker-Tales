@@ -99,6 +99,8 @@ class GameSaver {
         ..._section('settings',
             const {'lang': 'th', 'bgm': true, 'sfx': true, 'speed': 1}),
         'lang': _ref.read(langProvider),
+        'bgm': _ref.read(audioServiceProvider).bgmEnabled,
+        'sfx': _ref.read(audioServiceProvider).sfxEnabled,
         if (_ref.read(researchProvider) case final r?)
           'notify_research': r.notifyDone,
       },
@@ -192,6 +194,9 @@ class GameSaver {
       final settings = doc['settings'];
       r.notifyDone = settings is! Map || settings['notify_research'] != false;
     }
+    final audio = _ref.read(audioServiceProvider);
+    audio.setBgmEnabled(_map(doc['settings'])['bgm'] != false);
+    audio.setSfxEnabled(_map(doc['settings'])['sfx'] != false);
     if (_map(doc['settings'])['lang'] case final String lang
         when kLanguages.contains(lang)) {
       _ref.read(langProvider.notifier).state = lang;

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "_doc": "เสียง (T-024, D-034) — ไฟล์สังเคราะห์เองทั้งหมดด้วย tools/audio/make_sounds.py (ไม่มีลิขสิทธิ์คนอื่น) อยู่ app/assets/audio · bgm = เพลงวน ต่อฉาก · sfx = เสียงสั้น · volume 0–1 · crossfade_ms = เวลาสลับเพลง · sfx_min_gap_ms = เสียงเดียวกันห่างกันอย่างน้อยเท่านี้ (ตีรัว ๆ ไม่เป็นเสียงแตก)",
+  "crossfade_ms": 900,
+  "bgm_volume": 0.55,
+  "sfx_volume": 0.9,
+  "sfx_min_gap_ms": 90,
+  "bgm": {
+    "farm": "audio/bgm_farm.ogg",
+    "boss": "audio/bgm_boss.ogg"
+  },
+  "sfx": {
+    "hit": "audio/sfx_hit.ogg",
+    "crit": "audio/sfx_crit.ogg",
+    "defeat": "audio/sfx_pop.ogg",
+    "coin": "audio/sfx_coin.ogg",
+    "knit": "audio/sfx_knit.ogg",
+    "hatch": "audio/sfx_hatch.ogg",
+    "win": "audio/sfx_win.ogg",
+    "level_up": "audio/sfx_level.ogg",
+    "tap": "audio/sfx_tap.ogg"
+  }
+}

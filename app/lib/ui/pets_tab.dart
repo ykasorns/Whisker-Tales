@@ -26,7 +26,10 @@ class _PetsTabState extends ConsumerState<PetsTab> {
     final r = await pets.hatch(src);
     if (!mounted) return;
     setState(() => _busy = false);
-    if (r != null) await _showResult(pets, r);
+    if (r != null) {
+      ref.read(audioServiceProvider).playSfx('hatch');
+      await _showResult(pets, r);
+    }
   }
 
   Future<void> _showResult(Pets pets, HatchResult r) {

@@ -273,6 +273,8 @@
   "statAtk": "Attack",
   "statHp": "Health",
   "statDef": "Defense",
+  "music": "🎵 Music",
+  "sounds": "🔊 Sounds",
   "switchLanguage": "🌐 ภาษาไทย",
   "@switchLanguage": {
     "description": "Shown in the other language: the one it switches to"

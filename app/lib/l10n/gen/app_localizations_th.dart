@@ -323,6 +323,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get statDef => 'พลังป้องกัน';
 
   @override
+  String get music => '🎵 เพลง';
+
+  @override
+  String get sounds => '🔊 เสียงเอฟเฟกต์';
+
+  @override
   String get switchLanguage => '🌐 English';
 
   @override

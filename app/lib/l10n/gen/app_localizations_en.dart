@@ -324,6 +324,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statDef => 'Defense';
 
   @override
+  String get music => '🎵 Music';
+
+  @override
+  String get sounds => '🔊 Sounds';
+
+  @override
   String get switchLanguage => '🌐 ภาษาไทย';
 
   @override

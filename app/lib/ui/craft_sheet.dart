@@ -66,6 +66,7 @@ class _CraftSheetState extends ConsumerState<_CraftSheet> {
       _wiggle++;
     });
     final r = _basket.craft(slot);
+    ref.read(audioServiceProvider).playSfx('knit');
     await Future<void>.delayed(
         const Duration(milliseconds: 550)); // wiggle, then pop
     if (mounted) {

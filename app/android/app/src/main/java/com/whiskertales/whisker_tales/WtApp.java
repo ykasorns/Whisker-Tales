@@ -64,6 +64,13 @@ public class WtApp extends Application {
         SharedPreferences p = getSharedPreferences(PREFS, MODE_PRIVATE);
         if (e.getTimestamp() <= p.getLong("shown", 0)) return;
         int r = e.getReason();
+        // Android reclaims background apps for memory all the time: that is
+        // not a crash of ours (importance 400 = it was cached, not in use)
+        if ((r == ApplicationExitInfo.REASON_LOW_MEMORY
+                || r == ApplicationExitInfo.REASON_SIGNALED)
+                && e.getImportance() >= ActivityManager.RunningAppProcessInfo.IMPORTANCE_CACHED) {
+            return;
+        }
         if (r != ApplicationExitInfo.REASON_CRASH_NATIVE
                 && r != ApplicationExitInfo.REASON_SIGNALED
                 && r != ApplicationExitInfo.REASON_INITIALIZATION_FAILURE

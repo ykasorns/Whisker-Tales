@@ -51,3 +51,8 @@ FarmPanel / CraftPanel / HatchPanel / ResearchPanel / OfflineRewardSheet
 - แผงฟักไข่ / ห้องสมุด = T-038 / T-041 (ตอนนี้ "เร็ว ๆ นี้") · ข้อความผ่าน map ง่าย ๆ จนกว่า T-004 จะย้ายไป .arb
 - ชื่อคลาสยังแสดงเป็น id (warrior ฯลฯ) — ใส่ชื่อ TH/EN ใน data ตอน T-043
 - ภาพ `ui_yarn_ball.png` ยังไม่มี → วาดด้วยโค้ด
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ ปุ่ม 📺 + จำนวนเหลือ (`library_tab_test`, golden) · ✓ อัตราเกรด/ฟักแสดงก่อนกด (craft_sheet `_odds`, pets_tab) · ✓ golden ทุก panel TH/EN (`panels_golden_test`)
+- ⚠ golden ใช้ฟอนต์ทดสอบ ตรวจเลย์เอาต์ไม่ใช่ตัวอักษร (ตามที่ส่งงาน) — ยอมรับ

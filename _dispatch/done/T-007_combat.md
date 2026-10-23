@@ -47,3 +47,8 @@ StatBlock (stat+anti-stat, cap จาก data) · PowerScore.of(StatBlock)
 - balance sim ใช้ "พลัง" แบบรวมก้อน ไม่ใช่สูตร §15.2 → ตัวเลขพลังในเกมจะไม่ตรงกับ sim จนกว่า T-029 จะผูก stat จริง
 - **หน่วยไม่เหมือนกันในไฟล์เดียว:** `combat` ใช้ % (5 = 5%) แต่ `classes` ใช้เศษส่วน/ตัวคูณ → T-044 แปลง `evade_add` ด้วย ×10000 (0.15 → 1500 bp) และ `skill_dmg` เป็นโบนัส `(mult − 1) × 10000` bp ของ `Attribute.skillDmg` (1.8 → 8000) — ห้ามส่งผ่าน `bpFromPct`
 - `HitResolved.damage` = ขนาดฮิตเต็ม (รวม overkill) · ดาเมจที่ทำได้จริง = HP ที่ลด (`damageDealt()`)
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ deterministic 1000 seed + แบ่ง tick ต่างกันได้ผลเดิม · ✓ fixed-point/SeededRng (`seeded_rng_test`) · ✓ สูตร hit/คริ/proc จาก data (`resolve_hit_test`, `combat_rules_test`) · ✓ partner channel · ✓ headless 5 มอน < 5 ms · ✓ `UnitDefeated` ไม่มี gore
+- หนี้เดิม "T-003 ยังไม่เสร็จ" ปิดแล้ว (อ่านผ่าน ContentRepository)

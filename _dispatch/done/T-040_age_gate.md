@@ -21,3 +21,7 @@ AgeGate.band / needsPrompt / setBand(band) — screen widget อยู่ใน 
 - app `ui/age_screen.dart`: ตาราง 3…18+ เท่ากันทุกช่อง, จุดให้นับ, ยืนยัน ✓/✗, PopScope ข้ามไม่ได้ · แสดงก่อน GameShell ครั้งแรก · แก้อายุจากร้านค้าผ่านด่านผู้ปกครอง
 
 **Test** wt_core 278 (+5: ถามจนกว่าจะตอบ, เปลี่ยนต้องมี pass, โฆษณา child-directed ตามคำตอบ, save/ค่าที่ไม่รู้จัก, cloud merge) · app 15 (+2 golden TH/EN: เกมไม่ขึ้นก่อนตอบ, back ข้ามไม่ได้, ✗ ยังถาม, ✓ เข้าเกม) · analyze 0
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ ทุก AC: `age_gate_test.dart` + golden "first launch: the neutral age screen" TH/EN

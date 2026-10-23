@@ -32,3 +32,7 @@ conflict rule เปลี่ยนเป็น **`idle.cleared_page` → PowerS
 **ข้อสังเกต**
 - ปิดไว้จนกว่าจะใส่ project id และตรวจนโยบาย Families เรื่อง Play Games Services (D-025 ข้อ 6)
 - ทดสอบบนเครื่องจริงต้องมี PGS project + ผูก SHA-1 ของ signing key ใน Play Console
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ ทุก AC มี test (`cloud_sync_test.dart` 14 tests) · cloud ปิดอยู่จนกว่าจะตั้ง `pgsProjectId` → อยู่ใน RELEASE_CHECKLIST

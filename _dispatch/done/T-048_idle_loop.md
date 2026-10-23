@@ -40,3 +40,7 @@ RoadEvents.active / Stream<RoadEventStarted|RoadEventEnded> / boostWithAd(eventI
 - ผลบัฟใส่ตรงที่สเปกแมว (`applyRoadEffects`) จนกว่า T-008 buff engine — แล้วย้ายเป็น buff id (`buffs.json`)
 - golden test ปุ่มโฆษณา (ไม่มีนับถอยหลัง/popup) = T-042 UI · ต้นแบบ v14 ใช้ชิปเล็กใต้กระเป๋าเงิน + ปุ่ม 📺
 - เหตุการณ์ที่ค้างอยู่ไม่เซฟ (ปิดแอป = หาย) — ตั้งใจ (ออนไลน์เท่านั้น)
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ ทุก AC: `road_events_test.dart` 14 tests (รวม sim 1000 seed ดีบัฟอย่างเดียวไม่ทำให้แพ้, validator ปฏิเสธดีบัฟเกิน, ปุ่มโฆษณาซ่อนเมื่อหมด/มี Supporter Pack) · golden หน้าเกม

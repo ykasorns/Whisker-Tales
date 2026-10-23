@@ -41,3 +41,8 @@ SaveService.load()/save()/migrate(from,to)
 - แอปยังไม่ได้ต่อ: boot ต้อง `Hive.initFlutter()` → เปิด box → override `saveServiceProvider` + โหลดข้อมูล JSON (T-003) → `gameSaverProvider.load()` · autosave ตอน pause/ทุก N วินาที = งานแอป/T-042
 - ของที่ถักแล้วรอเลือก (pending) ไม่เซฟ · เหตุการณ์ระหว่างทางไม่เซฟ (ตั้งใจ, D-013)
 - cloud sync + conflict rule = T-023
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ kill กลางทางไม่ corrupt: `save_service_test` "killing the app mid-write keeps the last good save" · ✓ migration ทีละขั้น: "older saves migrate step by step"
+- หนี้ "แอปยังไม่ได้ต่อ boot" ปิดแล้ว: `app/lib/main.dart` (Hive → SaveService → `bootGame`) + autosave ตอน pause · `boot_test.dart`

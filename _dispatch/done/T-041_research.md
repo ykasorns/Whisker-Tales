@@ -31,3 +31,8 @@ Research.start(nodeId) / speedUpWithAd() / Stream<ResearchCompleted> / levels
 **ข้อสังเกต**
 - แจ้งเตือนระบบ Android ตอนปิดแอปยังไม่ทำ (ในเกมเท่านั้น) — AC ข้อนี้ผ่านครึ่งเดียว
 - ยังไม่ gate auto-craft/ช่องสกิล/ช่องเพื่อน ด้วยห้องสมุด (รอ YK)
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ เวลา/ราคา/นาฬิกา/ไม่มีเงินจริง: `research_test.dart` 14 tests
+- [~] แจ้งเตือน: ในเกม + สวิตช์ปิดได้ ✓ · แจ้งเตือนระบบ Android ตอนปิดแอป ยังไม่ทำ → v1.1 (ต้องขอ POST_NOTIFICATIONS ซึ่งไม่จำเป็นต่อ MVP)

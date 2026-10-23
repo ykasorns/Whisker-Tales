@@ -42,3 +42,8 @@ GameClock.now() / effectiveNow (= max(now, max_seen)) / Stream<DayRollover> · c
 3. `gameClockProvider` ยังไม่ restore จาก save — รอ T-022 (doc ระบุไว้)
 4. merge ให้ date_key ใหม่กว่าชนะ → daily quota ของอีกเครื่องต้อง merge ใน T-023 ตาม amendment (เอา counter ที่มากกว่าถ้าวันเท่ากัน)
 5. Flutter SDK มีในเครื่องแล้ว → blocker ของ T-001 (BLOCKED.md) น่าจะปลดได้ — แต่ยังต้องมี Xcode/Android SDK สำหรับ `flutter create` native project
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ ทุก AC: `game_clock_test.dart` 13 tests (ย้อน, ข้ามหลายวัน, timezone ตะวันออก/ตะวันตก, merge) 
+- หนี้ "ยังไม่ restore จาก save" ปิดแล้ว (GameSaver โหลด clock — `game_save_test` "a new day since the save resets the ad caps")

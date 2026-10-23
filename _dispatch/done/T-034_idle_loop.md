@@ -46,3 +46,7 @@ IdleLoop.state / challengeBoss() / Stream<WaveCleared|BossResult> / IncomeModel.
 - รางวัล (ปลาทอง/ไหมพรม/ไข่) แค่ emit — กระเป๋าเงิน (T-021) เป็นคนรับ · save `idle` ตอนนี้กู้แค่ `cleared_page` (หน้าฟาร์ม = หน้าหน้าสุด)
 - เปิด hook ให้ T-048 แล้ว: walk / wave cleared / boss ended (นับอายุผล) / canAutoChallenge (AUTO รอดีบัฟหมด) · บัฟเข้าทาง `catExtraStatsProvider` จนกว่า T-008 buff engine จะมา
 - ปุ่มความเร็ว: ผู้เรียก `tick` คูณเวลาเอง (UI)
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ สูตร P(n)/boss/รายได้: `idle_loop_test` · ✓ แพ้บอสไม่เสียอะไร · ✓ ใช้ IncomeModel เดียวกับออฟไลน์ ("waves pay the same as the offline formula") · ✓ deterministic

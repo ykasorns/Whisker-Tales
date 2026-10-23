@@ -35,3 +35,7 @@ OfflineReward.compute(lastSeen, effectiveNow, cap) -> RewardBundle / claim()
 - ไม่มีปุ่ม ×2 (placement `offline_x2` ปิดตาม D-003) · ปุ่มความเร็วไม่มีผลกับออฟไลน์
 - ออฟไลน์ไม่มีบอส/เหตุการณ์ระหว่างทาง (ตาม GDD) — ฟาร์มหน้าเดิมอย่างเดียว
 - เลเวลวิจัย `offline_cap` ส่งเข้า `checkIn(offlineResearchLevel:)` — research (T-041) ต้องต่อ
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ ทุก AC: `offline_reward_test.dart` (ย้อน/ติดลบ/เกิน cap/เลื่อนไปหน้า/merge จาก 2 เครื่อง) · ไม่มีปุ่ม ×2 (D-027)

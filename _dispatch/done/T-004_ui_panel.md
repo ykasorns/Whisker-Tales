@@ -20,3 +20,8 @@ AppLocalizations.of(context).xxx
 - `test/no_hardcoded_text_test.dart` สแกนข้อความตรง ๆ ใน UI · `test/_l10n.dart` helper
 
 **Test** app 18 (+2: สแกนข้อความ, สลับภาษาระหว่างเล่นแล้วเซฟ) · wt_core 278 · analyze 0 · golden อัปเดต (ชื่อคลาส/ป้าย Lv/ปุ่มภาษา)
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ สลับภาษา runtime + เซฟ: `panels_golden_test` "the language switches while playing and is saved"
+- ✓ กัน hard-code: `no_hardcoded_text_test.dart`

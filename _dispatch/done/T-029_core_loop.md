@@ -27,3 +27,8 @@ DebugTelemetry (dev build เท่านั้น — ห้ามหลุด�
 **Test** wt_core 278 · app 16 · analyze 0 · golden welcome_back อัปเดต (รางวัลออฟไลน์น้อยลง)
 
 **ต้องให้ YK ตัดสิน:** ออฟไลน์ได้ ~6–16% ของตอนเล่น (D-027 ข้อ 6)
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ เป้าโหมดหลัก (D-027): headless player บน engine จริง `tool/headless_player_test.dart` · ✓ dev flag ปิดใน release (`boot_test`)
+- n/a: เป้า run 3–5 นาทีของโหมดท้าทาย → ไปกับ T-005/T-029 รอบโหมดนิทาน (กลุ่ม B)

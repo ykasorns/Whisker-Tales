@@ -42,3 +42,8 @@ GearBasket.craft(slot|random) -> CraftResult / equip(id) / recycle(id) / upgrade
 - ของที่ถักแล้วยังไม่ตัดสินใจ (pending) ไม่ถูกเซฟ
 - `isNewStyle` ใช้ set ในหน่วยความจำจนกว่า T-045 wardrobe จะต่อ `unlockStyle`
 - **อัปเดต D-011:** ไหมพรมเริ่มต้น 10 + ไหมพรม/บอสช่วงบท 1 ง่ายขึ้น + สูตรพลังใหม่ (affix เป็น % ของพลังหลัก) → บอสหน้า 1–4 ภายใน ~5 นาที · test ทั้งระบบเช็กผ่าน ≥ 4 หน้าใน 30 นาที
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ chi-square 100k · pity · strictly better · ช่องไม่เสียเลเวล · ไหมพรมไม่มีทางจาก IAP: `gear_test.dart`
+- หนี้ "pending ไม่ถูกเซฟ" ปิดแล้ว: "knits still pending when the app closes are saved, settled on load"

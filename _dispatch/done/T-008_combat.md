@@ -52,3 +52,8 @@ BuffEngine.apply(unit, buffId, source) / CombatEngine.useSkill(slotIndex) / Skil
 - attack speed จากบัฟมีผลตั้งแต่การตีครั้งถัดไป (ครั้งที่จองไว้แล้วเวลาเดิม)
 - PowerScore ไม่นับสกิล → 🐾 ของเมจดูต่ำกว่าความแรงจริง · balance sim ไม่จำลองสกิล → ส่ง T-029
 - ต้นแบบ v15: แถบสกิลมุมซ้ายล่าง (วงคูลดาวน์) + ชื่อสกิลลอย + ลูกไฟ/วงน้ำแข็ง/อุกกาบาต/โล่/💫
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ action ครบ + buff จาก JSON ไม่แก้โค้ด + on_event ≥3 ชั้น/depth cap + cooldown/auto-cast + synergy fixture: `skills_buffs_test.dart`
+- ⚠ AC "ไม่มี allocation ระหว่าง tick" วัดใน Dart test ไม่ได้ (ตามที่ส่งงานไว้) — ใช้ list ต่อยูนิตแทน · ยอมรับ, วัดจริงได้ตอนมี profiler บนเครื่อง

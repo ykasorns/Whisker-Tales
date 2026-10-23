@@ -40,3 +40,8 @@ Wardrobe.unlocked / unlock(styleId) / choose(slotId, styleId|null) / lookFor(slo
 **ข้อสังเกต**
 - skin `adventurer` ยังไม่มีภาพ (ต้อง gen 13 เฟรม + วัดจุดยึดใหม่) · `iap` ว่างจนกว่าจะมีของตกแต่งขาย (T-025 parental gate)
 - หน้าจอตู้เสื้อผ้า/สมุดสะสม = T-042 UI
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ รีไซเคิลแล้วยังปลด · ไม่มีผลต่อ stat · save/restore: `wardrobe_test.dart`
+- เปลี่ยนเป็นสมุดสะสม + ชุดตามคลาส (D-024/D-029) → AC "อาวุธเปลี่ยนตามคลาส" ถูกแทนด้วยชุดคลาสวาดทั้งตัว ✓

@@ -42,3 +42,8 @@ placement ใหม่ `road_event` (3/วัน, อยู่ในเพดา
 **ข้อสังเกต**
 - ยังไม่ต่อ SDK จริง (ตาม card) — Opus เลือก SDK ที่อยู่ใน Families self-certified list + log DECISIONS ก่อน
 - 13+ ยัง non-personalized เพราะยังไม่มีหน้าขอความยินยอม (D-014)
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ ทุก AC: `ad_service_test.dart` 12 tests (รวม test ห้ามโมดูลอื่นแตะ SDK)
+- หนี้ "ยังไม่ต่อ SDK จริง" → ทำใน **D-033** (AdMob ผ่าน `AdNetwork` ใน app/)

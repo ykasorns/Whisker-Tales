@@ -47,3 +47,9 @@ abstract class ICombatEngine / ITalentSystem / ISaveService ฯลฯ + StateNot
 2. spec §4 ยกตัวอย่างแค่ `unlock.flag` → ผมกำหนด key ของอีกสองแบบเป็น `fish_total` → `amount`, `boss_cleared` → `boss` — Opus ช่วยยืนยันหรือแก้ใน spec
 3. `GameState` เพิ่ม `ageGate` ตาม v0.4 (T-040) · `hub` = หน้าฟาร์ม idle (D-002)
 4. `IEncounterGenerator.generate` คืน `List<Encounter>` แทน `NodeMap` ใน card T-006 — ยังไม่มี Fork ใน type; T-006 ขยายได้ (Opus ตัดสินว่าจะเพิ่ม `NodeMap` ไหม)
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ state machine ครบวงจร: `test/core/state/game_state_test.dart` (walk → encounter → resolve, boot → age gate → hub)
+- ✓ interface มี doc comment อ้าง GDD/CONTRACT
+- ค้างโดยตั้งใจ: ModeRegistry implementation = T-031 (กลุ่ม B โหมดท้าทายนิทาน)

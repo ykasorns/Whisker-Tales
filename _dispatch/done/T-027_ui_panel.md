@@ -41,3 +41,9 @@ AvatarComponent(skinId, anchors) / play(animId) / setGear(slotId, styleId|null) 
 - AC 60 fps บนเครื่องกลาง **ยังไม่ได้วัด** (ไม่มีเครื่อง Android/emulator) — วาด 1 แมว = ~5–9 drawImage + clip 2–3 ครั้ง/เฟรม น่าจะสบาย
 - มอน/บอสใน Flame + ฉาก parallax + HUD = T-042 · skin อื่นยังไม่มีภาพ (component รองรับ `setSkin` แล้ว — key `<skin>/<frame>`)
 - golden สร้างจากโค้ดเอง (`--update-goldens`) ใช้กันถอยหลัง; ความถูกต้องเชิงตำแหน่งยืนยันด้วย test เทียบค่ากับเครื่องมือต้นแบบ
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ⏭ AC "golden 13 เฟรม × 4 คลาส ตรงเว็บต้นแบบ" ถูกแทนด้วย **D-024/D-029** (ชุดคลาสวาดทั้งตัว ไม่ใช้จุดยึดอุปกรณ์บนตัวแล้ว) → n/a
+- ✓ เปลี่ยนคลาส/ชุดระหว่างเล่นไม่สร้าง component ใหม่ (`_applyLook`) · ✓ เท้าบนพื้น (slicer `--align feet/ground`)
+- ⚠ 60 fps บนเครื่องกลาง ยังไม่ได้วัด (ไม่มีเครื่อง) → ใส่ใน RELEASE_CHECKLIST ให้ลองบนเครื่องจริงตอน Internal testing

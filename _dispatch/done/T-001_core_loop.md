@@ -46,3 +46,10 @@ class AppLayout { static const gameViewportRatio = 0.60; } — อยู่ใ�
 - AC "build iOS" ตัดออกตาม D-017 (YK ลง Google Play อย่างเดียว) · ลบ `app/ios/`
 - ✅ โครง monorepo ตาม contract §2 · ✅ `app/` อ้าง wt_core ผ่าน path dep + lint `implementation_imports: error` · ✅ `flutter build apk --debug` ผ่าน · ✅ `flutter test` + `flutter analyze` 0 issue ทั้ง wt_core / wt_mode_story / app
 - หนี้: `games_services` ใช้ Kotlin Gradle Plugin แบบเก่า (เตือนตอน build) → แก้ใน T-023 · ยังไม่มี Android emulator บนเครื่อง YK (สร้างได้ใน Android Studio → Device Manager หรือใช้มือถือจริง)
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ build Android ได้จริง (APK arm64 release ทุกรอบตั้งแต่ T-027) · iOS ตัดออกตาม **D-017** (Play อย่างเดียว) → AC iOS = n/a
+- ✓ โครง packages/wt_core, packages/wt_mode_story, app/ ครบ · import ผ่าน barrel บังคับด้วย `implementation_imports: error` (app/analysis_options.yaml)
+- ✓ `flutter test` เขียวทั้ง wt_core และ app · `flutter analyze` 0 issue
+- ข้อสังเกตเดิม "ไม่มี Flutter SDK" แก้แล้ว (Flutter 3.44.8 บนเครื่อง)

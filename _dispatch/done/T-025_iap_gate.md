@@ -36,3 +36,8 @@ IapService.purchase(sku) / ParentalGate.challenge() -> bool
 **ข้อสังเกต**
 - restore = Android อย่างเดียว (D-017) · ซื้อจริงทดสอบได้เมื่อสร้าง `supporter_pack` (non-consumable) ใน Play Console + อัปโหลดขึ้น testing track
 - ไม่มีการตรวจใบเสร็จฝั่ง server (ไม่มี backend) — ยอมรับสำหรับ cosmetic/no_ads
+
+---
+## ตรวจรับ (2026-10-23, Opus) → done
+- ✓ gate ทุก entry point: `shop_test.dart` (รวม test สแกนโค้ดว่า ShopSheet/purchase อยู่หลัง openShop เท่านั้น) · ✓ ไม่มี SKU กระทบ gameplay: `iap_test` "shipped data: the Supporter Pack only, no currency"
+- [~] restore: Android ✓ (`iap_test` restore) · iOS n/a (D-017) · ต้องสร้าง SKU `supporter_pack` ใน Play Console → RELEASE_CHECKLIST

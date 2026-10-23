@@ -1,22 +1,22 @@
 Headless player on the real engine — seeds=3, sessions 3×15 min/day
 
 profile  class    | day p10 | day p20 | day p30 | Lv  | power   | offline fish % | longest page (h)
-full_ads warrior  |   0.2   |   2.0   |  11.0   |  74 |   15787 |             78 |  101.0
-         worst page: 28/29/29 · online waves/min 3.7 · boss losses timeout/faint: 0/498 0/584 0/695 · ads last day: {road_event: 1, pet_hatch: 3, daily_gift: 1, yarn_bundle: 2, research_speedup: 3}
-full_ads rogue    |   0.2   |   3.2   |  10.5   |  76 |   13977 |             70 |   84.0
-         worst page: 26/23/27 · online waves/min 6.2 · boss losses timeout/faint: 0/878 0/864 0/1520 · ads last day: {pet_hatch: 3, daily_gift: 1, yarn_bundle: 2, research_speedup: 4}
-full_ads archer   |   0.2   |   2.5   |  12.2   |  77 |   14536 |             64 |  136.8
-         worst page: 29/29/29 · online waves/min 8.2 · boss losses timeout/faint: 0/1085 0/1455 0/1712 · ads last day: {pet_hatch: 3, daily_gift: 1, yarn_bundle: 2, road_event: 1, research_speedup: 3}
-full_ads mage     |   0.2   |   2.5   |  12.0   |  79 |   14504 |             61 |  101.0
-         worst page: 29/29/29 · online waves/min 9.3 · boss losses timeout/faint: 0/1800 0/1693 0/1626 · ads last day: {pet_hatch: 3, daily_gift: 1, yarn_bundle: 2, research_speedup: 4}
-no_ads   warrior  |   0.2   |   2.5   |  12.0   |  74 |   16039 |             78 |   67.2
-         worst page: 29/29/29 · online waves/min 3.7 · boss losses timeout/faint: 0/611 0/514 0/668
-no_ads   rogue    |   0.2   |   3.2   |  16.0   |  80 |   15938 |             71 |  143.9
-         worst page: 28/30/28 · online waves/min 6.1 · boss losses timeout/faint: 0/1030 0/1406 0/1551
-no_ads   archer   |   0.2   |   2.5   |  13.5   |  79 |   16001 |             64 |  167.9
-         worst page: 29/29/27 · online waves/min 8.3 · boss losses timeout/faint: 0/1555 0/1727 0/1571
-no_ads   mage     |   0.2   |   2.5   |  11.2   |  78 |   12096 |             62 |  151.0
-         worst page: 29/29/28 · online waves/min 9.2 · boss losses timeout/faint: 0/1901 0/1325 0/1530
+full_ads warrior  |   0.2   |   2.0   |  11.2   |  75 |   16811 |             78 |  119.9
+         worst page: 28/29/29 · online waves/min 3.8 · boss losses timeout/faint: 0/570 0/577 0/766 · ads last day: {pet_hatch: 3, daily_gift: 1, yarn_bundle: 2, road_event: 1, research_speedup: 3}
+full_ads rogue    |   0.2   |   3.2   |  14.2   |  78 |   13712 |             71 |  150.9
+         worst page: 28/30/30 · online waves/min 6.0 · boss losses timeout/faint: 0/1244 0/1232 0/929 · ads last day: {pet_hatch: 3, daily_gift: 1, yarn_bundle: 2, research_speedup: 3, road_event: 1}
+full_ads archer   |   0.2   |   2.5   |  13.0   |  79 |   17914 |             64 |  144.0
+         worst page: 29/29/29 · online waves/min 8.3 · boss losses timeout/faint: 0/1970 0/1627 0/1203 · ads last day: {pet_hatch: 3, daily_gift: 1, yarn_bundle: 2, road_event: 2, research_speedup: 2}
+full_ads mage     |   0.2   |   2.5   |  13.5   |  79 |   14003 |             61 |  108.0
+         worst page: 28/29/29 · online waves/min 9.3 · boss losses timeout/faint: 0/1359 0/1845 0/1886 · ads last day: {pet_hatch: 3, daily_gift: 1, yarn_bundle: 2, road_event: 2, research_speedup: 2}
+no_ads   warrior  |   0.2   |   2.5   |  12.0   |  75 |   15499 |             78 |   90.9
+         worst page: 28/28/30 · online waves/min 3.7 · boss losses timeout/faint: 0/611 0/577 0/670
+no_ads   rogue    |   0.2   |   3.2   |  16.0   |  80 |   14717 |             70 |  132.0
+         worst page: 28/29/29 · online waves/min 6.1 · boss losses timeout/faint: 0/1405 0/1162 0/1432
+no_ads   archer   |   0.2   |   2.5   |  13.0   |  79 |   15562 |             64 |  144.0
+         worst page: 29/29/28 · online waves/min 8.2 · boss losses timeout/faint: 0/1517 0/1870 0/1310
+no_ads   mage     |   0.2   |   2.5   |  14.5   |  81 |   15076 |             61 |  160.9
+         worst page: 29/29/27 · online waves/min 9.4 · boss losses timeout/faint: 0/2060 0/1957 0/1930
 
-Target 1 — book 1 in 14±2 days (full ads, median):  12.0 → PASS
-Target 2 — no-ads slower by ≤ 25%: 10.1% → PASS
+Target 1 — book 1 in 14±2 days (full ads, median):  13.5 → PASS
+Target 2 — no-ads slower by ≤ 25%: 3.7% → PASS

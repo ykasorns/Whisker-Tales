@@ -369,3 +369,13 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 3. **wt_core `AudioService`** (contract `IAudioService`) + ข้อมูล `design/data/audio.json` (ไฟล์ ระดับเสียง เวลา crossfade, เสียงเดียวกันห่าง ≥ 90 ms กันตีรัวเป็นเสียงแตก) · แอปใช้ `audioplayers`: เพลง 2 ช่อง + เอฟเฟกต์ 4 ช่องแบบ low-latency ที่**ไม่แย่ง audio focus** (เสียงเอฟเฟกต์ไม่ทำให้เพลงหยุด)
 4. **สวิตช์ 🎵 เพลง / 🔊 เสียงเอฟเฟกต์** ในหน้าร้าน (ที่เดียวกับปุ่มภาษา) — ปิดแล้วเงียบทันที · เซฟใน `settings.bgm` / `settings.sfx` · แอปไปพื้นหลัง = หยุดเพลง กลับมา = เล่นต่อ
 5. **ยังไม่ได้ฟังบนเครื่องจริง** (ไม่มี emulator) — ตรวจระดับเสียงด้วย ffmpeg volumedetect แล้ว · YK ฟังใน APK แล้วบอกได้ว่าอยากให้เพลงเปลี่ยนอารมณ์ไหน (แก้ตัวเลขในสคริปต์แล้วรันใหม่)
+
+## D-035 (2026-10-23) — Opus — เตรียมขึ้น Google Play (T-030)
+
+1. **ไอคอน + splash จากภาพเดิม** (`tools/make_store_art.py`, ไม่ใช้ฟอนต์/ภาพใหม่): โมจิท่าดีใจบนพื้นเหลือง `Palette.sun` · adaptive icon (foreground + สีพื้น + **monochrome** สำหรับไอคอนธีม Android 13+) · ไอคอน legacy 5 ขนาด · splash = โมจิบนกระดาษ `Palette.paper` (ก่อน Android 12 ใช้ `launch_background`, 12+ ใช้ `values-v31`) · ไอคอน Play 512 + feature graphic 1024×500 อยู่ `docs/release/`
+2. **เซ็นแอป:** `app/android/key.properties` (ไม่ commit) → upload key · ไม่มีไฟล์ = เซ็นด้วย debug key (ทดสอบได้ Play ไม่รับ) · ใช้ Play App Signing
+3. **`scripts/build_release.sh`:** sync ข้อมูล → analyze + test ทั้งสอง package → `flutter build appbundle` (หรือ `--apk`) → ตรวจ merged manifest ว่าไม่มีสิทธิ์ Advertising ID และ targetSdk ≥ 36 · เตือนทุกค่าที่ยังเป็นค่าทดสอบ (keystore, AdMob, PGS)
+4. **targetSdk 36** (Flutter 3.44) ตรงกับข้อกำหนด Play ตั้งแต่ 2026-08-31 · minSdk 24
+5. **นโยบายความเป็นส่วนตัว TH/EN** `docs/privacy/index.html` (ร่าง — ต้องใส่ชื่อผู้พัฒนา อีเมล วันที่ แล้ว host) · **คำตอบ Data safety / Target audience / Content rating / ข้อความหน้าร้าน** + ขั้นตอนที่ต้องใช้บัญชีของ YK อยู่ใน `RELEASE_CHECKLIST.md`
+6. **AAB arm64 = 30.8 MB** สร้างจากสคริปต์บนเครื่องนี้แล้ว (`--arm64-only`) · build ทุก ABI ค้างเพราะ macOS ยังกักตัวคอมไพล์ ABI 32-bit/x86_64 (quarantine) → YK อนุญาตเองได้ (RELEASE_CHECKLIST §3) · `gradle.properties`: heap 3 GB + คอมไพล์ทีละตัว (เดิม 8 GB บนเครื่องแรม 8 GB)
+7. GDD v0.4 §14 ครบ: Families-certified SDK + child-directed + non-personalized + ไม่มี Advertising ID (D-033) · age screen กลาง (T-040) · หน้าโชว์อัตราก่อนกด (ตะกร้า + ฟักไข่) · ไม่มี IAP ให้ไหมพรม/ไข่/ปลาทอง (`iap_test` "shipped data") · โฆษณา opt-in มีป้าย 📺 · iOS/ATT = n/a (D-017)

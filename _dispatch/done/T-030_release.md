@@ -22,3 +22,11 @@ checklist compliance ตาม **GDD v0.4 §14** (แทน v0.3 §12.3): Privac
 ---
 ## Amendment D-017 (2026-10-19)
 **Android / Google Play อย่างเดียว** — ตัดทุกอย่างที่เป็น iOS (Game Center, App Store Privacy Label, ATT, build iOS) · cloud = Play Games Services · IAP = Google Play Billing
+
+---
+## ส่งงาน + ตรวจรับ (2026-10-23, Opus) — D-035 → done (ฝั่งโค้ด)
+- ✓ build release จาก CLI ล้วน: `scripts/build_release.sh` (test + analyze + appbundle + ตรวจ manifest) — รันจริงบนเครื่องนี้แล้ว → AAB arm64 30.8 MB (ทุก ABI ต้องรอ YK อนุญาตตัวคอมไพล์ใน macOS — RELEASE_CHECKLIST §3)
+- ✓ compliance ตาม GDD v0.4 §14 ครบทุกข้อ (ดู D-035 ข้อ 7) · Data safety / Families / target audience ตอบไว้ใน `RELEASE_CHECKLIST.md`
+- ✓ rating questionnaire draft (IARC → คาด Everyone / PEGI 3–7) ใน `RELEASE_CHECKLIST.md` §4
+- ✓ ไอคอน/splash/กราฟิกร้าน · privacy policy TH/EN (ร่าง) · signing ผ่าน key.properties · targetSdk 36
+- ค้างที่ต้องใช้บัญชี YK: keystore, AdMob app+unit, `supporter_pack`, PGS id, host privacy policy, ภาพหน้าจอจากมือถือ, กรอกฟอร์มใน Console → `RELEASE_CHECKLIST.md`

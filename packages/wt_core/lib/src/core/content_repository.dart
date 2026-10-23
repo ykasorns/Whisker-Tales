@@ -164,7 +164,7 @@ class ContentRepository {
     final avatar = parse('design/art/mochi_sprites.json',
         () => AvatarRules.fromJson(json['design/art/mochi_sprites.json']!));
     final pets = parse('design/data/pets.json',
-        () => PetsRules.fromJson(b, json['design/data/pets.json']!));
+        () => PetsRules.fromJson(b, json['design/data/pets.json']!, buffs));
     final research = parse(
         'design/data/research.json',
         () => ResearchRules.fromJson(b, json['design/data/research.json']!,

@@ -347,6 +347,16 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
     for (final b in skill.buffsSelf) {
       _applyBuff(u, buffBook[b], u, 0);
     }
+    if (skill.buffsAlly.isNotEmpty) {
+      for (final a in _units) {
+        if (a.alive && a.isCatSide == u.isCatSide && a.targetable) {
+          for (final b in skill.buffsAlly) {
+            _applyBuff(a, buffBook[b], u, 0);
+          }
+          break; // the cat (first targetable unit on this side)
+        }
+      }
+    }
     final targets = switch (skill.target) {
       SkillTarget.self => const <_Unit>[],
       SkillTarget.front => [if (_targetFor(u) case final t?) t],

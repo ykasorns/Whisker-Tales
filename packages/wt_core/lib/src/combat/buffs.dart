@@ -271,6 +271,7 @@ class SkillBook {
         hits: s['hits'] as int? ?? 1,
         buffsTarget: ids('buffs_target'),
         buffsSelf: ids('buffs_self'),
+        buffsAlly: ids('buffs_ally'),
       );
       (byClass[cls] ??= []).add((slot, spec));
       info[id] = (

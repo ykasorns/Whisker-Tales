@@ -35,7 +35,8 @@ class FakeAds implements IAdService {
 void main() {
   final balance = _j('../../design/balance/idle_balance_v1.json');
   final data = _j('../../design/data/pets.json');
-  final rules = PetsRules.fromJson(balance, data);
+  final buffs = BuffBook.fromJson(_j('../../design/data/buffs.json'));
+  final rules = PetsRules.fromJson(balance, data, buffs);
 
   late Time time;
   late GameClock clock;
@@ -189,6 +190,88 @@ void main() {
     expect(p.deploySlots, 3);
     expect(() => p.deploy(3, other), throwsRangeError);
     expect(() => p.deploy(0, 'dragon'), throwsStateError);
+  });
+
+  test('every pet has a passive and an active skill with a cooldown (D-039)',
+      () {
+    for (final p in rules.pets) {
+      expect(p.passive, isNotNull, reason: p.id);
+      expect(p.passive!.textTh, isNotEmpty);
+      final k = p.skill!;
+      expect(k.spec.cooldownMs, inInclusiveRange(8000, 15000), reason: p.id);
+      expect(k.nameTh, isNotEmpty);
+      expect(k.nameEn, isNot(k.id), reason: '${p.id} needs a real name');
+      expect(rules.bySkill(k.id), p);
+    }
+    expect({for (final p in rules.pets) p.skill!.id}, hasLength(6));
+  });
+
+  test('a pet passive counts only while it is deployed, scaled by stars', () {
+    final p = pets();
+    final cat = CombatUnitSpec(
+        id: 'mochi',
+        side: CombatSide.cat,
+        stats: StatBlock(hp: 100000, atk: 10000, def: 10000),
+        attackIntervalMs: 900);
+    final rabbit = rules.byId('rabbit')!;
+    p.restore(const PetsState(owned: {'rabbit': 1}, deployed: [], pity: 0));
+    final benched = p.withPassive(cat).stats.atk; // only the owned bonus
+    p.restore(
+        const PetsState(owned: {'rabbit': 1}, deployed: ['rabbit'], pity: 0));
+    final onField = p.withPassive(cat).stats.atk;
+    expect(onField, greaterThan(benched));
+    expect(p.passiveBpOf(rabbit), rabbit.passive!.bp); // 1 star
+    p.restore(
+        const PetsState(owned: {'rabbit': 3}, deployed: ['rabbit'], pity: 0));
+    expect(p.withPassive(cat).stats.atk, greaterThan(onField));
+    // a secondary-stat passive lands on the cat's attributes
+    p.restore(const PetsState(owned: {'frog': 1}, deployed: ['frog'], pity: 0));
+    expect(p.withPassive(cat).stats[Attribute.crit],
+        rules.byId('frog')!.passive!.bp);
+    p.restore(
+        const PetsState(owned: {'unicorn': 1}, deployed: ['unicorn'], pity: 0));
+    final u = p.withPassive(cat).stats;
+    expect(u.def, greaterThan(10000)); // "all" includes defense
+  });
+
+  test('a deployed pet casts its own skill beside Mochi; ally buffs reach her',
+      () {
+    cleared = 25; // chapter 3: all three slots open
+    final p = pets();
+    p.restore(const PetsState(
+        owned: {'hedgehog': 1, 'mouse': 1},
+        deployed: ['hedgehog', 'mouse'],
+        pity: 0));
+    final cat = CombatUnitSpec(
+        id: 'mochi',
+        side: CombatSide.cat,
+        stats: StatBlock(hp: 1000, atk: 100, def: 0),
+        attackIntervalMs: 100000);
+    final partners = p.partners(cat);
+    expect(partners.map((u) => u.skills.single.id),
+        ['spiky_shield', 'cheese_snack']);
+    final e = CombatEngine(CombatRules.fromBalance(balance),
+        buffs: buffs, firstCastPct: 50);
+    final out = <CombatEvent>[];
+    e.events.listen(out.add);
+    e.start(CombatSetup(seed: 3, units: [
+      cat,
+      ...partners,
+      CombatUnitSpec(
+          id: 'dummy',
+          side: CombatSide.enemy,
+          stats: StatBlock(hp: 1 << 30, atk: 0, def: 0),
+          attackIntervalMs: 1 << 30),
+    ]));
+    e.tick(7000); // hedgehog 12 s × 50 % = 6 s
+    final casts = out.whereType<SkillCast>().toList();
+    expect(casts.map((c) => c.unitId), contains('pet_hedgehog'));
+    final shield =
+        out.whereType<BuffApplied>().where((b) => b.unitId == 'mochi');
+    expect(shield, isNotEmpty); // the buff landed on the cat, not the pet
+    final view = e.view.firstWhere((u) => u.id == 'pet_hedgehog');
+    expect(view.skills.single.totalMs, 12000);
+    expect(view.skills.single.remainingMs, greaterThan(0));
   });
 
   test('owned pets give a passive; deployed pets fight as partners', () async {

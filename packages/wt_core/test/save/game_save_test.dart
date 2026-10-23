@@ -22,6 +22,7 @@ void main() {
   final combat = CombatRules.fromBalance(b);
   final w = combat.powerWeights;
   final t0 = DateTime.utc(2026, 10, 19, 2);
+  final buffs = BuffBook.fromJson(_j('../../design/data/buffs.json'));
 
   List<Override> world(Time time) => [
         timeSourceProvider.overrideWithValue(time),
@@ -37,8 +38,9 @@ void main() {
             b, _j('../../design/data/road_events.json'))),
         adRulesProvider.overrideWithValue(AdRules.fromJson(b)),
         offlineRulesProvider.overrideWithValue(OfflineRules.fromBalance(b)),
+        buffBookProvider.overrideWithValue(buffs),
         petsRulesProvider.overrideWithValue(
-            PetsRules.fromJson(b, _j('../../design/data/pets.json'))),
+            PetsRules.fromJson(b, _j('../../design/data/pets.json'), buffs)),
         researchRulesProvider.overrideWithValue(ResearchRules.fromJson(
             b,
             _j('../../design/data/research.json'),

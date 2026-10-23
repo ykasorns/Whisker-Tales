@@ -148,6 +148,7 @@ class SkillSpec {
     this.hits = 1,
     this.buffsTarget = const [],
     this.buffsSelf = const [],
+    this.buffsAlly = const [],
   });
 
   final String id;
@@ -159,6 +160,10 @@ class SkillSpec {
   final int hits;
   final List<String> buffsTarget;
   final List<String> buffsSelf;
+
+  /// Buffs on the cat, for skills cast by a partner (pets have 1 HP and are
+  /// never targeted, so `self` would be wasted on them; D-039).
+  final List<String> buffsAlly;
 }
 
 class CombatUnitSpec {

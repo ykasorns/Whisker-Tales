@@ -385,6 +385,46 @@ class AppLocalizationsTh extends AppLocalizations {
   String get tipPets => 'เคล็ดลับ: ฟักเพื่อนสัตว์ให้มาช่วยสู้';
 
   @override
+  String get rarityCommon => 'ธรรมดา';
+
+  @override
+  String get rarityRare => 'หายาก';
+
+  @override
+  String get rarityLegend => 'ตำนาน';
+
+  @override
+  String get petAttack => 'พลังโจมตี';
+
+  @override
+  String get petPassive => 'ตอนอยู่ในสนาม: ทำงานตลอด';
+
+  @override
+  String get petActive => 'สกิล (ใช้เองอัตโนมัติ)';
+
+  @override
+  String petCooldown(int sec) {
+    return 'คูลดาวน์ $sec วิ';
+  }
+
+  @override
+  String petStarsBoost(String mult) {
+    return 'ดาวเพิ่มพลังเป็น ×$mult';
+  }
+
+  @override
+  String get sendToBattle => 'ส่งลงสนาม';
+
+  @override
+  String get restPet => 'พัก';
+
+  @override
+  String get slotsFull => 'ช่องสนามเต็มแล้ว พักเพื่อนสักตัวก่อน';
+
+  @override
+  String get closeSheet => 'ปิด';
+
+  @override
   String get switchLanguage => '🌐 English';
 
   @override

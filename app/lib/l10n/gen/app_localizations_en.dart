@@ -387,6 +387,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tipPets => 'Tip: hatch pets, they fight beside Mochi';
 
   @override
+  String get rarityCommon => 'Common';
+
+  @override
+  String get rarityRare => 'Rare';
+
+  @override
+  String get rarityLegend => 'Legend';
+
+  @override
+  String get petAttack => 'Attack';
+
+  @override
+  String get petPassive => 'On the field: always on';
+
+  @override
+  String get petActive => 'Skill (casts by itself)';
+
+  @override
+  String petCooldown(int sec) {
+    return 'Cooldown $sec s';
+  }
+
+  @override
+  String petStarsBoost(String mult) {
+    return 'Stars scale it ×$mult';
+  }
+
+  @override
+  String get sendToBattle => 'Send to battle';
+
+  @override
+  String get restPet => 'Rest';
+
+  @override
+  String get slotsFull => 'All battle slots are used — rest a friend first';
+
+  @override
+  String get closeSheet => 'Close';
+
+  @override
   String get switchLanguage => '🌐 ภาษาไทย';
 
   @override

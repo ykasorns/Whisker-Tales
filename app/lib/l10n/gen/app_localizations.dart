@@ -758,6 +758,78 @@ abstract class AppLocalizations {
   /// **'Tip: hatch pets, they fight beside Mochi'**
   String get tipPets;
 
+  /// No description provided for @rarityCommon.
+  ///
+  /// In en, this message translates to:
+  /// **'Common'**
+  String get rarityCommon;
+
+  /// No description provided for @rarityRare.
+  ///
+  /// In en, this message translates to:
+  /// **'Rare'**
+  String get rarityRare;
+
+  /// No description provided for @rarityLegend.
+  ///
+  /// In en, this message translates to:
+  /// **'Legend'**
+  String get rarityLegend;
+
+  /// No description provided for @petAttack.
+  ///
+  /// In en, this message translates to:
+  /// **'Attack'**
+  String get petAttack;
+
+  /// No description provided for @petPassive.
+  ///
+  /// In en, this message translates to:
+  /// **'On the field: always on'**
+  String get petPassive;
+
+  /// No description provided for @petActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Skill (casts by itself)'**
+  String get petActive;
+
+  /// No description provided for @petCooldown.
+  ///
+  /// In en, this message translates to:
+  /// **'Cooldown {sec} s'**
+  String petCooldown(int sec);
+
+  /// No description provided for @petStarsBoost.
+  ///
+  /// In en, this message translates to:
+  /// **'Stars scale it ×{mult}'**
+  String petStarsBoost(String mult);
+
+  /// No description provided for @sendToBattle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to battle'**
+  String get sendToBattle;
+
+  /// No description provided for @restPet.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest'**
+  String get restPet;
+
+  /// No description provided for @slotsFull.
+  ///
+  /// In en, this message translates to:
+  /// **'All battle slots are used — rest a friend first'**
+  String get slotsFull;
+
+  /// No description provided for @closeSheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get closeSheet;
+
   /// Shown in the other language: the one it switches to
   ///
   /// In en, this message translates to:

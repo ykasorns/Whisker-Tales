@@ -1,14 +1,165 @@
 {
-  "_doc": "GDD v0.4 §6 (T-038, D-019) — เพื่อนสัตว์ 6 ตัว (ธรรมดา 3 / หายาก 2 / ตำนาน 1) · ตัวเลขพลัง/อัตรา/ราคาอยู่ใน idle_balance_v1.json → pets · ภาพยังไม่มี: ใช้ icon (emoji) ไปก่อน",
+  "_doc": "GDD v0.4 §6 (T-038, D-019) — เพื่อนสัตว์ 6 ตัว (ธรรมดา 3 / หายาก 2 / ตำนาน 1) · ตัวเลขพลัง/อัตรา/ราคาอยู่ใน idle_balance_v1.json → pets · ภาพยังไม่มี: ใช้ icon (emoji) ไปก่อน · passive = โบนัสให้โมจิตอนเลือกลงสนาม (attr = key stat รอง หรือ atk/hp/def/all = สเตตัสหลัก, pct = %, คูณตามดาว) · skill = active อัตโนมัติ มี cooldown (target self + buffs_ally = ให้โมจิ) ชื่อ/คำอธิบาย TH/EN อยู่ที่นี่ (D-039)",
   "schema_version": 1,
   "attack_interval_ms": 1500,
   "dup_over_max_cookies": 10,
   "pets": [
-    { "id": "sparrow", "rarity": "common", "icon": "🐦", "name_th": "นกกระจอกจิ๊บ", "name_en": "Chip the Sparrow" },
-    { "id": "mouse", "rarity": "common", "icon": "🐭", "name_th": "หนูน้อยมุ้งมิ้ง", "name_en": "Mimi the Mouse" },
-    { "id": "frog", "rarity": "common", "icon": "🐸", "name_th": "กบอ๊บอ๊บ", "name_en": "Hop the Frog" },
-    { "id": "hedgehog", "rarity": "rare", "icon": "🦔", "name_th": "เม่นหนามนุ่ม", "name_en": "Puff the Hedgehog" },
-    { "id": "rabbit", "rarity": "rare", "icon": "🐰", "name_th": "กระต่ายดินสอ", "name_en": "Doodle the Rabbit" },
-    { "id": "unicorn", "rarity": "legend", "icon": "🦄", "name_th": "ยูนิคอร์นสายรุ้ง", "name_en": "Rainbow Unicorn" }
+    {
+      "id": "sparrow",
+      "rarity": "common",
+      "icon": "🐦",
+      "name_th": "นกกระจอกจิ๊บ",
+      "name_en": "Chip the Sparrow",
+      "passive": {
+        "attr": "attack_speed",
+        "pct": 2,
+        "text_th": "ตีเร็วขึ้น +2%",
+        "text_en": "Attack speed +2%"
+      },
+      "skill": {
+        "id": "peck_flurry",
+        "icon": "🐦",
+        "name_th": "จิกรัว",
+        "name_en": "Peck Flurry",
+        "cooldown_ms": 9000,
+        "target": "front",
+        "damage_pct": 75,
+        "hits": 3,
+        "text_th": "จิกมอน 3 ครั้งติด",
+        "text_en": "Pecks the front monster 3 times"
+      }
+    },
+    {
+      "id": "mouse",
+      "rarity": "common",
+      "icon": "🐭",
+      "name_th": "หนูน้อยมุ้งมิ้ง",
+      "name_en": "Mimi the Mouse",
+      "passive": {
+        "attr": "evade",
+        "pct": 1.5,
+        "text_th": "หลบเก่งขึ้น +1.5%",
+        "text_en": "Dodge +1.5%"
+      },
+      "skill": {
+        "id": "cheese_snack",
+        "icon": "🧀",
+        "name_th": "ชีสให้พลัง",
+        "name_en": "Cheese Snack",
+        "cooldown_ms": 12000,
+        "target": "self",
+        "buffs_ally": [
+          "pet_heal_small"
+        ],
+        "text_th": "ฟื้นเลือดให้โมจิ 2%",
+        "text_en": "Heals Mochi for 2% of max HP"
+      }
+    },
+    {
+      "id": "frog",
+      "rarity": "common",
+      "icon": "🐸",
+      "name_th": "กบอ๊บอ๊บ",
+      "name_en": "Hop the Frog",
+      "passive": {
+        "attr": "crit",
+        "pct": 1,
+        "text_th": "โอกาสคริ +1%",
+        "text_en": "Crit chance +1%"
+      },
+      "skill": {
+        "id": "tongue_zap",
+        "icon": "🐸",
+        "name_th": "ลิ้นสะกด",
+        "name_en": "Tongue Zap",
+        "cooldown_ms": 10000,
+        "target": "front",
+        "damage_pct": 75,
+        "buffs_target": [
+          "stun_short"
+        ],
+        "text_th": "ตีมอนตัวหน้าและทำให้มึน",
+        "text_en": "Hits the front monster and stuns it"
+      }
+    },
+    {
+      "id": "hedgehog",
+      "rarity": "rare",
+      "icon": "🦔",
+      "name_th": "เม่นหนามนุ่ม",
+      "name_en": "Puff the Hedgehog",
+      "passive": {
+        "attr": "counter",
+        "pct": 2,
+        "text_th": "โอกาสสวนกลับ +2%",
+        "text_en": "Counter chance +2%"
+      },
+      "skill": {
+        "id": "spiky_shield",
+        "icon": "🛡️",
+        "name_th": "เกราะหนาม",
+        "name_en": "Spiky Shield",
+        "cooldown_ms": 12000,
+        "target": "self",
+        "buffs_ally": [
+          "pet_shield"
+        ],
+        "text_th": "ให้เกราะโมจิ 4% ของเลือดสูงสุด",
+        "text_en": "Gives Mochi a shield of 4% max HP"
+      }
+    },
+    {
+      "id": "rabbit",
+      "rarity": "rare",
+      "icon": "🐰",
+      "name_th": "กระต่ายดินสอ",
+      "name_en": "Doodle the Rabbit",
+      "passive": {
+        "attr": "atk",
+        "pct": 2,
+        "text_th": "พลังโจมตี +2%",
+        "text_en": "Attack +2%"
+      },
+      "skill": {
+        "id": "carrot_power",
+        "icon": "🥕",
+        "name_th": "แครอทพลัง",
+        "name_en": "Carrot Power",
+        "cooldown_ms": 14000,
+        "target": "self",
+        "buffs_ally": [
+          "pet_atk_up"
+        ],
+        "text_th": "โมจิโจมตีแรงขึ้น 4% นาน 6 วิ",
+        "text_en": "Mochi hits 4% harder for 6 s"
+      }
+    },
+    {
+      "id": "unicorn",
+      "rarity": "legend",
+      "icon": "🦄",
+      "name_th": "ยูนิคอร์นสายรุ้ง",
+      "name_en": "Rainbow Unicorn",
+      "passive": {
+        "attr": "all",
+        "pct": 1.5,
+        "text_th": "พลังหลักทั้งหมด +1.5%",
+        "text_en": "HP, attack and defense +1.5%"
+      },
+      "skill": {
+        "id": "rainbow_burst",
+        "icon": "🌈",
+        "name_th": "สายรุ้งระเบิด",
+        "name_en": "Rainbow Burst",
+        "cooldown_ms": 15000,
+        "target": "all",
+        "damage_pct": 125,
+        "buffs_ally": [
+          "pet_heal_tiny"
+        ],
+        "text_th": "ตีมอนทุกตัวและฟื้นเลือดโมจิ 2%",
+        "text_en": "Hits every monster and heals Mochi for 2%"
+      }
+    }
   ]
 }

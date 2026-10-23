@@ -71,8 +71,12 @@ class _GameViewState extends ConsumerState<GameView> {
     chapters: ref.read(chapterBookProvider),
     classId: () => ref.read(catClassProvider).current,
     skillName: (id) {
+      final en = ref.read(langProvider) == 'en';
+      if (ref.read(petsProvider)?.rules.bySkill(id)?.skill case final k?) {
+        return en ? k.nameEn : k.nameTh;
+      }
       final i = ref.read(skillBookProvider).info[id];
-      return ref.read(langProvider) == 'en' ? (i?.en ?? id) : (i?.th ?? id);
+      return en ? (i?.en ?? id) : (i?.th ?? id);
     },
     pets: () {
       final pets = ref.read(petsProvider);
@@ -104,6 +108,10 @@ class BattleGame extends FlameGame {
 
   /// Deployed pets (T-038), drawn following Mochi.
   final List<({String id, String icon})> Function()? pets;
+
+  /// Where each deployed pet is drawn (top-centre, by pet id) — skill names
+  /// float there.
+  final _petSpots = <String, Offset>{};
 
   /// Seconds left of each pet's attack pose (by pet id).
   final _petAttack = <String, double>{};
@@ -360,11 +368,22 @@ class BattleGame extends FlameGame {
         final label = skillName?.call(skillId);
         if (label != null) {
           final isMochi = unitId == 'mochi';
+          final petSpot =
+              unitId.startsWith('pet_') ? _petSpots[unitId.substring(4)] : null;
           final at = isMochi
               ? mochi.position + Vector2(0, -size.y * 0.33)
-              : (_monsters[unitId]?.position ?? mochi.position) +
-                  Vector2(0, -size.y * 0.25);
-          _float(label, at, isMochi ? const Color(0xFFE8742B) : Palette.plum,
+              : petSpot != null
+                  ? Vector2(petSpot.dx, petSpot.dy - size.y * 0.04)
+                  : (_monsters[unitId]?.position ?? mochi.position) +
+                      Vector2(0, -size.y * 0.25);
+          _float(
+              label,
+              at,
+              isMochi
+                  ? const Color(0xFFE8742B)
+                  : petSpot != null
+                      ? Palette.teal
+                      : Palette.plum,
               scale: 1.25);
         }
       default:
@@ -672,6 +691,7 @@ class _Pets extends Component {
       final hop = (math.sin(t * 8 + i * 1.7)).abs() * u * 0.02;
       final lift = back ? u * 0.03 : 0.0;
       final x = game.mochi.position.x - u * (0.2 + 0.085 * i);
+      game._petSpots[p.id] = Offset(x, game.groundY - h - hop - lift);
       final pose = (game._petAttack[p.id] ?? 0) > 0 ? 'attack' : 'idle';
       final key = 'pet/${p.id}_$pose.png';
       if (game.images.containsKey(key)) {

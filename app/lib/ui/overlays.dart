@@ -10,6 +10,7 @@ import '../l10n/strings.dart';
 import 'home_page.dart';
 import 'game_icon.dart';
 import 'palette.dart';
+import 'pets_tab.dart' show PetPicture;
 
 /// "Welcome back" (GDD v0.4 §8): what Mochi farmed while away. One button,
 /// no ×2 ad (D-003). Shown only when at least a minute is credited.
@@ -168,8 +169,9 @@ class _SkillBarState extends ConsumerState<SkillBar> {
   void initState() {
     super.initState();
     _sub = ref.read(idleLoopProvider).combatEvents.listen((e) {
-      if (e is SkillCast && e.unitId == 'mochi' && mounted) {
-        setState(() => _flash[e.skillId] = (_flash[e.skillId] ?? 0) + 1);
+      if (e is SkillCast && mounted) {
+        final key = e.unitId == 'mochi' ? e.skillId : e.unitId;
+        setState(() => _flash[key] = (_flash[key] ?? 0) + 1);
       }
     });
     // the sweep moves smoothly while a fight runs; idle otherwise
@@ -200,6 +202,67 @@ class _SkillBarState extends ConsumerState<SkillBar> {
         }
       }
       return null;
+    }
+
+    // pets on the field: one smaller circle per skill, after Mochi's
+    final pets = ref.read(petsProvider);
+    final petRows = <({PetDef def, SkillView? timer})>[
+      for (final u in view)
+        if (u.isPartner && u.id.startsWith('pet_'))
+          if (pets?.rules.byId(u.id.substring(4)) case final def?)
+            if (def.skill != null)
+              (
+                def: def,
+                timer: u.skills.isEmpty ? null : u.skills.first,
+              ),
+    ];
+
+    Widget circle(double size, Widget face, SkillView? t, int flash) {
+      final frac = t == null || t.totalMs == 0
+          ? 0.0
+          : (t.remainingMs / t.totalMs).clamp(0.0, 1.0);
+      final secs = t == null || t.remainingMs == 0
+          ? 0
+          : (t.remainingMs / widget.speed() / 1000).ceil();
+      return TweenAnimationBuilder<double>(
+        key: ValueKey('c${face.hashCode}$flash'),
+        tween: Tween(begin: 1, end: 0),
+        duration: const Duration(milliseconds: 600),
+        builder: (context, glow, _) => Container(
+          width: size,
+          height: size,
+          margin: const EdgeInsets.only(right: 6),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Palette.paper,
+            border: Border.all(color: Palette.ink, width: 2.5),
+            boxShadow: [
+              BoxShadow(
+                  color: Palette.sun.withValues(alpha: flash == 0 ? 0 : glow),
+                  blurRadius: 12,
+                  spreadRadius: 4)
+            ],
+          ),
+          child: ClipOval(
+            child: Stack(alignment: Alignment.center, children: [
+              face,
+              if (frac > 0)
+                Positioned.fill(
+                    child: CustomPaint(painter: _CooldownPainter(frac))),
+              if (secs > 0)
+                Text('$secs',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: size * 0.42,
+                        fontWeight: FontWeight.w900,
+                        shadows: const [
+                          Shadow(color: Colors.black, blurRadius: 4),
+                          Shadow(color: Colors.black, blurRadius: 2),
+                        ])),
+            ]),
+          ),
+        ),
+      );
     }
 
     return Row(mainAxisSize: MainAxisSize.min, children: [
@@ -253,6 +316,9 @@ class _SkillBarState extends ConsumerState<SkillBar> {
             ),
           );
         }),
+      for (final r in petRows)
+        circle(38, PetPicture(id: r.def.id, icon: r.def.icon, size: 26),
+            r.timer, _flash['pet_${r.def.id}'] ?? 0),
     ]);
   }
 }

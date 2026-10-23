@@ -17,5 +17,5 @@
   "events": ["grilled_fish", "tailwind", "rainbow", "fish_bag", "drizzle", "bees", "mud"],
   "classes": ["novice", "warrior", "rogue", "archer", "mage"],
   "projectiles": ["arrow"],
-  "keep_as_text": ["★", "▶", "🐦", "🐭", "🐸", "🦔", "🐰", "🦄"]
+  "keep_as_text": ["★", "▶", "🧀", "🥕", "🌈", "🐦", "🐭", "🐸", "🦔", "🐰", "🦄"]
 }

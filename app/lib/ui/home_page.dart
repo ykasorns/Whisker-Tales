@@ -125,91 +125,114 @@ class _Hud extends ConsumerWidget {
             ]),
           ),
           // page tag + boss button (top-centre)
-          Align(
-            alignment: const Alignment(0, -0.62),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                decoration: inkBox(radius: 10),
-                child: Column(children: [
-                  IconText(
-                      s.chapterPage(rules.chapterOf(st.farmPage),
-                          rules.pageInChapter(st.farmPage)),
-                      style: _bold),
-                  Row(mainAxisSize: MainAxisSize.min, children: [
-                    for (var i = 0; i < plan.waves; i++)
-                      Container(
-                        width: 8,
-                        height: 8,
-                        margin: const EdgeInsets.all(1.5),
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: i < loop.waveIndex
-                                ? Palette.lime
-                                : Palette.sheet,
-                            border: Border.all(color: Palette.ink, width: 1.5)),
-                      ),
-                  ]),
-                ]),
-              ),
-              const SizedBox(height: 6),
-              Row(mainAxisSize: MainAxisSize.min, children: [
-                Semantics(
-                  button: true,
-                  label: ready
-                      ? s.tapForBoss
-                      : s.farm(
-                          math.min(loop.waveIndex, plan.waves), plan.waves),
-                  child: GestureDetector(
-                    onTap: ready && frontier && !boss
-                        ? () => loop.challengeBoss()
-                        : null,
-                    child: _BossButton(
-                      progress:
-                          boss ? 1 : math.min(1, loop.waveIndex / plan.waves),
-                      ready: ready && frontier,
-                      face: ref
-                          .read(chapterBookProvider)
-                          .bossOf(rules, st.clearedPage + 1),
+          // (below the profile card; squeezed on a short scene so it never
+          // reaches Mochi's health bar)
+          Positioned.fill(
+            child: LayoutBuilder(builder: (context, area) {
+              final room = (area.maxHeight * 0.545 - 88).clamp(60.0, 400.0);
+              return Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 84),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: room),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Column(mainAxisSize: MainAxisSize.min, children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 2),
+                          decoration: inkBox(radius: 10),
+                          child: Column(children: [
+                            IconText(
+                                s.chapterPage(rules.chapterOf(st.farmPage),
+                                    rules.pageInChapter(st.farmPage)),
+                                style: _bold),
+                            Row(mainAxisSize: MainAxisSize.min, children: [
+                              for (var i = 0; i < plan.waves; i++)
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  margin: const EdgeInsets.all(1.5),
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: i < loop.waveIndex
+                                          ? Palette.lime
+                                          : Palette.sheet,
+                                      border: Border.all(
+                                          color: Palette.ink, width: 1.5)),
+                                ),
+                            ]),
+                          ]),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          Semantics(
+                            button: true,
+                            label: ready
+                                ? s.tapForBoss
+                                : s.farm(math.min(loop.waveIndex, plan.waves),
+                                    plan.waves),
+                            child: GestureDetector(
+                              onTap: ready && frontier && !boss
+                                  ? () => loop.challengeBoss()
+                                  : null,
+                              child: _BossButton(
+                                progress: boss
+                                    ? 1
+                                    : math.min(1, loop.waveIndex / plan.waves),
+                                ready: ready && frontier,
+                                face: ref
+                                    .read(chapterBookProvider)
+                                    .bossOf(rules, st.clearedPage + 1),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () => loop.autoBoss = !loop.autoBoss,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: inkBox(
+                                  fill: loop.autoBoss
+                                      ? Palette.coral
+                                      : Palette.paper,
+                                  radius: 12),
+                              child: IconText(
+                                  '${s.auto}\n${loop.autoBoss ? s.on : s.off}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 12,
+                                      color: loop.autoBoss
+                                          ? Palette.paper
+                                          : Palette.ink)),
+                            ),
+                          ),
+                        ]),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 1),
+                          decoration: inkBox(radius: 8, width: 2),
+                          child: IconText(
+                              boss
+                                  ? s.fightingBoss
+                                  : ready && frontier
+                                      ? s.tapForBoss
+                                      : s.farm(
+                                          math.min(loop.waveIndex, plan.waves),
+                                          plan.waves),
+                              style: const TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.w700)),
+                        ),
+                      ]),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () => loop.autoBoss = !loop.autoBoss,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: inkBox(
-                        fill: loop.autoBoss ? Palette.coral : Palette.paper,
-                        radius: 12),
-                    child: IconText(
-                        '${s.auto}\n${loop.autoBoss ? s.on : s.off}',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 12,
-                            color:
-                                loop.autoBoss ? Palette.paper : Palette.ink)),
-                  ),
-                ),
-              ]),
-              const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-                decoration: inkBox(radius: 8, width: 2),
-                child: IconText(
-                    boss
-                        ? s.fightingBoss
-                        : ready && frontier
-                            ? s.tapForBoss
-                            : s.farm(math.min(loop.waveIndex, plan.waves),
-                                plan.waves),
-                    style: const TextStyle(
-                        fontSize: 12, fontWeight: FontWeight.w700)),
-              ),
-            ]),
+              );
+            }),
           ),
           Positioned(
               left: 10, bottom: 10, child: SkillBar(speed: () => driver.speed)),

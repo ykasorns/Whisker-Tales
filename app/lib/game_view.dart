@@ -690,7 +690,7 @@ class _Pets extends Component {
       final h = u * (back ? 0.078 : 0.088);
       final hop = (math.sin(t * 8 + i * 1.7)).abs() * u * 0.02;
       final lift = back ? u * 0.03 : 0.0;
-      final x = game.mochi.position.x - u * (0.2 + 0.085 * i);
+      final x = game.mochi.position.x - u * (0.165 + 0.075 * i);
       game._petSpots[p.id] = Offset(x, game.groundY - h - hop - lift);
       final pose = (game._petAttack[p.id] ?? 0) > 0 ? 'attack' : 'idle';
       final key = 'pet/${p.id}_$pose.png';

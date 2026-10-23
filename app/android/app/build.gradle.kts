@@ -71,6 +71,8 @@ android {
 
     buildTypes {
         release {
+            // adds to Flutter's own shrinker rules (R8 is on for release)
+            proguardFiles("proguard-rules.pro")
             signingConfig = if (keystorePropertiesFile.exists()) {
                 signingConfigs.getByName("release")
             } else {

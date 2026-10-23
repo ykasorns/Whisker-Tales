@@ -14,8 +14,15 @@
         tools:node="remove" />
     <application
         android:label="Whisker Tales"
-        android:name="${applicationName}"
+        android:name=".WtApp"
         android:icon="@mipmap/ic_launcher">
+        <!-- Test-build crash screen (D-036): own process, no Flutter. -->
+        <activity
+            android:name=".CrashActivity"
+            android:exported="false"
+            android:process=":crash"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"

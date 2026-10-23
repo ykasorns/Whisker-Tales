@@ -379,3 +379,10 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 5. **นโยบายความเป็นส่วนตัว TH/EN** `docs/privacy/index.html` (ร่าง — ต้องใส่ชื่อผู้พัฒนา อีเมล วันที่ แล้ว host) · **คำตอบ Data safety / Target audience / Content rating / ข้อความหน้าร้าน** + ขั้นตอนที่ต้องใช้บัญชีของ YK อยู่ใน `RELEASE_CHECKLIST.md`
 6. **AAB arm64 = 30.8 MB** สร้างจากสคริปต์บนเครื่องนี้แล้ว (`--arm64-only`) · build ทุก ABI ค้างเพราะ macOS ยังกักตัวคอมไพล์ ABI 32-bit/x86_64 (quarantine) → YK อนุญาตเองได้ (RELEASE_CHECKLIST §3) · `gradle.properties`: heap 3 GB + คอมไพล์ทีละตัว (เดิม 8 GB บนเครื่องแรม 8 GB)
 7. GDD v0.4 §14 ครบ: Families-certified SDK + child-directed + non-personalized + ไม่มี Advertising ID (D-033) · age screen กลาง (T-040) · หน้าโชว์อัตราก่อนกด (ตะกร้า + ฟักไข่) · ไม่มี IAP ให้ไหมพรม/ไข่/ปลาทอง (`iap_test` "shipped data") · โฆษณา opt-in มีป้าย 📺 · iOS/ATT = n/a (D-017)
+
+## D-036 (2026-10-23) — Sonnet+Opus advisor — แอปเปิดไม่ติดบนมือถือจริง: รุ่นทดสอบที่แสดงข้อผิดพลาดบนจอ
+
+1. **อาการ (YK):** ติดตั้ง APK ได้ แต่เปิดแล้วเด้งทันที Device care เตือน "crashing frequently" · รุ่นก่อน D-030 เปิดเล่นได้บนเครื่องเดียวกัน → สาเหตุอยู่ในของที่เพิ่ม/แก้ตั้งแต่นั้น: AdMob (plugin + `MobileAdsInitProvider`), `audioplayers` (สร้าง player ใน `main()`), ธีม launch `values-v31` + ไอคอน adaptive/monochrome, แก้ manifest
+2. **ตัดทฤษฎี "Play Games ID ว่าง" ออก:** `PlayGamesInitProvider` อยู่ในรุ่นที่เปิดได้อยู่แล้ว และอ่านโค้ดแล้วมัน throw เฉพาะกรณี authority ผิด
+3. **ไม่เดาแก้:** YK อยู่นอกบ้าน ต่อ adb/ส่ง log ไม่ได้ → ทำ **รุ่นวินิจฉัย** แทน: `WtApp.java` (ดัก Java crash ใน `attachBaseContext` ก่อน content provider ใด ๆ ทำงาน · ตอนเปิดครั้งถัดไปอ่าน `getHistoricalProcessExitReasons` สำหรับ native crash + ข้อความจาก tombstone) → เปิด `CrashActivity` (process แยก `:crash`, ไม่พึ่ง Flutter) ที่โชว์ข้อความ + ปุ่ม Copy · YK แค่ถ่ายหน้าจอส่งมา
+4. **ก่อนขึ้น Play ต้องถอดออก** (RELEASE_CHECKLIST §3)

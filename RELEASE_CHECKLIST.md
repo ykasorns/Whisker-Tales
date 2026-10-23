@@ -41,6 +41,8 @@ scripts/build_release.sh
 - [ ] **อนุญาตตัวคอมไพล์ของ Flutter ให้ครบทุก ABI (ครั้งเดียว):** บนเครื่องนี้ macOS ยังกักตัวคอมไพล์ของ ABI 32-bit ARM และ x86_64 ไว้ (ธง quarantine จากตอนดาวน์โหลด) → build ทุก ABI จะค้างเงียบ ๆ · ระหว่างนี้ใช้ `scripts/build_release.sh --arm64-only` (Play รับ — ตัดแค่มือถือ 32-bit รุ่นเก่ามาก) · ถ้าอยากได้ครบ: เปิด Terminal แล้วสั่ง `xattr -d com.apple.quarantine` กับไฟล์ `gen_snapshot` ใน `/opt/homebrew/share/flutter/bin/cache/artifacts/engine/android-arm-release/darwin-x64/` และ `android-x64-release/darwin-x64/` (เป็นการตัดสินใจเรื่องความปลอดภัยของเครื่อง Claude เลยไม่ทำให้)
 - ทดสอบลงมือถือเร็ว ๆ: `scripts/build_release.sh --apk`
 
+- [ ] **ถอดหน้าแสดงข้อผิดพลาดของรุ่นทดสอบก่อนขึ้น Play (D-036):** `WtApp.java` + `CrashActivity.java` แสดงข้อความ stack trace บนจอเวลาแอปพัง — เหมาะกับรุ่นทดสอบ ไม่เหมาะกับเด็ก → ลบสองไฟล์ + `android:name=".WtApp"` + `<activity .CrashActivity>` ใน AndroidManifest (กลับเป็น `${applicationName}`) หรือเปลี่ยนข้อความเป็นแบบเป็นมิตร
+
 ## 4. Play Console → App content (คำตอบที่เตรียมไว้)
 
 | หัวข้อ | คำตอบ |

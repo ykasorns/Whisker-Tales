@@ -1,7 +1,7 @@
 # HANDOFF — Whisker Tales (updated 2026-10-23, after D-041, last commit 6e8e3ea)
 
 Read this first if you are a new session or a different model picking up the work.
-For background, also read `DECISIONS.md` (D-001 … D-035), `_contract/GAME_CONTRACT.md`, `_contract/GDD_WhiskerTales_v0.5.md` and `RELEASE_CHECKLIST.md`.
+For background, also read `DECISIONS.md` (D-001 … D-041), `_contract/GAME_CONTRACT.md`, `_contract/GDD_WhiskerTales_v0.5.md` and `RELEASE_CHECKLIST.md`.
 
 ---
 

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:whisker_tales/l10n/strings.dart';
 import 'package:whisker_tales/ui/game_icon.dart';
+import 'package:whisker_tales/ui/yarn_basket.dart';
 import 'package:whisker_tales/main.dart';
 import 'package:whisker_tales/ui/age_screen.dart';
 import 'package:whisker_tales/ui/game_shell.dart';
@@ -34,6 +35,7 @@ void main() {
   setUpAll(() async {
     content = await ContentRepository(DiskSource()).loadAll();
     await IconRegistry.load(); // painted icons, as in the app (D-037)
+    await BasketArt.load(); // the home basket (D-040)
   });
 
   Future<ProviderContainer> boot(WidgetTester tester, String lang,

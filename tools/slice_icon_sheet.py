@@ -27,8 +27,8 @@ v = json.load(open(f'{ROOT}/design/art/icon_sheets.json'))[name]
 r = subprocess.run(
     ['python3', '-I', f'{ROOT}/tools/sprite_slicer/slice_sheet.py',
      f'{ROOT}/assets/raw/sheets/{name}.png', '--cols', str(v['cols']),
-     '--rows', str(v['rows']), '--names', ','.join('icon_' + i for i in v['ids']),
-     '--out', f'{ROOT}/assets/raw/frames/icon', '--align', 'center',
+     '--rows', str(v['rows']), '--names', ','.join(v.get('prefix', 'icon_') + i for i in v['ids']),
+     '--out', f"{ROOT}/assets/raw/frames/{v.get('out', 'icon')}", '--align', 'center',
      '--spill-start', '110', '--last-row-cols', str(len(v['ids']) - v['cols'] * (v['rows'] - 1))],
     capture_output=True, text=True)
 print(r.stdout[-600:], r.stderr[-400:])

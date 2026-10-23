@@ -44,6 +44,7 @@ flutter:
     - assets/game/bg/
     - assets/game/ui/
     - assets/game/icon/
+    - assets/game/home/
     - assets/game/pet/
     # Music + effects, made by tools/audio/make_sounds.py (T-024)
     - assets/audio/

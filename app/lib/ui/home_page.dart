@@ -11,6 +11,7 @@ import 'craft_sheet.dart';
 import 'overlays.dart';
 import 'game_icon.dart';
 import 'palette.dart';
+import 'yarn_basket.dart';
 
 String fmtNum(int n) => n >= 1000000
     ? '${(n / 1000000).toStringAsFixed(1)}M'
@@ -376,102 +377,167 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
         final yarn = ref.read(walletProvider).balance(Currency.yarn);
         final cls = ref.read(catClassProvider).current;
         final wr = ref.read(wardrobeRulesProvider);
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
-          child: Column(children: [
-            Row(children: [
-              for (final slot in GearSlot.values)
-                Expanded(
-                    child: Padding(
-                  padding: const EdgeInsets.all(2.5),
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: _Slot(
-                      slot: slot,
-                      open: basket.isOpen(slot),
-                      item: basket.equipped(slot),
-                      hasNew: basket.stashed(slot) != null,
-                      art: FarmPanel.slotArt(
-                          slot, basket.equipped(slot), cls, wr),
-                      unlockPage: basket.rules.slots[slot]!.unlockPage,
-                      onTap: basket.stashed(slot) == null
-                          ? null
-                          : () => showCraftSheet(context, ref,
-                              stashed: basket.stashed(slot)),
+        return LayoutBuilder(builder: (context, box) {
+          // sized from the panel so a small phone (≈ 210 dp) still fits
+          final panelH = box.maxHeight.isFinite ? box.maxHeight : 300.0;
+          final slotSize = ((panelH - 124) / 2).clamp(34.0, 58.0);
+          Widget slotOf(GearSlot slot) => SizedBox(
+                width: slotSize,
+                height: slotSize,
+                child: _Slot(
+                  slot: slot,
+                  open: basket.isOpen(slot),
+                  item: basket.equipped(slot),
+                  hasNew: basket.stashed(slot) != null,
+                  art: FarmPanel.slotArt(slot, basket.equipped(slot), cls, wr),
+                  unlockPage: basket.rules.slots[slot]!.unlockPage,
+                  onTap: basket.stashed(slot) == null
+                      ? null
+                      : () => showCraftSheet(context, ref,
+                          stashed: basket.stashed(slot)),
+                ),
+              );
+          const slots = GearSlot.values;
+          Widget shelfRow(List<GearSlot> row) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [for (final slot in row) slotOf(slot)]);
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(10, 8, 10, 6),
+            child: Column(children: [
+              // the gear shelf: two rows of four, big enough for a child's thumb
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                decoration: inkBox(
+                    fill: const Color(0xFFF7E6C2), radius: 16, width: 2.5),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  shelfRow(slots.sublist(0, 4)),
+                  const SizedBox(height: 6),
+                  shelfRow(slots.sublist(4)),
+                ]),
+              ),
+              const SizedBox(height: 6),
+              Expanded(
+                child: Row(children: [
+                  // the two auto-knit switches, one above the other
+                  SizedBox(
+                    width: box.maxWidth * 0.36,
+                    // ≥ 48 dp tall on a normal phone; scaled down only when
+                    // the panel is too short for both
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: SizedBox(
+                        width: box.maxWidth * 0.36,
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _Toggle(
+                                  label: s.autoCraft,
+                                  on: auto.running,
+                                  onTap: () => auto.running
+                                      ? auto.stop()
+                                      : auto.start()),
+                              const SizedBox(height: 8),
+                              _Toggle(
+                                  label: auto.rule.mode == AutoCraftMode.equip
+                                      ? s.betterEquip
+                                      : s.betterStash,
+                                  on: auto.rule.mode == AutoCraftMode.equip,
+                                  onTap: () => auto.configure(AutoCraftRule(
+                                      on: auto.running,
+                                      mode:
+                                          auto.rule.mode == AutoCraftMode.equip
+                                              ? AutoCraftMode.stash
+                                              : AutoCraftMode.equip))),
+                            ]),
+                      ),
                     ),
                   ),
-                )),
-            ]),
-            const SizedBox(height: 8),
-            Row(children: [
-              Expanded(
-                  child: _Toggle(
-                      label: s.autoCraft,
-                      on: auto.running,
-                      onTap: () => auto.running ? auto.stop() : auto.start())),
-              const SizedBox(width: 8),
-              Expanded(
-                  child: _Toggle(
-                      label: auto.rule.mode == AutoCraftMode.equip
-                          ? s.betterEquip
-                          : s.betterStash,
-                      on: auto.rule.mode == AutoCraftMode.equip,
-                      onTap: () => auto.configure(AutoCraftRule(
-                          on: auto.running,
-                          mode: auto.rule.mode == AutoCraftMode.equip
-                              ? AutoCraftMode.stash
-                              : AutoCraftMode.equip)))),
-            ]),
-            Expanded(
-              child: Semantics(
-                button: true,
-                label: s.knit,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: yarn < 1 ? null : () => showCraftSheet(context, ref),
-                  child: Opacity(
-                    opacity: yarn < 1 ? 0.5 : 1,
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Stack(
+                  const SizedBox(width: 8),
+                  // the basket: the big button — it opens the knit sheet
+                  // (odds first), and its balls move when auto-knit knits
+                  Expanded(
+                    child: Semantics(
+                      button: true,
+                      label: s.knit,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: yarn < 1
+                            ? null
+                            : () => showCraftSheet(context, ref),
+                        child: LayoutBuilder(builder: (context, area) {
+                          const tagH = 30.0;
+                          final basketH = math.max(
+                              72.0,
+                              math.min(area.maxHeight,
+                                  area.maxWidth / BasketArt.aspect));
+                          return Stack(
                               clipBehavior: Clip.none,
                               alignment: Alignment.center,
                               children: [
-                                YarnBall(size: 84, wiggle: _wiggle),
+                                Center(
+                                  child: YarnBasket(
+                                      height: basketH,
+                                      knit: _wiggle,
+                                      quiet: true,
+                                      empty: yarn < 1),
+                                ),
+                                // the tag hangs over the basket's front
+                                Positioned(
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  child: Center(
+                                    child: ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                          maxWidth: area.maxWidth),
+                                      child: Container(
+                                        height: tagH,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        alignment: Alignment.center,
+                                        decoration: inkBox(
+                                            fill: yarn < 1
+                                                ? Palette.sheet
+                                                : Palette.sun,
+                                            radius: 12,
+                                            width: 2),
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: IconText(
+                                              yarn < 1
+                                                  ? s.noYarn
+                                                  : '${s.knit} · ${s.curYarn} 🧶 ${fmtNum(yarn)}',
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w800)),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                                 if (_pop case final p?)
-                                  KnitPop(
-                                      key: ValueKey(p.key),
-                                      art: p.art,
-                                      kept: p.kept,
-                                      onDone: () {
-                                        if (mounted && _pop?.key == p.key) {
-                                          setState(() => _pop = null);
-                                        }
-                                      }),
-                              ]),
-                          const SizedBox(width: 12),
-                          Flexible(
-                              child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                IconText(s.knit,
-                                    style: const TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w800)),
-                                IconText(yarn < 1 ? s.noYarn : s.yarnLeft(yarn),
-                                    style: const TextStyle(
-                                        color: Palette.inkSoft,
-                                        fontWeight: FontWeight.w600)),
-                              ])),
-                        ]),
+                                  Positioned(
+                                    top: 0,
+                                    child: KnitPop(
+                                        key: ValueKey(p.key),
+                                        art: p.art,
+                                        kept: p.kept,
+                                        onDone: () {
+                                          if (mounted && _pop?.key == p.key) {
+                                            setState(() => _pop = null);
+                                          }
+                                        }),
+                                  ),
+                              ]);
+                        }),
+                      ),
+                    ),
                   ),
-                ),
+                ]),
               ),
-            ),
-          ]),
-        );
+            ]),
+          );
+        });
       },
     );
   }
@@ -513,15 +579,17 @@ class _Slot extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Stack(clipBehavior: Clip.none, children: [
-        Container(
-          decoration: BoxDecoration(
-              color: Palette.paper,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: color, width: 2.5)),
-          padding: const EdgeInsets.all(3),
-          child: Opacity(
-            opacity: item == null ? 0.35 : 1,
-            child: Image.asset('assets/game/$art.png', fit: BoxFit.contain),
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+                color: Palette.paper,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: color, width: 2.5)),
+            padding: const EdgeInsets.all(3),
+            child: Opacity(
+              opacity: item == null ? 0.35 : 1,
+              child: Image.asset('assets/game/$art.png', fit: BoxFit.contain),
+            ),
           ),
         ),
         if (hasNew)
@@ -544,7 +612,7 @@ class _Toggle extends StatelessWidget {
   Widget build(BuildContext context) => GestureDetector(
         onTap: onTap,
         child: Container(
-          height: 44,
+          height: 48,
           padding: const EdgeInsets.symmetric(horizontal: 8),
           decoration:
               inkBox(fill: on ? Palette.lime : Palette.paper, radius: 12),

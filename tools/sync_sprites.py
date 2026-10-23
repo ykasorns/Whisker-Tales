@@ -81,6 +81,16 @@ for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/icon/*.png')):
     sq.alpha_composite(im, ((sq.width - im.width) // 2, (sq.height - im.height) // 2))
     s = min(1, 128 / sq.width)
     sq.resize((round(sq.width * s),) * 2, Image.LANCZOS).save(f'{OUT}/icon/{name}.png', optimize=True)
+# home panel art (D-040): the yarn basket and its balls, bigger than the
+# icons because they are drawn at ~190 dp
+os.makedirs(f'{OUT}/home', exist_ok=True)
+for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/home/*.png')):
+    im = Image.open(src).convert('RGBA')
+    im = im.crop(im.getbbox())
+    cap = 720 if os.path.basename(src) == 'basket.png' else 256
+    s = min(1, cap / max(im.size))
+    im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS).save(
+        f'{OUT}/home/{os.path.basename(src)}', optimize=True)
 # boss faces for the challenge button
 os.makedirs(f'{OUT}/ui', exist_ok=True)
 for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/ui/*.png')):

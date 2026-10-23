@@ -10,6 +10,7 @@ import 'cloud/play_cloud.dart';
 import 'iap/play_store.dart';
 import 'ui/age_screen.dart';
 import 'ui/game_icon.dart';
+import 'ui/yarn_basket.dart';
 import 'ui/game_shell.dart';
 import 'l10n/strings.dart';
 import 'modes.dart';
@@ -37,6 +38,11 @@ Future<void> main() async {
       await IconRegistry.load(); // painted icons replace the emoji (D-037)
     } catch (e) {
       debugPrint('icons.json not loaded, showing emoji: $e'); // never a hole
+    }
+    try {
+      await BasketArt.load(); // the home basket (D-040)
+    } catch (e) {
+      debugPrint('basket art not loaded, showing the yarn ball: $e');
     }
     await Hive.initFlutter();
     final box = await Hive.openBox<String>('whisker_tales_save');

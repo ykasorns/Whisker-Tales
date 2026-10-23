@@ -110,5 +110,19 @@
    "class_mage",
    "arrow"
   ]
+ },
+ "sheet_home_yarn": {
+  "cols": 3,
+  "rows": 2,
+  "ids": [
+   "yarn_1",
+   "yarn_2",
+   "yarn_3",
+   "yarn_4",
+   "yarn_5",
+   "yarn_6"
+  ],
+  "out": "home",
+  "prefix": ""
  }
 }

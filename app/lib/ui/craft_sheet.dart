@@ -5,6 +5,7 @@ import 'package:wt_core/wt_core.dart';
 import '../l10n/strings.dart';
 import 'home_page.dart';
 import 'game_icon.dart';
+import 'yarn_basket.dart';
 import 'palette.dart';
 
 /// Knit flow (GDD v0.4 §3, D-010): pick a slot → the yarn ball wiggles →
@@ -100,7 +101,9 @@ class _CraftSheetState extends ConsumerState<_CraftSheet> {
         padding: const EdgeInsets.all(16),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Row(children: [
-            YarnBall(size: 52, wiggle: _wiggle),
+            // the same basket as on the home panel: its balls leap where the
+            // knit happens (D-040)
+            YarnBasket(height: 64, knit: _wiggle),
             const SizedBox(width: 8),
             Expanded(
                 child: IconText(item == null ? s.pickSlot : s.newItem,

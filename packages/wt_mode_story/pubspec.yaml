@@ -1,8 +1,8 @@
 name: wt_mode_story
 description: >
   Whisker Tales — Story mode (biome + boss), the MVP game mode. Implements
-  GameMode from wt_core (MODE_PLUGIN_SPEC.md §3). Empty scaffold; logic lands
-  in T-031.
+  GameMode from wt_core (MODE_PLUGIN_SPEC.md §3). Group B (D-042); ships
+  dormant (manifest enabled:false) until YK decides it is part of v1.0.
 version: 0.1.0
 publish_to: none
 
@@ -22,3 +22,5 @@ dev_dependencies:
   flutter_lints: ^4.0.0
 
 flutter:
+  assets:
+    - assets/manifest.json

@@ -336,6 +336,26 @@ void main() {
     expect(again['age'], {'band': 'under13'});
   });
 
+  test('a mode\'s save goes under modes.<id> and comes back', () {
+    final time = Time(t0);
+    final store = MemorySaveStore();
+    final a = game(time, store);
+    addTearDown(a.dispose);
+    a.read(modeSavesProvider).restore({
+      'story': {'best': 3},
+      'other': {'x': 1},
+    });
+    final doc = a.read(gameSaverProvider).capture();
+    expect(doc['modes'], {
+      'story': {'best': 3},
+      'other': {'x': 1},
+    });
+    final b = game(time, store);
+    addTearDown(b.dispose);
+    b.read(gameSaverProvider).restore(doc);
+    expect(b.read(gameSaverProvider).capture()['modes'], doc['modes']);
+  });
+
   test('a broken section names itself', () {
     final time = Time(t0);
     final a = game(time, MemorySaveStore());

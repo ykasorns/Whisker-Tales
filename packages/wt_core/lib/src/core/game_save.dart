@@ -18,8 +18,8 @@ import 'wallet/memory_wallet.dart';
 /// Puts every module's state into one Save v3 document and back
 /// (GAME_CONTRACT §4.6, T-022). Part of the wiring layer, like
 /// `providers.dart`: modules only expose `toJson`/`restore`; this is the one
-/// place that knows them all. Sections no module owns yet (modes,
-/// settings) are carried through unchanged.
+/// place that knows them all. Sections no module owns yet are carried
+/// through unchanged.
 class GameSaver {
   GameSaver(this._ref);
 
@@ -27,6 +27,12 @@ class GameSaver {
   Map<String, dynamic> _carry = {};
 
   static const version = 3;
+
+  /// `profile.flags` as saved (story unlocks and the like).
+  Set<String> get profileFlags => {
+        if (_section('profile', const {})['flags'] case final List l)
+          ...l.whereType<String>(),
+      };
 
   Map<String, dynamic> _section(String k, Map<String, dynamic> fallback) {
     final v = _carry[k];
@@ -94,7 +100,7 @@ class GameSaver {
       'age': {'band': _ref.read(ageGateProvider).toJsonBand()},
       // what was bought decides no_ads; a carried flag never sticks on
       'entitlements': {...ent, ...?iap?.toJson()},
-      'modes': _section('modes', const {}),
+      'modes': _ref.read(modeSavesProvider).toJson(),
       'settings': {
         ..._section('settings',
             const {'lang': 'th', 'bgm': true, 'sfx': true, 'speed': 1}),
@@ -204,6 +210,8 @@ class GameSaver {
     // loading = opening the app: a day that turned since the save resets now
     _ref.read(gameClockProvider).tick();
 
+    _ref.read(modeSavesProvider).restore(doc['modes']);
+
     _carry = {
       for (final k in const [
         'profile',
@@ -211,7 +219,6 @@ class GameSaver {
         'research',
         'daily',
         'entitlements',
-        'modes',
         'settings'
       ])
         if (doc[k] != null) k: doc[k],

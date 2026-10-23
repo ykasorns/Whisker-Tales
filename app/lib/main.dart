@@ -30,7 +30,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // the game is designed for a phone held upright (60/40 layout)
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  registerModes();
+  final modes = await registerModes();
   try {
     final content =
         await ContentRepository(const AssetContentSource()).loadAll();
@@ -53,6 +53,7 @@ Future<void> main() async {
     // new game, with the broken save kept aside (bootGame)
     final boot = await bootGame(() => ProviderContainer(overrides: [
           ...content.overrides,
+          modeRegistryProvider.overrideWithValue(modes),
           saveServiceProvider.overrideWithValue(saves),
           iapStoreProvider.overrideWithValue(store),
           cloudStoreProvider.overrideWithValue(const PlayCloudStore()),

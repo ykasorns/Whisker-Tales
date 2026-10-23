@@ -13,6 +13,7 @@ import 'contracts/rewards.dart';
 import '../gear/gear.dart';
 import '../iap/iap.dart';
 import '../idle/idle.dart';
+import '../modes/mode_registry.dart';
 import '../offline/offline_reward.dart';
 import '../pets/pets.dart';
 import '../audio/audio.dart';
@@ -21,6 +22,7 @@ import '../wardrobe/wardrobe.dart';
 import 'contracts/wallet.dart';
 import 'wallet/memory_wallet.dart';
 import 'state/game_state.dart';
+import 'game_save.dart';
 
 /// Shared Riverpod providers — the only channel between modules besides
 /// `core/contracts/` (GAME_CONTRACT §3). Module tasks add their providers here.
@@ -359,3 +361,29 @@ final audioOutputProvider = Provider<AudioOutput>((ref) => SilentAudioOutput());
 /// Music and effects (T-024). Its two switches are saved in `settings`.
 final audioServiceProvider = Provider<AudioService>((ref) => AudioService(
     ref.watch(audioRulesProvider), ref.watch(audioOutputProvider)));
+
+/// Run-based modes (MODE_PLUGIN_SPEC §2). The app registers its modes in
+/// `modes.dart` and overrides this at boot; empty until then.
+final modeRegistryProvider = Provider<ModeRegistry>((ref) => ModeRegistry());
+
+/// Each mode's saved state (`modes.<id>`), loaded and saved with the game.
+final modeSavesProvider =
+    Provider<ModeSaves>((ref) => ModeSaves(ref.watch(modeRegistryProvider)));
+
+/// What mode unlock rules are checked against: save flags, goldfish held and
+/// the chapter bosses beaten in the main loop (a boss counts once the last
+/// page of its chapter is cleared).
+final Provider<ModeUnlockContext Function()> modeUnlockContextProvider =
+    Provider<ModeUnlockContext Function()>((ref) => () {
+          final cleared = ref.read(idleLoopProvider).state.clearedPage;
+          final rules = ref.read(idleRulesProvider);
+          final chapters = ref.read(chapterBookProvider).chapters;
+          return ModeUnlockContext(
+            flags: ref.read(gameSaverProvider).profileFlags,
+            fishTotal: ref.read(walletProvider).balance(Currency.goldfish),
+            bossCleared: (id) {
+              final i = chapters.indexWhere((c) => c.boss == id);
+              return i >= 0 && cleared >= (i + 1) * rules.pagesPerChapter;
+            },
+          );
+        });

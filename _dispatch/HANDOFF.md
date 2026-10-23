@@ -1,7 +1,7 @@
-# HANDOFF — Whisker Tales (updated 2026-10-23, after D-041, last commit 6e8e3ea)
+# HANDOFF — Whisker Tales (updated 2026-10-23, after D-042)
 
 Read this first if you are a new session or a different model picking up the work.
-For background, also read `DECISIONS.md` (D-001 … D-041), `_contract/GAME_CONTRACT.md`, `_contract/GDD_WhiskerTales_v0.5.md` and `RELEASE_CHECKLIST.md`.
+For background, also read `DECISIONS.md` (D-001 … D-042), `_contract/GAME_CONTRACT.md`, `_contract/GDD_WhiskerTales_v0.5.md` and `RELEASE_CHECKLIST.md`.
 
 ---
 
@@ -93,7 +93,13 @@ Verification commands are in §6; the last full run before this note was green.
 - T-041: Android system notification for "research done" while the app is closed → v1.1.
 - Balance is a set of ASSUMPTIONs; re-run `flutter test tool/headless_player_test.dart` (in `packages/wt_core`) after any power change. Both targets must PASS.
 
-## 5. Next: Group B (story challenge mode), still in todo
+## 5. Group B (story challenge mode) — IN PROGRESS (D-042)
+
+**Chunk 1 (T-031) is done and in `_dispatch/done/`**: `ModeRegistry`, `ModeSaves`, `wt_core_testing.dart` conformance checks, `wt_mode_story` skeleton (dormant, `enabled:false`). YK ordered Group B built, but has **not** decided whether v1.0 includes it (recommendation: v1.1). Ask in one line.
+
+**Next = chunk 2 (T-005 + T-006).** First settle the 6 contract gaps listed at the end of `_dispatch/done/T-031_mode_framework.md` (branching choice, cat snapshot into the mode, boss AC without dodge, 3 full runs/day then 25%, one content location, balance 12.2 days). Call `advisor()` before changing any interface, and log a D-entry. Commit per chunk only when YK asks.
+
+Original plan (chunk 1 done):
 
 GDD v0.5 §6/§8 keeps "ท้าทายนิทาน" (story challenge) in MVP, but YK has **not** yet decided whether v1.0 ships with it or with a locked "เร็ว ๆ นี้" ("coming soon") button.
 

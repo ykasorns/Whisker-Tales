@@ -330,6 +330,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sounds => '🔊 Sounds';
 
   @override
+  String get shortHp => 'HP';
+
+  @override
+  String get shortAtk => 'ATK';
+
+  @override
+  String get shortDef => 'DEF';
+
+  @override
+  String get shortEvade => 'Dodge';
+
+  @override
+  String get shortCrit => 'Crit';
+
+  @override
+  String get shortSkill => 'Skill';
+
+  @override
+  String get shortPower => 'Power';
+
+  @override
+  String get curFish => 'Goldfish';
+
+  @override
+  String get curYarn => 'Yarn';
+
+  @override
+  String get curEggs => 'Eggs';
+
+  @override
+  String pityLabel(int n) {
+    return 'Guarantee in $n';
+  }
+
+  @override
   String get switchLanguage => '🌐 ภาษาไทย';
 
   @override

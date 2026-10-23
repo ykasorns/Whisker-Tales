@@ -97,12 +97,12 @@ class _CatTabState extends ConsumerState<_CatTab> {
       const SizedBox(height: 12),
       Wrap(spacing: 8, runSpacing: 8, children: [
         for (final (k, v) in [
-          ('❤️ HP', '${st.hp}'),
-          ('⚔️ ATK', '${st.atk}'),
-          ('🛡️ DEF', '${st.def}'),
-          ('💨', pct(Attribute.evade)),
-          ('💥', pct(Attribute.crit)),
-          ('✨', pct(Attribute.skillDmg)),
+          ('❤️ ${s.shortHp}', '${st.hp}'),
+          ('⚔️ ${s.shortAtk}', '${st.atk}'),
+          ('🛡️ ${s.shortDef}', '${st.def}'),
+          ('💨 ${s.shortEvade}', pct(Attribute.evade)),
+          ('💥 ${s.shortCrit}', pct(Attribute.crit)),
+          ('✨ ${s.shortSkill}', pct(Attribute.skillDmg)),
         ])
           Container(
             width: 104,

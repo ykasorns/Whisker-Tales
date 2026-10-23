@@ -124,7 +124,7 @@ class _CraftSheetState extends ConsumerState<_CraftSheet> {
             ),
             const SizedBox(height: 4),
             IconText(
-                '${_odds(grades, basket.gradeTable)} · 💜 ${basket.pityLeft}',
+                '${_odds(grades, basket.gradeTable)} · 💜 ${s.pityLabel(basket.pityLeft)}',
                 style: const TextStyle(fontSize: 12, color: Palette.inkSoft)),
             const SizedBox(height: 12),
             Wrap(spacing: 8, runSpacing: 8, children: [
@@ -229,10 +229,11 @@ class _Compare extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w800)),
             ]),
             IconText(
-                '⚔️ ${g.stats.atk}${arrow(g.stats.atk, other?.stats.atk)}'),
-            IconText('❤️ ${g.stats.hp}${arrow(g.stats.hp, other?.stats.hp)}'),
+                '⚔️ ${s.shortAtk} ${g.stats.atk}${arrow(g.stats.atk, other?.stats.atk)}'),
             IconText(
-                '🛡️ ${g.stats.def}${arrow(g.stats.def, other?.stats.def)}'),
+                '❤️ ${s.shortHp} ${g.stats.hp}${arrow(g.stats.hp, other?.stats.hp)}'),
+            IconText(
+                '🛡️ ${s.shortDef} ${g.stats.def}${arrow(g.stats.def, other?.stats.def)}'),
             for (final e in g.stats.attrs.entries)
               IconText('✦ ${e.key.key} +${(e.value / 100).toStringAsFixed(1)}%',
                   style: const TextStyle(fontSize: 12)),

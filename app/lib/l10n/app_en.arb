@@ -275,6 +275,18 @@
   "statDef": "Defense",
   "music": "🎵 Music",
   "sounds": "🔊 Sounds",
+  "shortHp": "HP",
+  "shortAtk": "ATK",
+  "shortDef": "DEF",
+  "shortEvade": "Dodge",
+  "shortCrit": "Crit",
+  "shortSkill": "Skill",
+  "shortPower": "Power",
+  "curFish": "Goldfish",
+  "curYarn": "Yarn",
+  "curEggs": "Eggs",
+  "pityLabel": "Guarantee in {n}",
+  "@pityLabel": {"placeholders": {"n": {"type": "int"}}},
   "switchLanguage": "🌐 ภาษาไทย",
   "@switchLanguage": {
     "description": "Shown in the other language: the one it switches to"

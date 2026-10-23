@@ -329,6 +329,41 @@ class AppLocalizationsTh extends AppLocalizations {
   String get sounds => '🔊 เสียงเอฟเฟกต์';
 
   @override
+  String get shortHp => 'เลือด';
+
+  @override
+  String get shortAtk => 'โจมตี';
+
+  @override
+  String get shortDef => 'ป้องกัน';
+
+  @override
+  String get shortEvade => 'หลบ';
+
+  @override
+  String get shortCrit => 'คริ';
+
+  @override
+  String get shortSkill => 'สกิล';
+
+  @override
+  String get shortPower => 'พลัง';
+
+  @override
+  String get curFish => 'ปลาทอง';
+
+  @override
+  String get curYarn => 'ไหมพรม';
+
+  @override
+  String get curEggs => 'ไข่';
+
+  @override
+  String pityLabel(int n) {
+    return 'การันตีอีก $n';
+  }
+
+  @override
   String get switchLanguage => '🌐 English';
 
   @override

@@ -650,6 +650,72 @@ abstract class AppLocalizations {
   /// **'🔊 Sounds'**
   String get sounds;
 
+  /// No description provided for @shortHp.
+  ///
+  /// In en, this message translates to:
+  /// **'HP'**
+  String get shortHp;
+
+  /// No description provided for @shortAtk.
+  ///
+  /// In en, this message translates to:
+  /// **'ATK'**
+  String get shortAtk;
+
+  /// No description provided for @shortDef.
+  ///
+  /// In en, this message translates to:
+  /// **'DEF'**
+  String get shortDef;
+
+  /// No description provided for @shortEvade.
+  ///
+  /// In en, this message translates to:
+  /// **'Dodge'**
+  String get shortEvade;
+
+  /// No description provided for @shortCrit.
+  ///
+  /// In en, this message translates to:
+  /// **'Crit'**
+  String get shortCrit;
+
+  /// No description provided for @shortSkill.
+  ///
+  /// In en, this message translates to:
+  /// **'Skill'**
+  String get shortSkill;
+
+  /// No description provided for @shortPower.
+  ///
+  /// In en, this message translates to:
+  /// **'Power'**
+  String get shortPower;
+
+  /// No description provided for @curFish.
+  ///
+  /// In en, this message translates to:
+  /// **'Goldfish'**
+  String get curFish;
+
+  /// No description provided for @curYarn.
+  ///
+  /// In en, this message translates to:
+  /// **'Yarn'**
+  String get curYarn;
+
+  /// No description provided for @curEggs.
+  ///
+  /// In en, this message translates to:
+  /// **'Eggs'**
+  String get curEggs;
+
+  /// No description provided for @pityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Guarantee in {n}'**
+  String pityLabel(int n);
+
   /// Shown in the other language: the one it switches to
   ///
   /// In en, this message translates to:

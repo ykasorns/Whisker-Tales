@@ -99,7 +99,7 @@ class _Hud extends ConsumerWidget {
                         backgroundColor: Palette.sheet,
                         minHeight: 5),
                   ),
-                  IconText('🐾 ${fmtNum(power)}',
+                  IconText('🐾 ${s.shortPower} ${fmtNum(power)}',
                       style: const TextStyle(fontWeight: FontWeight.w700)),
                 ]),
               ]),
@@ -111,11 +111,14 @@ class _Hud extends ConsumerWidget {
             top: 10,
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              IconText('🐟 ${fmtNum(wallet.balance(Currency.goldfish))}',
+              IconText(
+                  '${s.curFish} 🐟 ${fmtNum(wallet.balance(Currency.goldfish))}',
                   style: _bold),
-              IconText('🧶 ${fmtNum(wallet.balance(Currency.yarn))}',
+              IconText(
+                  '${s.curYarn} 🧶 ${fmtNum(wallet.balance(Currency.yarn))}',
                   style: _bold),
-              IconText('🥚 ${wallet.balance(Currency.eggs)}', style: _bold),
+              IconText('${s.curEggs} 🥚 ${wallet.balance(Currency.eggs)}',
+                  style: _bold),
               const RoadChips(),
             ]),
           ),
@@ -438,7 +441,12 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
                                   KnitPop(
                                       key: ValueKey(p.key),
                                       art: p.art,
-                                      kept: p.kept),
+                                      kept: p.kept,
+                                      onDone: () {
+                                        if (mounted && _pop?.key == p.key) {
+                                          setState(() => _pop = null);
+                                        }
+                                      }),
                               ]),
                           const SizedBox(width: 12),
                           Flexible(
@@ -622,19 +630,31 @@ class _YarnBallState extends State<YarnBall> with TickerProviderStateMixin {
 /// either settles (kept) or fades away into goldfish (recycled).
 class KnitPop extends StatelessWidget {
   const KnitPop(
-      {super.key, required this.art, required this.kept, this.size = 56});
+      {super.key,
+      required this.art,
+      required this.kept,
+      this.size = 56,
+      this.onDone});
   final String art;
   final bool kept;
   final double size;
+
+  /// Called when the animation ends and nothing is left on screen.
+  final VoidCallback? onDone;
 
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 900),
+      duration: const Duration(milliseconds: 1200),
+      onEnd: onDone,
       builder: (context, v, _) {
         final up = Curves.easeOutBack.transform(math.min(1, v * 1.6));
-        final fade = kept ? 1.0 : (1 - math.max(0, (v - 0.55) / 0.45));
+        // a kept piece lingers a moment (it is in the slot now), then both
+        // kinds fade out completely — nothing stays on screen
+        final fade = kept
+            ? 1 - math.max(0, (v - 0.7) / 0.3)
+            : (1 - math.max(0, (v - 0.55) / 0.45));
         return Opacity(
           opacity: fade.clamp(0.0, 1.0).toDouble(),
           child: Transform.translate(

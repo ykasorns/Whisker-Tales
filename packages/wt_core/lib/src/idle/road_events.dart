@@ -37,8 +37,13 @@ class RoadEventDef {
     required this.waves,
     this.instantFishWaves = 0,
     this.icon = '✨',
+    this.nameTh = '',
+    this.nameEn = '',
   });
   final String id;
+
+  /// Short name shown on the effect chip (no icon without a word).
+  final String nameTh, nameEn;
 
   /// Shown on the road and on the effect chip.
   final String icon;
@@ -130,6 +135,8 @@ class RoadEventRules {
         effects: List.unmodifiable(effects),
         waves: e['waves'] as int? ?? buffWaves,
         icon: e['icon'] as String? ?? '✨',
+        nameTh: e['name_th'] as String? ?? id,
+        nameEn: e['name_en'] as String? ?? id,
         instantFishWaves: instant is int ? instant : 0,
       );
       if (def.effects.isEmpty && !def.isInstant) {

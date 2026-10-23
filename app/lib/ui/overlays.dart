@@ -44,9 +44,9 @@ Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
           const SizedBox(height: 12),
           Wrap(spacing: 14, children: [
             for (final (icon, v) in [
-              ('🐟', r.reward[Currency.goldfish]),
-              ('🧶', r.reward[Currency.yarn]),
-              ('🥚', r.reward[Currency.eggs]),
+              ('🐟 ${s.curFish}', r.reward[Currency.goldfish]),
+              ('🧶 ${s.curYarn}', r.reward[Currency.yarn]),
+              ('🥚 ${s.curEggs}', r.reward[Currency.eggs]),
               ('⭐ EXP', r.exp),
             ])
               if (v > 0)
@@ -119,7 +119,8 @@ class RoadChips extends ConsumerWidget {
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               GameIcon.event(d.id, d.icon, size: 18),
-              IconText('${badge(d)} ·${a.wavesLeft}',
+              IconText(
+                  '${AppLocalizations.of(context).lang == 'en' ? d.nameEn : d.nameTh} ${badge(d)} ·${a.wavesLeft}',
                   style: const TextStyle(
                       fontSize: 12, fontWeight: FontWeight.w700)),
               if (ad) ...[

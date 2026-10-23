@@ -217,9 +217,13 @@ class BattleGame extends FlameGame {
     if (isLoaded) _layout();
   }
 
+  /// Mochi stands further right so the pets have room on her left (YK
+  /// 2026-10-23: they were hidden behind her).
+  static const _mochiX = 0.40;
+
   void _layout() {
     mochi
-      ..position = Vector2(size.x * 0.24, groundY)
+      ..position = Vector2(size.x * _mochiX, groundY)
       // a bit smaller so the scene breathes (YK 2026-10-23, D-030)
       ..frameScale = size.y * 0.27 / 335;
   }
@@ -253,9 +257,9 @@ class BattleGame extends FlameGame {
     final enemies =
         loop.fightUnits.where((u) => u.side == CombatSide.enemy).toList();
     const spots = {
-      1: [0.74],
-      2: [0.64, 0.86],
-      3: [0.6, 0.76, 0.92]
+      1: [0.78],
+      2: [0.70, 0.90],
+      3: [0.66, 0.80, 0.93]
     };
     for (var i = 0; i < enemies.length; i++) {
       final e = enemies[i];
@@ -512,11 +516,16 @@ class _Pets extends Component {
   @override
   void render(ui.Canvas c) {
     final pets = game.pets?.call() ?? const [];
-    final h = game.size.y * 0.1;
+    final u = game.size.y;
     for (var i = 0; i < pets.length; i++) {
       final p = pets[i];
-      final hop = (math.sin(t * 8 + i * 1.7)).abs() * game.size.y * 0.02;
-      final x = game.mochi.position.x - game.size.x * (0.08 + 0.07 * i);
+      // a staggered formation to Mochi's left, clear of her body: the
+      // front row stands on the ground, the back row a step higher and smaller
+      final back = i.isOdd;
+      final h = u * (back ? 0.078 : 0.088);
+      final hop = (math.sin(t * 8 + i * 1.7)).abs() * u * 0.02;
+      final lift = back ? u * 0.03 : 0.0;
+      final x = game.mochi.position.x - u * (0.2 + 0.085 * i);
       final pose = (game._petAttack[p.id] ?? 0) > 0 ? 'attack' : 'idle';
       final key = 'pet/${p.id}_$pose.png';
       if (game.images.containsKey(key)) {
@@ -525,7 +534,7 @@ class _Pets extends Component {
         c.drawImageRect(
             im,
             ui.Rect.fromLTWH(0, 0, im.width.toDouble(), im.height.toDouble()),
-            ui.Rect.fromLTWH(x - w / 2, game.groundY - h - hop, w, h),
+            ui.Rect.fromLTWH(x - w / 2, game.groundY - h - hop - lift, w, h),
             ui.Paint()..filterQuality = ui.FilterQuality.medium);
         continue;
       }
@@ -536,7 +545,8 @@ class _Pets extends Component {
                 text: TextSpan(text: p.icon, style: TextStyle(fontSize: size)),
                 textDirection: TextDirection.ltr,
               )..layout());
-      tp.paint(c, Offset(x - tp.width / 2, game.groundY - tp.height - hop));
+      tp.paint(
+          c, Offset(x - tp.width / 2, game.groundY - tp.height - hop - lift));
     }
   }
 }

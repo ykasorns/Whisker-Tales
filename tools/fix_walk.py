@@ -18,7 +18,20 @@ import tempfile
 from PIL import Image
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+def require_magenta(path: str) -> None:
+    """Stop when the sheet's border is not the magenta key colour — a wrong
+    file (e.g. something else picked up from Downloads) must never be sliced."""
+    import numpy as np
+    from PIL import Image
+    rgb = np.asarray(Image.open(path).convert('RGB'))
+    border = np.concatenate([rgb[:4].reshape(-1, 3), rgb[-4:].reshape(-1, 3),
+                             rgb[:, :4].reshape(-1, 3), rgb[:, -4:].reshape(-1, 3)])
+    r, g, b = np.median(border, axis=0)
+    if not (r > 200 and b > 200 and g < 90):
+        sys.exit(f'ERROR: {path} is not on a magenta background (border {int(r)},{int(g)},{int(b)}) — wrong file?')
+
 cls, sheet = sys.argv[1], sys.argv[2]
+require_magenta(sheet)
 OUT = f'{ROOT}/assets/raw/frames/outfit/{cls}'
 
 with tempfile.TemporaryDirectory() as tmp:

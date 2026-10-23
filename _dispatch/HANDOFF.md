@@ -118,6 +118,13 @@ Not for v1.0: T-032 (endless, P2) and HOLD_T-047 (dungeon, v1.1).
 
 All UI icons are painted art, not emoji. To add an icon: draw it (sheet prompt style in `design/art/icon_prompts.md`; same ChatGPT chat; send the prompt by JS `document.execCommand('insertText')` into the composer — typing with newlines sends the message early) → save as `assets/raw/sheets/<sheet>.png` and list the ids in `design/art/icon_sheets.json` → `python3 -I tools/slice_icon_sheet.py <sheet>` → `python3 tools/sync_sprites.py` → map the emoji in `design/art/icons.json` (or add to `keep_as_text`) → `bash tools/sync_content.sh`. Draw with `IconText` / `GameIcon`, never `Text` with an emoji or `Icons.*` (tests fail). Purple art needs the slicer's `--spill-start 110`, already set in `slice_icon_sheet.py`.
 
+## 5c. Downloading from ChatGPT safely, walk frames
+
+- The image viewer shows an **intermediate** image while ChatGPT is still refining ("Worked for …", stop button visible). Wait until the stop button is gone, then open the final image and download.
+- **Never** take `ls -t ~/Downloads | head -1`: on 2026-10-23 that moved YK's own file into the repo (put back unchanged, nothing sent). Take the file by the exact new name with a fresh mtime. `fix_walk.py` and `slice_icon_sheet.py` now refuse a sheet whose border is not magenta.
+- Walk frames: `python3 -I tools/fix_walk.py <class> assets/raw/sheets/sheet_walk_<class>.png` replaces `assets/raw/frames/outfit/<class>/walk_f1..3.png`, then `python3 tools/sync_sprites.py`. The prompt that works describes pose 3 anatomically (far leg forward, near leg bent behind with the heel up); the vaguer "other leg forward" wording was ignored.
+- Sending a prompt: insert the text with `execCommand('insertText')`, then press Return in the composer (the blue send button click can miss).
+
 ## 6. Commands
 
 ```bash

@@ -11,7 +11,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
 
-import 'chapter_art.dart';
 import 'ui/palette.dart';
 
 /// Drives the game while the app is open: the idle loop, auto-knit and the
@@ -64,6 +63,7 @@ class _GameViewState extends ConsumerState<GameView> {
     rules: widget.avatarRules,
     driver: widget.driver,
     loop: ref.read(idleLoopProvider),
+    chapters: ref.read(chapterBookProvider),
     classId: () => ref.read(catClassProvider).current,
     pets: () {
       final pets = ref.read(petsProvider);
@@ -84,6 +84,7 @@ class BattleGame extends FlameGame {
     required this.rules,
     required this.driver,
     required this.loop,
+    required this.chapters,
     required this.classId,
     this.pets,
   });
@@ -97,6 +98,9 @@ class BattleGame extends FlameGame {
   final AvatarRules rules;
   final GameDriver driver;
   final IdleLoop loop;
+
+  /// Monsters, bosses and scenery per chapter (D-032).
+  final ChapterBook chapters;
 
   /// The cat's class: Mochi wears its outfit (D-024).
   final String Function() classId;
@@ -155,11 +159,11 @@ class BattleGame extends FlameGame {
       for (final f in _catFrames) 'cat/$f.png',
       ...outfits,
       ...petFrames,
-      for (final k in ChapterArt.kinds)
+      for (final k in chapters.kinds)
         for (final f in _monFrames) 'mon/${k}_$f.png',
       'bg/bg_book1_L0_sky.png',
       'bg/bg_book1_L3_ground.png',
-      for (final a in ChapterArt.all)
+      for (final a in chapters.chapters)
         for (final l in ['L1_far', 'L2_mid']) 'bg/bg_book1_${a.layer}_$l.png',
     ]);
     _bg = _Parallax(this);
@@ -249,9 +253,9 @@ class BattleGame extends FlameGame {
               0.56 + 0.38 * j / (enemies.length - 1)
           ];
       final page = loop.state.farmPage;
-      final mons = ChapterArt.of(loop.rules, page).monsters;
+      final mons = chapters.of(loop.rules, page).monsters;
       final kind = e.isBoss
-          ? ChapterArt.bossOf(loop.rules, page)
+          ? chapters.bossOf(loop.rules, page)
           : mons[(loop.fightId + i) % mons.length];
       final m = _Monster(this, kind, boss: e.isBoss)
         ..position = Vector2(size.x * xs[i], groundY)
@@ -338,7 +342,7 @@ class _Parallax extends Component {
     final s = game.size, gy = game.groundY;
     _tile('bg/bg_book1_L0_sky.png', 0.05, s.y, s.y, c);
     final layer =
-        ChapterArt.of(game.loop.rules, game.loop.state.farmPage).layer;
+        game.chapters.of(game.loop.rules, game.loop.state.farmPage).layer;
     _tile(
         'bg/bg_book1_${layer}_L1_far.png', 0.2, s.y * 0.62, gy + s.y * 0.04, c);
     _tile(

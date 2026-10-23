@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "_doc": "บทของเล่ม 1 (GDD v0.4 §12, T-043, D-032) — ลำดับ = บท 1..chapters_per_book · monsters = มอนในคลื่น (สลับกันตาม fight) · boss = บอสประจำบท (หน้าสุดท้ายของบท) · หน้าอื่นใช้ monsters[0] ตัวใหญ่เป็นบอสหน้า · layer = ชื่อชั้นฉาก bg_book1_<layer>_L1_far / _L2_mid · ภาพอยู่ assets/game (tools/sync_sprites.py) · เล่มถัดไปใช้ชุดนี้วนจนกว่าจะมีของตัวเอง",
+  "chapters": [
+    {
+      "id": "pencil_meadow",
+      "name_th": "ทุ่งดินสอสี",
+      "name_en": "Crayon Meadow",
+      "layer": "ch1",
+      "monsters": ["eraserslime", "acorn"],
+      "boss": "eraserking"
+    },
+    {
+      "id": "ink_lake",
+      "name_th": "ทะเลสาบหมึก",
+      "name_en": "Ink Lake",
+      "layer": "ch2",
+      "monsters": ["inkbat", "crayonsnail"],
+      "boss": "sharpcrab"
+    },
+    {
+      "id": "paper_forest",
+      "name_th": "ป่ากระดาษ",
+      "name_en": "Paper Forest",
+      "layer": "ch3",
+      "monsters": ["shavinghog", "clipbeetle"],
+      "boss": "paperwolf"
+    }
+  ]
+}

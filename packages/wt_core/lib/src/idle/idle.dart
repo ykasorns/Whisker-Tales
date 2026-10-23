@@ -2,6 +2,7 @@
 /// Shared types live in `core/contracts/idle_loop.dart`.
 library;
 
+export 'chapters.dart';
 export 'idle_loop.dart';
 export 'idle_rules.dart';
 export 'income_model.dart';

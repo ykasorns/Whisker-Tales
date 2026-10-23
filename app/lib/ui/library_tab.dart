@@ -44,6 +44,9 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
       case ResearchEffect.stat:
         final per = r.rules.statBpPerLevel / 100;
         return s.statNode(s.statName(n.mainStat!), _pct(per), _pct(per * lv));
+      case ResearchEffect.bonus:
+        final per = n.bonusBpPerLevel / 100;
+        return s.statNode(_name(s, n), _pct(per), _pct(per * lv));
       case ResearchEffect.offlineCap:
         final cap = ref.read(offlineRulesProvider).capFor(lv);
         return s.offlineNode(fmtDur(cap).replaceAll(RegExp(r':\d\d$'), ''));
@@ -52,8 +55,9 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
     }
   }
 
-  static String _pct(num v) =>
-      v == v.roundToDouble() ? '${v.round()}' : v.toStringAsFixed(1);
+  static String _pct(num v) => v == v.roundToDouble()
+      ? '${v.round()}'
+      : v.toStringAsFixed(2).replaceAll(RegExp(r'0$'), '');
 
   @override
   Widget build(BuildContext context) {

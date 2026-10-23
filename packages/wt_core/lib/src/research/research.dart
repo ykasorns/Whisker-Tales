@@ -11,7 +11,7 @@ import '../core/contracts/wallet.dart';
 /// Ad placement for cutting research time (D-003).
 const researchSpeedupPlacement = 'research_speedup';
 
-enum ResearchEffect { stat, offlineCap, queue }
+enum ResearchEffect { stat, bonus, offlineCap, queue }
 
 /// Why a node cannot start right now.
 enum ResearchBlock { maxed, locked, running, queueFull, fish }
@@ -25,6 +25,8 @@ class ResearchNode {
     required this.effect,
     required this.maxLevel,
     this.mainStat,
+    this.bonusAttr,
+    this.bonusBpPerLevel = 0,
     this.costMult = 1,
     this.timeMult = 1,
     this.requires = const [],
@@ -37,6 +39,11 @@ class ResearchNode {
 
   /// `atk` / `hp` / `def` for stat nodes.
   final String? mainStat;
+
+  /// Bonus stat of a `bonus` node (crit, evade, fish find …) and how much
+  /// each level adds, in basis points.
+  final Attribute? bonusAttr;
+  final int bonusBpPerLevel;
   final num costMult, timeMult;
 
   /// Every (node, level) must be reached first.
@@ -109,14 +116,23 @@ class ResearchRules {
       FormatException bad(String why) => FormatException('node $id: $why');
       final effect = switch (m['effect']) {
         'stat' => ResearchEffect.stat,
+        'bonus' => ResearchEffect.bonus,
         'offline_cap' => ResearchEffect.offlineCap,
         'queue' => ResearchEffect.queue,
-        _ => throw bad('effect must be stat, offline_cap or queue'),
+        _ => throw bad('effect must be stat, bonus, offline_cap or queue'),
       };
       final attr = m['attr'];
       if (effect == ResearchEffect.stat &&
           !const {'atk', 'hp', 'def'}.contains(attr)) {
         throw bad('stat node needs attr atk, hp or def');
+      }
+      final bonusAttr = effect == ResearchEffect.bonus && attr is String
+          ? Attribute.fromKey(attr)
+          : null;
+      final perLevel = m['pct_per_level'];
+      if (effect == ResearchEffect.bonus &&
+          (bonusAttr == null || perLevel is! num || perLevel <= 0)) {
+        throw bad('bonus node needs a known attr and pct_per_level > 0');
       }
       final max = m['max_level'];
       if (max is! int || max < 1) throw bad('max_level must be ≥ 1');
@@ -136,6 +152,9 @@ class ResearchRules {
         effect: effect,
         maxLevel: max,
         mainStat: effect == ResearchEffect.stat ? attr as String : null,
+        bonusAttr: bonusAttr,
+        bonusBpPerLevel:
+            bonusAttr == null ? 0 : ((perLevel as num) * kBp / 100).round(),
         costMult: m['cost_mult'] as num? ?? 1,
         timeMult: m['time_mult'] as num? ?? 1,
         requires: [
@@ -226,13 +245,31 @@ class Research implements IResearch {
       .where((n) => n.effect == ResearchEffect.stat && n.mainStat == mainStat)
       .fold(0, (a, n) => a + levelOf(n.id) * rules.statBpPerLevel);
 
-  /// [cat] with the stat nodes applied (% of the main stats).
+  /// Bonus stats from `bonus` nodes (added on top of gear and pets).
+  Map<Attribute, int> get bonusAttrs {
+    final out = <Attribute, int>{};
+    for (final n in rules.nodes) {
+      final a = n.bonusAttr, lv = levelOf(n.id);
+      if (a != null && lv > 0) out[a] = (out[a] ?? 0) + lv * n.bonusBpPerLevel;
+    }
+    return out;
+  }
+
+  /// [cat] with the stat nodes applied (% of the main stats) and the bonus
+  /// nodes added.
   CombatUnitSpec withBonus(CombatUnitSpec cat) {
     final atk = statBp('atk'), hp = statBp('hp'), def = statBp('def');
-    if (atk == 0 && hp == 0 && def == 0) return cat;
-    return cat.copyWith(
-        stats:
-            cat.stats.scaledBp(atk: kBp + atk, hp: kBp + hp, def: kBp + def));
+    final bonus = bonusAttrs;
+    if (atk == 0 && hp == 0 && def == 0 && bonus.isEmpty) return cat;
+    var stats =
+        cat.stats.scaledBp(atk: kBp + atk, hp: kBp + hp, def: kBp + def);
+    if (bonus.isNotEmpty) {
+      stats = stats.copyWith(attrs: {
+        ...stats.attrs,
+        for (final e in bonus.entries) e.key: stats[e.key] + e.value,
+      });
+    }
+    return cat.copyWith(stats: stats);
   }
 
   int costOf(ResearchNode node) => rules.costFor(node, levelOf(node.id) + 1);

@@ -197,6 +197,48 @@ void main() {
     expect(s.def, 54);
   });
 
+  test('bonus nodes add secondary stats on top of gear (D-032)', () {
+    research.restore(const ResearchState(levels: {
+      'keen_eyes': 3, // crit
+      'fishing_lore': 2, // fish find
+      'sharp_claws': 1,
+    }));
+    final cat = CombatUnitSpec(
+        id: 'cat',
+        side: CombatSide.cat,
+        attackIntervalMs: 1000,
+        stats: StatBlock(
+            hp: 1000, atk: 100, def: 50, attrs: {Attribute.crit: 500}));
+    final s = research.withBonus(cat).stats;
+    expect(s[Attribute.crit], 500 + 3 * node('keen_eyes').bonusBpPerLevel);
+    expect(s[Attribute.fishFind], 2 * node('fishing_lore').bonusBpPerLevel);
+    expect(node('keen_eyes').bonusBpPerLevel, 50); // 0.5 % per level
+    expect(s.atk, 103);
+    // the shipped tree: ~25 nodes, every bonus attr is a real stat
+    expect(rules.nodes.length, greaterThanOrEqualTo(20));
+    for (final n
+        in rules.nodes.where((n) => n.effect == ResearchEffect.bonus)) {
+      expect(n.bonusAttr, isNotNull, reason: n.id);
+      expect(n.bonusBpPerLevel, greaterThan(0), reason: n.id);
+    }
+  });
+
+  test('a bonus node with an unknown stat is refused', () {
+    final bad = {
+      'nodes': [
+        {
+          'id': 'x',
+          'effect': 'bonus',
+          'attr': 'luck_of_the_irish',
+          'pct_per_level': 1,
+          'max_level': 5
+        }
+      ]
+    };
+    expect(() => ResearchRules.fromJson(balance, bad, adParams),
+        throwsA(isA<FormatException>()));
+  });
+
   test('the pillow node raises the offline cap (8 h + 10 min/level)', () {
     research.restore(const ResearchState(levels: {'offline_cap': 3}));
     expect(research.offlineCapLevel, 3);

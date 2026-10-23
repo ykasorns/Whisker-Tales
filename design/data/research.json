@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "_doc": "ห้องสมุดนกฮูก (GDD v0.4 §7, T-041, D-020). เวลา/ราคาตามสูตรใน idle_balance_v1.json → research: time = time_base_min × time_growth^(L−1) × time_mult (cap time_cap_min), cost = cost_base × cost_growth^(L−1) × cost_mult. effect: stat (attr atk/hp/def, +stat_node_pct_per_level ต่อเลเวล) · offline_cap (+offline_node_min_per_level นาที) · queue (+1 คิว). requires = [node, level] ทุกข้อ",
+  "_doc": "ห้องสมุดนกฮูก (GDD v0.4 §7, T-041, D-020). เวลา/ราคาตามสูตรใน idle_balance_v1.json → research: time = time_base_min × time_growth^(L−1) × time_mult (cap time_cap_min), cost = cost_base × cost_growth^(L−1) × cost_mult. effect: stat (attr atk/hp/def, +stat_node_pct_per_level ต่อเลเวล) · bonus (attr = stat รองตาม key ใน combat เช่น crit/evade/fish_find, +pct_per_level % ต่อเลเวล, ASSUMPTION จูนใน T-029 — D-032) · offline_cap (+offline_node_min_per_level นาที) · queue (+1 คิว). requires = [node, level] ทุกข้อ",
   "nodes": [
     {
       "id": "sharp_claws",
@@ -27,7 +27,12 @@
       "effect": "stat",
       "attr": "hp",
       "max_level": 20,
-      "requires": [["sharp_claws", 1]]
+      "requires": [
+        [
+          "sharp_claws",
+          1
+        ]
+      ]
     },
     {
       "id": "tough_paws",
@@ -37,7 +42,12 @@
       "effect": "stat",
       "attr": "def",
       "max_level": 20,
-      "requires": [["fluffy_fur", 1]]
+      "requires": [
+        [
+          "fluffy_fur",
+          1
+        ]
+      ]
     },
     {
       "id": "queue_2",
@@ -48,7 +58,337 @@
       "max_level": 1,
       "cost_mult": 5,
       "time_mult": 10,
-      "requires": [["sharp_claws", 5], ["offline_cap", 3]]
+      "requires": [
+        [
+          "sharp_claws",
+          5
+        ],
+        [
+          "offline_cap",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "quick_paws",
+      "icon": "💨",
+      "name_th": "อุ้งเท้าว่องไว",
+      "name_en": "Quick Paws",
+      "effect": "bonus",
+      "attr": "attack_speed",
+      "pct_per_level": 1.0,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "sharp_claws",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "keen_eyes",
+      "icon": "👀",
+      "name_th": "ตาแหลมคม",
+      "name_en": "Keen Eyes",
+      "effect": "bonus",
+      "attr": "crit",
+      "pct_per_level": 0.5,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "sharp_claws",
+          5
+        ]
+      ]
+    },
+    {
+      "id": "big_pounce",
+      "icon": "💥",
+      "name_th": "กระโจนเต็มแรง",
+      "name_en": "Big Pounce",
+      "effect": "bonus",
+      "attr": "crit_dmg",
+      "pct_per_level": 2.5,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "keen_eyes",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "double_swipe",
+      "icon": "✌️",
+      "name_th": "ตะปบสองที",
+      "name_en": "Double Swipe",
+      "effect": "bonus",
+      "attr": "combo",
+      "pct_per_level": 0.5,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "quick_paws",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "dizzy_pounce",
+      "icon": "💫",
+      "name_th": "กระโจนจนมึน",
+      "name_en": "Dizzy Pounce",
+      "effect": "bonus",
+      "attr": "stun",
+      "pct_per_level": 0.25,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "double_swipe",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "whisker_sense",
+      "icon": "〰️",
+      "name_th": "หนวดรู้ทัน",
+      "name_en": "Whisker Sense",
+      "effect": "bonus",
+      "attr": "evade",
+      "pct_per_level": 0.5,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "tough_paws",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "hiss_back",
+      "icon": "😾",
+      "name_th": "ขู่ฟ่อสวนกลับ",
+      "name_en": "Hiss Back",
+      "effect": "bonus",
+      "attr": "counter",
+      "pct_per_level": 0.5,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "tough_paws",
+          5
+        ]
+      ]
+    },
+    {
+      "id": "cat_nap",
+      "icon": "💤",
+      "name_th": "งีบฟื้นแรง",
+      "name_en": "Cat Nap",
+      "effect": "bonus",
+      "attr": "regen",
+      "pct_per_level": 0.025,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "fluffy_fur",
+          5
+        ]
+      ]
+    },
+    {
+      "id": "milk_sip",
+      "icon": "🥛",
+      "name_th": "จิบนมเติมพลัง",
+      "name_en": "Milk Sip",
+      "effect": "bonus",
+      "attr": "lifesteal",
+      "pct_per_level": 0.5,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "cat_nap",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "spell_book",
+      "icon": "📖",
+      "name_th": "ตำราสกิล",
+      "name_en": "Spell Book",
+      "effect": "bonus",
+      "attr": "skill_dmg",
+      "pct_per_level": 1.5,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "sharp_claws",
+          5
+        ]
+      ]
+    },
+    {
+      "id": "quick_study",
+      "icon": "⏳",
+      "name_th": "เรียนไว",
+      "name_en": "Quick Study",
+      "effect": "bonus",
+      "attr": "cdr",
+      "pct_per_level": 0.5,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "spell_book",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "boss_tactics",
+      "icon": "👑",
+      "name_th": "ตำราปราบบอส",
+      "name_en": "Boss Tactics",
+      "effect": "bonus",
+      "attr": "boss_dmg",
+      "pct_per_level": 1.5,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "sharp_claws",
+          10
+        ]
+      ]
+    },
+    {
+      "id": "pet_treats",
+      "icon": "🍪",
+      "name_th": "ขนมเพื่อนรัก",
+      "name_en": "Pet Treats",
+      "effect": "bonus",
+      "attr": "pet_dmg",
+      "pct_per_level": 1.5,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "fluffy_fur",
+          3
+        ]
+      ]
+    },
+    {
+      "id": "fishing_lore",
+      "icon": "🐟",
+      "name_th": "ตำราตกปลา",
+      "name_en": "Fishing Lore",
+      "effect": "bonus",
+      "attr": "fish_find",
+      "pct_per_level": 1.0,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "offline_cap",
+          2
+        ]
+      ]
+    },
+    {
+      "id": "story_time",
+      "icon": "📜",
+      "name_th": "เวลานิทาน",
+      "name_en": "Story Time",
+      "effect": "bonus",
+      "attr": "exp_find",
+      "pct_per_level": 1.0,
+      "max_level": 10,
+      "cost_mult": 3,
+      "time_mult": 3,
+      "requires": [
+        [
+          "offline_cap",
+          2
+        ]
+      ]
+    },
+    {
+      "id": "iron_claws",
+      "icon": "🗡️",
+      "name_th": "เล็บเหล็ก",
+      "name_en": "Iron Claws",
+      "effect": "stat",
+      "attr": "atk",
+      "max_level": 20,
+      "cost_mult": 4,
+      "time_mult": 2,
+      "requires": [
+        [
+          "sharp_claws",
+          20
+        ]
+      ]
+    },
+    {
+      "id": "thick_coat",
+      "icon": "🧥",
+      "name_th": "ขนหนาอุ่น",
+      "name_en": "Thick Coat",
+      "effect": "stat",
+      "attr": "hp",
+      "max_level": 20,
+      "cost_mult": 4,
+      "time_mult": 2,
+      "requires": [
+        [
+          "fluffy_fur",
+          20
+        ]
+      ]
+    },
+    {
+      "id": "stone_paws",
+      "icon": "🪨",
+      "name_th": "อุ้งเท้าหิน",
+      "name_en": "Stone Paws",
+      "effect": "stat",
+      "attr": "def",
+      "max_level": 20,
+      "cost_mult": 4,
+      "time_mult": 2,
+      "requires": [
+        [
+          "tough_paws",
+          20
+        ]
+      ]
     }
   ]
 }

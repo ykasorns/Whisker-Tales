@@ -48,6 +48,7 @@ class GameContent {
     required this.pets,
     required this.research,
     required this.iap,
+    required this.chapters,
   });
 
   final CombatRules combat;
@@ -73,6 +74,9 @@ class GameContent {
   /// What can be bought (T-025).
   final IapCatalog iap;
 
+  /// Monsters, bosses and scenery per chapter (D-032).
+  final ChapterBook chapters;
+
   /// Provider overrides for `ProviderScope` / `ProviderContainer`.
   List<Override> get overrides => [
         combatRulesProvider.overrideWithValue(combat),
@@ -88,6 +92,7 @@ class GameContent {
         petsRulesProvider.overrideWithValue(pets),
         researchRulesProvider.overrideWithValue(research),
         iapCatalogProvider.overrideWithValue(iap),
+        chapterBookProvider.overrideWithValue(chapters),
       ];
 }
 
@@ -112,6 +117,7 @@ class ContentRepository {
     'design/data/pets.json': 1,
     'design/data/research.json': 1,
     'design/data/iap.json': 1,
+    'design/data/chapters.json': 1,
   };
 
   Future<GameContent> loadAll() async {
@@ -161,6 +167,8 @@ class ContentRepository {
         () =>
             RoadEventRules.fromJson(b, json['design/data/road_events.json']!));
 
+    final chapters = parse('design/data/chapters.json',
+        () => ChapterBook.fromJson(json['design/data/chapters.json']!, idle));
     final iap = parse('design/data/iap.json',
         () => IapCatalog.fromJson(json['design/data/iap.json']!));
     // cross-references between files
@@ -214,6 +222,7 @@ class ContentRepository {
       pets: pets,
       research: research,
       iap: iap,
+      chapters: chapters,
     );
   }
 

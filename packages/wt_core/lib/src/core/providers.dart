@@ -97,6 +97,11 @@ final Provider<CatClass> catClassProvider = Provider<CatClass>((ref) =>
 final idleRulesProvider = Provider<IdleRules>(
     (ref) => throw UnimplementedError('override with loaded IdleRules'));
 
+/// Monsters, bosses and scenery per chapter (`chapters.json`, D-032).
+/// Overridden at boot with the loaded book.
+final chapterBookProvider = Provider<ChapterBook>(
+    (ref) => throw UnimplementedError('override with loaded ChapterBook'));
+
 /// Seed of the player's world; restored from the save.
 final idleSeedProvider = Provider<int>((ref) => 0);
 

@@ -59,8 +59,27 @@ for src in sorted(glob.glob(f'{ROOT}/assets/raw/backgrounds/*.png')):
     s = 400 / im.height
     im.resize((round(im.width * s), 400), Image.LANCZOS).save(
         f'{OUT}/bg/{os.path.basename(src)}', optimize=True)
+# pets (T-038): idle + attack per pet, drawn small beside Mochi
+os.makedirs(f'{OUT}/pet', exist_ok=True)
+for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/pets/*.png')):
+    im = Image.open(src)
+    s = 200 / im.height
+    im.resize((round(im.width * s), 200), Image.LANCZOS).save(
+        f'{OUT}/pet/{os.path.basename(src)}', optimize=True)
 # boss faces for the challenge button
 os.makedirs(f'{OUT}/ui', exist_ok=True)
 for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/ui/*.png')):
-    shutil.copy(src, f'{OUT}/ui/{os.path.basename(src)}')
+    im = Image.open(src)
+    im.thumbnail((160, 160), Image.LANCZOS)  # drawn at ~58 px
+    im.save(f'{OUT}/ui/{os.path.basename(src)}', optimize=True)
+# 256 colours for every sprite (not the painted backgrounds, which band):
+# the art is flat-shaded, so it looks the same and the APK stays under the
+# 30 MB send limit (D-030)
+for f in glob.glob(f'{OUT}/**/*.png', recursive=True):
+    if f'{os.sep}bg{os.sep}' in f:
+        continue
+    im = Image.open(f)
+    if im.mode != 'P':
+        im.convert('RGBA').quantize(colors=256, method=Image.Quantize.FASTOCTREE) \
+            .save(f, optimize=True)
 print(f'{len(FRAMES)} cat frames + {outfits} outfit frames + {n} gear + {m} monster frames + bg + ui → {OUT}')

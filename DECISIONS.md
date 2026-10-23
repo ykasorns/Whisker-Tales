@@ -329,3 +329,12 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 1. ภาพชุดประจำคลาส 5 แผ่น (ฝึกหัด นักรบ โจร นักธนู นักเวท) สร้างด้วย ChatGPT ตาม `design/art/outfit_prompts.md` + แนบ `sheet_mochi2_poses.png` → `assets/raw/sheets/sheet_outfit_<class>.png` → ตัด 9 เฟรม/คลาส → `assets/raw/frames/outfit/<class>/` → `app/assets/game/cat/outfit_<class>_<frame>.png`
 2. **ทางที่ได้ผล:** แชทใหม่ทุกแผ่น + prompt เต็ม + แนบ reference — สั่งต่อในแชทเดิมแล้วของเก่าติดมา (พู่หมวกนักรบไปโผล่ในชุดโจร, ลำดับท่าเพี้ยน) · โจรกับนักธนูสั่งใหม่แบบนี้
 3. `sync_sprites.py`: เฟรมชุดย่อ ×0.85 ให้ตัวแมวสูงเท่าเฟรมพื้นฐาน (~291 px) + ลดเหลือ 256 สี — ภาพแมว 9.8 → 3 MB · APK arm64 30.5 MB (เพดานส่ง 31.46 MB — เหลือไม่ถึง 1 MB; รอบหน้าควรบีบภาพพื้นฐาน/พื้นหลังด้วย)
+
+---
+
+## D-030 (2026-10-23) — YK/Opus — smaller characters, pet art, lighter APK
+
+1. **ตัวละครเล็กลง ~25%** (YK: "ดูแน่นไป"): โมจิ 0.36 → 0.27 ของความสูงฉาก · มอน 0.25 → 0.19 · บอส 0.4 → 0.3 · เพื่อนสัตว์เดินตามชิดขึ้น
+2. **ภาพเพื่อนสัตว์ 6 ตัว × (ยืน/โจมตี)** จาก ChatGPT (`sheet_pets.png`, prompt `design/art/pet_prompts.md`) → `app/assets/game/pet/<id>_<idle|attack>.png` สูง 200 px · ในฉากใช้ท่าโจมตีตอนเพื่อนตีมอน · แท็บเพื่อนสัตว์/ผลฟักไข่ใช้ภาพ (`PetPicture`) — ไม่มีภาพ = emoji เหมือนเดิม
+3. **APK 30.5 → 23.2 MB:** `sync_sprites.py` ลดทุก sprite เหลือ 256 สี (ยกเว้นพื้นหลังที่ระบายสี จะเป็นแถบ) · หน้าบอสในปุ่มย่อเหลือ 160 px · ภาพเกมรวม 11.8 → ~4.8 MB · ภาพยังคมเหมือนเดิม (ตรวจแล้ว)
+4. build release บน Mac 8 GB: ถ้า AOT snapshotter โดน kill (-9) ให้ปิดแท็บ/แอปที่กินแรม หรือ build `--target-platform android-arm64` อย่างเดียว

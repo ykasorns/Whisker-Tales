@@ -64,12 +64,12 @@ class _GameViewState extends ConsumerState<GameView> {
     driver: widget.driver,
     loop: ref.read(idleLoopProvider),
     classId: () => ref.read(catClassProvider).current,
-    petIcons: () {
+    pets: () {
       final pets = ref.read(petsProvider);
       if (pets == null) return const [];
       return [
         for (final id in pets.deployed.take(pets.deploySlots))
-          pets.rules.byId(id)?.icon ?? '🐾'
+          (id: id, icon: pets.rules.byId(id)?.icon ?? '🐾'),
       ];
     },
   );
@@ -84,11 +84,14 @@ class BattleGame extends FlameGame {
     required this.driver,
     required this.loop,
     required this.classId,
-    this.petIcons,
+    this.pets,
   });
 
   /// Deployed pets (T-038), drawn following Mochi.
-  final List<String> Function()? petIcons;
+  final List<({String id, String icon})> Function()? pets;
+
+  /// Seconds left of each pet's attack pose (by pet id).
+  final _petAttack = <String, double>{};
 
   final AvatarRules rules;
   final GameDriver driver;
@@ -142,9 +145,15 @@ class BattleGame extends FlameGame {
         if (a.startsWith('assets/game/cat/outfit_'))
           a.substring('assets/game/'.length),
     ];
+    final petFrames = [
+      for (final a in manifest.listAssets())
+        if (a.startsWith('assets/game/pet/'))
+          a.substring('assets/game/'.length),
+    ];
     await images.loadAll([
       for (final f in _catFrames) 'cat/$f.png',
       ...outfits,
+      ...petFrames,
       for (final k in ['eraserslime', 'acorn', 'eraserking'])
         for (final f in _monFrames) 'mon/${k}_$f.png',
       for (final b in [
@@ -197,7 +206,8 @@ class BattleGame extends FlameGame {
   void _layout() {
     mochi
       ..position = Vector2(size.x * 0.24, groundY)
-      ..frameScale = size.y * 0.36 / 335;
+      // a bit smaller so the scene breathes (YK 2026-10-23, D-030)
+      ..frameScale = size.y * 0.27 / 335;
   }
 
   @override
@@ -249,7 +259,7 @@ class BattleGame extends FlameGame {
               : 'acorn';
       final m = _Monster(this, kind, boss: e.isBoss)
         ..position = Vector2(size.x * xs[i], groundY)
-        ..heightPx = size.y * (e.isBoss ? 0.4 : 0.25 - i * 0.012);
+        ..heightPx = size.y * (e.isBoss ? 0.3 : 0.19 - i * 0.009);
       _monsters[e.id] = m;
       add(m);
     }
@@ -272,6 +282,9 @@ class BattleGame extends FlameGame {
           :final source
         ):
         final target = _monsters[targetId];
+        if (attackerId.startsWith('pet_')) {
+          _petAttack[attackerId.substring(4)] = 0.3;
+        }
         if (attackerId == 'mochi' && source != AttackSource.dot) {
           _attackT = 0.25;
         }
@@ -434,7 +447,8 @@ class _FloatText extends PositionComponent {
   }
 }
 
-/// Deployed pets hop along behind Mochi (emoji until pet art exists).
+/// Deployed pets hop along behind Mochi (T-038): their sprite (attack pose
+/// while they hit), or the emoji while a pet has no art yet.
 class _Pets extends Component {
   _Pets(this.game) : super(priority: 9);
   final BattleGame game;
@@ -444,22 +458,38 @@ class _Pets extends Component {
   final _painted = <String, TextPainter>{};
 
   @override
-  void update(double dt) => t += dt;
+  void update(double dt) {
+    t += dt;
+    game._petAttack.updateAll((_, v) => v - dt);
+  }
 
   @override
   void render(ui.Canvas c) {
-    final icons = game.petIcons?.call() ?? const [];
-    final size = game.size.y * 0.08;
-    for (var i = 0; i < icons.length; i++) {
+    final pets = game.pets?.call() ?? const [];
+    final h = game.size.y * 0.1;
+    for (var i = 0; i < pets.length; i++) {
+      final p = pets[i];
       final hop = (math.sin(t * 8 + i * 1.7)).abs() * game.size.y * 0.02;
+      final x = game.mochi.position.x - game.size.x * (0.08 + 0.07 * i);
+      final pose = (game._petAttack[p.id] ?? 0) > 0 ? 'attack' : 'idle';
+      final key = 'pet/${p.id}_$pose.png';
+      if (game.images.containsKey(key)) {
+        final im = game.images.fromCache(key);
+        final w = im.width * h / im.height;
+        c.drawImageRect(
+            im,
+            ui.Rect.fromLTWH(0, 0, im.width.toDouble(), im.height.toDouble()),
+            ui.Rect.fromLTWH(x - w / 2, game.groundY - h - hop, w, h),
+            ui.Paint()..filterQuality = ui.FilterQuality.medium);
+        continue;
+      }
+      final size = game.size.y * 0.06;
       final tp = _painted.putIfAbsent(
-          '${icons[i]}@$size',
+          '${p.icon}@$size',
           () => TextPainter(
-                text:
-                    TextSpan(text: icons[i], style: TextStyle(fontSize: size)),
+                text: TextSpan(text: p.icon, style: TextStyle(fontSize: size)),
                 textDirection: TextDirection.ltr,
               )..layout());
-      final x = game.mochi.position.x - game.size.x * (0.1 + 0.09 * i);
       tp.paint(c, Offset(x - tp.width / 2, game.groundY - tp.height - hop));
     }
   }

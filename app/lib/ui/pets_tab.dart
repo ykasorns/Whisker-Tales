@@ -47,7 +47,7 @@ class _PetsTabState extends ConsumerState<PetsTab> {
               duration: const Duration(milliseconds: 600),
               curve: Curves.elasticOut,
               builder: (_, v, child) => Transform.scale(scale: v, child: child),
-              child: Text(def.icon, style: const TextStyle(fontSize: 88)),
+              child: PetPicture(id: def.id, icon: def.icon, size: 110),
             ),
             Text(s.lang == 'en' ? def.nameEn : def.nameTh,
                 style:
@@ -183,8 +183,10 @@ class _PetsTabState extends ConsumerState<PetsTab> {
                       children: [
                         Opacity(
                           opacity: stars == null ? 0.25 : 1,
-                          child: Text(stars == null ? '❔' : def.icon,
-                              style: const TextStyle(fontSize: 36)),
+                          child: stars == null
+                              ? const Text('❔', style: TextStyle(fontSize: 36))
+                              : PetPicture(
+                                  id: def.id, icon: def.icon, size: 48),
                         ),
                         Text(
                             stars == null
@@ -204,4 +206,22 @@ class _PetsTabState extends ConsumerState<PetsTab> {
       ),
     ]);
   }
+}
+
+/// A pet's picture (`assets/game/pet/<id>_idle.png`), or its emoji while
+/// the pet has no art yet.
+class PetPicture extends StatelessWidget {
+  const PetPicture(
+      {super.key, required this.id, required this.icon, required this.size});
+  final String id, icon;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: size,
+        child: Image.asset('assets/game/pet/${id}_idle.png',
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) =>
+                Text(icon, style: TextStyle(fontSize: size * 0.75))),
+      );
 }

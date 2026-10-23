@@ -41,4 +41,5 @@ flutter:
     - assets/game/mon/
     - assets/game/bg/
     - assets/game/ui/
+    - assets/game/pet/
   generate: true # T-004: lib/l10n/*.arb → AppLocalizations

@@ -11,6 +11,9 @@ class AwayTracker {
   /// The app left the foreground (inactive, hidden or paused).
   void left(DateTime now) => _left ??= now;
 
+  /// Forget the absence (e.g. it was a rewarded ad, however long).
+  void reset() => _left = null;
+
   /// The app is back. True only when it was gone for [minAway] or more;
   /// either way the tracker starts over.
   bool back(DateTime now) {

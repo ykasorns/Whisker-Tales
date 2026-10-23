@@ -29,6 +29,12 @@ void main() {
     expect(a.back(t0.add(const Duration(seconds: 70))), isTrue);
   });
 
+  test('reset forgets an absence (a rewarded ad, however long)', () {
+    final a = AwayTracker()..left(t0);
+    a.reset();
+    expect(a.back(t0.add(const Duration(minutes: 5))), isFalse);
+  });
+
   test('it starts over after every return; no "left" means not away', () {
     final a = AwayTracker()..left(t0);
     expect(a.back(t0.add(const Duration(minutes: 3))), isTrue);

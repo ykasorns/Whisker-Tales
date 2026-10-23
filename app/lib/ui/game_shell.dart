@@ -72,6 +72,9 @@ class _GameShellState extends ConsumerState<GameShell>
         ref.read(audioServiceProvider).resume();
         // only a real absence opens "welcome back": a screenshot, a dialog or
         // a rewarded ad blinks the app, and the time was spent playing
+        // watching a rewarded ad is never "away", however long it runs
+        final ads = ref.read(adServiceProvider);
+        if (ads is AdService && ads.showingOrJustShown()) _away.reset();
         if (!_away.back(DateTime.now())) {
           ref.read(gameClockProvider).markSeen();
           return;

@@ -1,4 +1,17 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- Families policy (D-033): never send the advertising ID. The ads SDK
+         adds this permission itself; removing it makes the ID read as zeros. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"
+        tools:node="remove" />
+    <!-- Privacy Sandbox ad APIs (attribution, topics, ad id): not for a
+         children's game either (D-033). -->
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID"
+        tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION"
+        tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_TOPICS"
+        tools:node="remove" />
     <application
         android:label="Whisker Tales"
         android:name="${applicationName}"
@@ -26,6 +39,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- AdMob (D-033): rewarded ads only, set from admobAppId. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/admob_app_id" />
         <!-- Play Games Services (T-023): cloud save. Empty id = off. -->
         <meta-data
             android:name="com.google.android.gms.games.APP_ID"

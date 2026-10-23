@@ -38,7 +38,7 @@ void main() {
     }
     for (final c in book.chapters) {
       for (final l in ['L1_far', 'L2_mid']) {
-        expect(File('assets/game/bg/bg_book1_${c.layer}_$l.png').existsSync(),
+        expect(File('assets/game/bg/bg_book1_${c.layer}_$l.webp').existsSync(),
             isTrue);
       }
       for (final k in [c.boss, c.monsters.first]) {

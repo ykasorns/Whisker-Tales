@@ -59,8 +59,10 @@ os.makedirs(f'{OUT}/bg', exist_ok=True)
 for src in sorted(glob.glob(f'{ROOT}/assets/raw/backgrounds/*.png')):
     im = Image.open(src)
     s = 400 / im.height
+    # painted layers: lossy WebP (≈ ⅓ of the PNG, no visible change) keeps
+    # the APK under the 30 MB send limit with the ads SDK in (D-033)
     im.resize((round(im.width * s), 400), Image.LANCZOS).save(
-        f'{OUT}/bg/{os.path.basename(src)}', optimize=True)
+        f'{OUT}/bg/{os.path.basename(src)[:-4]}.webp', quality=88, method=6)
 # pets (T-038): idle + attack per pet, drawn small beside Mochi
 os.makedirs(f'{OUT}/pet', exist_ok=True)
 for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/pets/*.png')):

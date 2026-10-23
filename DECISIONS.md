@@ -352,3 +352,12 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 2. **ห้องสมุด 5 → 23 node** (การ์ดขอ ~25): effect ใหม่ `bonus` = stat รองตาม key ของ combat (`attr` + `pct_per_level`) — ใช้เฉพาะ stat ที่ engine ใช้จริง: ตีเร็ว คริ แรงคริ ตีติด มึน หลบ สวนกลับ ฟื้นพลัง ดูดเลือด ดาเมจสกิล ลดคูลดาวน์ ดาเมจบอส ดาเมจเพื่อนสัตว์ หาปลาทอง หา EXP (15) · ไม่ใส่ yarn_find/craft_luck/ค่าต้าน เพราะยังไม่มีระบบไหนอ่าน · เพิ่มชั้น 2 ของ ATK/HP/DEF (เล็บเหล็ก/ขนหนาอุ่น/อุ้งเท้าหิน, ต้อง Lv20 ของชั้นแรก, ราคา ×4 เวลา ×2)
 3. **บาลานซ์:** node รอง ราคา ×3 เวลา ×3 และ % ครึ่งหนึ่งของร่างแรก — headless player: ร่างแรก 9.5 วัน (FAIL) → ปรับแล้ว **13.0 วัน PASS** (ก่อนเพิ่ม 12.0) · no-ads ช้ากว่า 9.3% PASS · ทุกค่า ASSUMPTION จูนต่อใน playtest
 4. content อื่นของ T-043 ครบแล้ว: buffs/สกิล 12 · gear 8 ช่อง affix pool ต่อช่อง + special ตามเกรด · เพื่อนสัตว์ 6 · ตู้เสื้อผ้า 3 ชั้น + อาวุธต่อคลาส · EXP ไม่จำกัดเลเวล (exp_curve) · เหตุการณ์ระหว่างทาง ดี 4 ไม่ดี 3 · ไม่มีชื่อ/ค่าใดจาก LoM
+
+## D-033 (2026-10-23) — Opus — โฆษณาจริง: Google AdMob (rewarded เท่านั้น)
+
+1. **SDK = Google AdMob** (`google_mobile_ads` 9.2.0 → `play-services-ads`) — อยู่ในรายชื่อ **Families self-certified ads SDK** ของ Google Play (ต้องการ play-services-ads ≥ 19.0.0) ตรวจจากหน้า Play Console Help 9283445 วันที่ 2026-10-23 · ต้องยืนยันรายชื่ออีกครั้งในวัน submit
+2. **ตัวเชื่อม `app/lib/ads/admob_network.dart`** implement `AdNetwork` ของ wt_core — cap/placement/ธงอายุยังอยู่ใน `AdService` ที่เดียว · test แยกโมดูลอนุญาตเฉพาะ `src/ads/` + `app/lib/ads/`
+3. **ทุก request:** เรต **G** เสมอ · อายุ < 13 / ไม่รู้ = `AgeRestrictedTreatment.child` · **non-personalized ทุกคน** (ยังไม่มีหน้าขอความยินยอม — D-014) · SDK เริ่มทำงานตอนโฆษณาแรก *หลัง* ตั้งธงอายุแล้ว · โหลดเกิน 12 วิ = ล้มเหลว (ไม่ให้รางวัล ไม่กินโควต้า) · ปิดก่อนจบ = skipped
+4. **Manifest:** ถอด `com.google.android.gms.permission.AD_ID` + สิทธิ์ Privacy Sandbox (`ACCESS_ADSERVICES_AD_ID/ATTRIBUTION/TOPICS`) ด้วย `tools:node="remove"` (ตรวจใน merged manifest แล้ว) · `APPLICATION_ID` จาก gradle property `admobAppId` · หน่วยโฆษณาจาก `--dart-define=ADMOB_REWARDED_ID` · ค่าเริ่มต้น = **รหัสตัวอย่างของ Google (โฆษณาทดสอบเท่านั้น)**
+5. APK ยังต่ำกว่า 30 MB: ฉากหลังเปลี่ยนเป็น WebP (3.0 → 0.6 MB) → APK arm64 **26.5 MB** รวม SDK โฆษณา
+6. **ยังไม่ได้ลองบนเครื่องจริง** (เครื่องนี้ไม่มี emulator) → ลองกดปุ่ม 📺 ใน APK บนมือถือจริงตอน Internal testing · **EEA/UK:** AdMob อาจต้องใช้ฟอร์มความยินยอม UMP แม้ non-personalized — ตัดสินตอนเลือกประเทศที่เปิดขาย (ถ้าเปิดแค่ไทยยังไม่ต้อง) → RELEASE_CHECKLIST

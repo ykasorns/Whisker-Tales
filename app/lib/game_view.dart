@@ -161,10 +161,10 @@ class BattleGame extends FlameGame {
       ...petFrames,
       for (final k in chapters.kinds)
         for (final f in _monFrames) 'mon/${k}_$f.png',
-      'bg/bg_book1_L0_sky.png',
-      'bg/bg_book1_L3_ground.png',
+      'bg/bg_book1_L0_sky.webp',
+      'bg/bg_book1_L3_ground.webp',
       for (final a in chapters.chapters)
-        for (final l in ['L1_far', 'L2_mid']) 'bg/bg_book1_${a.layer}_$l.png',
+        for (final l in ['L1_far', 'L2_mid']) 'bg/bg_book1_${a.layer}_$l.webp',
     ]);
     _bg = _Parallax(this);
     add(_bg);
@@ -340,15 +340,15 @@ class _Parallax extends Component {
   @override
   void render(ui.Canvas c) {
     final s = game.size, gy = game.groundY;
-    _tile('bg/bg_book1_L0_sky.png', 0.05, s.y, s.y, c);
+    _tile('bg/bg_book1_L0_sky.webp', 0.05, s.y, s.y, c);
     final layer =
         game.chapters.of(game.loop.rules, game.loop.state.farmPage).layer;
+    _tile('bg/bg_book1_${layer}_L1_far.webp', 0.2, s.y * 0.62, gy + s.y * 0.04,
+        c);
     _tile(
-        'bg/bg_book1_${layer}_L1_far.png', 0.2, s.y * 0.62, gy + s.y * 0.04, c);
-    _tile(
-        'bg/bg_book1_${layer}_L2_mid.png', 0.5, s.y * 0.6, gy + s.y * 0.06, c);
+        'bg/bg_book1_${layer}_L2_mid.webp', 0.5, s.y * 0.6, gy + s.y * 0.06, c);
     final hg = (s.y - gy) / 0.3;
-    _tile('bg/bg_book1_L3_ground.png', 1, hg, gy + 0.3 * hg, c);
+    _tile('bg/bg_book1_L3_ground.webp', 1, hg, gy + 0.3 * hg, c);
   }
 }
 

@@ -47,3 +47,4 @@ placement ใหม่ `road_event` (3/วัน, อยู่ในเพดา
 ## ตรวจรับ (2026-10-23, Opus) → done
 - ✓ ทุก AC: `ad_service_test.dart` 12 tests (รวม test ห้ามโมดูลอื่นแตะ SDK)
 - หนี้ "ยังไม่ต่อ SDK จริง" → ทำใน **D-033** (AdMob ผ่าน `AdNetwork` ใน app/)
+- 2026-10-23: ต่อ SDK จริงแล้ว → **D-033** (AdMob, `app/lib/ads/admob_network.dart`)

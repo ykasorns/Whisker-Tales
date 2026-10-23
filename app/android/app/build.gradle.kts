@@ -36,6 +36,15 @@ android {
             "game_services_project_id",
             (project.findProperty("pgsProjectId") as String?) ?: "",
         )
+        // AdMob app id (D-033): set `admobAppId=ca-app-pub-…~…` in
+        // android/gradle.properties for release. The default is Google's
+        // published sample id, which only ever serves test ads.
+        resValue(
+            "string",
+            "admob_app_id",
+            (project.findProperty("admobAppId") as String?)
+                ?: "ca-app-pub-3940256099942544~3347511713",
+        )
     }
 
     buildTypes {

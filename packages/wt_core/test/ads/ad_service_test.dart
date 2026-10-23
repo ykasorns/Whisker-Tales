@@ -165,7 +165,11 @@ void main() {
       final dir = Directory(root);
       if (!dir.existsSync()) continue;
       for (final f in dir.listSync(recursive: true).whereType<File>()) {
-        if (!f.path.endsWith('.dart') || f.path.contains('/src/ads/')) continue;
+        if (!f.path.endsWith('.dart') ||
+            f.path.contains('/src/ads/') ||
+            f.path.contains('app/lib/ads/')) {
+          continue; // the ads module: core + the app's SDK adapter (D-033)
+        }
         if (f.path.endsWith('wt_core.dart') ||
             f.path.endsWith('providers.dart') ||
             f.path.endsWith('game_save.dart') ||

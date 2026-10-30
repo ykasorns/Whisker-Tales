@@ -18,3 +18,12 @@ EncounterGenerator.generate(seed) -> NodeMap
 ---
 ## Amendment v2.0 (D-002, 2026-10-12)
 ใช้กับโหมดนิทานผจญภัยเท่านั้น (spec = GDD v0.3 §3) · ไม่เกี่ยวกับ wave source ของ idle_loop
+
+---
+## ส่งงาน/ตรวจรับ (2026-10-24, D-046)
+- [x] seed เดิมได้แผนที่เดิม 8–10 node และ node สุดท้ายเป็น `eraserking`
+- [x] gen 1,000 maps แล้วสัดส่วน encounter ทุกชนิดอยู่ในช่วง ±10% ของ GDD
+- [x] ทุกเส้นทางมี combat ต่อกันไม่เกิน 3 node ตรวจครบ safe/risky branches ใน 1,000 seeds
+- [x] Fork เปิดตัวเลือก safe/risky ที่ depth เดียวกันและกลับมารวมเส้นทางหลังเลือก
+- [x] การเลือก branch ต้องส่ง route id ชัดเจน; ไม่มีการสุ่มเลือกแทนผู้เล่น
+- [x] conformance suite รองรับ source ที่มีหลายตัวเลือกและตรวจ determinism ของทุก route

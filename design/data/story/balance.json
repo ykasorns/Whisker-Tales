@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "_doc": "T-026 · ASSUMPTION เริ่มต้นสำหรับ Run 3–5 นาที · รางวัลเต็ม 3 รอบ/วันแล้วเหลือ 25% · XP จูนให้เลือก talent 2–3 ครั้งต่อ Run",
+  "rewards": {
+    "goldfish_per_node": 10,
+    "victory_bonus": 50,
+    "full_runs_per_day": 3,
+    "repeat_reward_pct": 25
+  },
+  "xp": {
+    "combat": 12,
+    "event": 10,
+    "boss": 30,
+    "to_next": [25, 35, 45]
+  },
+  "campfire": {
+    "heal_pct": 50,
+    "upgrade_relic_tiers": 1
+  },
+  "treasure": {
+    "relic_choices": 3
+  },
+  "shop": {
+    "slots": 3,
+    "potions": [
+      {
+        "id": "berry_tea",
+        "name_th": "ชาเบอร์รี",
+        "name_en": "Berry Tea",
+        "description_th": "ฟื้นพลังชีวิต 20%",
+        "description_en": "Restore 20% health.",
+        "icon": "potion_berry_tea",
+        "price": 20,
+        "buff": "story_heal_20"
+      },
+      {
+        "id": "warm_cocoa",
+        "name_th": "โกโก้อุ่น",
+        "name_en": "Warm Cocoa",
+        "description_th": "ฟื้นพลังชีวิต 50%",
+        "description_en": "Restore 50% health.",
+        "icon": "potion_warm_cocoa",
+        "price": 45,
+        "buff": "story_heal_50"
+      },
+      {
+        "id": "paper_armor_tonic",
+        "name_th": "ยาน้ำเกราะกระดาษ",
+        "name_en": "Paper Armor Tonic",
+        "description_th": "สร้างโล่ 25% ของพลังชีวิตสูงสุด",
+        "description_en": "Gain a shield worth 25% maximum health.",
+        "icon": "potion_paper_armor",
+        "price": 35,
+        "buff": "iron_wall"
+      },
+      {
+        "id": "brave_syrup",
+        "name_th": "น้ำเชื่อมผู้กล้า",
+        "name_en": "Bravery Syrup",
+        "description_th": "เพิ่มพลังโจมตี 25% ตลอดการต่อสู้",
+        "description_en": "Gain 25% attack for the fight.",
+        "icon": "potion_brave_syrup",
+        "price": 40,
+        "buff": "story_potion_atk"
+      }
+    ]
+  }
+}

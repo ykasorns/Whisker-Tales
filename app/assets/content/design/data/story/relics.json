@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "_doc": "T-026 · relics อยู่เฉพาะในหนึ่ง Story run · effects อ้าง buff จาก buffs.json · synergy ระบุคู่เพียงด้านเดียวเพื่อไม่เปิดผลซ้ำ",
+  "relics": [
+    {
+      "id": "electric_fur",
+      "name_th": "ขนแมวไฟฟ้า",
+      "name_en": "Electric Fur",
+      "description_th": "โจมตีมีโอกาสปล่อยประกายตีซ้ำ",
+      "description_en": "Attacks may release a spark for an extra hit.",
+      "icon": "relic_electric_fur",
+      "rarity": "common",
+      "effects": [{ "trigger": "on_attack", "buff": "story_extra_hit", "target": "self", "chance_pct": 10 }],
+      "synergies": [{ "with": "echo_bell", "trigger": "on_attack", "buff": "story_extra_hit", "target": "self" }]
+    },
+    {
+      "id": "echo_bell",
+      "name_th": "กระดิ่งสะท้อน",
+      "name_en": "Echo Bell",
+      "description_th": "ใช้สกิลแล้วลดเวลารอสกิลทั้งหมด",
+      "description_en": "Casting a skill shortens every skill cooldown.",
+      "icon": "relic_echo_bell",
+      "rarity": "rare",
+      "effects": [{ "trigger": "on_skill", "buff": "story_cooldown_1000", "target": "self", "chance_pct": 25 }],
+      "synergies": []
+    },
+    {
+      "id": "grilled_fish",
+      "name_th": "ปลาย่างหอม",
+      "name_en": "Warm Grilled Fish",
+      "description_th": "ฟื้นพลังชีวิตเล็กน้อยหลังจบการต่อสู้",
+      "description_en": "Recover a little health after combat.",
+      "icon": "relic_grilled_fish",
+      "rarity": "common",
+      "effects": [{ "trigger": "on_combat_end", "buff": "story_heal_8", "target": "self" }],
+      "synergies": [{ "with": "warm_scarf", "trigger": "on_combat_end", "buff": "story_heal_20", "target": "self" }]
+    },
+    {
+      "id": "warm_scarf",
+      "name_th": "ผ้าพันคออุ่น",
+      "name_en": "Warm Scarf",
+      "description_th": "เพิ่มพลังชีวิตสูงสุด 15% ตลอด Run",
+      "description_en": "Gain 15% maximum health for the run.",
+      "icon": "relic_warm_scarf",
+      "rarity": "common",
+      "effects": [{ "trigger": "passive", "buff": "story_hp_15", "target": "self" }],
+      "synergies": []
+    },
+    {
+      "id": "shadow_claw",
+      "name_th": "กรงเล็บเงา",
+      "name_en": "Shadow Claw",
+      "description_th": "คริติคอลมีโอกาสฟันซ้ำทันที",
+      "description_en": "Critical hits may strike once more.",
+      "icon": "relic_shadow_claw",
+      "rarity": "rare",
+      "effects": [{ "trigger": "on_crit", "buff": "story_extra_hit", "target": "self", "chance_pct": 25 }],
+      "synergies": [{ "with": "lightning_milk", "trigger": "on_crit", "buff": "story_crit_haste", "target": "self" }]
+    },
+    {
+      "id": "lightning_milk",
+      "name_th": "นมสายฟ้า",
+      "name_en": "Lightning Milk",
+      "description_th": "เพิ่มความเร็วโจมตี 20% ตลอด Run",
+      "description_en": "Gain 20% attack speed for the run.",
+      "icon": "relic_lightning_milk",
+      "rarity": "rare",
+      "effects": [{ "trigger": "passive", "buff": "story_speed_20", "target": "self" }],
+      "synergies": []
+    },
+    {
+      "id": "paper_shield",
+      "name_th": "โล่กระดาษพับ",
+      "name_en": "Folded Paper Shield",
+      "description_th": "สร้างโล่หลังชนะการต่อสู้",
+      "description_en": "Gain a shield after winning a fight.",
+      "icon": "relic_paper_shield",
+      "rarity": "common",
+      "effects": [{ "trigger": "on_combat_end", "buff": "story_shield_12", "target": "self" }],
+      "synergies": [{ "with": "brave_button", "trigger": "passive", "buff": "story_def_12", "target": "self" }]
+    },
+    {
+      "id": "brave_button",
+      "name_th": "กระดุมผู้กล้า",
+      "name_en": "Brave Button",
+      "description_th": "เพิ่มพลังป้องกัน 12% ตลอด Run",
+      "description_en": "Gain 12% defence for the run.",
+      "icon": "relic_brave_button",
+      "rarity": "rare",
+      "effects": [{ "trigger": "passive", "buff": "story_def_12", "target": "self" }],
+      "synergies": []
+    },
+    {
+      "id": "moon_thread",
+      "name_th": "ด้ายแสงจันทร์",
+      "name_en": "Moon Thread",
+      "description_th": "ลดคูลดาวน์สกิล 15% ตลอด Run",
+      "description_en": "Gain 15% cooldown reduction for the run.",
+      "icon": "relic_moon_thread",
+      "rarity": "rare",
+      "effects": [{ "trigger": "passive", "buff": "story_cdr_15", "target": "self" }],
+      "synergies": [{ "with": "star_thimble", "trigger": "on_skill", "buff": "story_star_bomb", "target": "enemy" }]
+    },
+    {
+      "id": "star_thimble",
+      "name_th": "ปลอกนิ้วดาว",
+      "name_en": "Star Thimble",
+      "description_th": "ใช้สกิลแล้วมีโอกาสทิ้งดาวระเบิด",
+      "description_en": "Skills may leave a small exploding star.",
+      "icon": "relic_star_thimble",
+      "rarity": "epic",
+      "effects": [{ "trigger": "on_skill", "buff": "story_star_bomb", "target": "enemy", "chance_pct": 20 }],
+      "synergies": []
+    },
+    {
+      "id": "lucky_pencil",
+      "name_th": "ดินสอนำโชค",
+      "name_en": "Lucky Pencil",
+      "description_th": "เพิ่มโอกาสคริติคอล 8% ตลอด Run",
+      "description_en": "Gain 8% critical chance for the run.",
+      "icon": "relic_lucky_pencil",
+      "rarity": "common",
+      "effects": [{ "trigger": "passive", "buff": "story_crit_8", "target": "self" }],
+      "synergies": [{ "with": "map_scrap", "trigger": "passive", "buff": "story_lucky_crit", "target": "self" }]
+    },
+    {
+      "id": "map_scrap",
+      "name_th": "เศษแผนที่ลับ",
+      "name_en": "Secret Map Scrap",
+      "description_th": "สร้างความเสียหายต่อบอสเพิ่ม 15%",
+      "description_en": "Deal 15% more damage to bosses.",
+      "icon": "relic_map_scrap",
+      "rarity": "common",
+      "effects": [{ "trigger": "passive", "buff": "story_boss_15", "target": "self" }],
+      "synergies": []
+    },
+    {
+      "id": "acorn_charm",
+      "name_th": "เครื่องรางลูกโอ๊ก",
+      "name_en": "Acorn Charm",
+      "description_th": "ฟื้นพลังชีวิต 2% เป็นระยะระหว่างต่อสู้",
+      "description_en": "Regenerate 2% health during combat.",
+      "icon": "relic_acorn_charm",
+      "rarity": "common",
+      "effects": [{ "trigger": "passive", "buff": "story_regen_2", "target": "self" }],
+      "synergies": [{ "with": "leaf_cape", "trigger": "passive", "buff": "story_evade_8", "target": "self" }]
+    },
+    {
+      "id": "leaf_cape",
+      "name_th": "ผ้าคลุมใบไม้",
+      "name_en": "Leaf Cape",
+      "description_th": "เพิ่มโอกาสหลบ 8% ตลอด Run",
+      "description_en": "Gain 8% evade chance for the run.",
+      "icon": "relic_leaf_cape",
+      "rarity": "rare",
+      "effects": [{ "trigger": "passive", "buff": "story_evade_8", "target": "self" }],
+      "synergies": []
+    },
+    {
+      "id": "ink_bottle",
+      "name_th": "ขวดหมึกซน",
+      "name_en": "Mischievous Ink Bottle",
+      "description_th": "โจมตีมีโอกาสทำให้ศัตรูติดพิษ",
+      "description_en": "Attacks may poison the enemy.",
+      "icon": "relic_ink_bottle",
+      "rarity": "epic",
+      "effects": [{ "trigger": "on_attack", "buff": "poison", "target": "enemy", "chance_pct": 15 }],
+      "synergies": [{ "with": "electric_fur", "trigger": "passive", "buff": "story_combo_12", "target": "self" }]
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "_doc": "T-026 · พลังเป็นเปอร์เซ็นต์ของ Power snapshot ตอนเริ่ม Run · stat_weights แบ่งบุคลิก HP/ATK/DEF · ตัวเลข ASSUMPTION รอจูนกับ T-028",
+  "monsters": [
+    {
+      "id": "eraserslime",
+      "name_th": "สไลม์ยางลบ",
+      "name_en": "Eraser Slime",
+      "sprite": "eraserslime",
+      "role": "balanced",
+      "is_boss": false,
+      "weight": 28,
+      "power_pct": 72,
+      "stat_weights": { "hp": 40, "atk": 35, "def": 25 },
+      "attack_interval_ms": 1500,
+      "on_hit_buffs": []
+    },
+    {
+      "id": "acorn",
+      "name_th": "ลูกโอ๊กเด้งดึ๋ง",
+      "name_en": "Bouncy Acorn",
+      "sprite": "acorn",
+      "role": "swarm",
+      "is_boss": false,
+      "weight": 22,
+      "power_pct": 68,
+      "stat_weights": { "hp": 28, "atk": 48, "def": 24 },
+      "attack_interval_ms": 1050,
+      "on_hit_buffs": []
+    },
+    {
+      "id": "inkbat",
+      "name_th": "ค้างคาวหยดหมึก",
+      "name_en": "Inkdrop Bat",
+      "sprite": "inkbat",
+      "role": "fast",
+      "is_boss": false,
+      "weight": 18,
+      "power_pct": 78,
+      "stat_weights": { "hp": 25, "atk": 55, "def": 20 },
+      "attack_interval_ms": 900,
+      "on_hit_buffs": ["poison"]
+    },
+    {
+      "id": "crayonsnail",
+      "name_th": "หอยทากสีเทียน",
+      "name_en": "Crayon Snail",
+      "sprite": "crayonsnail",
+      "role": "tank",
+      "is_boss": false,
+      "weight": 18,
+      "power_pct": 88,
+      "stat_weights": { "hp": 52, "atk": 18, "def": 30 },
+      "attack_interval_ms": 1900,
+      "on_hit_buffs": []
+    },
+    {
+      "id": "shavinghog",
+      "name_th": "เม่นเศษดินสอ",
+      "name_en": "Pencil-Shaving Hog",
+      "sprite": "shavinghog",
+      "role": "bruiser",
+      "is_boss": false,
+      "weight": 14,
+      "power_pct": 96,
+      "stat_weights": { "hp": 42, "atk": 38, "def": 20 },
+      "attack_interval_ms": 1350,
+      "on_hit_buffs": ["burn"]
+    },
+    {
+      "id": "paperwolf",
+      "name_th": "หมาป่ากระดาษยักษ์",
+      "name_en": "Giant Paper Wolf",
+      "sprite": "paperwolf",
+      "role": "boss",
+      "is_boss": true,
+      "weight": 0,
+      "power_pct": 125,
+      "stat_weights": { "hp": 46, "atk": 38, "def": 16 },
+      "attack_interval_ms": 1250,
+      "on_hit_buffs": []
+    }
+  ]
+}

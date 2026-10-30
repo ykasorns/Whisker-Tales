@@ -21,3 +21,13 @@ RunManager.startRun(catId) / advanceToNextNode() / endRun(RunResult)
 ---
 ## Amendment v2.0 (D-002, 2026-10-12)
 RunManager ใช้เฉพาะ **โหมดเสริมแบบ run** (story/endless) — โหมดหลัก idle อยู่ใน `idle_loop` (T-034) ไม่ผ่าน RunManager · pacing 3–5 นาทียังใช้กับโหมดนิทานผจญภัย · ศัตรูในโหมดเสริม scale ตาม PowerScore จาก core
+
+---
+## ส่งงาน/ตรวจรับ (2026-10-24, D-046)
+- [x] วงจรเต็มเริ่ม run → เดิน → encounter → resolve → จบชนะ/ตาย/ออก ผ่าน `test/core/run_manager_test.dart`
+- [x] snapshot คลาส, stats และ Power ของโมจิตอนเริ่ม run; การอัปเกรดด้านนอกไม่เปลี่ยน run ที่กำลังเล่น
+- [x] ตายกลางทางยังคำนวณรางวัลจากจำนวน node ที่ผ่าน (Fail Forward)
+- [x] GameMode เป็นเจ้าของ `EncounterSource`, `WinCondition`, สูตรรางวัล และ save progress; RunManager ไม่ hardcode เงื่อนไขชนะ
+- [x] source แบบ finite และ infinite ใช้ RunManager ตัวเดียวกัน โดยมี test ทั้งสองแบบ
+- [x] โควตารางวัลรายวันส่งผ่าน config/result แบบ deterministic และบันทึกโดยโหมด
+- [x] `flutter analyze` และ wt_core tests 316 รายการผ่าน; story tests 7 รายการและ app tests 45 รายการผ่าน

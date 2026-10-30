@@ -3,3 +3,4 @@
 library wt_mode_story;
 
 export 'src/story_mode.dart';
+export 'src/story_run_controller.dart';

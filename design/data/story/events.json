@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "_doc": "T-026 · ทุกเหตุการณ์มีสองทางเลือกแบบภาพใหญ่ เด็กเลือกจากภาพได้ · outcome ใช้ goldfish/xp/heal_pct/damage_pct/relic_choice/buff",
+  "events": [
+    {
+      "id": "whispering_chest",
+      "name_th": "หีบกระซิบ",
+      "name_en": "Whispering Chest",
+      "description_th": "หีบใบหนึ่งกระซิบว่าในนี้มีของดีแน่นอน",
+      "description_en": "A tiny chest whispers that treasure is definitely inside.",
+      "icon": "story_event_chest",
+      "choices": [
+        { "id": "open", "label_th": "เปิดเลย", "label_en": "Open it", "result_th": "โดนงับนิดหนึ่ง แต่เจอของวิเศษ", "result_en": "It nipped you, but a relic was hiding inside.", "icon": "story_choice_open", "outcome": { "damage_pct": 12, "relic_choice": true } },
+        { "id": "listen", "label_th": "ฟังก่อน", "label_en": "Listen first", "result_th": "หีบชอบผู้ฟัง จึงมอบปลาทองให้", "result_en": "The chest liked a good listener and shared its goldfish.", "icon": "story_choice_ear", "outcome": { "goldfish": 18 } }
+      ]
+    },
+    {
+      "id": "broken_pencil_bridge",
+      "name_th": "สะพานดินสอหัก",
+      "name_en": "Broken Pencil Bridge",
+      "description_th": "สะพานดินสอขาดตรงกลาง แต่ปลายทางอยู่ไม่ไกล",
+      "description_en": "The pencil bridge is snapped, though the far bank is close.",
+      "icon": "story_event_bridge",
+      "choices": [
+        { "id": "jump", "label_th": "กระโดดข้าม", "label_en": "Jump across", "result_th": "ลงพื้นแรงไปหน่อย แต่ได้ประสบการณ์", "result_en": "A bumpy landing taught you something useful.", "icon": "story_choice_jump", "outcome": { "damage_pct": 10, "xp": 18 } },
+        { "id": "detour", "label_th": "เดินอ้อม", "label_en": "Take the path", "result_th": "ทางอ้อมมีใบไม้สมุนไพรช่วยฟื้นพลัง", "result_en": "Healing leaves grew along the quiet path.", "icon": "story_choice_path", "outcome": { "heal_pct": 12 } }
+      ]
+    },
+    {
+      "id": "sleepy_owl",
+      "name_th": "นกฮูกง่วงนอน",
+      "name_en": "Sleepy Owl",
+      "description_th": "นกฮูกเฝ้าป่าหลับคาหนังสือปริศนา",
+      "description_en": "The forest owl has fallen asleep over a riddle book.",
+      "icon": "story_event_owl",
+      "choices": [
+        { "id": "answer", "label_th": "ตอบปริศนา", "label_en": "Answer the riddle", "result_th": "ตอบถูก! นกฮูกสอนเคล็ดลับให้", "result_en": "Correct! The owl shared a clever lesson.", "icon": "story_choice_riddle", "outcome": { "xp": 24 } },
+        { "id": "blanket", "label_th": "ห่มผ้าให้", "label_en": "Tuck in the owl", "result_th": "ความใจดีทำให้รู้สึกสดชื่นขึ้น", "result_en": "The kind deed left you feeling refreshed.", "icon": "story_choice_blanket", "outcome": { "heal_pct": 15 } }
+      ]
+    },
+    {
+      "id": "dancing_ink",
+      "name_th": "แอ่งหมึกเต้นรำ",
+      "name_en": "Dancing Ink Puddle",
+      "description_th": "หยดหมึกเรียงตัวเป็นลูกศรชวนให้เดินตาม",
+      "description_en": "Ink drops form a dancing arrow that invites you onward.",
+      "icon": "story_event_ink",
+      "choices": [
+        { "id": "follow", "label_th": "เดินตาม", "label_en": "Follow it", "result_th": "หมึกพาไปพบถุงปลาทอง แต่พื้นลื่นนิดหน่อย", "result_en": "The ink found a goldfish pouch, though the path was slippery.", "icon": "story_choice_ink", "outcome": { "goldfish": 28, "damage_pct": 8 } },
+        { "id": "draw", "label_th": "วาดดาว", "label_en": "Draw a star", "result_th": "ดาวหมึกนำโชคให้การต่อสู้ที่เหลือ", "result_en": "The ink star brings luck for the rest of the run.", "icon": "story_choice_star", "outcome": { "buff": "story_lucky_crit" } }
+      ]
+    },
+    {
+      "id": "paper_boat_stream",
+      "name_th": "ลำธารเรือกระดาษ",
+      "name_en": "Paper Boat Stream",
+      "description_th": "เรือกระดาษสองลำลอยวนรอผู้โดยสาร",
+      "description_en": "Two paper boats circle the stream, waiting for a passenger.",
+      "icon": "story_event_boat",
+      "choices": [
+        { "id": "sail", "label_th": "นั่งเรือ", "label_en": "Set sail", "result_th": "เรือเปียกนิดหน่อย แต่ลอยไปถึงสมบัติ", "result_en": "The soggy boat carried you to a hidden relic.", "icon": "story_choice_boat", "outcome": { "damage_pct": 6, "relic_choice": true } },
+        { "id": "fold", "label_th": "พับลำใหม่", "label_en": "Fold a new boat", "result_th": "การพับเรือทำให้เก่งขึ้นอีกนิด", "result_en": "Folding a neat boat taught you patience.", "icon": "story_choice_fold", "outcome": { "xp": 16 } }
+      ]
+    },
+    {
+      "id": "lost_mouse",
+      "name_th": "หนูน้อยหลงทาง",
+      "name_en": "Lost Little Mouse",
+      "description_th": "หนูน้อยถือป้ายกลับหัวและกำลังหาทางกลับบ้าน",
+      "description_en": "A tiny mouse holds an upside-down sign and looks lost.",
+      "icon": "story_event_mouse",
+      "choices": [
+        { "id": "escort", "label_th": "พาไปส่ง", "label_en": "Walk together", "result_th": "หนูสอนทางลัดและแบ่งเสบียงให้", "result_en": "The mouse showed a shortcut and shared a snack.", "icon": "story_choice_help", "outcome": { "xp": 14, "heal_pct": 8 } },
+        { "id": "sign", "label_th": "หมุนป้ายให้", "label_en": "Fix the sign", "result_th": "ใต้ป้ายมีปลาทองซ่อนอยู่", "result_en": "A few goldfish were tucked under the sign.", "icon": "story_choice_sign", "outcome": { "goldfish": 16 } }
+      ]
+    },
+    {
+      "id": "starfruit_tree",
+      "name_th": "ต้นผลดาว",
+      "name_en": "Starfruit Tree",
+      "description_th": "ผลไม้รูปดาวส่องแสงอยู่บนกิ่งสูง",
+      "description_en": "Star-shaped fruit glows on the highest branches.",
+      "icon": "story_event_tree",
+      "choices": [
+        { "id": "shake", "label_th": "เขย่าต้นไม้", "label_en": "Shake the tree", "result_th": "ผลดาวหล่นใส่หัวพร้อมถุงปลาทอง", "result_en": "A starfruit bonked your head beside a goldfish pouch.", "icon": "story_choice_shake", "outcome": { "damage_pct": 10, "goldfish": 32 } },
+        { "id": "wish", "label_th": "ขอพร", "label_en": "Make a wish", "result_th": "แสงดาวช่วยให้สกิลแข็งแกร่งขึ้น", "result_en": "Starlight strengthens your skills for the run.", "icon": "story_choice_wish", "outcome": { "buff": "story_skill_20" } }
+      ]
+    },
+    {
+      "id": "forest_bakery",
+      "name_th": "ร้านขนมกลางป่า",
+      "name_en": "Forest Bakery",
+      "description_th": "กลิ่นขนมปังอุ่นลอยออกมาจากโพรงไม้",
+      "description_en": "Warm bread smells drift from a bakery inside a tree.",
+      "icon": "story_event_bakery",
+      "choices": [
+        { "id": "eat", "label_th": "กินตรงนี้", "label_en": "Eat a warm bun", "result_th": "ขนมปังอุ่นช่วยฟื้นพลังมากมาย", "result_en": "The warm bun restored plenty of health.", "icon": "story_choice_bun", "outcome": { "heal_pct": 22 } },
+        { "id": "pack", "label_th": "ห่อไปแบ่ง", "label_en": "Pack some to share", "result_th": "คนทำขนมชอบน้ำใจและมอบรางวัลให้", "result_en": "The baker rewarded your thoughtful choice.", "icon": "story_choice_bag", "outcome": { "goldfish": 12, "xp": 12 } }
+      ]
+    }
+  ]
+}

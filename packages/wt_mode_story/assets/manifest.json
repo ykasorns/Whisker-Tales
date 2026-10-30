@@ -4,7 +4,7 @@
   "name_en": "Story Challenge",
   "icon": "mode_story",
   "order": 1,
-  "enabled": false,
+  "enabled": true,
   "min_app_version": "1.0.0",
   "unlock": { "type": "boss_cleared", "boss": "eraserking" }
 }

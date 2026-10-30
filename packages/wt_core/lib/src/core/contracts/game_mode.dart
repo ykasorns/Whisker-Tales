@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/widgets.dart';
 
+import 'combat.dart';
 import 'rewards.dart';
 
 /// Encounter kinds and their target share (GDD v0.3 §3.3).
@@ -9,13 +10,22 @@ enum EncounterType { combat, treasure, event, campfire, shop, fork, boss }
 
 /// One stop on a run's path. Payload ids point into design/data JSON.
 class Encounter {
-  const Encounter({required this.type, required this.depth, this.contentId});
+  const Encounter({
+    required this.type,
+    required this.depth,
+    this.contentId,
+    this.routeId,
+  });
 
   final EncounterType type;
   final int depth;
 
   /// Monster/event/shop id, or null where the type needs none.
   final String? contentId;
+
+  /// Stable id for choosing one of several encounters at the same depth.
+  /// Linear sources may leave it null.
+  final String? routeId;
 }
 
 /// What the floating node map draws ahead of the player (GDD v0.3 §3.4).
@@ -36,11 +46,62 @@ abstract class EncounterSource {
   List<EncounterPreview> preview(int depth, int count);
 }
 
+/// Optional extension for a source that offers two or more routes at one
+/// depth. A run manager can still consume an ordinary linear source.
+abstract class ChoiceEncounterSource implements EncounterSource {
+  List<Encounter> choices(int depth);
+
+  /// [routeId] is required when more than one choice exists. With one choice
+  /// it may be omitted, keeping auto-play possible.
+  Encounter? choose(int depth, String? routeId, Random rng);
+}
+
+/// Mochi as they were when the run began. Later upgrades in the idle mode do
+/// not alter a run already in progress.
+class RunCatSnapshot {
+  const RunCatSnapshot({
+    required this.id,
+    required this.classId,
+    required this.stats,
+    required this.power,
+  });
+
+  final String id;
+  final String classId;
+  final StatBlock stats;
+  final int power;
+}
+
 /// Per-run settings a mode derives from its save (difficulty, seed, modifiers).
 class RunConfig {
-  const RunConfig({required this.seed, this.modifiers = const {}});
+  const RunConfig({
+    required this.seed,
+    this.modifiers = const {},
+    this.cat,
+    this.dayKey = '',
+    this.completedRunsToday = 0,
+  });
   final int seed;
   final Map<String, Object> modifiers;
+  final RunCatSnapshot? cat;
+  final String dayKey;
+
+  /// Completed runs before this run starts. 0–2 receive full rewards; the
+  /// fourth and later runs may reduce rewards according to the mode.
+  final int completedRunsToday;
+
+  RunConfig copyWith({
+    RunCatSnapshot? cat,
+    String? dayKey,
+    int? completedRunsToday,
+  }) =>
+      RunConfig(
+        seed: seed,
+        modifiers: modifiers,
+        cat: cat ?? this.cat,
+        dayKey: dayKey ?? this.dayKey,
+        completedRunsToday: completedRunsToday ?? this.completedRunsToday,
+      );
 }
 
 enum RunOutcome { won, died, abandoned }
@@ -51,11 +112,15 @@ class RunResult {
     required this.outcome,
     required this.depthReached,
     this.bossesCleared = const [],
+    this.dayKey = '',
+    this.completedRunsToday = 0,
   });
 
   final RunOutcome outcome;
   final int depthReached;
   final List<String> bossesCleared;
+  final String dayKey;
+  final int completedRunsToday;
 }
 
 /// When a run counts as finished-and-won (MODE_PLUGIN_SPEC §3).
@@ -76,7 +141,9 @@ class RewardResult {
 
 /// Opaque per-mode save; core stores it under `modes.<id>` without reading it
 /// (MODE_PLUGIN_SPEC §5, GAME_CONTRACT §4.6).
-abstract class ModeSaveState {}
+abstract class ModeSaveState {
+  const ModeSaveState();
+}
 
 /// Unlock vocabulary for mode manifests (MODE_PLUGIN_SPEC §4).
 enum UnlockType { flag, fishTotal, bossCleared }
@@ -180,6 +247,17 @@ abstract class GameMode {
   ModeSaveState decodeSave(Map<String, dynamic> json);
 
   Map<String, dynamic> encodeSave(ModeSaveState state);
+}
+
+/// Optional capability for a mode whose reward rate changes by daily runs.
+abstract class DailyRunMode {
+  int completedRunsOn(ModeSaveState state, String dayKey);
+}
+
+/// Optional capability for mode-owned progress after a run. Core treats the
+/// returned state as opaque and stores it under the mode's namespace.
+abstract class RunProgressMode {
+  ModeSaveState updateAfterRun(RunResult result, ModeSaveState state);
 }
 
 /// Where modes register (MODE_PLUGIN_SPEC §2, §4; GDD v0.4 §9); the

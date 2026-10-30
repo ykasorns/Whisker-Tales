@@ -71,6 +71,10 @@ class RunState {
 class RunStateMachine extends StateNotifier<RunState> {
   RunStateMachine() : super(RunState.initial);
 
+  RunPhase get phase => state.phase;
+  int get depth => state.depth;
+  RunOutcome? get outcome => state.outcome;
+
   /// Starts a new run; allowed before the first run or after one ended.
   void start() {
     _expect({RunPhase.notStarted, RunPhase.ended}, 'start');

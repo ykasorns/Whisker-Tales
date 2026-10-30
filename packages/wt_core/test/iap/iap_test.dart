@@ -24,6 +24,8 @@ class FakeIapStore implements IapStore {
   bool open = true;
   bool pendingFirst = false;
   final bought = <String>{};
+  int sequence = 0;
+  final restorable = <String>{};
   final _queue = <StoreEvent>[];
   void Function(StoreEvent)? _h;
 
@@ -46,21 +48,24 @@ class FakeIapStore implements IapStore {
             StoreProduct(sku: e.key, title: e.key, price: e.value),
       ];
   @override
-  Future<bool> buy(String sku) async {
+  Future<bool> buy(String sku, {required bool consumable}) async {
     if (!open || !prices.containsKey(sku)) return false;
     if (pendingFirst) {
       emit(StoreEvent(StoreEventKind.pending, sku));
     } else {
       bought.add(sku);
-      emit(StoreEvent(StoreEventKind.purchased, sku));
+      if (!consumable) restorable.add(sku);
+      emit(StoreEvent(StoreEventKind.purchased, sku,
+          transactionId: '${sku}_${sequence++}'));
     }
     return true;
   }
 
   @override
   Future<void> restore() async {
-    for (final s in bought) {
-      emit(StoreEvent(StoreEventKind.purchased, s));
+    for (final s in restorable) {
+      emit(StoreEvent(StoreEventKind.purchased, s,
+          transactionId: '${s}_restore'));
     }
   }
 }
@@ -73,6 +78,7 @@ void main() {
   late ParentalGate gate;
   late FakeIapStore store;
   late IapService iap;
+  late MemoryWallet wallet;
 
   setUp(() {
     time = Time(t0);
@@ -82,7 +88,9 @@ void main() {
     store = FakeIapStore({
       for (final p in catalog.products) p.sku: '฿35.00',
     });
-    iap = IapService(catalog: catalog, store: store, gate: gate)..start();
+    wallet = MemoryWallet();
+    iap = IapService(catalog: catalog, store: store, gate: gate, wallet: wallet)
+      ..start();
   });
 
   GatePass pass() {
@@ -160,6 +168,22 @@ void main() {
       expect(iap.owned, isEmpty);
     });
 
+    test('a currency pack can be bought again and each transaction grants once',
+        () async {
+      const sku = 'story_supplies_099';
+      final p = catalog.bySku(sku)!;
+      expect(p.consumable, isTrue);
+      expect(await iap.purchase(sku, pass()), PurchaseStart.started);
+      expect(wallet.balance(Currency.yarn), p.grants[Currency.yarn]);
+      expect(wallet.balance(Currency.goldfish), p.grants[Currency.goldfish]);
+      expect(await iap.purchase(sku, pass()), PurchaseStart.started);
+      expect(wallet.balance(Currency.yarn), p.grants[Currency.yarn] * 2);
+      final before = wallet.balance(Currency.goldfish);
+      expect(iap.deliver(sku, transactionId: '${sku}_0'), isFalse);
+      expect(wallet.balance(Currency.goldfish), before);
+      expect(iap.owned, isEmpty);
+    });
+
     test('delivery needs no gate (already paid) and grants once', () {
       final news = <StoreEvent>[];
       iap.news.listen(news.add);
@@ -183,7 +207,8 @@ void main() {
       // the payment clears while the app is closed; next boot delivers it
       final store2 = FakeIapStore({})
         ..emit(const StoreEvent(StoreEventKind.purchased, 'supporter_pack'));
-      final iap2 = IapService(catalog: catalog, store: store2, gate: gate);
+      final iap2 = IapService(
+          catalog: catalog, store: store2, gate: gate, wallet: MemoryWallet());
       expect(iap2.owned, isEmpty);
       iap2.start();
       expect(iap2.owned, {'supporter_pack'});
@@ -191,7 +216,8 @@ void main() {
 
     test('restore brings back everything bought before', () async {
       await iap.purchase('supporter_pack', pass());
-      final fresh = IapService(catalog: catalog, store: store, gate: gate)
+      final fresh = IapService(
+          catalog: catalog, store: store, gate: gate, wallet: MemoryWallet())
         ..start();
       expect(fresh.owned, isEmpty);
       expect(await fresh.restore(pass()), isTrue);
@@ -207,7 +233,7 @@ void main() {
       expect(iap.owned, isEmpty);
       const none = UnavailableIapStore();
       expect(await none.products({'supporter_pack'}), isEmpty);
-      expect(await none.buy('supporter_pack'), isFalse);
+      expect(await none.buy('supporter_pack', consumable: false), isFalse);
     });
 
     test('save keeps owned SKUs; unknown ones are dropped', () async {
@@ -215,9 +241,11 @@ void main() {
       final json = jsonDecode(jsonEncode(iap.toJson())) as Map<String, dynamic>;
       expect(json, {
         'no_ads': true,
-        'skus': ['supporter_pack']
+        'skus': ['supporter_pack'],
+        'delivered_transactions': <String>[]
       });
-      final back = IapService(catalog: catalog, store: store, gate: gate)
+      final back = IapService(
+          catalog: catalog, store: store, gate: gate, wallet: MemoryWallet())
         ..restoreSaved({
           ...json,
           'skus': ['supporter_pack', 'retired_sku']
@@ -227,16 +255,22 @@ void main() {
     });
   });
 
-  group('catalog never sells gameplay', () {
-    test('shipped data: the Supporter Pack only, no currency', () {
-      // outfits come back when every class has its art (D-024)
-      expect(catalog.products.map((p) => p.sku), ['supporter_pack']);
-      for (final p in catalog.products) {
-        expect(kEntitlements.containsAll(p.entitlements), isTrue);
+  group('catalog safety', () {
+    test('shipped data has six repeatable supply packs and one no-ads item',
+        () {
+      expect(catalog.products.where((p) => p.consumable), hasLength(6));
+      expect(catalog.products.where((p) => !p.consumable).single.sku,
+          'supporter_pack');
+      expect(catalog.products.first.referencePriceUsd, 0.99);
+      expect(catalog.products[5].referencePriceUsd, 99.99);
+      for (final p in catalog.products.where((p) => p.consumable)) {
+        expect(p.grants[Currency.yarn], greaterThan(0));
+        expect(p.grants[Currency.goldfish], greaterThan(0));
+        expect(p.grants[Currency.eggs], 0);
       }
     });
 
-    test('a SKU that gives currency, power or unknown rights is refused', () {
+    test('eggs, cookies, power and unknown rights are refused', () {
       Map<String, dynamic> one(Map<String, dynamic> extra) => {
             'products': [
               {
@@ -270,26 +304,6 @@ void main() {
       ]) {
         expect(() => IapCatalog.fromJson(one(bad)), throwsFormatException,
             reason: '$bad');
-      }
-    });
-
-    test('the iap module never touches the wallet or currencies', () {
-      for (final f in Directory('lib/src/iap').listSync().whereType<File>()) {
-        // code only: the doc comments say what is never sold
-        final src = f
-            .readAsLinesSync()
-            .where((l) => !l.trimLeft().startsWith('//'))
-            .join('\n');
-        for (final w in [
-          'IWallet',
-          'Currency',
-          'wallet',
-          'goldfish',
-          'eggs',
-          'yarn'
-        ]) {
-          expect(src.contains(w), isFalse, reason: '${f.path}: $w');
-        }
       }
     });
   });

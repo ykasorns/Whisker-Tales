@@ -54,6 +54,17 @@ void main() {
       expect(e.runToEnd(), isFalse);
     });
 
+    test('a run fight can carry current HP while keeping the same max HP', () {
+      final e = CombatEngine(rules)
+        ..start(CombatSetup(seed: 1, units: [
+          cat(hp: 1000).copyWith(initialHp: 375),
+          mon('wall', hp: 99999, atk: 1, intervalMs: 1 << 30),
+        ]));
+
+      final catView = e.view.firstWhere((unit) => unit.id == 'mochi');
+      expect((catView.hp, catView.maxHp), (375, 1000));
+    });
+
     test('nothing happens after the fight ends', () {
       final e = CombatEngine(rules);
       final ev = <CombatEvent>[];

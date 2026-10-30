@@ -1,3 +1,4 @@
+import 'combat.dart';
 import 'game_mode.dart';
 
 /// Effect triggers from GAME_CONTRACT §4.5 (adventure mode relics/talents).
@@ -15,19 +16,95 @@ enum EffectTrigger {
 /// T-010/T-013.
 abstract class EffectContext {
   String get ownerUnitId;
+  String? get enemyUnitId;
+  IBuffEngine get buffEngine;
+
+  /// Deterministic chance roll in basis points (`0 <= value < 10000`).
+  int nextBasisPoint();
 }
 
 /// Run lifecycle for run-based modes only — the idle main loop does not use
 /// it (D-002). GDD v0.3 §3.2. Owner: T-005.
 abstract class IRunManager {
-  void startRun(String catId);
-  void advanceToNextNode();
-  void endRun(RunResult result);
+  RunSessionView? get current;
+  RunCompletion? get completion;
+
+  void startRun({
+    required GameMode mode,
+    required ModeSaveState modeState,
+    required RunCatSnapshot cat,
+    required String dayKey,
+  });
+
+  List<Encounter> get nextChoices;
+  List<EncounterPreview> preview(int count);
+  Encounter? advanceToNextNode({String? routeId});
+  RunCompletion? resolveEncounter({required bool survived});
+  RunCompletion endRun(RunOutcome outcome);
 }
 
 /// Seeded node map for the adventure mode (GDD v0.3 §3.3). Owner: T-006.
 abstract class IEncounterGenerator {
-  List<Encounter> generate(int seed);
+  EncounterMap generate(int seed);
+}
+
+class EncounterStage {
+  EncounterStage({required this.depth, required List<Encounter> choices})
+      : choices = List.unmodifiable(choices) {
+    if (choices.isEmpty) {
+      throw ArgumentError('an encounter stage needs a choice');
+    }
+    if (choices.any((e) => e.depth != depth)) {
+      throw ArgumentError('every choice must use stage depth $depth');
+    }
+  }
+
+  final int depth;
+  final List<Encounter> choices;
+}
+
+/// A finite, seeded route. Most stages have one encounter; the stage after a
+/// fork has a safe and a risky choice that reconverge afterwards.
+class EncounterMap {
+  EncounterMap({required this.seed, required List<EncounterStage> stages})
+      : stages = List.unmodifiable(stages);
+
+  final int seed;
+  final List<EncounterStage> stages;
+
+  int get length => stages.length;
+  List<Encounter> choicesAt(int depth) =>
+      depth < 0 || depth >= stages.length ? const [] : stages[depth].choices;
+}
+
+class RunSessionView {
+  const RunSessionView({
+    required this.modeId,
+    required this.config,
+    required this.cat,
+    required this.modeState,
+    required this.clearedNodes,
+    this.encounter,
+  });
+
+  final String modeId;
+  final RunConfig config;
+  final RunCatSnapshot cat;
+  final ModeSaveState modeState;
+  final int clearedNodes;
+  final Encounter? encounter;
+}
+
+class RunCompletion {
+  const RunCompletion({
+    required this.result,
+    required this.reward,
+    required this.modeState,
+  });
+
+  final RunResult result;
+  final RewardResult reward;
+  final ModeSaveState modeState;
 }
 
 /// Relics held during a run; effects resolve to buffs (GDD v0.3 §6,

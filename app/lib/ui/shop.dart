@@ -15,10 +15,10 @@ Future<void> openShop(BuildContext context, WidgetRef ref) async {
   if (pass == null || !context.mounted) return;
   await showModalBottomSheet<void>(
     context: context,
-    backgroundColor: Palette.paper,
+    backgroundColor: Palette.storyPaper,
     isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    shape: const ContinuousRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(38))),
     builder: (_) => ShopSheet(pass: pass),
   );
 }
@@ -79,7 +79,7 @@ class _GateDialogState extends State<_GateDialog> {
               child: Container(
                 height: 48,
                 alignment: Alignment.center,
-                decoration: inkBox(
+                decoration: storybookButton(
                     fill: k == '✓' ? Palette.lime : Palette.paper, radius: 10),
                 child: IconText(k,
                     style: const TextStyle(
@@ -89,10 +89,9 @@ class _GateDialogState extends State<_GateDialog> {
           ),
         );
     return Dialog(
-      backgroundColor: Palette.paper,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: Palette.ink, width: 3)),
+      backgroundColor: Palette.storyPaper,
+      shadowColor: Palette.plum.withValues(alpha: 0.30),
+      shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(34)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -111,7 +110,8 @@ class _GateDialogState extends State<_GateDialog> {
             height: 44,
             width: double.infinity,
             alignment: Alignment.center,
-            decoration: inkBox(fill: Palette.sheet, radius: 10),
+            decoration: storybookCard(
+                fill: Palette.sheet, accent: Palette.plum, radius: 8),
             child: IconText(_typed,
                 style:
                     const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
@@ -197,87 +197,138 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
     final s = AppLocalizations.of(context);
     final iap = _iap;
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: FutureBuilder<List<StoreProduct>>(
-          future: _products,
-          builder: (context, snap) {
-            final sold = snap.data ?? const [];
-            return Column(mainAxisSize: MainAxisSize.min, children: [
-              Row(children: [
-                Expanded(
-                    child: IconText(s.navShop,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w800))),
-                IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const GameIcon('cross', size: 28)),
-              ]),
-              if (snap.connectionState != ConnectionState.done)
-                const Padding(
-                    padding: EdgeInsets.all(24),
-                    child: CircularProgressIndicator())
-              else if (iap == null || sold.isEmpty)
-                Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: IconText(s.shopClosed, textAlign: TextAlign.center))
-              else
-                for (final sp in sold)
-                  if (iap.catalog.bySku(sp.sku) case final p?)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(12),
-                      decoration: inkBox(fill: const Color(0xFFFFF3D6)),
-                      child: Row(children: [
-                        IconText(p.icon, style: const TextStyle(fontSize: 36)),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                IconText(s.lang == 'en' ? p.nameEn : p.nameTh,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w800)),
-                                IconText(s.lang == 'en' ? p.descEn : p.descTh,
-                                    style: const TextStyle(fontSize: 12)),
-                              ]),
+      child: SizedBox(
+        height: MediaQuery.sizeOf(context).height * 0.84,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+          child: Column(children: [
+            Row(children: [
+              Expanded(
+                  child: IconText(s.navShop,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w800))),
+              IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const GameIcon('cross', size: 28)),
+            ]),
+            Expanded(
+              child: FutureBuilder<List<StoreProduct>>(
+                future: _products,
+                builder: (context, snap) {
+                  final sold = snap.data ?? const [];
+                  if (snap.connectionState != ConnectionState.done) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (iap == null || sold.isEmpty) {
+                    return Center(
+                        child: IconText(s.shopClosed,
+                            textAlign: TextAlign.center));
+                  }
+                  final cards = <Widget>[];
+                  IapKind? previous;
+                  for (final sp in sold) {
+                    final p = iap.catalog.bySku(sp.sku);
+                    if (p == null) continue;
+                    if (p.kind != previous) {
+                      previous = p.kind;
+                      cards.add(Padding(
+                        padding: const EdgeInsets.fromLTRB(2, 12, 2, 8),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: IconText(
+                            p.consumable
+                                ? (s.lang == 'th'
+                                    ? 'เสบียงสำหรับเดินทาง'
+                                    : 'Adventure supplies')
+                                : (s.lang == 'th'
+                                    ? 'เล่นแบบไม่มีโฆษณา'
+                                    : 'Play without ads'),
+                            style: const TextStyle(
+                                fontSize: 17, fontWeight: FontWeight.w800),
+                          ),
                         ),
-                        const SizedBox(width: 8),
-                        iap.owned.contains(p.sku)
-                            ? IconText(s.owned,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w800))
-                            : GestureDetector(
-                                onTap: () => _buy(p.sku),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 10),
-                                  decoration:
-                                      inkBox(fill: Palette.lime, radius: 12),
-                                  child: IconText(sp.price,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w800)),
-                                ),
-                              ),
-                      ]),
+                      ));
+                    }
+                    cards.add(_productCard(s, iap, p, sp));
+                  }
+                  final table = ref.read(gearBasketProvider).gradeTable;
+                  final names = s.gradeNames.split(',');
+                  final odds = [
+                    for (var i = 0; i < table.length; i++)
+                      if (table[i] > 0)
+                        '${names[i]} ${table[i].toStringAsFixed(table[i] % 1 == 0 ? 0 : 1)}%'
+                  ].join(' · ');
+                  return ListView(children: [
+                    IconText(
+                      s.lang == 'th'
+                          ? 'ไหมพรมใช้ถักอุปกรณ์แบบสุ่ม · อัตราตอนนี้: $odds'
+                          : 'Yarn knits random gear · current rates: $odds',
+                      style:
+                          const TextStyle(fontSize: 11, color: Palette.inkSoft),
                     ),
-              if (_status case final st?)
-                Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: IconText(st,
-                        style: const TextStyle(fontWeight: FontWeight.w700))),
-              if (iap != null)
-                TextButton(
-                  onPressed: () async {
-                    await iap.restore(widget.pass);
-                    if (mounted) setState(() => _status = s.restoring);
-                  },
-                  child: IconText(s.restorePurchases),
-                ),
-            ]);
-          },
+                    ...cards,
+                  ]);
+                },
+              ),
+            ),
+            if (_status case final st?)
+              Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: IconText(st,
+                      style: const TextStyle(fontWeight: FontWeight.w700))),
+            if (iap != null)
+              TextButton(
+                onPressed: () async {
+                  await iap.restore(widget.pass);
+                  if (mounted) setState(() => _status = s.restoring);
+                },
+                child: IconText(s.restorePurchases),
+              ),
+          ]),
         ),
       ),
+    );
+  }
+
+  Widget _productCard(
+      AppLocalizations s, IapService iap, IapProduct p, StoreProduct sp) {
+    final owned = !p.consumable && iap.owned.contains(p.sku);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 9),
+      padding: const EdgeInsets.all(12),
+      decoration: storybookCard(
+          fill:
+              p.consumable ? const Color(0xFFFFF1D5) : const Color(0xFFE4F4EC),
+          accent: p.consumable ? Palette.sun : Palette.teal),
+      child: Row(children: [
+        IconText(p.icon, style: const TextStyle(fontSize: 34)),
+        const SizedBox(width: 10),
+        Expanded(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            IconText(s.lang == 'en' ? p.nameEn : p.nameTh,
+                style: const TextStyle(fontWeight: FontWeight.w800)),
+            IconText(s.lang == 'en' ? p.descEn : p.descTh,
+                style: const TextStyle(fontSize: 12, color: Palette.inkSoft)),
+          ]),
+        ),
+        const SizedBox(width: 8),
+        owned
+            ? IconText(s.owned,
+                style: const TextStyle(fontWeight: FontWeight.w800))
+            : GestureDetector(
+                key: ValueKey('buy-${p.sku}'),
+                onTap: () => _buy(p.sku),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: storybookButton(
+                      fill: Palette.lime, accent: Palette.teal, radius: 9),
+                  child: IconText(sp.price,
+                      style: const TextStyle(fontWeight: FontWeight.w800)),
+                ),
+              ),
+      ]),
     );
   }
 }

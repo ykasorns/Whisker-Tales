@@ -4,7 +4,7 @@ import 'contracts/ads.dart';
 import 'contracts/rewards.dart';
 import 'providers.dart';
 
-/// 🎁 daily gift / 🧶 yarn bundle on the Events page (D-003): one rewarded
+/// 🎁 daily gift / 🧶 yarn bundle in the Shop (D-053): one rewarded
 /// ad pays N minutes of the farm page's income (`*_minutes_of_income`), the
 /// gear's goldfish find included. One place for the app and the balance
 /// sim (T-029).
@@ -42,5 +42,5 @@ class AdGifts {
   }
 }
 
-/// Events-page gifts (D-003).
+/// Shop gifts (D-053).
 final adGiftsProvider = Provider<AdGifts>((ref) => AdGifts(ref));

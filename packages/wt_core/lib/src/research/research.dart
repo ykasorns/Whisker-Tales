@@ -22,6 +22,8 @@ class ResearchNode {
     required this.icon,
     required this.nameTh,
     required this.nameEn,
+    this.descriptionTh = '',
+    this.descriptionEn = '',
     required this.effect,
     required this.maxLevel,
     this.mainStat,
@@ -34,6 +36,7 @@ class ResearchNode {
 
   final String id;
   final String icon, nameTh, nameEn;
+  final String descriptionTh, descriptionEn;
   final ResearchEffect effect;
   final int maxLevel;
 
@@ -149,6 +152,8 @@ class ResearchRules {
         icon: m['icon'] as String? ?? '📖',
         nameTh: m['name_th'] as String? ?? id,
         nameEn: m['name_en'] as String? ?? id,
+        descriptionTh: m['description_th'] as String? ?? '',
+        descriptionEn: m['description_en'] as String? ?? '',
         effect: effect,
         maxLevel: max,
         mainStat: effect == ResearchEffect.stat ? attr as String : null,

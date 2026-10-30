@@ -40,10 +40,11 @@ class _PetsTabState extends ConsumerState<PetsTab> {
     return showDialog(
       context: context,
       builder: (ctx) => Dialog(
-        backgroundColor: Palette.paper,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(color: _rarityColor(r.rarity), width: 4)),
+        backgroundColor:
+            Color.lerp(Palette.paper, _rarityColor(r.rarity), 0.16),
+        shadowColor: _rarityColor(r.rarity).withValues(alpha: 0.35),
+        shape: const ContinuousRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(28))),
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -74,7 +75,8 @@ class _PetsTabState extends ConsumerState<PetsTab> {
               child: Container(
                 height: 52,
                 alignment: Alignment.center,
-                decoration: inkBox(fill: Palette.lime),
+                decoration:
+                    storybookButton(fill: Palette.lime, accent: Palette.teal),
                 child: IconText(s.yay,
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w800)),
@@ -107,7 +109,15 @@ class _PetsTabState extends ConsumerState<PetsTab> {
                 height: 56,
                 alignment: Alignment.center,
                 margin: const EdgeInsets.all(4),
-                decoration: inkBox(fill: fill, radius: 12),
+                decoration: storybookButton(
+                    fill: fill,
+                    accent: src == HatchSource.ad
+                        ? Palette.mochi
+                        : src == HatchSource.egg
+                            ? Palette.plum
+                            : Palette.teal,
+                    enabled: enabled,
+                    radius: 9),
                 child: IconText(label,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
@@ -120,21 +130,41 @@ class _PetsTabState extends ConsumerState<PetsTab> {
       // hatch
       Container(
         padding: const EdgeInsets.all(12),
-        decoration: inkBox(fill: const Color(0xFFFFF3D6)),
+        decoration: storybookCard(
+            fill: const Color(0xFFFFE8B2), accent: Palette.mochi, radius: 11),
         child: Column(children: [
-          const IconText('🥚', style: TextStyle(fontSize: 64)),
-          IconText(s.hatch,
-              style:
-                  const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-          IconText(
-            s.odds(
-                rates[PetRarity.common]!.round(),
-                rates[PetRarity.rare]!.round(),
-                rates[PetRarity.legend]!.round(),
-                pets.pityLeft),
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 12, color: Palette.inkSoft),
-          ),
+          Row(children: [
+            Container(
+              width: 76,
+              height: 76,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: Color(0x99FFFBF2),
+                shape: BoxShape.circle,
+              ),
+              child: const IconText('🥚', style: TextStyle(fontSize: 54)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconText(s.hatch,
+                        style: const TextStyle(
+                            fontSize: 21, fontWeight: FontWeight.w900)),
+                    const SizedBox(height: 3),
+                    IconText(
+                      s.odds(
+                          rates[PetRarity.common]!.round(),
+                          rates[PetRarity.rare]!.round(),
+                          rates[PetRarity.legend]!.round(),
+                          pets.pityLeft),
+                      style: const TextStyle(
+                          fontSize: 11.5, color: Palette.inkSoft),
+                    ),
+                  ]),
+            ),
+          ]),
           const SizedBox(height: 8),
           Row(children: [
             button(s.useEgg(wallet.balance(Currency.eggs)),
@@ -174,12 +204,15 @@ class _PetsTabState extends ConsumerState<PetsTab> {
                       },
                 child: Container(
                   padding: const EdgeInsets.all(6),
-                  decoration: inkBox(
-                      fill: out ? Palette.lime : Palette.paper,
-                      border: stars == null
-                          ? Palette.inkSoft
+                  decoration: storybookCard(
+                      fill: out
+                          ? Color.lerp(Palette.parchment, Palette.lime, .42)!
+                          : Color.lerp(Palette.parchment,
+                              _rarityColor(def.rarity), .12)!,
+                      accent: stars == null
+                          ? Palette.storyEdge
                           : _rarityColor(def.rarity),
-                      radius: 12),
+                      radius: 8),
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -235,10 +268,10 @@ class PetPicture extends StatelessWidget {
 Future<void> showPetSheet(BuildContext context, WidgetRef ref, PetDef def) =>
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Palette.paper,
+      backgroundColor: Palette.storyPaper,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const ContinuousRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(34))),
       builder: (_) => PetSheet(def: def),
     );
 
@@ -273,7 +306,10 @@ class _PetSheetState extends ConsumerState<PetSheet> {
           width: double.infinity,
           margin: const EdgeInsets.only(top: 10),
           padding: const EdgeInsets.all(10),
-          decoration: inkBox(radius: 12, width: 2),
+          decoration: storybookCard(
+              fill: const Color(0xFFFFEDCF),
+              accent: Palette.storyEdge,
+              radius: 8),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             IconText(title,
@@ -363,8 +399,11 @@ class _PetSheetState extends ConsumerState<PetSheet> {
                   child: Container(
                     height: 56,
                     alignment: Alignment.center,
-                    decoration: inkBox(
-                        fill: out ? Palette.paper : Palette.lime, radius: 14),
+                    decoration: storybookButton(
+                        fill: out ? Palette.parchment : Palette.lime,
+                        accent: out ? Palette.storyEdge : Palette.teal,
+                        enabled: !full,
+                        radius: 10),
                     child: IconText(out ? s.restPet : s.sendToBattle,
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w900)),
@@ -379,7 +418,10 @@ class _PetSheetState extends ConsumerState<PetSheet> {
                 height: 56,
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 alignment: Alignment.center,
-                decoration: inkBox(radius: 14),
+                decoration: storybookCard(
+                    fill: Palette.parchment,
+                    accent: Palette.storyEdge,
+                    radius: 9),
                 child: IconText(s.closeSheet,
                     style: const TextStyle(fontWeight: FontWeight.w800)),
               ),

@@ -34,6 +34,11 @@ enum MergeWinner { local, cloud }
     'no_ads': le['no_ads'] == true || ce['no_ads'] == true,
     'skus': ({..._strings(le['skus']), ..._strings(ce['skus'])}.toList()
       ..sort()),
+    'delivered_transactions': ({
+      ..._strings(le['delivered_transactions']),
+      ..._strings(ce['delivered_transactions'])
+    }.toList()
+      ..sort()),
   };
   // an age answered on either phone is kept (asked once, D-026)
   final la = '${_map(local['age'])['band']}',

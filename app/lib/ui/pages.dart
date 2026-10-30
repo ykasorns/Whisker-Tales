@@ -17,6 +17,49 @@ Widget _pageTitle(String t) => Padding(
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
     );
 
+Widget _storyHeading(String t) => Padding(
+      padding: const EdgeInsets.fromLTRB(0, 16, 0, 10),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Row(children: [
+          Transform.rotate(
+            angle: -.08,
+            child: Container(
+              width: 28,
+              height: 7,
+              decoration: storybookButton(
+                fill: Palette.coral,
+                accent: Palette.mochi,
+                radius: 3,
+              ),
+            ),
+          ),
+          const SizedBox(width: 9),
+          Flexible(
+            child: IconText(t,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          ),
+        ]),
+      ),
+    );
+
+Widget _statCell(String label, String value, Color accent) => Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 8),
+        color: Color.lerp(Palette.parchment, accent, .11),
+        child: Column(children: [
+          IconText(label,
+              maxLines: 1,
+              style: const TextStyle(fontSize: 11, color: Palette.inkSoft)),
+          const SizedBox(height: 2),
+          IconText(value,
+              style:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.w900)),
+        ]),
+      ),
+    );
+
 Widget _soon(BuildContext context, String icon, String text) => Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         IconText(icon, style: const TextStyle(fontSize: 64)),
@@ -35,19 +78,73 @@ class CharacterPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = AppLocalizations.of(context);
-    return DefaultTabController(
+    return StorybookPaper(
+        child: DefaultTabController(
       length: 4,
       child: Column(children: [
-        TabBar(
-          labelColor: Palette.ink,
-          indicatorColor: Palette.coral,
-          labelStyle: const TextStyle(fontWeight: FontWeight.w800),
-          tabs: [
-            Tab(text: s.tabCat),
-            Tab(text: s.tabWardrobe),
-            Tab(text: s.tabPets),
-            Tab(text: s.tabLibrary)
-          ],
+        Builder(
+          builder: (tabContext) {
+            final controller = DefaultTabController.of(tabContext);
+            final chapters = [
+              (s.tabCat, '🐱'),
+              (s.tabWardrobe, 'openbook'),
+              (s.tabPets, '🐾'),
+              (s.tabLibrary, 'books'),
+            ];
+            return AnimatedBuilder(
+              animation: controller,
+              builder: (context, _) => Container(
+                margin: const EdgeInsets.fromLTRB(8, 7, 8, 4),
+                padding: const EdgeInsets.all(3),
+                decoration: storybookCard(
+                  fill: Palette.parchmentDeep,
+                  accent: Palette.wood,
+                  radius: 9,
+                ),
+                child: TabBar(
+                  dividerHeight: 0,
+                  indicatorColor: Colors.transparent,
+                  labelPadding: EdgeInsets.zero,
+                  tabs: [
+                    for (var i = 0; i < chapters.length; i++)
+                      Tab(
+                        height: 62,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 160),
+                          width: double.infinity,
+                          margin: const EdgeInsets.all(2),
+                          padding: const EdgeInsets.symmetric(horizontal: 2),
+                          decoration: i == controller.index
+                              ? storybookButton(
+                                  fill: const Color(0xFFFFE1A0),
+                                  accent: Palette.coral,
+                                  radius: 8,
+                                )
+                              : null,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GameIcon(chapters[i].$2, size: 22),
+                              const SizedBox(height: 1),
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: IconText(chapters[i].$1,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: i == controller.index
+                                          ? FontWeight.w900
+                                          : FontWeight.w700,
+                                    )),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
         Expanded(
           child: TabBarView(children: [
@@ -64,7 +161,7 @@ class CharacterPage extends ConsumerWidget {
           ]),
         ),
       ]),
-    );
+    ));
   }
 }
 
@@ -88,37 +185,73 @@ class _CatTabState extends ConsumerState<_CatTab> {
     String pct(Attribute a) => '${(st[a] / 100).toStringAsFixed(1)}%';
     final unlocked = cat.level >= rules.classUnlockLevel;
     return ListView(padding: const EdgeInsets.all(16), children: [
-      Row(children: [
-        IconText('${s.level(cat.level)} · ${s.className(cls.current)}',
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-        const SizedBox(width: 8),
-        GameIcon.classEmblem(cls.current, size: 34),
-      ]),
-      LinearProgressIndicator(
-          value: cat.expToNext == 0 ? 1 : cat.exp / cat.expToNext,
-          color: Palette.teal,
-          minHeight: 6),
-      const SizedBox(height: 12),
-      Wrap(spacing: 8, runSpacing: 8, children: [
-        for (final (k, v) in [
-          ('❤️ ${s.shortHp}', '${st.hp}'),
-          ('⚔️ ${s.shortAtk}', '${st.atk}'),
-          ('🛡️ ${s.shortDef}', '${st.def}'),
-          ('💨 ${s.shortEvade}', pct(Attribute.evade)),
-          ('💥 ${s.shortCrit}', pct(Attribute.crit)),
-          ('✨ ${s.shortSkill}', pct(Attribute.skillDmg)),
-        ])
+      Container(
+        padding: const EdgeInsets.fromLTRB(14, 11, 14, 12),
+        decoration: storybookCard(
+            fill: const Color(0xFFFFE9B8), accent: Palette.mochi, radius: 11),
+        child: Row(children: [
           Container(
-            width: 104,
-            padding: const EdgeInsets.all(8),
-            decoration: inkBox(radius: 10, width: 2),
-            child: Column(children: [
-              IconText(k, style: const TextStyle(fontSize: 12)),
-              IconText(v, style: const TextStyle(fontWeight: FontWeight.w800))
+            width: 54,
+            height: 54,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Palette.paper.withValues(alpha: .62),
+              shape: BoxShape.circle,
+            ),
+            child: GameIcon.classEmblem(cls.current, size: 38),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              IconText(s.className(cls.current),
+                  style: const TextStyle(
+                      fontSize: 21, fontWeight: FontWeight.w900)),
+              IconText(s.level(cat.level),
+                  style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Palette.inkSoft)),
+              const SizedBox(height: 5),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(5),
+                child: LinearProgressIndicator(
+                    value: cat.expToNext == 0 ? 1 : cat.exp / cat.expToNext,
+                    color: Palette.teal,
+                    backgroundColor: Palette.paper.withValues(alpha: .75),
+                    minHeight: 7),
+              ),
             ]),
           ),
-      ]),
-      _pageTitle(s.classPick),
+        ]),
+      ),
+      const SizedBox(height: 10),
+      ClipRRect(
+        borderRadius: BorderRadius.circular(9),
+        child: Container(
+          decoration: storybookCard(
+            fill: Palette.parchment,
+            accent: Palette.storyEdge,
+            radius: 9,
+          ),
+          child: Column(children: [
+            Row(children: [
+              _statCell('❤️ ${s.shortHp}', '${st.hp}', Palette.coral),
+              _statCell('⚔️ ${s.shortAtk}', '${st.atk}', Palette.mochi),
+              _statCell('🛡️ ${s.shortDef}', '${st.def}', Palette.teal),
+            ]),
+            Row(children: [
+              _statCell(
+                  '💨 ${s.shortEvade}', pct(Attribute.evade), Palette.lime),
+              _statCell(
+                  '💥 ${s.shortCrit}', pct(Attribute.crit), Palette.coral),
+              _statCell(
+                  '✨ ${s.shortSkill}', pct(Attribute.skillDmg), Palette.sun),
+            ]),
+          ]),
+        ),
+      ),
+      _storyHeading(s.classPick),
       if (!unlocked) IconText(s.classAt(rules.classUnlockLevel)),
       Wrap(spacing: 8, runSpacing: 8, children: [
         for (final c in rules.classes.where((c) => c.tier == 1))
@@ -136,9 +269,15 @@ class _CatTabState extends ConsumerState<_CatTab> {
               child: Container(
                 width: 150,
                 padding: const EdgeInsets.all(10),
-                decoration: inkBox(
-                    fill: c.id == cls.current ? Palette.sun : Palette.paper,
-                    radius: 12),
+                decoration: c.id == cls.current
+                    ? storybookButton(
+                        fill: const Color(0xFFFFD77F),
+                        accent: Palette.coral,
+                        radius: 9)
+                    : storybookCard(
+                        fill: const Color(0xFFFFEDCF),
+                        accent: unlocked ? Palette.storyEdge : Palette.inkSoft,
+                        radius: 8),
                 child: Row(children: [
                   GameIcon.classEmblem(c.id, size: 30),
                   const SizedBox(width: 8),
@@ -150,20 +289,57 @@ class _CatTabState extends ConsumerState<_CatTab> {
             ),
           ),
       ]),
-      _pageTitle(s.skills),
+      _storyHeading(s.skills),
       for (final sk in skills.byClass[cls.current] ?? const <SkillSpec>[])
         Builder(builder: (_) {
           final i = skills.info[sk.id];
           final open = cls.combatSpec().skills.any((x) => x.id == sk.id);
+          final description = lang == 'en'
+              ? (i?.descriptionEn ?? '')
+              : (i?.descriptionTh ?? '');
           return Opacity(
-            opacity: open ? 1 : 0.4,
-            child: ListTile(
-              leading: GameIcon.skill(sk.id, i?.icon ?? '✨', size: 36),
-              title: IconText(
-                  lang == 'en' ? (i?.en ?? sk.id) : (i?.th ?? sk.id),
-                  style: const TextStyle(fontWeight: FontWeight.w700)),
-              subtitle: IconText(
-                  s.cooldownSeconds((sk.cooldownMs / 1000).toStringAsFixed(1))),
+            opacity: open ? 1 : 0.72,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: storybookCard(
+                fill: open ? const Color(0xFFFFEFD2) : const Color(0xFFE9E1D4),
+                accent: open ? Palette.mochi : Palette.inkSoft,
+                radius: 8,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GameIcon.skill(sk.id, i?.icon ?? '✨', size: 36),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            IconText(
+                                lang == 'en'
+                                    ? (i?.en ?? sk.id)
+                                    : (i?.th ?? sk.id),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w800)),
+                            if (description.isNotEmpty)
+                              IconText(description,
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      height: 1.25,
+                                      color: Palette.inkSoft)),
+                            const SizedBox(height: 3),
+                            IconText(
+                                s.cooldownSeconds(
+                                    (sk.cooldownMs / 1000).toStringAsFixed(1)),
+                                style: const TextStyle(
+                                    fontSize: 11, color: Palette.inkSoft)),
+                          ],
+                        ),
+                      ),
+                    ]),
+              ),
             ),
           );
         }),
@@ -186,33 +362,45 @@ class _WardrobeTab extends ConsumerWidget {
     final classes = ref.read(catRulesProvider).classes;
     final found = wd.collection.where((e) => e.unlocked).length;
     return ListView(padding: const EdgeInsets.all(12), children: [
-      IconText(s.classOutfits,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+      _storyHeading(s.classOutfits),
       const SizedBox(height: 6),
-      SizedBox(
-        height: 104,
+      Container(
+        height: 112,
+        padding: const EdgeInsets.all(6),
+        decoration: storybookCard(
+          fill: Palette.parchmentDeep,
+          accent: Palette.wood,
+          radius: 9,
+        ),
         child: ListView(scrollDirection: Axis.horizontal, children: [
           for (final c in classes)
             Container(
-              width: 80,
-              margin: const EdgeInsets.only(right: 8),
+              width: 82,
+              margin: const EdgeInsets.only(right: 5),
               padding: const EdgeInsets.all(4),
-              decoration: inkBox(
-                  fill: c.id == cls ? Palette.sun : Palette.paper, radius: 12),
+              decoration: c.id == cls
+                  ? storybookButton(
+                      fill: const Color(0xFFFFD77F),
+                      accent: Palette.coral,
+                      radius: 8,
+                    )
+                  : null,
               child: Column(children: [
                 Expanded(
                     child: Image.asset('assets/game/cat/bare_${c.id}.png',
                         fit: BoxFit.contain)),
                 IconText(s.className(c.id),
-                    style: const TextStyle(
-                        fontSize: 11, fontWeight: FontWeight.w700)),
+                    maxLines: 1,
+                    style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight:
+                            c.id == cls ? FontWeight.w900 : FontWeight.w700)),
               ]),
             ),
         ]),
       ),
       const SizedBox(height: 12),
-      IconText(s.looksFound(found, wd.collection.length),
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+      _storyHeading(s.looksFound(found, wd.collection.length)),
       const SizedBox(height: 6),
       GridView.count(
         shrinkWrap: true,
@@ -223,10 +411,13 @@ class _WardrobeTab extends ConsumerWidget {
         children: [
           for (final e in wd.collection)
             Container(
-              padding: const EdgeInsets.all(6),
-              decoration: inkBox(
-                  border: e.unlocked ? Palette.ink : Palette.inkSoft,
-                  radius: 12),
+              padding: const EdgeInsets.all(7),
+              decoration: storybookCard(
+                  fill: e.unlocked
+                      ? const Color(0xFFFFEBC9)
+                      : const Color(0xFFE6DAC2),
+                  accent: e.unlocked ? Palette.mochi : Palette.inkSoft,
+                  radius: 7),
               child: ColorFiltered(
                 colorFilter: e.unlocked
                     ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
@@ -253,52 +444,86 @@ class DungeonPage extends StatelessWidget {
       _soon(context, '🏰🔒', AppLocalizations.of(context).dungeonSoon);
 }
 
-/// 🎁 Events: daily gift + yarn bundle, rewarded ads only (D-003).
-class EventsPage extends ConsumerStatefulWidget {
+/// 🎁 Events are reserved for rotating activities. Daily shop gifts moved to
+/// Shop in D-053 so every way of getting supplies lives in one place.
+class EventsPage extends ConsumerWidget {
   const EventsPage({super.key});
 
   @override
-  ConsumerState<EventsPage> createState() => _EventsPageState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final s = AppLocalizations.of(context);
+    return StorybookPaper(
+      child: ListView(children: [
+        _pageTitle(s.navEvents),
+        const SizedBox(height: 80),
+        _soon(context, '🎁', s.comingSoon),
+      ]),
+    );
+  }
 }
 
-class _EventsPageState extends ConsumerState<EventsPage> {
-  Future<void> _watch(String placement) async {
-    await ref.read(adGiftsProvider).watch(placement);
-    if (mounted) setState(() {});
+/// 🛒 Unified shop: free daily gifts first, then grown-up purchases.
+class ShopPage extends ConsumerStatefulWidget {
+  const ShopPage({super.key});
+
+  @override
+  ConsumerState<ShopPage> createState() => _ShopPageState();
+}
+
+class _ShopPageState extends ConsumerState<ShopPage> {
+  Future<void> _claim(String placement) async {
+    final reward = await ref.read(adGiftsProvider).watch(placement);
+    if (!mounted) return;
+    setState(() {});
+    if (reward != null) {
+      final amount = reward.amounts.values.single;
+      final s = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: IconText('${s.claim} +$amount'),
+          duration: const Duration(seconds: 1)));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final ads = ref.read(adServiceProvider);
-    Widget row(
-        String icon, String title, String placement, VoidCallback onTap) {
+    final gifts = ref.read(adGiftsProvider);
+    final noAds = ref.read(noAdsProvider)();
+
+    Widget gift(String placement, String icon, String title, Currency c) {
       final left = ads.remainingToday(placement);
+      final amount = gifts.rewardFor(placement)[c];
       return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        padding: const EdgeInsets.all(12),
-        decoration: inkBox(),
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(13),
+        decoration: storybookCard(
+            fill: c == Currency.yarn
+                ? const Color(0xFFE5F5F2)
+                : const Color(0xFFFFF1C7),
+            accent: c == Currency.yarn ? Palette.teal : Palette.sun),
         child: Row(children: [
-          IconText(icon, style: const TextStyle(fontSize: 40)),
-          const SizedBox(width: 12),
+          IconText(icon, style: const TextStyle(fontSize: 38)),
+          const SizedBox(width: 10),
           Expanded(
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                 IconText(title,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w800)),
-                IconText(s.adsLeft(left),
-                    style: const TextStyle(color: Palette.inkSoft)),
+                    style: const TextStyle(fontWeight: FontWeight.w800)),
+                IconText('+$amount · ${s.adsLeft(left)}',
+                    style:
+                        const TextStyle(fontSize: 12, color: Palette.inkSoft)),
               ])),
           if (left > 0)
             GestureDetector(
-              onTap: onTap,
+              onTap: () => _claim(placement),
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: inkBox(fill: Palette.sun, radius: 12),
-                child: IconText(s.watch,
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                decoration: storybookButton(
+                    fill: Palette.lime, accent: Palette.teal, radius: 9),
+                child: IconText(noAds ? s.claim : s.watch,
                     style: const TextStyle(fontWeight: FontWeight.w800)),
               ),
             ),
@@ -306,75 +531,83 @@ class _EventsPageState extends ConsumerState<EventsPage> {
       );
     }
 
-    return ListView(children: [
-      _pageTitle(s.navEvents),
-      row('🎁', s.dailyGift, 'daily_gift', () => _watch('daily_gift')),
-      row('🧶', s.yarnBundle, 'yarn_bundle', () => _watch('yarn_bundle')),
-    ]);
-  }
-}
-
-/// 🛒 Shop: Supporter Pack + cosmetics, behind the parental gate (T-025).
-class ShopPage extends ConsumerWidget {
-  const ShopPage({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final s = AppLocalizations.of(context);
-    return ListView(children: [
-      _pageTitle(s.navShop),
-      Container(
-        margin: const EdgeInsets.all(16),
-        padding: const EdgeInsets.all(16),
-        decoration: inkBox(fill: const Color(0xFFFFF3D6)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          IconText('💛 ${s.supporterPack}',
+    return StorybookPaper(
+      child: ListView(children: [
+        _pageTitle(s.navShop),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 2, 16, 4),
+          child: IconText(s.lang == 'th' ? 'ของฟรีวันนี้' : 'Free today',
               style:
-                  const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 4),
-          IconText(s.supporterDesc),
-          const SizedBox(height: 12),
-          // the parental gate comes first, always (T-025)
-          Semantics(
-            button: true,
-            label: s.askParent,
-            child: GestureDetector(
-              onTap: () => openShop(context, ref),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: inkBox(fill: Palette.lime, radius: 12),
-                child: IconText('👨‍👩‍👧 ${s.askParent}',
-                    style: const TextStyle(fontWeight: FontWeight.w800)),
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(children: [
+            gift('daily_gift', '🐟', s.dailyGift, Currency.goldfish),
+            gift('yarn_bundle', '🧶', s.yarnBundle, Currency.yarn),
+          ]),
+        ),
+        Container(
+          margin: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+          padding: const EdgeInsets.all(16),
+          decoration: storybookCard(
+              fill: const Color(0xFFFFE8C4), accent: Palette.coral),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            IconText(
+                s.lang == 'th'
+                    ? '🎁 เสบียงและนิทานไร้โฆษณา'
+                    : '🎁 Supplies & ad-free story',
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 4),
+            IconText(s.lang == 'th'
+                ? 'แพ็กเริ่ม \$0.99 ถึง \$99.99 · ราคาในหน้าซื้อจะแสดงตามประเทศ'
+                : 'Packs from \$0.99 to \$99.99 · checkout shows the local price'),
+            const SizedBox(height: 12),
+            // the parental gate comes first, always (T-025)
+            Semantics(
+              button: true,
+              label: s.askParent,
+              child: GestureDetector(
+                onTap: () => openShop(context, ref),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: storybookButton(
+                      fill: Palette.lime, accent: Palette.teal, radius: 9),
+                  child: IconText('👨‍👩‍👧 ${s.askParent}',
+                      style: const TextStyle(fontWeight: FontWeight.w800)),
+                ),
               ),
             ),
+          ]),
+        ),
+        // music and effects, each off at once and saved (T-024)
+        const _SoundSwitches(),
+        // language, shown in the language it switches to (T-004)
+        Center(
+          child: TextButton(
+            onPressed: () => ref.read(langProvider.notifier).state =
+                s.lang == 'th' ? 'en' : 'th',
+            child: IconText(s.switchLanguage),
           ),
-        ]),
-      ),
-      // music and effects, each off at once and saved (T-024)
-      const _SoundSwitches(),
-      // language, shown in the language it switches to (T-004)
-      Center(
-        child: TextButton(
-          onPressed: () => ref.read(langProvider.notifier).state =
-              s.lang == 'th' ? 'en' : 'th',
-          child: IconText(s.switchLanguage),
         ),
-      ),
-      // a grown-up can correct the age answer, behind the gate (T-040)
-      Center(
-        child: TextButton(
-          onPressed: () async {
-            final pass = await showParentalGate(context, ref);
-            if (pass == null || !context.mounted) return;
-            await Navigator.of(context).push(MaterialPageRoute<void>(
-                builder: (ctx) => AgeScreen(
-                    pass: pass, onDone: () => Navigator.of(ctx).pop())));
-          },
-          child: IconText(s.changeAge),
+        // a grown-up can correct the age answer, behind the gate (T-040)
+        Center(
+          child: TextButton(
+            onPressed: () async {
+              final pass = await showParentalGate(context, ref);
+              if (pass == null || !context.mounted) return;
+              await Navigator.of(context).push(MaterialPageRoute<void>(
+                  builder: (ctx) => AgeScreen(
+                      pass: pass, onDone: () => Navigator.of(ctx).pop())));
+            },
+            child: IconText(s.changeAge),
+          ),
         ),
-      ),
-    ]);
+      ]),
+    );
   }
 }
 
@@ -404,8 +637,11 @@ class _SoundSwitchesState extends ConsumerState<_SoundSwitches> {
             ),
           ],
         );
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.fromLTRB(12, 5, 6, 5),
+      decoration: storybookCard(
+          fill: const Color(0xFFE3F0EA), accent: Palette.teal, radius: 8),
       child: Column(children: [
         row(s.music, audio.bgmEnabled, audio.setBgmEnabled),
         row(s.sounds, audio.sfxEnabled, audio.setSfxEnabled),

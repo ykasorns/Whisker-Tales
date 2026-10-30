@@ -29,9 +29,10 @@ class FakeStore implements IapStore {
         for (final s in skus) StoreProduct(sku: s, title: s, price: '฿99.00'),
       ];
   @override
-  Future<bool> buy(String sku) async {
+  Future<bool> buy(String sku, {required bool consumable}) async {
     bought.add(sku);
-    _h?.call(StoreEvent(StoreEventKind.purchased, sku));
+    _h?.call(StoreEvent(StoreEventKind.purchased, sku,
+        transactionId: '${sku}_${bought.length}'));
     return true;
   }
 
@@ -105,10 +106,14 @@ void main() {
       (tester) async {
     final (c, store) = await shop(tester);
     await type(tester, '${answerOf(tester)}');
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
     expect(find.byType(ShopSheet), findsOneWidget);
-    expect(find.text('Supporter Pack'), findsOneWidget);
-    await tester.tap(find.text('฿99.00'));
+    await tester.drag(find.byType(ListView).last, const Offset(0, -1200));
+    await tester.pumpAndSettle();
+    expect(find.text('Ad-free Story'), findsOneWidget);
+    await tester
+        .ensureVisible(find.byKey(const ValueKey('buy-supporter_pack')));
+    await tester.tap(find.byKey(const ValueKey('buy-supporter_pack')));
     await tester.pump();
     await tester.pump();
     expect(store.bought, ['supporter_pack']);
@@ -116,6 +121,22 @@ void main() {
     expect(c.read(adServiceProvider).canShow('pet_hatch'), isFalse);
     expect(find.text(lookupAppLocalizations(const Locale('en')).owned),
         findsOneWidget);
+  });
+
+  testWidgets('daily fish and yarn gifts live on Shop, not Events',
+      (tester) async {
+    final c = ProviderContainer(overrides: [
+      ...content.overrides,
+      saveServiceProvider.overrideWithValue(SaveService(MemorySaveStore())),
+    ]);
+    addTearDown(c.dispose);
+    await tester.pumpWidget(UncontrolledProviderScope(
+        container: c,
+        child: localized(const Scaffold(body: ShopPage()))));
+    expect(find.text('Daily gift'), findsOneWidget);
+    expect(find.text('Yarn bundle'), findsOneWidget);
+    expect(c.read(adServiceProvider).remainingToday('daily_gift'), 2);
+    expect(c.read(adServiceProvider).remainingToday('yarn_bundle'), 2);
   });
 
   test('the shop sheet and purchase calls exist only behind openShop', () {

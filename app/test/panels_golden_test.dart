@@ -65,6 +65,9 @@ void main() {
     testWidgets('every page ($lang)', (tester) async {
       await boot(tester, lang);
       final app = find.byType(WhiskerTalesApp);
+      final speed = find.byKey(const Key('game-speed-control'));
+      expect(speed, findsOneWidget);
+      expect(tester.getTopLeft(speed).dy, lessThan(120));
       await expectLater(app, matchesGoldenFile('goldens/$lang/home.png'));
       // menu, left to right; home is in the middle
       final tabs = ['character', 'dungeon', 'home', 'events', 'shop'];
@@ -82,6 +85,13 @@ void main() {
         await expectLater(
             app, matchesGoldenFile('goldens/$lang/${tabs[i]}.png'));
         if (tabs[i] == 'character') {
+          await tester.tap(find.text(lang == 'en' ? 'Collection' : 'สมุดสะสม'));
+          for (var k = 0; k < 4; k++) {
+            await tester.pump(const Duration(milliseconds: 200));
+          }
+          expect(tester.takeException(), isNull);
+          await expectLater(
+              app, matchesGoldenFile('goldens/$lang/wardrobe.png'));
           await tester.tap(find.text(lang == 'en' ? 'Pets' : 'เพื่อนสัตว์'));
           for (var k = 0; k < 4; k++) {
             await tester.pump(const Duration(milliseconds: 200));
@@ -144,6 +154,29 @@ void main() {
       expect(find.byType(GameShell), findsOneWidget);
     });
   }
+
+  testWidgets('class skills explain their effects under their names',
+      (tester) async {
+    final c = await boot(tester, 'en');
+    c.read(catClassProvider).restore(
+        const CatState(level: 10, exp: 0, classId: 'warrior', tier: 1));
+    await tester.pumpWidget(UncontrolledProviderScope(
+        container: c,
+        child: WhiskerTalesApp(
+            avatarRules: content.avatar, lang: 'en', key: UniqueKey())));
+    await tester.pump(const Duration(milliseconds: 300));
+    final tabs = find.byWidgetPredicate((w) =>
+        w is Semantics &&
+        w.properties.button == true &&
+        w.properties.selected != null);
+    await tester.tap(tabs.at(0));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Shield Bash'), findsOneWidget);
+    expect(
+        find.text('Strike the front enemy with a shield and briefly stun it.'),
+        findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('the language switches while playing and is saved',
       (tester) async {

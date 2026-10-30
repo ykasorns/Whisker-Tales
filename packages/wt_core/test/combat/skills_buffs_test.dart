@@ -49,6 +49,14 @@ void main() {
       skills.byClass.values.expand((l) => l).firstWhere((s) => s.id == id);
 
   group('data', () {
+    test('every skill has a description in both languages', () {
+      expect(skills.info, hasLength(12));
+      for (final entry in skills.info.entries) {
+        expect(entry.value.descriptionTh.trim(), isNotEmpty, reason: entry.key);
+        expect(entry.value.descriptionEn.trim(), isNotEmpty, reason: entry.key);
+      }
+    });
+
     test('12 skills, 3 per class, by slot; buffs load as basis points', () {
       for (final c in ['warrior', 'rogue', 'archer', 'mage']) {
         expect(skills.byClass[c], hasLength(3), reason: c);
@@ -134,6 +142,39 @@ void main() {
       e2.start(setup);
       e2.tick(1125);
       expect(out, plain);
+    });
+
+    test('fight view exposes live stun and stacked damage statuses', () {
+      final e = engine();
+      e.start(CombatSetup(seed: 2, units: [
+        caster(const []),
+        mon('dummy', hp: 5000, atk: 0, intervalMs: 1 << 30),
+      ]));
+
+      e.apply('dummy', 'poison', sourceId: 'mochi');
+      e.apply('dummy', 'poison', sourceId: 'mochi');
+      e.apply('dummy', 'stun_short', sourceId: 'mochi');
+      var statuses = e.view.firstWhere((u) => u.id == 'dummy').statuses;
+      expect(statuses.firstWhere((s) => s.id == 'poison').stacks, 2);
+      expect(statuses.firstWhere((s) => s.id == 'poison').remainingMs, 4000);
+      expect(statuses.firstWhere((s) => s.id == 'stun_short').remainingMs, 800);
+
+      e.tick(800);
+      statuses = e.view.firstWhere((u) => u.id == 'dummy').statuses;
+      expect(statuses.where((s) => s.id == 'stun_short'), isEmpty);
+      expect(statuses.firstWhere((s) => s.id == 'poison').remainingMs, 3200);
+
+      e.apply('dummy', 'stun_frost', sourceId: 'mochi');
+      statuses = e.view.firstWhere((u) => u.id == 'dummy').statuses;
+      expect(statuses.firstWhere((s) => s.id == 'stun_frost').remainingMs, 600);
+
+      e.apply('mochi', 'iron_wall', sourceId: 'mochi');
+      e.apply('mochi', 'war_cry_atk', sourceId: 'mochi');
+      e.apply('mochi', 'war_cry_def', sourceId: 'mochi');
+      final catStatuses =
+          e.view.firstWhere((u) => u.id == 'mochi').statuses.map((s) => s.id);
+      expect(catStatuses,
+          containsAll(['iron_wall', 'war_cry_atk', 'war_cry_def']));
     });
 
     test('skills cannot be dodged; skill damage and crits scale', () {

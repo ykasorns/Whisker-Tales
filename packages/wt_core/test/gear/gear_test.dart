@@ -275,7 +275,7 @@ void main() {
       expect(auto.running, isTrue);
     });
 
-    test('fills the weakest slots, stops when the yarn runs out', () {
+    test('fills the weakest slots, waits for yarn, then resumes', () {
       final wallet = MemoryWallet({Currency.yarn: 40});
       final k = basket(wallet);
       final auto = AutoCraft(k, wallet)
@@ -287,12 +287,16 @@ void main() {
       expect(first.toSet(), k.openSlots.toSet());
       auto.tick(1 << 20);
       expect(wallet.balance(Currency.yarn), 0);
-      expect(stops, [AutoCraftStopReason.outOfYarn]);
-      expect(auto.running, isFalse);
+      expect(stops, isEmpty);
+      expect(auto.running, isTrue);
       for (final s in k.openSlots) {
         expect(k.equipped(s), isNotNull);
         expect(k.stashed(s), isNull);
       }
+      wallet.add(RewardBundle({Currency.yarn: 1}));
+      auto.tick(1);
+      expect(wallet.balance(Currency.yarn), 0);
+      expect(auto.running, isTrue);
     });
 
     test('never recycles an item ✨ better than what it would replace', () {

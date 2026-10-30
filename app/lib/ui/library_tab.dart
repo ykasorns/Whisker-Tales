@@ -70,11 +70,21 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
     return ListView(padding: const EdgeInsets.all(12), children: [
       Container(
         padding: const EdgeInsets.all(12),
-        decoration: inkBox(fill: const Color(0xFFEFE6FF)),
+        decoration: storybookCard(
+            fill: const Color(0xFFE9DDF3), accent: Palette.plum, radius: 11),
         child:
             Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(children: [
-            const IconText('🦉', style: TextStyle(fontSize: 44)),
+            Container(
+              width: 58,
+              height: 58,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: Color(0x99FFFBF2),
+                shape: BoxShape.circle,
+              ),
+              child: const IconText('🦉', style: TextStyle(fontSize: 42)),
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: IconText(s.libraryTitle,
@@ -139,7 +149,8 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
               height: 44,
               margin: const EdgeInsets.only(top: 6),
               alignment: Alignment.center,
-              decoration: inkBox(fill: Palette.sun, radius: 12),
+              decoration: storybookButton(
+                  fill: Palette.sun, accent: Palette.mochi, radius: 9),
               child: IconText(s.adSpeedUp(r.rules.adCutMin, adsLeft),
                   style: const TextStyle(
                       fontSize: 13, fontWeight: FontWeight.w800)),
@@ -152,6 +163,13 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
   Widget _node(AppLocalizations s, Research r, ResearchNode n) {
     final lv = r.levelOf(n.id);
     final block = r.blockOf(n.id);
+    final description = s.lang == 'en' ? n.descriptionEn : n.descriptionTh;
+    final accent = switch (n.effect) {
+      ResearchEffect.stat => Palette.coral,
+      ResearchEffect.bonus => Palette.mochi,
+      ResearchEffect.offlineCap => Palette.teal,
+      ResearchEffect.queue => Palette.plum,
+    };
     final label = switch (block) {
       null ||
       ResearchBlock.fish =>
@@ -167,22 +185,37 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(10),
-      decoration: inkBox(
+      decoration: storybookCard(
           fill: block == ResearchBlock.locked
               ? const Color(0xFFEDE8DF)
-              : Palette.paper,
-          radius: 14),
+              : Color.lerp(Palette.parchment, accent, .10)!,
+          accent: block == ResearchBlock.locked ? Palette.inkSoft : accent,
+          radius: 8),
       child: Row(children: [
-        IconText(block == ResearchBlock.locked ? '🔒' : n.icon,
-            style: const TextStyle(fontSize: 32)),
+        Container(
+          width: 48,
+          height: 48,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Color.lerp(Palette.paper, accent, .16),
+            shape: BoxShape.circle,
+          ),
+          child: IconText(block == ResearchBlock.locked ? '🔒' : n.icon,
+              style: const TextStyle(fontSize: 29)),
+        ),
         const SizedBox(width: 10),
         Expanded(
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             IconText('${_name(s, n)}  ${s.level(lv)}/${n.maxLevel}',
                 style: const TextStyle(fontWeight: FontWeight.w800)),
+            if (description.isNotEmpty)
+              IconText(description,
+                  style: const TextStyle(
+                      fontSize: 12, height: 1.25, color: Palette.inkSoft)),
+            const SizedBox(height: 3),
             IconText(_effect(s, r, n),
-                style: const TextStyle(fontSize: 12, color: Palette.inkSoft)),
+                style: const TextStyle(fontSize: 12, color: Palette.ink)),
           ]),
         ),
         GestureDetector(
@@ -193,9 +226,11 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
               width: 104,
               padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
               alignment: Alignment.center,
-              decoration: inkBox(
-                  fill: block == null ? Palette.lime : Palette.paper,
-                  radius: 12),
+              decoration: block == null
+                  ? storybookButton(
+                      fill: Palette.lime, accent: Palette.teal, radius: 8)
+                  : storybookCard(
+                      fill: Palette.sheet, accent: Palette.inkSoft, radius: 7),
               child: IconText(label,
                   textAlign: TextAlign.center,
                   style: const TextStyle(

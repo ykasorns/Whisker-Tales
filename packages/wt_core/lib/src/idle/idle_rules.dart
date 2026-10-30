@@ -93,10 +93,18 @@ class IdleRules {
 
   bool isChapterBoss(int page) => pageInChapter(page) == pagesPerChapter;
 
-  /// Wave power `P(n) = base × growth^(n−1)` (GDD v0.4 §15.3), rounded once.
-  int wavePower(int page) => (_num(_enemy, 'page_power_base') *
-          math.pow(_num(_enemy, 'page_power_growth'), page - 1))
-      .round();
+  /// Book 1 ramps quickly; later books track gear's per-page growth.
+  /// The two segments meet at the last page of book 1 without a reset.
+  int wavePower(int page) {
+    if (page < 1) throw ArgumentError.value(page, 'page', 'must be >= 1');
+    final firstBookPages = pagesPerBook;
+    final firstBookSteps = math.min(page - 1, firstBookPages - 1);
+    final laterSteps = math.max(0, page - firstBookPages);
+    return (_num(_enemy, 'page_power_base') *
+            math.pow(_num(_enemy, 'page_power_growth'), firstBookSteps) *
+            math.pow(_num(_enemy, 'page_power_growth_after_book1'), laterSteps))
+        .round();
+  }
 
   /// Boss power: page boss or chapter boss multiplier × P(n), minus the
   /// early-page discount (D-011).
@@ -107,11 +115,20 @@ class IdleRules {
           100)
       .round();
 
-  /// % taken off the boss on the first pages, fading to 0 (D-011).
+  /// % taken off bosses during onboarding. The full discount is held through
+  /// the first book, then fades to zero so later repeated content keeps
+  /// scaling without a sudden wall (D-050).
   num earlyBossDiscountPct(int page) {
+    final hold = _int(_enemy, 'early_boss_hold_until_page');
     final until = _int(_enemy, 'early_boss_until_page');
+    final discount = _num(_enemy, 'early_boss_discount_pct');
+    if (hold < 0 || until <= hold) {
+      throw const FormatException(
+          'balance: early boss pages must satisfy 0 <= hold < until');
+    }
+    if (page <= hold) return discount;
     if (page > until) return 0;
-    return _num(_enemy, 'early_boss_discount_pct') * (until - page + 1) / until;
+    return discount * (until - page + 1) / (until - hold);
   }
 
   /// Yarn a new player starts with (D-011).

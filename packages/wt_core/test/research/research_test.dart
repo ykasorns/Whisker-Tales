@@ -61,6 +61,14 @@ void main() {
 
   ResearchNode node(String id) => rules.byId(id)!;
 
+  test('every research topic has a description in both languages', () {
+    expect(rules.nodes, hasLength(23));
+    for (final n in rules.nodes) {
+      expect(n.descriptionTh.trim(), isNotEmpty, reason: n.id);
+      expect(n.descriptionEn.trim(), isNotEmpty, reason: n.id);
+    }
+  });
+
   test('time and cost follow the JSON formula (GDD §15.6)', () {
     final claws = node('sharp_claws');
     expect(rules.timeFor(claws, 1), const Duration(seconds: 60));

@@ -176,6 +176,7 @@ class CombatUnitSpec {
     this.isPartner = false,
     this.isBoss = false,
     this.skills = const [],
+    this.initialHp,
   });
 
   /// Unique within one fight.
@@ -197,10 +198,15 @@ class CombatUnitSpec {
   /// Skills cast automatically, in slot order.
   final List<SkillSpec> skills;
 
+  /// Starting HP for modes that carry health between fights. Null starts at
+  /// full health, as the idle loop always does.
+  final int? initialHp;
+
   CombatUnitSpec copyWith({
     StatBlock? stats,
     int? attackIntervalMs,
     List<SkillSpec>? skills,
+    int? initialHp,
   }) =>
       CombatUnitSpec(
         id: id,
@@ -211,6 +217,7 @@ class CombatUnitSpec {
         isPartner: isPartner,
         isBoss: isBoss,
         skills: skills ?? this.skills,
+        initialHp: initialHp ?? this.initialHp,
       );
 }
 
@@ -514,8 +521,22 @@ class SkillView {
   final int totalMs;
 }
 
+/// One timed effect currently applied to a unit. [remainingMs] is -1 for an
+/// effect without an expiry. The view is read-only and never drives combat.
+class CombatStatusView {
+  const CombatStatusView({
+    required this.id,
+    required this.stacks,
+    required this.remainingMs,
+  });
+
+  final String id;
+  final int stacks;
+  final int remainingMs;
+}
+
 /// One unit of the running fight as the screen shows it: bars, shields and
-/// skill timers (read-only — nothing here feeds back into the sim).
+/// skill timers/statuses (read-only — nothing here feeds back into the sim).
 class UnitView {
   const UnitView({
     required this.id,
@@ -527,12 +548,14 @@ class UnitView {
     required this.shield,
     required this.alive,
     this.skills = const [],
+    this.statuses = const [],
   });
   final String id;
   final CombatSide side;
   final bool isBoss, isPartner, alive;
   final int hp, maxHp, shield;
   final List<SkillView> skills;
+  final List<CombatStatusView> statuses;
 }
 
 abstract class ICombatEngine {

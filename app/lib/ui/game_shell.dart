@@ -14,6 +14,7 @@ import 'pages.dart';
 import 'away_tracker.dart';
 import 'game_icon.dart';
 import 'palette.dart';
+import 'story_adventure.dart';
 
 /// The app's frame (D-018): pages above, 5-button menu below. The game
 /// keeps running whatever page is open — it is driven from here, not from
@@ -151,7 +152,7 @@ class _GameShellState extends ConsumerState<GameShell>
     final s = AppLocalizations.of(context);
     final items = [
       ('🐱', s.navCharacter),
-      ('🏰', s.navDungeon),
+      ('📖', s.navDungeon),
       ('🏠', s.navHome),
       ('🎁', s.navEvents),
       ('🛒', s.navShop),
@@ -164,54 +165,16 @@ class _GameShellState extends ConsumerState<GameShell>
             Expanded(
               child: IndexedStack(index: _tab, children: [
                 CharacterPage(refresh: _driver.ui$),
-                const DungeonPage(),
+                AdventurePage(refresh: _driver.ui$),
                 HomePage(avatarRules: widget.avatarRules, driver: _driver),
                 const EventsPage(),
                 const ShopPage(),
               ]),
             ),
-            Container(
-              decoration: const BoxDecoration(
-                color: Palette.sheet,
-                border: Border(top: BorderSide(color: Palette.ink, width: 2.5)),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(children: [
-                for (var i = 0; i < items.length; i++)
-                  Expanded(
-                    child: Semantics(
-                      button: true,
-                      selected: i == _tab,
-                      label: items[i].$2,
-                      child: InkWell(
-                        onTap: () => setState(() => _tab = i),
-                        child: SizedBox(
-                          height: 66,
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                AnimatedScale(
-                                  scale: i == _tab ? 1.25 : 1,
-                                  duration: const Duration(milliseconds: 150),
-                                  child: IconText(items[i].$1,
-                                      style: TextStyle(
-                                          fontSize: i == home ? 26 : 22)),
-                                ),
-                                IconText(items[i].$2,
-                                    style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: i == _tab
-                                            ? FontWeight.w800
-                                            : FontWeight.w500,
-                                        color: i == _tab
-                                            ? Palette.ink
-                                            : Palette.inkSoft)),
-                              ]),
-                        ),
-                      ),
-                    ),
-                  ),
-              ]),
+            _BottomDock(
+              items: items,
+              selected: _tab,
+              onSelected: (i) => setState(() => _tab = i),
             ),
           ]),
         ),
@@ -227,4 +190,95 @@ class _GameShellState extends ConsumerState<GameShell>
       ]),
     );
   }
+}
+
+/// One shared illustrated dock instead of five unrelated rounded cards.
+/// The selected page lifts like a cloth bookmark, leaving quiet tabs flat.
+class _BottomDock extends StatelessWidget {
+  const _BottomDock({
+    required this.items,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final List<(String, String)> items;
+  final int selected;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) => StorybookPaper(
+        child: SizedBox(
+          height: 78,
+          child: LayoutBuilder(builder: (context, box) {
+            final tabWidth = box.maxWidth / items.length;
+            return Stack(clipBehavior: Clip.none, children: [
+              Positioned.fill(
+                child: Image.asset(
+                  'assets/game/ui/ui_frame_nav_dock.png',
+                  fit: BoxFit.fill,
+                  filterQuality: FilterQuality.medium,
+                ),
+              ),
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 170),
+                curve: Curves.easeOut,
+                left: tabWidth * selected + tabWidth * .16,
+                top: -2,
+                width: tabWidth * .68,
+                height: 74,
+                child: Image.asset(
+                  'assets/game/ui/ui_frame_nav_selected.png',
+                  fit: BoxFit.fill,
+                  filterQuality: FilterQuality.medium,
+                ),
+              ),
+              Positioned.fill(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 2, 8, 12),
+                  child: Row(children: [
+                    for (var i = 0; i < items.length; i++)
+                      Expanded(
+                        child: Semantics(
+                          button: true,
+                          selected: i == selected,
+                          label: items[i].$2,
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => onSelected(i),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AnimatedScale(
+                                  scale: i == selected ? 1.18 : 1,
+                                  duration: const Duration(milliseconds: 170),
+                                  child: IconText(items[i].$1,
+                                      style: const TextStyle(fontSize: 23)),
+                                ),
+                                const SizedBox(height: 1),
+                                IconText(
+                                  items[i].$2,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.fade,
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: i == selected
+                                        ? FontWeight.w900
+                                        : FontWeight.w700,
+                                    color: i == selected
+                                        ? Palette.ink
+                                        : Palette.inkSoft,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                  ]),
+                ),
+              ),
+            ]);
+          }),
+        ),
+      );
 }

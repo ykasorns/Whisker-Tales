@@ -107,7 +107,7 @@ abstract class AppLocalizations {
   /// No description provided for @navDungeon.
   ///
   /// In en, this message translates to:
-  /// **'Dungeon'**
+  /// **'Adventure'**
   String get navDungeon;
 
   /// No description provided for @navHome.
@@ -725,13 +725,13 @@ abstract class AppLocalizations {
   /// No description provided for @failBoss.
   ///
   /// In en, this message translates to:
-  /// **'The boss won this time. Mochi loses nothing — try again!'**
+  /// **'The boss won this time. You lose nothing — try again!'**
   String get failBoss;
 
   /// No description provided for @failWave.
   ///
   /// In en, this message translates to:
-  /// **'Mochi needs a rest. Nothing is lost!'**
+  /// **'You need a short rest. Nothing is lost!'**
   String get failWave;
 
   /// No description provided for @tipKnit.
@@ -743,7 +743,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipLevel.
   ///
   /// In en, this message translates to:
-  /// **'Tip: farm a page to level Mochi up'**
+  /// **'Tip: farm a page to level up'**
   String get tipLevel;
 
   /// No description provided for @tipLibrary.
@@ -755,7 +755,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipPets.
   ///
   /// In en, this message translates to:
-  /// **'Tip: hatch pets, they fight beside Mochi'**
+  /// **'Tip: hatch pets — they fight beside you'**
   String get tipPets;
 
   /// No description provided for @rarityCommon.
@@ -859,6 +859,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cooldown {sec} s'**
   String cooldownSeconds(String sec);
+
+  /// No description provided for @storyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Story Challenge'**
+  String get storyTitle;
+
+  /// No description provided for @storySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a path, collect magical keepsakes, and reach the final boss'**
+  String get storySubtitle;
+
+  /// No description provided for @storyLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'This story is still locked'**
+  String get storyLocked;
+
+  /// No description provided for @storyUnlockHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear the Chapter 1 boss to open it'**
+  String get storyUnlockHint;
+
+  /// No description provided for @storyStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start adventure'**
+  String get storyStart;
+
+  /// No description provided for @storyDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Full rewards today'**
+  String get storyDaily;
+
+  /// No description provided for @storyBest.
+  ///
+  /// In en, this message translates to:
+  /// **'Best distance'**
+  String get storyBest;
+
+  /// No description provided for @storyQuit.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave story'**
+  String get storyQuit;
+
+  /// No description provided for @storyMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Story map'**
+  String get storyMap;
+
+  /// No description provided for @storyCombat.
+  ///
+  /// In en, this message translates to:
+  /// **'Battle in progress'**
+  String get storyCombat;
+
+  /// No description provided for @storyPickRelic.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose one relic'**
+  String get storyPickRelic;
+
+  /// No description provided for @storyPickTalent.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose one talent'**
+  String get storyPickTalent;
+
+  /// No description provided for @storyEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'A story event'**
+  String get storyEvent;
+
+  /// No description provided for @storyOwlShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Owl shop'**
+  String get storyOwlShop;
+
+  /// No description provided for @storyCampfire.
+  ///
+  /// In en, this message translates to:
+  /// **'Cozy campfire'**
+  String get storyCampfire;
+
+  /// No description provided for @storyRest.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest and heal'**
+  String get storyRest;
+
+  /// No description provided for @storyUpgrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Strengthen a relic'**
+  String get storyUpgrade;
+
+  /// No description provided for @storyContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get storyContinue;
+
+  /// No description provided for @storyLeaveShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave shop'**
+  String get storyLeaveShop;
+
+  /// No description provided for @storyVictory.
+  ///
+  /// In en, this message translates to:
+  /// **'Story complete!'**
+  String get storyVictory;
+
+  /// No description provided for @storyDefeat.
+  ///
+  /// In en, this message translates to:
+  /// **'You need a rest'**
+  String get storyDefeat;
+
+  /// No description provided for @storyAbandoned.
+  ///
+  /// In en, this message translates to:
+  /// **'Back home safely'**
+  String get storyAbandoned;
+
+  /// No description provided for @storyReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to adventures'**
+  String get storyReturn;
+
+  /// No description provided for @storySafe.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe path'**
+  String get storySafe;
+
+  /// No description provided for @storyRisky.
+  ///
+  /// In en, this message translates to:
+  /// **'Brave path'**
+  String get storyRisky;
+
+  /// No description provided for @storyTapAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap again to choose'**
+  String get storyTapAgain;
+
+  /// No description provided for @storyConfirmBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy this item?'**
+  String get storyConfirmBuy;
+
+  /// No description provided for @storyNotEnough.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough goldfish'**
+  String get storyNotEnough;
+
+  /// No description provided for @storyNoRelic.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no relic to upgrade yet'**
+  String get storyNoRelic;
+
+  /// No description provided for @storyRelics.
+  ///
+  /// In en, this message translates to:
+  /// **'Relics'**
+  String get storyRelics;
+
+  /// No description provided for @storyTalents.
+  ///
+  /// In en, this message translates to:
+  /// **'Talents'**
+  String get storyTalents;
+
+  /// No description provided for @storyHp.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get storyHp;
+
+  /// No description provided for @storyXp.
+  ///
+  /// In en, this message translates to:
+  /// **'Star experience'**
+  String get storyXp;
+
+  /// No description provided for @storyReward.
+  ///
+  /// In en, this message translates to:
+  /// **'Goldfish reward'**
+  String get storyReward;
+
+  /// No description provided for @storyFullReward.
+  ///
+  /// In en, this message translates to:
+  /// **'Full'**
+  String get storyFullReward;
+
+  /// No description provided for @storyReducedReward.
+  ///
+  /// In en, this message translates to:
+  /// **'25%'**
+  String get storyReducedReward;
+
+  /// No description provided for @storyBuy.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy'**
+  String get storyBuy;
+
+  /// No description provided for @storyLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Level'**
+  String get storyLevel;
 }
 
 class _AppLocalizationsDelegate

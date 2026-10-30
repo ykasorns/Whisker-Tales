@@ -9,7 +9,8 @@ library;
 //   cd packages/wt_core && flutter test tool/headless_player_test.dart
 //
 // Options via --dart-define: SEEDS=3, CLASSES=warrior,rogue,archer,mage,
-// DAYS=30. Prints a report; exits non-zero when a pacing target fails.
+// DAYS=30, TARGET_PAGES=30. Prints a report; exits non-zero when a pacing
+// target fails.
 
 import 'dart:convert';
 import 'dart:io';
@@ -165,7 +166,7 @@ class _Run {
 }
 
 Future<_Run> _play(GameContent content, String cls, int seed,
-    {required bool ads, required int maxDays}) async {
+    {required bool ads, required int maxDays, required int targetPages}) async {
   final start = DateTime.utc(2026, 11, 1, 1); // 08:00 local
   final time = _Time(start);
   final c = ProviderContainer(overrides: [
@@ -218,8 +219,9 @@ Future<_Run> _play(GameContent content, String cls, int seed,
     Duration(hours: 13)
   ];
   const sessionMs = 15 * 60 * 1000, stepMs = 2000;
-  const target = 30;
-  for (var day = 0; day < maxDays && loop.state.clearedPage < target; day++) {
+  for (var day = 0;
+      day < maxDays && loop.state.clearedPage < targetPages;
+      day++) {
     for (final at in sessions) {
       final open =
           DateTime.utc(start.year, start.month, start.day + day).add(at);
@@ -271,25 +273,32 @@ void main() {
     final t = balance['pacing_targets'] as Map<String, dynamic>;
     const seeds = int.fromEnvironment('SEEDS', defaultValue: 3);
     const maxDays = int.fromEnvironment('DAYS', defaultValue: 30);
+    const targetPages = int.fromEnvironment('TARGET_PAGES', defaultValue: 30);
     const clsArg = String.fromEnvironment('CLASSES',
         defaultValue: 'warrior,rogue,archer,mage');
     final classes = clsArg.split(',');
 
     final out = StringBuffer()
       ..writeln('Headless player on the real engine — seeds=$seeds, '
-          'sessions 3×15 min/day')
+          'sessions 3×15 min/day, target page $targetPages')
       ..writeln()
       ..writeln('profile  class    | day p10 | day p20 | day p30 | '
+          '${targetPages > 30 ? 'day p$targetPages | ' : ''}'
           'Lv  | power   | offline fish % | longest page (h)');
     final book = <bool, List<double?>>{true: [], false: []};
+    final later = <double?>[];
     for (final ads in [true, false]) {
       for (final cls in classes) {
         final runs = [
           for (var s = 0; s < seeds; s++)
-            await _play(content, cls, 101 + s, ads: ads, maxDays: maxDays),
+            await _play(content, cls, 101 + s,
+                ads: ads, maxDays: maxDays, targetPages: targetPages),
         ];
         double? med(double? Function(_Run) f) => _median(runs.map(f).toList());
         book[ads]!.addAll(runs.map((r) => r.dayAt[30]));
+        if (targetPages > 30) {
+          later.addAll(runs.map((r) => r.dayAt[targetPages]));
+        }
         final longest = runs
             .map((r) => r.pageMinutes.values.fold(0.0, math.max) / 60)
             .reduce(math.max);
@@ -301,6 +310,7 @@ void main() {
         out.writeln('${(ads ? 'full_ads' : 'no_ads').padRight(8)} '
             '${cls.padRight(8)} | ${_f(med((r) => r.dayAt[10]))}   | '
             '${_f(med((r) => r.dayAt[20]))}   | ${_f(med((r) => r.dayAt[30]))}   | '
+            '${targetPages > 30 ? '${_f(med((r) => r.dayAt[targetPages]))}   | ' : ''}'
             '${(runs.map((r) => r.level).reduce((a, b) => a + b) ~/ runs.length).toString().padLeft(3)} | '
             '${(runs.map((r) => r.power).reduce((a, b) => a + b) ~/ runs.length).toString().padLeft(7)} | '
             '${offPct.toStringAsFixed(0).padLeft(14)} | ${longest.toStringAsFixed(1).padLeft(6)}');
@@ -329,9 +339,14 @@ void main() {
           '${slow.toStringAsFixed(1)}% → ${slow <= maxSlow ? 'PASS' : 'FAIL'}');
     // ignore: avoid_print
     print(out);
-    if (_Disk.balance.isEmpty) {
+    if (_Disk.balance.isEmpty && targetPages == 30) {
       File('../../tools/balance_sim/headless_report.txt')
           .writeAsStringSync(out.toString());
+    }
+    expect(paceOk, isTrue, reason: out.toString());
+    expect(slow <= maxSlow, isTrue, reason: out.toString());
+    if (targetPages > 30) {
+      expect(later, everyElement(isNotNull), reason: out.toString());
     }
   });
 }

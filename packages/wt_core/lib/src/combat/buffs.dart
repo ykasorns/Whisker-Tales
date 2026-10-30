@@ -219,8 +219,16 @@ class SkillBook {
       required this.firstCastPct,
       this.info = const {}});
 
-  /// Skill id → icon and names, for the UI.
-  final Map<String, ({String icon, String th, String en})> info;
+  /// Skill id → icon, name and player-facing explanation, for the UI.
+  final Map<
+      String,
+      ({
+        String icon,
+        String th,
+        String en,
+        String descriptionTh,
+        String descriptionEn
+      })> info;
 
   /// Class id → skills in slot order.
   final Map<String, List<SkillSpec>> byClass;
@@ -242,7 +250,14 @@ class SkillBook {
           'skills.json: needs skills and first_cast_pct 0..100');
     }
     final byClass = <String, List<(int, SkillSpec)>>{};
-    final info = <String, ({String icon, String th, String en})>{};
+    final info = <String,
+        ({
+      String icon,
+      String th,
+      String en,
+      String descriptionTh,
+      String descriptionEn
+    })>{};
     for (final s in raw.cast<Map<String, dynamic>>()) {
       final id = s['id'];
       if (id is! String) {
@@ -278,6 +293,8 @@ class SkillBook {
         icon: s['icon'] as String? ?? '✨',
         th: s['name_th'] as String? ?? id,
         en: s['name_en'] as String? ?? id,
+        descriptionTh: s['description_th'] as String? ?? '',
+        descriptionEn: s['description_en'] as String? ?? '',
       );
     }
     return SkillBook(

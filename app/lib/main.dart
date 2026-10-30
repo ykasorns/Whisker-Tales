@@ -12,6 +12,7 @@ import 'ui/age_screen.dart';
 import 'ui/game_icon.dart';
 import 'ui/yarn_basket.dart';
 import 'ui/game_shell.dart';
+import 'ui/palette.dart';
 import 'l10n/strings.dart';
 import 'modes.dart';
 
@@ -30,10 +31,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // the game is designed for a phone held upright (60/40 layout)
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  final modes = await registerModes();
   try {
     final content =
         await ContentRepository(const AssetContentSource()).loadAll();
+    final modes = await registerModes(content.story);
     try {
       await IconRegistry.load(); // painted icons replace the emoji (D-037)
     } catch (e) {
@@ -124,8 +125,44 @@ class _WhiskerTalesAppState extends ConsumerState<WhiskerTalesApp> {
       title: 'Whisker Tales',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFFFFFBF2),
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFF6A83C)),
+        useMaterial3: true,
+        scaffoldBackgroundColor: Palette.paper,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Palette.mochi,
+          primary: Palette.coral,
+          secondary: Palette.teal,
+          surface: Palette.parchment,
+        ),
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            foregroundColor: Palette.ink,
+            backgroundColor: Palette.sun,
+            disabledBackgroundColor: Palette.sheet,
+            disabledForegroundColor: Palette.inkSoft,
+            elevation: 3,
+            shadowColor: Palette.coral.withValues(alpha: .34),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13),
+            textStyle: const TextStyle(fontWeight: FontWeight.w900),
+            shape: const ContinuousRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(22)),
+            ),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Palette.inkSoft,
+            textStyle: const TextStyle(fontWeight: FontWeight.w800),
+            shape: const ContinuousRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(18)),
+            ),
+          ),
+        ),
+        dialogTheme: const DialogThemeData(
+          backgroundColor: Palette.parchment,
+          shape: ContinuousRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(28)),
+          ),
+        ),
       ),
       // T-004: arb strings; the language switches at runtime (settings)
       locale: Locale(widget.lang ?? ref.watch(langProvider)),

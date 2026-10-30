@@ -50,12 +50,13 @@ void main() {
   }
 
   test('placements load from data (D-003, D-008)', () {
-    expect(rules.dailyCapTotal, 10);
+    expect(rules.dailyCapTotal, 15);
     expect(rules.placements['pet_hatch']!.perDay, 3);
     expect(rules.placements['road_event']!.perDay, 3);
     expect(rules.placements['offline_x2']!.enabled, isFalse);
-    expect(rules.placements.values.every((p) => p.noAds == NoAdsBehavior.hide),
-        isTrue);
+    expect(rules.placements['daily_gift']!.perDay, 2);
+    expect(rules.placements['yarn_bundle']!.noAds, NoAdsBehavior.grant);
+    expect(rules.placements['daily_gift']!.noAds, NoAdsBehavior.grant);
   });
 
   test('a disabled or unknown placement never shows', () async {
@@ -71,11 +72,11 @@ void main() {
     expect(await watchAll(s, 'pet_hatch'), 3);
     expect(await watchAll(s, 'research_speedup'), 5);
     expect(s.remainingToday('yarn_bundle'), 2);
-    expect(await watchAll(s, 'yarn_bundle'), 2); // total now 10
-    expect(s.canShow('daily_gift'), isFalse);
-    expect(s.canShow('road_event'), isFalse);
+    expect(await watchAll(s, 'yarn_bundle'), 2);
+    expect(await watchAll(s, 'daily_gift'), 2);
+    expect(await watchAll(s, 'road_event'), 3); // total now 15
     expect(await s.show('road_event'), AdOutcome.capped);
-    expect(net.requests, hasLength(10));
+    expect(net.requests, hasLength(15));
   });
 
   test('only a finished ad counts', () async {
@@ -113,12 +114,14 @@ void main() {
     expect(net.requests.every((r) => r.nonPersonalized), isTrue);
   });
 
-  test('Supporter Pack hides every placement and grants nothing', () async {
+  test('Supporter Pack hides ads but keeps the two shop gifts', () async {
     noAds = true;
     final s = service();
     for (final id in rules.placements.keys) {
-      expect(s.canShow(id), isFalse, reason: id);
-      expect(await s.show(id), AdOutcome.capped);
+      final gift = id == 'daily_gift' || id == 'yarn_bundle';
+      expect(s.canShow(id), gift, reason: id);
+      expect(await s.show(id), gift ? AdOutcome.rewarded : AdOutcome.capped,
+          reason: id);
     }
     expect(net.requests, isEmpty);
   });
@@ -211,6 +214,6 @@ void main() {
     expect(ads.remainingToday('road_event'), 3);
     expect(await ads.show('road_event'), AdOutcome.rewarded);
     expect(ads.remainingToday('road_event'), 2);
-    expect(b['ads']['daily_cap_total'], 10);
+    expect(b['ads']['daily_cap_total'], 15);
   });
 }

@@ -15,10 +15,10 @@ Future<void> showCraftSheet(BuildContext context, WidgetRef ref,
     {GearItem? stashed}) {
   return showModalBottomSheet(
     context: context,
-    backgroundColor: Palette.paper,
+    backgroundColor: Palette.storyPaper,
     isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    shape: const ContinuousRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32))),
     builder: (_) => _CraftSheet(stashed: stashed),
   );
 }
@@ -130,20 +130,38 @@ class _CraftSheetState extends ConsumerState<_CraftSheet> {
                 '${_odds(grades, basket.gradeTable)} · 💜 ${s.pityLabel(basket.pityLeft)}',
                 style: const TextStyle(fontSize: 12, color: Palette.inkSoft)),
             const SizedBox(height: 12),
-            Wrap(spacing: 8, runSpacing: 8, children: [
-              for (final slot in basket.openSlots)
-                GestureDetector(
-                  onTap: _knitting ? null : () => _knit(slot),
-                  child: Container(
-                    width: 72,
-                    height: 72,
-                    padding: const EdgeInsets.all(6),
-                    decoration: inkBox(radius: 12),
-                    child: Image.asset(
-                        'assets/game/${FarmPanel.slotArt(slot, basket.equipped(slot), cls, wr)}.png'),
-                  ),
-                ),
-            ]),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(8),
+              decoration: storybookCard(
+                fill: Palette.parchmentDeep,
+                accent: Palette.wood,
+                radius: 9,
+              ),
+              child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final slot in basket.openSlots)
+                      GestureDetector(
+                        onTap: _knitting ? null : () => _knit(slot),
+                        child: Container(
+                          width: 72,
+                          height: 72,
+                          padding: const EdgeInsets.all(7),
+                          decoration: storybookButton(
+                            fill: const Color(0xFFFFEDCF),
+                            accent: Palette.mochi,
+                            enabled: !_knitting,
+                            radius: 8,
+                          ),
+                          child: Image.asset(
+                              'assets/game/${FarmPanel.slotArt(slot, basket.equipped(slot), cls, wr)}.png'),
+                        ),
+                      ),
+                  ]),
+            ),
           ] else
             TweenAnimationBuilder<double>(
               key: ValueKey(item.id),
@@ -211,9 +229,13 @@ class _Compare extends StatelessWidget {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(10),
-        decoration: inkBox(
-            border: g == null ? Palette.inkSoft : Palette.grades[g.grade],
-            width: 3),
+        decoration: storybookCard(
+          fill: g == null
+              ? Palette.sheet
+              : Color.lerp(Palette.parchment, Palette.grades[g.grade], .13)!,
+          accent: g == null ? Palette.inkSoft : Palette.grades[g.grade],
+          radius: 8,
+        ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           IconText(label,
               style: const TextStyle(fontSize: 12, color: Palette.inkSoft)),
@@ -285,7 +307,9 @@ class _Big extends StatelessWidget {
         child: Container(
           height: 56,
           alignment: Alignment.center,
-          decoration: inkBox(fill: color),
+          decoration: color == Palette.lime
+              ? storybookButton(fill: color, accent: Palette.teal, radius: 10)
+              : storybookCard(fill: color, accent: Palette.inkSoft, radius: 9),
           child: IconText(label,
               style:
                   const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),

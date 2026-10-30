@@ -4,31 +4,43 @@
   "first_cast_pct": 50,
   "skills": [
     { "id": "shield_bash", "class": "warrior", "slot": 1, "icon": "🛡️", "name_th": "โล่กระแทก", "name_en": "Shield Bash",
+      "description_th": "ฟาดศัตรูตัวหน้าด้วยโล่และทำให้ชะงักชั่วครู่", "description_en": "Strike the front enemy with a shield and briefly stun it.",
       "cooldown_ms": 6000, "target": "front", "damage_pct": 150, "buffs_target": ["stun_short"] },
     { "id": "iron_wall", "class": "warrior", "slot": 2, "icon": "🧱", "name_th": "กำแพงเหล็ก", "name_en": "Iron Wall",
+      "description_th": "สร้างโล่ชั่วคราวเพื่อรับความเสียหายแทนเลือด", "description_en": "Gain a temporary shield that absorbs damage before HP.",
       "cooldown_ms": 12000, "target": "self", "buffs_self": ["iron_wall"] },
     { "id": "war_cry", "class": "warrior", "slot": 3, "icon": "📣", "name_th": "เสียงคำราม", "name_en": "War Cry",
+      "description_th": "เพิ่มพลังโจมตีและพลังป้องกันของโมจิชั่วคราว", "description_en": "Temporarily raise Mochi's attack and defense.",
       "cooldown_ms": 15000, "target": "self", "buffs_self": ["war_cry_atk", "war_cry_def"] },
 
     { "id": "twin_strike", "class": "rogue", "slot": 1, "icon": "⚔️", "name_th": "ฟันคู่", "name_en": "Twin Strike",
+      "description_th": "ฟันศัตรูตัวหน้าติดต่อกันสองครั้ง", "description_en": "Hit the front enemy twice in quick succession.",
       "cooldown_ms": 4000, "target": "front", "damage_pct": 70, "hits": 2 },
     { "id": "poison_blade", "class": "rogue", "slot": 2, "icon": "🧪", "name_th": "มีดอาบพิษ", "name_en": "Poison Blade",
+      "description_th": "โจมตีศัตรูตัวหน้าและติดพิษที่ทำความเสียหายต่อเนื่อง", "description_en": "Hit the front enemy and poison it for damage over time.",
       "cooldown_ms": 8000, "target": "front", "damage_pct": 50, "buffs_target": ["poison"] },
     { "id": "shadow_step", "class": "rogue", "slot": 3, "icon": "💨", "name_th": "ก้าวเงา", "name_en": "Shadow Step",
+      "description_th": "เพิ่มโอกาสหลบและความเร็วโจมตีชั่วคราว", "description_en": "Temporarily increase dodge chance and attack speed.",
       "cooldown_ms": 12000, "target": "self", "buffs_self": ["shadow_evade", "shadow_speed"] },
 
     { "id": "power_shot", "class": "archer", "slot": 1, "icon": "🎯", "name_th": "ยิงทะลวง", "name_en": "Power Shot",
+      "description_th": "ยิงศัตรูตัวหน้าอย่างรุนแรง", "description_en": "Fire a powerful shot at the front enemy.",
       "cooldown_ms": 5000, "target": "front", "damage_pct": 220 },
     { "id": "arrow_rain", "class": "archer", "slot": 2, "icon": "🌧️", "name_th": "ฝนลูกธนู", "name_en": "Arrow Rain",
+      "description_th": "โปรยลูกธนูโจมตีศัตรูทุกตัว", "description_en": "Rain arrows down on every enemy.",
       "cooldown_ms": 9000, "target": "all", "damage_pct": 90 },
     { "id": "eagle_eye", "class": "archer", "slot": 3, "icon": "🦅", "name_th": "ตาเหยี่ยว", "name_en": "Eagle Eye",
+      "description_th": "เพิ่มโอกาสคริติคอลและความแรงคริติคอลชั่วคราว", "description_en": "Temporarily increase critical hit chance and damage.",
       "cooldown_ms": 14000, "target": "self", "buffs_self": ["eagle_crit", "eagle_crit_dmg"] },
 
     { "id": "fireball", "class": "mage", "slot": 1, "icon": "🔥", "name_th": "ลูกไฟ", "name_en": "Fireball",
+      "description_th": "ยิงลูกไฟใส่ศัตรูตัวหน้าและเผาไหม้ต่อเนื่อง", "description_en": "Hit the front enemy with fire and burn it over time.",
       "cooldown_ms": 3000, "target": "front", "damage_pct": 200, "buffs_target": ["burn"] },
     { "id": "frost_nova", "class": "mage", "slot": 2, "icon": "❄️", "name_th": "วงน้ำแข็ง", "name_en": "Frost Nova",
+      "description_th": "โจมตีศัตรูทุกตัวและทำให้ชะงักชั่วครู่", "description_en": "Damage every enemy and briefly stun them.",
       "cooldown_ms": 8000, "target": "all", "damage_pct": 110, "buffs_target": ["stun_frost"] },
     { "id": "meteor", "class": "mage", "slot": 3, "icon": "☄️", "name_th": "อุกกาบาต", "name_en": "Meteor",
+      "description_th": "เรียกอุกกาบาตโจมตีศัตรูทุกตัวอย่างรุนแรง", "description_en": "Call down a meteor for heavy damage to every enemy.",
       "cooldown_ms": 12000, "target": "all", "damage_pct": 240 }
   ]
 }

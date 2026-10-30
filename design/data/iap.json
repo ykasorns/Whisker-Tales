@@ -1,20 +1,13 @@
 {
   "schema_version": 1,
-  "_doc": "ของที่ขายด้วยเงินจริง (GDD v0.4 §10/§12, D-003, T-025, D-023, D-024) — ผ่าน parental gate เท่านั้น · ตอนนี้มี Supporter Pack อย่างเดียว: ซ่อนปุ่มโฆษณาทุกจุด ไม่มีรางวัลแทน · ชุดพิเศษขายได้เมื่อมีภาพชุดครบทุกคลาส (D-024) · ห้ามมีปลาทอง/ไข่/ไหมพรม/ขนม/การเร่งเวลา (validator ไม่รับ field อื่น) · gear_presets/basket_theme = สิทธิ์ที่จองไว้ ยังไม่มีระบบ — ห้ามเขียนในคำอธิบายจนกว่าจะทำ · SKU ต้องสร้างใน Play Console ด้วย id เดียวกัน (non-consumable)",
+  "_doc": "D-053 — ร้านใช้ catalog เดียวเพื่อเพิ่มสินค้าในอนาคต · ทุกการซื้อผ่าน parental gate · ราคา USD เป็น tier อ้างอิงสำหรับตั้ง Play Console เท่านั้น หน้าจอแสดงราคาท้องถิ่นจาก Google Play · supply pack เป็น consumable ซื้อซ้ำได้และให้เฉพาะปลาทอง/ไหมพรม (ไม่ขายไข่) · ไหมพรมใช้สุ่มอุปกรณ์ จึงต้องแสดงอัตราเกรดปัจจุบันใกล้ปุ่มซื้อ · supporter_pack เป็น non-consumable และทำให้รางวัลฟรี 2 ครั้ง/วันรับได้ทันทีโดยไม่เปิดวิดีโอ",
   "products": [
-    {
-      "sku": "supporter_pack",
-      "kind": "supporter",
-      "icon": "💛",
-      "name_th": "Supporter Pack",
-      "name_en": "Supporter Pack",
-      "desc_th": "ซ่อนปุ่มโฆษณาทุกจุดในเกม (ไม่มีรางวัลแทน) และช่วยให้คนทำเกมทำเกมต่อได้",
-      "desc_en": "Hides every ad button in the game (no reward instead) and helps us keep making the game",
-      "entitlements": [
-        "no_ads",
-        "gear_presets",
-        "basket_theme"
-      ]
-    }
+    {"sku":"story_supplies_099","kind":"currency_pack","icon":"🧶","name_th":"ตะกร้าใบเล็ก","name_en":"Little Basket","desc_th":"ไหมพรม 80 · ปลาทอง 1,200","desc_en":"80 yarn · 1,200 goldfish","reference_price_usd":0.99,"grants":{"yarn":80,"goldfish":1200}},
+    {"sku":"story_supplies_499","kind":"currency_pack","icon":"🧶","name_th":"ตะกร้าสำหรับเดินทาง","name_en":"Travel Basket","desc_th":"ไหมพรม 450 · ปลาทอง 7,000","desc_en":"450 yarn · 7,000 goldfish","reference_price_usd":4.99,"grants":{"yarn":450,"goldfish":7000}},
+    {"sku":"story_supplies_999","kind":"currency_pack","icon":"🎁","name_th":"หีบช่างถัก","name_en":"Knitter's Chest","desc_th":"ไหมพรม 1,000 · ปลาทอง 16,000","desc_en":"1,000 yarn · 16,000 goldfish","reference_price_usd":9.99,"grants":{"yarn":1000,"goldfish":16000}},
+    {"sku":"story_supplies_1999","kind":"currency_pack","icon":"🎁","name_th":"เสบียงนักผจญภัย","name_en":"Adventure Supplies","desc_th":"ไหมพรม 2,250 · ปลาทอง 38,000","desc_en":"2,250 yarn · 38,000 goldfish","reference_price_usd":19.99,"grants":{"yarn":2250,"goldfish":38000}},
+    {"sku":"story_supplies_4999","kind":"currency_pack","icon":"🎁","name_th":"หีบนิทานใหญ่","name_en":"Grand Story Chest","desc_th":"ไหมพรม 6,250 · ปลาทอง 115,000","desc_en":"6,250 yarn · 115,000 goldfish","reference_price_usd":49.99,"grants":{"yarn":6250,"goldfish":115000}},
+    {"sku":"story_supplies_9999","kind":"currency_pack","icon":"✨","name_th":"คลังเทพนิยาย","name_en":"Fairytale Treasury","desc_th":"ไหมพรม 14,000 · ปลาทอง 280,000","desc_en":"14,000 yarn · 280,000 goldfish","reference_price_usd":99.99,"grants":{"yarn":14000,"goldfish":280000}},
+    {"sku":"supporter_pack","kind":"supporter","icon":"💛","name_th":"นิทานไร้โฆษณา","name_en":"Ad-free Story","desc_th":"ปิดโฆษณาถาวร และรับรางวัลปลา/ไหมฟรีได้ทันทีวันละ 2 ครั้ง","desc_en":"Remove ads forever and instantly claim both free rewards twice a day","reference_price_usd":4.99,"entitlements":["no_ads"]}
   ]
 }

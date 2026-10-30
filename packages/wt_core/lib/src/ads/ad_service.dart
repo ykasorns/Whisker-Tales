@@ -173,6 +173,14 @@ class AdService implements IAdService {
     if (!canShow(placementId) || _showing) {
       return _showing ? AdOutcome.failed : AdOutcome.capped;
     }
+    final rule = _rule(placementId)!;
+    // Ad-free owners keep the two shop gifts. They claim them directly, so
+    // buying no-ads never makes their daily economy worse.
+    if (hasNoAds() && rule.noAds == NoAdsBehavior.grant) {
+      _used[placementId] = (_used[placementId] ?? 0) + 1;
+      _total++;
+      return AdOutcome.rewarded;
+    }
     final kid = ageBand() != AgeBand.over13;
     _showing = true;
     final AdNetworkResult result;

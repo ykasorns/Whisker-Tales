@@ -73,7 +73,9 @@ class _Buff {
 
 class _Unit {
   _Unit(this.spec)
-      : hp = spec.stats.hp,
+      : hp = spec.initialHp == null
+            ? spec.stats.hp
+            : spec.initialHp!.clamp(1, spec.stats.hp).toInt(),
         eff = spec.stats;
 
   final CombatUnitSpec spec;
@@ -82,6 +84,7 @@ class _Unit {
   int intervalMs = 1;
   int nextActAt = 1;
   int stunnedUntil = 0;
+  String stunStatusId = 'stun';
   bool alive = true;
   final buffs = <_Buff>[];
 
@@ -204,6 +207,20 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
                   remainingMs:
                       u.nextSkillAt[i] > _now ? u.nextSkillAt[i] - _now : 0,
                   totalMs: _cooldown(u, i),
+                ),
+            ],
+            statuses: [
+              if (_now < u.stunnedUntil)
+                CombatStatusView(
+                  id: u.stunStatusId,
+                  stacks: 1,
+                  remainingMs: u.stunnedUntil - _now,
+                ),
+              for (final b in u.buffs)
+                CombatStatusView(
+                  id: b.def.id,
+                  stacks: b.stacks,
+                  remainingMs: b.expiresAt < 0 ? -1 : b.expiresAt - _now,
                 ),
             ],
           ),
@@ -504,9 +521,12 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
     _stun(d, rules.stunMs);
   }
 
-  void _stun(_Unit d, int ms) {
+  void _stun(_Unit d, int ms, {String statusId = 'stun'}) {
     final until = _now + ms;
-    if (d.stunnedUntil < until) d.stunnedUntil = until;
+    if (d.stunnedUntil <= until) {
+      d.stunnedUntil = until;
+      d.stunStatusId = statusId;
+    }
     if (d.nextActAt < until) d.nextActAt = until;
     _emit(UnitStunned(atMs: _now, unitId: d.spec.id, untilMs: until));
   }
@@ -526,7 +546,7 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
     if (!u.alive || isOver) return;
     switch (def.action) {
       case BuffAction.stun:
-        _stun(u, def.durationMs);
+        _stun(u, def.durationMs, statusId: def.id);
         return;
       case BuffAction.cooldownMod:
         for (var i = 0; i < u.nextSkillAt.length; i++) {

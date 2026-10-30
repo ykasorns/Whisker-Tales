@@ -155,6 +155,181 @@
       "duration_ms": 6000,
       "group": "pet_atk_up",
       "stack_max": 1
+    },
+    {
+      "id": "story_atk_15",
+      "action": "attrib",
+      "params": { "attr": "atk", "mode": "pct", "value": 15 },
+      "duration_ms": -1,
+      "group": "story_atk",
+      "stack_max": 1
+    },
+    {
+      "id": "story_def_12",
+      "action": "attrib",
+      "params": { "attr": "def", "mode": "pct", "value": 12 },
+      "duration_ms": -1,
+      "group": "story_def",
+      "stack_max": 1
+    },
+    {
+      "id": "story_hp_15",
+      "action": "attrib",
+      "params": { "attr": "hp", "mode": "pct", "value": 15 },
+      "duration_ms": -1,
+      "group": "story_hp",
+      "stack_max": 1
+    },
+    {
+      "id": "story_crit_8",
+      "action": "attrib",
+      "params": { "attr": "crit", "mode": "add", "value": 8 },
+      "duration_ms": -1,
+      "group": "story_crit",
+      "stack_max": 1
+    },
+    {
+      "id": "story_evade_8",
+      "action": "attrib",
+      "params": { "attr": "evade", "mode": "add", "value": 8 },
+      "duration_ms": -1,
+      "group": "story_evade",
+      "stack_max": 1
+    },
+    {
+      "id": "story_speed_20",
+      "action": "attrib",
+      "params": { "attr": "attack_speed", "mode": "add", "value": 20 },
+      "duration_ms": -1,
+      "group": "story_speed",
+      "stack_max": 1
+    },
+    {
+      "id": "story_skill_20",
+      "action": "attrib",
+      "params": { "attr": "skill_dmg", "mode": "add", "value": 20 },
+      "duration_ms": -1,
+      "group": "story_skill",
+      "stack_max": 1
+    },
+    {
+      "id": "story_cdr_15",
+      "action": "attrib",
+      "params": { "attr": "cdr", "mode": "add", "value": 15 },
+      "duration_ms": -1,
+      "group": "story_cdr",
+      "stack_max": 1
+    },
+    {
+      "id": "story_boss_15",
+      "action": "attrib",
+      "params": { "attr": "boss_dmg", "mode": "add", "value": 15 },
+      "duration_ms": -1,
+      "group": "story_boss",
+      "stack_max": 1
+    },
+    {
+      "id": "story_lifesteal_5",
+      "action": "attrib",
+      "params": { "attr": "lifesteal", "mode": "add", "value": 5 },
+      "duration_ms": -1,
+      "group": "story_lifesteal",
+      "stack_max": 1
+    },
+    {
+      "id": "story_combo_12",
+      "action": "attrib",
+      "params": { "attr": "combo", "mode": "add", "value": 12 },
+      "duration_ms": -1,
+      "group": "story_combo",
+      "stack_max": 1
+    },
+    {
+      "id": "story_counter_10",
+      "action": "attrib",
+      "params": { "attr": "counter", "mode": "add", "value": 10 },
+      "duration_ms": -1,
+      "group": "story_counter",
+      "stack_max": 1
+    },
+    {
+      "id": "story_regen_2",
+      "action": "attrib",
+      "params": { "attr": "regen", "mode": "add", "value": 2 },
+      "duration_ms": -1,
+      "group": "story_regen",
+      "stack_max": 1
+    },
+    {
+      "id": "story_heal_8",
+      "action": "heal",
+      "params": { "pct_max_hp": 8 },
+      "duration_ms": 0
+    },
+    {
+      "id": "story_heal_20",
+      "action": "heal",
+      "params": { "pct_max_hp": 20 },
+      "duration_ms": 0
+    },
+    {
+      "id": "story_heal_50",
+      "action": "heal",
+      "params": { "pct_max_hp": 50 },
+      "duration_ms": 0
+    },
+    {
+      "id": "story_shield_12",
+      "action": "shield",
+      "params": { "pct_max_hp": 12 },
+      "duration_ms": 5000,
+      "group": "shield",
+      "stack_max": 1
+    },
+    {
+      "id": "story_cooldown_1000",
+      "action": "cooldown_mod",
+      "params": { "ms": 1000 },
+      "duration_ms": 0
+    },
+    {
+      "id": "story_extra_hit",
+      "action": "extra_hit",
+      "params": {},
+      "duration_ms": 0
+    },
+    {
+      "id": "story_star_bomb",
+      "action": "dot",
+      "params": { "pct_atk": 12 },
+      "duration_ms": 3000,
+      "tick_ms": 1000,
+      "group": "story_star_bomb",
+      "stack_max": 1
+    },
+    {
+      "id": "story_crit_haste",
+      "action": "attrib",
+      "params": { "attr": "attack_speed", "mode": "add", "value": 30 },
+      "duration_ms": 2500,
+      "group": "story_crit_haste",
+      "stack_max": 1
+    },
+    {
+      "id": "story_potion_atk",
+      "action": "attrib",
+      "params": { "attr": "atk", "mode": "pct", "value": 25 },
+      "duration_ms": -1,
+      "group": "story_potion_atk",
+      "stack_max": 1
+    },
+    {
+      "id": "story_lucky_crit",
+      "action": "attrib",
+      "params": { "attr": "crit", "mode": "add", "value": 10 },
+      "duration_ms": -1,
+      "group": "story_lucky_crit",
+      "stack_max": 1
     }
   ]
 }

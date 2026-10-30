@@ -3,18 +3,21 @@
   "schema_version": 1,
   "pacing_targets": {
     "book1_pages": 30,
-    "book1_target_day_full_ads": 14,
-    "book1_target_day_tolerance": 2,
+    "book1_target_day_full_ads": 2,
+    "book1_target_day_tolerance": 1,
     "max_no_ads_slowdown_pct": 25
   },
   "enemy": {
     "page_power_base": 100,
-    "page_power_growth": 1.2,
+    "page_power_growth": 1.18,
+    "_doc_later_books": "After book 1, enemy power grows at the same per-page rate as gear base power so new books remain climbable. Book 1 keeps the faster onboarding curve.",
+    "page_power_growth_after_book1": 1.065,
     "page_boss_mult": 1.5,
     "chapter_boss_mult": 1.3,
-    "_doc_early": "D-011: บอสหน้า 1..early_boss_until_page อ่อนลง early_boss_discount_pct% ลดลงเป็นเส้นตรงจนเต็มหลังหน้านั้น",
-    "ASSUMPTION_early_boss_discount_pct": 40,
-    "ASSUMPTION_early_boss_until_page": 10,
+    "_doc_early": "D-050: บอสลดพลังเต็มถึงจบบท 3 (หน้า 30) แล้วคืนความยากแบบเส้นตรงหน้า 31–120 (~4–5 วัน); หลังหน้า 120 ใช้ multiplier เต็ม",
+    "ASSUMPTION_early_boss_discount_pct": 65,
+    "ASSUMPTION_early_boss_hold_until_page": 30,
+    "ASSUMPTION_early_boss_until_page": 120,
     "pages_per_chapter": 10,
     "farm_min_power_ratio": 0.7,
     "_doc_monsters": "พลังคลื่น P(n) แบ่งเป็น HP:ATK ตาม hp_share (GDD v0.4 §15.3 = 60:40) แล้วแปลงกลับด้วยน้ำหนักพลัง §15.2 · หารเท่ากันทุกตัวในคลื่น",
@@ -25,7 +28,8 @@
   "player": {
     "base_power": 60,
     "ASSUMPTION_waves_per_minute_online": 0.6,
-    "offline_rate_vs_online": 1.0
+    "_doc_offline": "offline_rate_vs_online multiplies this fixed 0.6 waves/minute baseline; it is not the measured combat speed while the app is open.",
+    "offline_rate_vs_online": 1.5
   },
   "gear": {
     "slots": 8,
@@ -124,16 +128,16 @@
     ]
   },
   "income": {
-    "ASSUMPTION_yarn_per_wave": 0.1,
+    "ASSUMPTION_yarn_per_wave": 0.15,
     "ASSUMPTION_yarn_growth_per_page_pct": 2,
     "_doc_early": "ช่วงแรกง่ายขึ้น (YK 2026-10-19, D-011): เริ่มเกมได้ไหมพรม starter_yarn · หน้า 1..early_yarn_until_page ได้ไหมพรมเพิ่มต่อคลื่น ลดลงเป็นเส้นตรงจนหมดหลังหน้านั้น",
     "ASSUMPTION_starter_yarn": 10,
-    "ASSUMPTION_early_yarn_bonus_per_wave": 0.5,
+    "ASSUMPTION_early_yarn_bonus_per_wave": 0.7,
     "ASSUMPTION_early_yarn_until_page": 10,
     "ASSUMPTION_fish_per_wave_base": 2,
     "ASSUMPTION_fish_growth_per_page": 1.06,
     "boss_fish_mult_waves": 20,
-    "egg_drop_wave_chance": 0.01,
+    "egg_drop_wave_chance": 0.02,
     "egg_page_boss": 1,
     "egg_chapter_boss": 3,
     "ASSUMPTION_boss_exp_kills": 10
@@ -199,8 +203,8 @@
     "base_cap_min": 480
   },
   "ads": {
-    "_doc": "rewarded เท่านั้น. daily_cap_total บังคับรวมทุก placement (D-003: 10 = hatch 3 + research 5 + yarn 2 ... cap รวมตัดที่ 10). no_ads_behavior = ผลของ Supporter Pack (D-003 = hide: ซ่อนปุ่ม ไม่ให้รางวัลแทน)",
-    "daily_cap_total": 10,
+    "_doc": "rewarded เท่านั้น. cap ราย placement เป็นตัวจำกัดหลัก; daily_cap_total เท่าผลรวม cap ของ placement ที่เปิด เพื่อไม่ให้กิจกรรมหนึ่งกินสิทธิ์ของอีกกิจกรรม. D-053: yarn_bundle/daily_gift อยู่ใน Shop อย่างละ 2 ครั้ง/วัน; เมื่อมี no_ads ให้กดรับทันทีโดยไม่เปิดวิดีโอ",
+    "daily_cap_total": 15,
     "placements": {
       "pet_hatch": {
         "enabled": true,
@@ -223,13 +227,15 @@
         "enabled": true,
         "per_day": 2,
         "yarn_minutes_of_income": 30,
-        "no_ads_behavior": "hide"
+        "no_ads_behavior": "grant",
+        "grant_allowed": true
       },
       "daily_gift": {
         "enabled": true,
-        "per_day": 1,
+        "per_day": 2,
         "fish_minutes_of_income": 60,
-        "no_ads_behavior": "hide"
+        "no_ads_behavior": "grant",
+        "grant_allowed": true
       },
       "road_event": {
         "_doc": "D-008: ดี = ผล ×2 นานขึ้น · ไม่ดี = ปัดเป่าทันที · ดีบัฟหายเองเสมอถ้าไม่ดู",

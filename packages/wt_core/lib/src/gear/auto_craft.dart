@@ -6,8 +6,9 @@ import '../core/contracts/wallet.dart';
 import 'gear_basket.dart';
 
 /// Auto-craft (GDD v0.5 §4.3): knit the weakest open slot (counting worn
-/// and stashed items) every [GearRules.autoCraftIntervalMs] of play until
-/// the yarn runs out. Only runs while [tick] is called — never offline.
+/// and stashed items) every [GearRules.autoCraftIntervalMs] of play. When
+/// yarn runs out it stays armed and waits, then resumes as soon as yarn is
+/// available again. Only runs while [tick] is called — never offline.
 ///
 /// An item is kept when it beats both the worn and the stashed item on
 /// power, or is ✨ strictly better than the one it would replace; anything
@@ -65,9 +66,19 @@ class AutoCraft implements IAutoCraft {
   /// Advances online play time; crafts once per interval.
   void tick(int dtMs) {
     if (!_rule.on || held) return;
-    _sinceLastMs += dtMs;
     final every = basket.rules.autoCraftIntervalMs;
+    if (wallet.balance(Currency.yarn) < 1) {
+      // Keep one craft ready while the mouse waits by the empty basket.
+      // The next yarn drop is therefore picked up on the next game tick.
+      _sinceLastMs = every;
+      return;
+    }
+    _sinceLastMs += dtMs;
     while (_rule.on && _sinceLastMs >= every) {
+      if (wallet.balance(Currency.yarn) < 1) {
+        _sinceLastMs = every;
+        break;
+      }
       _sinceLastMs -= every;
       craftOnce();
     }
@@ -76,7 +87,6 @@ class AutoCraft implements IAutoCraft {
   /// One auto-craft step. Returns the result, or null when out of yarn.
   CraftResult? craftOnce() {
     if (wallet.balance(Currency.yarn) < 1) {
-      stopFor(AutoCraftStopReason.outOfYarn);
       return null;
     }
     GearSlot? weakest;

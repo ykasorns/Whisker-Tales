@@ -79,16 +79,25 @@ void main() {
     expect(rules.capFor(0), const Duration(hours: 8));
     expect(rules.capFor(3), const Duration(minutes: 510));
     expect(rules.capFor(99), const Duration(minutes: 600));
-    expect(rules.ratePct, 100);
+    expect(rules.ratePct, 150);
   });
 
   test('an hour away pays an hour of farming, same formula as online', () {
     away(const Duration(hours: 1));
     final r = offline().checkIn();
-    final waves = (60 * income.wavesPerMinute).floor();
+    final waves = (60 * income.wavesPerMinute * rules.ratePct / 100).floor();
     expect((r.creditedMinutes, r.waves), (60, waves));
     expect(r.reward, income.forWaves(4, waves));
     expect(r.exp, income.expForWaves(4, waves));
+  });
+
+  test('a short return at page 1 pays yarn and an egg', () {
+    page = 1;
+    away(const Duration(hours: 1));
+    final r = offline().checkIn();
+    expect(r.waves, 54);
+    expect(r.reward[Currency.yarn], 45);
+    expect(r.reward[Currency.eggs], 1);
   });
 
   test('longer than the cap pays the cap', () {

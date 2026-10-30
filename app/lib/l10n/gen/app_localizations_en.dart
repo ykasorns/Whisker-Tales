@@ -12,7 +12,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navCharacter => 'Cat';
 
   @override
-  String get navDungeon => 'Dungeon';
+  String get navDungeon => 'Adventure';
 
   @override
   String get navHome => 'Home';
@@ -369,22 +369,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failBoss =>
-      'The boss won this time. Mochi loses nothing — try again!';
+      'The boss won this time. You lose nothing — try again!';
 
   @override
-  String get failWave => 'Mochi needs a rest. Nothing is lost!';
+  String get failWave => 'You need a short rest. Nothing is lost!';
 
   @override
   String get tipKnit => 'Tip: knit new gear to get stronger';
 
   @override
-  String get tipLevel => 'Tip: farm a page to level Mochi up';
+  String get tipLevel => 'Tip: farm a page to level up';
 
   @override
   String get tipLibrary => 'Tip: study in the Owl Library for permanent boosts';
 
   @override
-  String get tipPets => 'Tip: hatch pets, they fight beside Mochi';
+  String get tipPets => 'Tip: hatch pets — they fight beside you';
 
   @override
   String get rarityCommon => 'Common';
@@ -459,4 +459,119 @@ class AppLocalizationsEn extends AppLocalizations {
   String cooldownSeconds(String sec) {
     return 'Cooldown $sec s';
   }
+
+  @override
+  String get storyTitle => 'Story Challenge';
+
+  @override
+  String get storySubtitle =>
+      'Choose a path, collect magical keepsakes, and reach the final boss';
+
+  @override
+  String get storyLocked => 'This story is still locked';
+
+  @override
+  String get storyUnlockHint => 'Clear the Chapter 1 boss to open it';
+
+  @override
+  String get storyStart => 'Start adventure';
+
+  @override
+  String get storyDaily => 'Full rewards today';
+
+  @override
+  String get storyBest => 'Best distance';
+
+  @override
+  String get storyQuit => 'Leave story';
+
+  @override
+  String get storyMap => 'Story map';
+
+  @override
+  String get storyCombat => 'Battle in progress';
+
+  @override
+  String get storyPickRelic => 'Choose one relic';
+
+  @override
+  String get storyPickTalent => 'Choose one talent';
+
+  @override
+  String get storyEvent => 'A story event';
+
+  @override
+  String get storyOwlShop => 'Owl shop';
+
+  @override
+  String get storyCampfire => 'Cozy campfire';
+
+  @override
+  String get storyRest => 'Rest and heal';
+
+  @override
+  String get storyUpgrade => 'Strengthen a relic';
+
+  @override
+  String get storyContinue => 'Continue';
+
+  @override
+  String get storyLeaveShop => 'Leave shop';
+
+  @override
+  String get storyVictory => 'Story complete!';
+
+  @override
+  String get storyDefeat => 'You need a rest';
+
+  @override
+  String get storyAbandoned => 'Back home safely';
+
+  @override
+  String get storyReturn => 'Back to adventures';
+
+  @override
+  String get storySafe => 'Safe path';
+
+  @override
+  String get storyRisky => 'Brave path';
+
+  @override
+  String get storyTapAgain => 'Tap again to choose';
+
+  @override
+  String get storyConfirmBuy => 'Buy this item?';
+
+  @override
+  String get storyNotEnough => 'Not enough goldfish';
+
+  @override
+  String get storyNoRelic => 'There is no relic to upgrade yet';
+
+  @override
+  String get storyRelics => 'Relics';
+
+  @override
+  String get storyTalents => 'Talents';
+
+  @override
+  String get storyHp => 'Health';
+
+  @override
+  String get storyXp => 'Star experience';
+
+  @override
+  String get storyReward => 'Goldfish reward';
+
+  @override
+  String get storyFullReward => 'Full';
+
+  @override
+  String get storyReducedReward => '25%';
+
+  @override
+  String get storyBuy => 'Buy';
+
+  @override
+  String get storyLevel => 'Level';
 }

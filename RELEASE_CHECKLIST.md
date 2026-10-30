@@ -29,7 +29,20 @@ T-030 / D-035. ฝั่งโค้ดพร้อมแล้ว ทุกอ�
   - ตอน build: `ADMOB_REWARDED_ID=ca-app-pub-…/… scripts/build_release.sh`
   - ⚠️ ระหว่างทดสอบบนเครื่องตัวเอง **ห้ามกดโฆษณาจริงของตัวเอง** (บัญชีโดนแบน) — ใช้ build ที่ยังเป็นรหัสทดสอบ หรือเพิ่มเครื่องเป็น test device ใน AdMob
 - [ ] **Play Games Services** (เซฟคลาวด์ — ไม่ทำก็ได้ เกมเล่นออฟไลน์ได้ครบ): Play Console → Play Games Services → Setup → คัดลอก Project ID → `pgsProjectId=…` ใน `app/android/gradle.properties`
-- [ ] **สินค้าในแอป**: Play Console → Monetize → Products → In-app products → สร้าง `supporter_pack` (one-time, ไม่ใช่ subscription) ตั้งราคา · เพิ่มอีเมลตัวเองใน **License testing** เพื่อลองซื้อแบบไม่เสียเงิน
+- [ ] **สินค้าในแอป**: Play Console → Monetize → Products → In-app products → สร้าง SKU ตามตารางนี้ · supply packs เป็น **consumable** และ `supporter_pack` เป็น **non-consumable** · ราคาในเกมอ่านจาก Play โดยตรง · เพิ่มอีเมลตัวเองใน **License testing** เพื่อลองซื้อแบบไม่เสียเงินจริง
+
+| SKU | ราคาอ้างอิง USD | ของที่ได้รับ |
+|---|---:|---:|
+| `story_supplies_099` | $0.99 | ไหม 80 + ปลา 1,200 |
+| `story_supplies_499` | $4.99 | ไหม 450 + ปลา 7,000 |
+| `story_supplies_999` | $9.99 | ไหม 1,000 + ปลา 16,000 |
+| `story_supplies_1999` | $19.99 | ไหม 2,250 + ปลา 38,000 |
+| `story_supplies_4999` | $49.99 | ไหม 6,250 + ปลา 115,000 |
+| `story_supplies_9999` | $99.99 | ไหม 14,000 + ปลา 280,000 |
+| `supporter_pack` | $4.99 | ปิดโฆษณาถาวร + รับของฟรี 2×/วันได้ทันที |
+
+  - [ ] กรอกคำอธิบาย Play ให้ตรงกับจำนวนใน `design/data/iap.json` ทุกภาษา และอย่าใช้ข้อความเร่งเวลา/ของใกล้หมด/“คุ้มที่สุด” กับเด็ก
+  - [ ] ทดสอบซื้อ supply SKU เดิมซ้ำ 2 ครั้งแล้วได้ของทั้งสองครั้ง; ปิดแอประหว่างจ่ายแล้วเปิดใหม่ต้องได้ครั้งเดียว; restore คืนเฉพาะ `supporter_pack`
 
 ## 3. Build
 
@@ -51,7 +64,7 @@ scripts/build_release.sh
 | App access | All functionality is available without special access (ไม่มีล็อกอิน) |
 | Ads | **Yes, my app contains ads** (rewarded เท่านั้น) |
 | Target audience | แนะนำ **ages 6–8, 9–12** (+ 13–15 ถ้าอยากให้วัยรุ่นเล่นด้วย) → เข้าโปรแกรม Families ต้องทำตาม Families policy ทั้งหมด (ทำแล้วในโค้ด: ad SDK self-certified, ไม่มี Advertising ID, child-directed, เรต G, parental gate ก่อนซื้อ) · "Appeals to children" = Yes |
-| Content rating (IARC) | Category **Game** · ความรุนแรง: การ์ตูน/แฟนตาซี มอนแพ้แล้ว "ป๊อป" หายไป ไม่มีเลือด → mild fantasy violence · ไม่มีภาษาหยาบ เพศ ยาเสพติด การพนันด้วยเงินจริง · **Users interact: No** · **Shares location: No** · **Digital purchases: Yes** · ของสุ่ม (ฟักไข่/ถักของ) ได้จากของในเกมหรือดูโฆษณา **ไม่ขายด้วยเงินจริง** → ตอบว่าไม่มี loot box ที่ซื้อด้วยเงินจริง · คาดว่าได้ Everyone / PEGI 3–7 |
+| Content rating (IARC) | Category **Game** · ความรุนแรง: การ์ตูน/แฟนตาซี มอนแพ้แล้ว "ป๊อป" หายไป ไม่มีเลือด → mild fantasy violence · ไม่มีภาษาหยาบ เพศ ยาเสพติด การพนันด้วยเงินจริง · **Users interact: No** · **Shares location: No** · **Digital purchases: Yes** · D-053 ขายไหมพรมที่นำไปถักอุปกรณ์แบบสุ่ม จึงต้องตอบคำถามเรื่อง randomized virtual items/loot boxes ตามจริง และเปิดเผยอัตราเกรดใกล้รายการซื้อ |
 | News app / COVID / Government | No |
 | Financial features / Health | None |
 
@@ -83,7 +96,7 @@ scripts/build_release.sh
 > 🦉 ค้นคว้าในห้องสมุดนกฮูกให้โมจิเก่งขึ้น
 > 🐱 เลือกคลาส นักรบ โจร นักธนู หรือนักเวท พร้อมชุดของแต่ละคลาส
 > 🌙 ปิดเกมไปโมจิก็ยังเก็บของให้
-> เหมาะกับเด็ก: ไม่มีแชต ไม่ต้องสมัคร โฆษณาเป็นแบบกดดูเองเพื่อรับของเท่านั้น การซื้อต้องผ่านคำถามผู้ปกครอง และไม่ขายไหมพรม ไข่ หรือปลาทองด้วยเงินจริง
+> เหมาะกับเด็ก: ไม่มีแชต ไม่ต้องสมัคร โฆษณาเป็นแบบกดดูเองเพื่อรับของเท่านั้น การซื้อต้องผ่านคำถามผู้ปกครอง ไข่ไม่ขายด้วยเงินจริง และร้านแสดงอัตราสุ่มอุปกรณ์จากไหมพรมอย่างชัดเจน
 
 **EN — Short (≤80):** Adventure through a crayon storybook with Mochi the kitten. Knit, hatch, play!
 
@@ -94,7 +107,7 @@ scripts/build_release.sh
 > 🦉 Study in the Owl Library to make Mochi stronger
 > 🐱 Pick a class — Warrior, Rogue, Archer or Mage — each with its own outfit
 > 🌙 Mochi keeps collecting while the game is closed
-> Made for kids: no chat, no sign-up, only optional rewarded ads, a grown-ups-only check before any purchase, and yarn, eggs and goldfish are never sold for real money.
+> Made for kids: no chat, no sign-up, only optional rewarded ads, a grown-ups-only check before every purchase, no real-money egg sales, and clear gear-grade odds beside yarn supply packs.
 
 ## 6. ลองบนมือถือจริงก่อนเปิด (Claude ทดสอบไม่ได้ — เครื่องนี้ไม่มี emulator)
 

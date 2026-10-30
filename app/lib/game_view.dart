@@ -185,6 +185,7 @@ class BattleGame extends FlameGame {
       ...iconFrames.where((a) =>
           a.endsWith('/crown.png') ||
           a.endsWith('/evade.png') ||
+          a.contains('/status_') ||
           rules.projectiles.values.any((p) => a.endsWith('/${p.icon}.png'))),
       for (final f in _catFrames) 'cat/$f.png',
       ...outfits,
@@ -498,10 +499,10 @@ class _Monster extends PositionComponent {
         c.drawImageRect(
             im,
             ui.Rect.fromLTWH(0, 0, im.width.toDouble(), im.height.toDouble()),
-            ui.Rect.fromLTWH(-15, -heightPx - 54, 30, 30),
+            ui.Rect.fromLTWH(-15, -heightPx - 78, 30, 30),
             ui.Paint()..filterQuality = ui.FilterQuality.medium);
       } else {
-        _crown.paint(c, Offset(-_crown.width / 2, -heightPx - 46));
+        _crown.paint(c, Offset(-_crown.width / 2, -heightPx - 70));
       }
     }
   }
@@ -663,8 +664,88 @@ class _HpBars extends Component {
             ..style = ui.PaintingStyle.stroke
             ..strokeWidth = 2
             ..color = Palette.ink);
+
+      _drawStatuses(c, v, box);
     }
   }
+
+  void _drawStatuses(ui.Canvas c, UnitView unit, ui.RRect hpBox) {
+    final statuses = <({CombatStatusView status, String asset})>[];
+    final seenAssets = <String>{};
+    for (final status in unit.statuses) {
+      final asset = _statusAsset(status.id);
+      if (asset != null && seenAssets.add(asset)) {
+        statuses.add((status: status, asset: asset));
+      }
+    }
+    if (statuses.isEmpty) return;
+
+    final iconSize = (game.size.y * 0.052).clamp(18.0, 24.0);
+    const gap = 3.0;
+    final total = statuses.length * iconSize + (statuses.length - 1) * gap;
+    var x = hpBox.center.dx - total / 2;
+    final y = hpBox.top - iconSize - 4;
+    for (final item in statuses) {
+      if (!game.images.containsKey(item.asset)) continue;
+      final image = game.images.fromCache(item.asset);
+      final circle = ui.Rect.fromLTWH(x, y, iconSize, iconSize);
+      c.drawOval(circle.inflate(1.5), ui.Paint()..color = Palette.paper);
+      c.drawOval(
+          circle.inflate(1.5),
+          ui.Paint()
+            ..style = ui.PaintingStyle.stroke
+            ..strokeWidth = 1.5
+            ..color = Palette.ink);
+      c.drawImageRect(
+        image,
+        ui.Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+        circle,
+        ui.Paint()..filterQuality = ui.FilterQuality.medium,
+      );
+      if (item.status.stacks > 1) {
+        _drawStackCount(c, item.status.stacks, circle, iconSize);
+      }
+      x += iconSize + gap;
+    }
+  }
+
+  void _drawStackCount(
+      ui.Canvas c, int stacks, ui.Rect iconRect, double iconSize) {
+    final badgeSize = iconSize * 0.48;
+    final badge = ui.Rect.fromCircle(
+      center: Offset(iconRect.right - badgeSize * 0.32,
+          iconRect.bottom - badgeSize * 0.32),
+      radius: badgeSize / 2,
+    );
+    c.drawOval(badge, ui.Paint()..color = Palette.ink);
+    final text = TextPainter(
+      text: TextSpan(
+        text: '$stacks',
+        style: TextStyle(
+          color: Palette.paper,
+          fontSize: badgeSize * 0.72,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    text.paint(
+        c,
+        Offset(badge.center.dx - text.width / 2,
+            badge.center.dy - text.height / 2));
+  }
+
+  String? _statusAsset(String id) => switch (id) {
+        'stun' || 'stun_short' => 'icon/status_stun.png',
+        'stun_frost' => 'icon/status_frost.png',
+        'poison' => 'icon/status_poison.png',
+        'burn' => 'icon/status_burn.png',
+        'iron_wall' || 'pet_shield' => 'icon/status_shield.png',
+        'war_cry_atk' || 'war_cry_def' => 'icon/status_war_cry.png',
+        'shadow_evade' || 'shadow_speed' => 'icon/status_shadow.png',
+        'eagle_crit' || 'eagle_crit_dmg' => 'icon/status_eagle.png',
+        _ => null,
+      };
 }
 
 /// Deployed pets hop along behind Mochi (T-038): their sprite (attack pose

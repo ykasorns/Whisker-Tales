@@ -56,6 +56,7 @@ void main() {
       final basket = tester.getSize(find.byType(YarnBasket));
       expect(basket.height, greaterThanOrEqualTo(72));
       expect(find.byType(YarnBasket), findsOneWidget);
+      expect(find.byType(Image), findsWidgets); // mouse helper + shelf art
     });
   }
 }

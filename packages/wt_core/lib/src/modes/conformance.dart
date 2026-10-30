@@ -47,8 +47,18 @@ List<String> checkModeConformance(
     final b = mode.encounterSource(config);
     final ra = Random(config.seed), rb = Random(config.seed);
     for (var d = 0; d <= maxDepth; d++) {
-      final ea = a.next(d, ra), eb = b.next(d, rb);
-      if (ea?.type != eb?.type || ea?.contentId != eb?.contentId) {
+      final ea = a is ChoiceEncounterSource
+          ? a.choices(d)
+          : [if (a.next(d, ra) case final encounter?) encounter];
+      final eb = b is ChoiceEncounterSource
+          ? b.choices(d)
+          : [if (b.next(d, rb) case final encounter?) encounter];
+      final same = ea.length == eb.length &&
+          Iterable<int>.generate(ea.length).every((i) =>
+              ea[i].type == eb[i].type &&
+              ea[i].contentId == eb[i].contentId &&
+              ea[i].routeId == eb[i].routeId);
+      if (!same) {
         problems.add('same seed gave different encounters at depth $d');
         break;
       }

@@ -12,7 +12,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get navCharacter => 'ตัวละคร';
 
   @override
-  String get navDungeon => 'ดันเจี้ยน';
+  String get navDungeon => 'ผจญภัย';
 
   @override
   String get navHome => 'หลัก';
@@ -367,13 +367,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get failTitle => 'แพ้แล้ว!';
 
   @override
-  String get failBoss => 'บอสชนะรอบนี้ โมจิไม่เสียอะไร ลองใหม่นะ!';
+  String get failBoss => 'บอสชนะรอบนี้ คุณไม่เสียอะไร ลองใหม่นะ!';
 
   @override
-  String get failWave => 'โมจิต้องพักสักครู่ ไม่เสียอะไรเลย!';
+  String get failWave => 'คุณต้องพักสักครู่ ไม่เสียอะไรเลย!';
 
   @override
-  String get tipKnit => 'เคล็ดลับ: ถักอุปกรณ์ใหม่ให้โมจิแกร่งขึ้น';
+  String get tipKnit => 'เคล็ดลับ: ถักอุปกรณ์ใหม่ให้คุณแกร่งขึ้น';
 
   @override
   String get tipLevel => 'เคล็ดลับ: ฟาร์มหน้าเดิมเพื่อเก็บเลเวล';
@@ -457,4 +457,119 @@ class AppLocalizationsTh extends AppLocalizations {
   String cooldownSeconds(String sec) {
     return 'คูลดาวน์ $sec วิ';
   }
+
+  @override
+  String get storyTitle => 'ท้าทายนิทาน';
+
+  @override
+  String get storySubtitle =>
+      'เลือกเส้นทาง เก็บของวิเศษ และไปให้ถึงบอสท้ายเรื่อง';
+
+  @override
+  String get storyLocked => 'เรื่องนี้ยังล็อกอยู่';
+
+  @override
+  String get storyUnlockHint => 'ผ่านบอสบท 1 เพื่อเปิดเรื่องนี้';
+
+  @override
+  String get storyStart => 'เริ่มผจญภัย';
+
+  @override
+  String get storyDaily => 'รางวัลเต็มวันนี้';
+
+  @override
+  String get storyBest => 'ไปได้ไกลสุด';
+
+  @override
+  String get storyQuit => 'ออกจากเรื่อง';
+
+  @override
+  String get storyMap => 'แผนที่เรื่อง';
+
+  @override
+  String get storyCombat => 'กำลังต่อสู้';
+
+  @override
+  String get storyPickRelic => 'เลือกของวิเศษ 1 ชิ้น';
+
+  @override
+  String get storyPickTalent => 'เลือกพรสวรรค์ 1 อย่าง';
+
+  @override
+  String get storyEvent => 'เหตุการณ์ระหว่างทาง';
+
+  @override
+  String get storyOwlShop => 'ร้านนกฮูก';
+
+  @override
+  String get storyCampfire => 'กองไฟพักใจ';
+
+  @override
+  String get storyRest => 'พักและฟื้นพลัง';
+
+  @override
+  String get storyUpgrade => 'เสริมพลังของวิเศษ';
+
+  @override
+  String get storyContinue => 'เดินทางต่อ';
+
+  @override
+  String get storyLeaveShop => 'ออกจากร้าน';
+
+  @override
+  String get storyVictory => 'จบนิทานสำเร็จ!';
+
+  @override
+  String get storyDefeat => 'คุณพักก่อนนะ';
+
+  @override
+  String get storyAbandoned => 'กลับบ้านอย่างปลอดภัย';
+
+  @override
+  String get storyReturn => 'กลับหน้าผจญภัย';
+
+  @override
+  String get storySafe => 'ทางปลอดภัย';
+
+  @override
+  String get storyRisky => 'ทางท้าทาย';
+
+  @override
+  String get storyTapAgain => 'แตะอีกครั้งเพื่อเลือก';
+
+  @override
+  String get storyConfirmBuy => 'ซื้อชิ้นนี้ไหม?';
+
+  @override
+  String get storyNotEnough => 'ปลาทองไม่พอ';
+
+  @override
+  String get storyNoRelic => 'ยังไม่มีของวิเศษให้อัปเกรด';
+
+  @override
+  String get storyRelics => 'ของวิเศษ';
+
+  @override
+  String get storyTalents => 'พรสวรรค์';
+
+  @override
+  String get storyHp => 'พลังชีวิต';
+
+  @override
+  String get storyXp => 'ดาวประสบการณ์';
+
+  @override
+  String get storyReward => 'รางวัลปลาทอง';
+
+  @override
+  String get storyFullReward => 'เต็ม';
+
+  @override
+  String get storyReducedReward => '25%';
+
+  @override
+  String get storyBuy => 'ซื้อ';
+
+  @override
+  String get storyLevel => 'ระดับ';
 }

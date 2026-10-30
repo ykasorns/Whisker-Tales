@@ -154,7 +154,8 @@ void main() {
       expect(m.winner, MergeWinner.local);
       expect(m.doc['entitlements'], {
         'no_ads': true,
-        'skus': ['supporter_pack']
+        'skus': ['supporter_pack'],
+        'delivered_transactions': <String>[]
       });
     });
 

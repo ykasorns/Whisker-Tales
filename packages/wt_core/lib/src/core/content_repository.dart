@@ -13,6 +13,7 @@ import '../idle/idle.dart';
 import '../offline/offline_reward.dart';
 import '../pets/pets.dart';
 import '../research/research.dart';
+import '../story/story_content.dart';
 import '../wardrobe/wardrobe.dart';
 import 'providers.dart';
 
@@ -51,6 +52,7 @@ class GameContent {
     required this.iap,
     required this.chapters,
     required this.audio,
+    required this.story,
   });
 
   final CombatRules combat;
@@ -82,6 +84,9 @@ class GameContent {
   /// Music + effects (T-024).
   final AudioRules audio;
 
+  /// Relics, talents, monsters, events and balance for Story Challenge.
+  final StoryContent story;
+
   /// Provider overrides for `ProviderScope` / `ProviderContainer`.
   List<Override> get overrides => [
         combatRulesProvider.overrideWithValue(combat),
@@ -99,6 +104,7 @@ class GameContent {
         iapCatalogProvider.overrideWithValue(iap),
         chapterBookProvider.overrideWithValue(chapters),
         audioRulesProvider.overrideWithValue(audio),
+        storyContentProvider.overrideWithValue(story),
       ];
 }
 
@@ -125,6 +131,11 @@ class ContentRepository {
     'design/data/iap.json': 1,
     'design/data/chapters.json': 1,
     'design/data/audio.json': 1,
+    'design/data/story/relics.json': 1,
+    'design/data/story/talents.json': 1,
+    'design/data/story/monsters.json': 1,
+    'design/data/story/events.json': 1,
+    'design/data/story/balance.json': 1,
   };
 
   Future<GameContent> loadAll() async {
@@ -180,6 +191,16 @@ class ContentRepository {
         () => AudioRules.fromJson(json['design/data/audio.json']!));
     final iap = parse('design/data/iap.json',
         () => IapCatalog.fromJson(json['design/data/iap.json']!));
+    final story = parse(
+        'design/data/story',
+        () => StoryContent.fromJson(
+              relicsJson: json['design/data/story/relics.json']!,
+              talentsJson: json['design/data/story/talents.json']!,
+              monstersJson: json['design/data/story/monsters.json']!,
+              eventsJson: json['design/data/story/events.json']!,
+              balanceJson: json['design/data/story/balance.json']!,
+              buffs: buffs,
+            ));
     // cross-references between files
     final classIds = {for (final c in cat.classes) c.id};
     for (final cls in skills.byClass.keys) {
@@ -233,6 +254,7 @@ class ContentRepository {
       iap: iap,
       chapters: chapters,
       audio: audio,
+      story: story,
     );
   }
 

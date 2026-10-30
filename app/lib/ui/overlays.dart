@@ -29,10 +29,10 @@ Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
     context: context,
     barrierDismissible: false,
     builder: (ctx) => Dialog(
-      backgroundColor: Palette.paper,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: Palette.ink, width: 3)),
+      backgroundColor: Palette.storyPaper,
+      shadowColor: Palette.inkSoft.withValues(alpha: 0.32),
+      shape: const ContinuousRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(30))),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -44,7 +44,7 @@ Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
           IconText(s.awayFarmed(r.creditedMinutes),
               textAlign: TextAlign.center),
           const SizedBox(height: 12),
-          Wrap(spacing: 14, children: [
+          Wrap(spacing: 8, runSpacing: 8, children: [
             for (final (icon, v) in [
               ('🐟 ${s.curFish}', r.reward[Currency.goldfish]),
               ('🧶 ${s.curYarn}', r.reward[Currency.yarn]),
@@ -52,9 +52,12 @@ Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
               ('⭐ EXP', r.exp),
             ])
               if (v > 0)
-                IconText('$icon +${fmtNum(v)}',
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w800)),
+                StoryTag(
+                  color: const Color(0xFFFFEDCF),
+                  child: IconText('$icon +${fmtNum(v)}',
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w900)),
+                ),
           ]),
           const SizedBox(height: 16),
           GestureDetector(
@@ -65,7 +68,8 @@ Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
             child: Container(
               height: 56,
               alignment: Alignment.center,
-              decoration: inkBox(fill: Palette.lime),
+              decoration: storybookButton(
+                  fill: Palette.lime, accent: Palette.teal, radius: 10),
               child: IconText(s.claim,
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.w800)),
@@ -113,11 +117,20 @@ class RoadChips extends ConsumerWidget {
             margin: const EdgeInsets.only(top: 4),
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: good ? Palette.paper : const Color(0xFFF1E8F4),
+              gradient: LinearGradient(
+                colors: good
+                    ? const [Color(0xFFF4F9E9), Color(0xFFD9EFC1)]
+                    : const [Color(0xFFF5EEF7), Color(0xFFE2D2EA)],
+              ),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                  color: good ? const Color(0xFF4E8A1F) : Palette.plum,
-                  width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: (good ? Palette.lime : Palette.plum)
+                      .withValues(alpha: 0.25),
+                  blurRadius: 5,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               GameIcon.event(d.id, d.icon, size: 18),
@@ -133,7 +146,8 @@ class RoadChips extends ConsumerWidget {
                       : road.cleanseWithAd(a.uid),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: inkBox(radius: 6, width: 1.5),
+                    decoration:
+                        storybookCard(fill: Palette.parchment, radius: 6),
                     child: IconText(good ? '📺×2' : '📺✖',
                         style: const TextStyle(fontSize: 11)),
                   ),
@@ -234,8 +248,8 @@ class _SkillBarState extends ConsumerState<SkillBar> {
           margin: const EdgeInsets.only(right: 6),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Palette.paper,
-            border: Border.all(color: Palette.ink, width: 2.5),
+            gradient: const RadialGradient(
+                colors: [Colors.white, Palette.paper, Palette.storyPaper]),
             boxShadow: [
               BoxShadow(
                   color: Palette.sun.withValues(alpha: flash == 0 ? 0 : glow),
@@ -285,8 +299,8 @@ class _SkillBarState extends ConsumerState<SkillBar> {
               margin: const EdgeInsets.only(right: 6),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Palette.paper,
-                border: Border.all(color: Palette.ink, width: 2.5),
+                gradient: const RadialGradient(
+                    colors: [Colors.white, Palette.paper, Palette.storyPaper]),
                 boxShadow: [
                   BoxShadow(
                       color: Palette.sun.withValues(
@@ -424,7 +438,10 @@ class _FailCardState extends ConsumerState<FailCard> {
                 key: const ValueKey('fail-card'),
                 width: 280,
                 padding: const EdgeInsets.all(14),
-                decoration: inkBox(fill: const Color(0xFFFFF1E6), radius: 20),
+                decoration: storybookCard(
+                    fill: const Color(0xFFFFE2CE),
+                    accent: Palette.coral,
+                    radius: 11),
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     const GameIcon('sadcat', size: 56),

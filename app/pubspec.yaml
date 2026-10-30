@@ -36,6 +36,7 @@ flutter:
   assets:
     - assets/content/design/balance/
     - assets/content/design/data/
+    - assets/content/design/data/story/
     - assets/content/design/art/
     # Sprites, copied from assets/raw by tools/sync_sprites.py (T-027)
     - assets/game/cat/

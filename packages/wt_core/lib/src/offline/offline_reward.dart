@@ -18,7 +18,8 @@ class OfflineRules {
   final int minPerLevel;
   final int maxLevel;
 
-  /// Offline waves per minute as % of online (100 = same).
+  /// Multiplier of the configured baseline waves/minute. Actual combat speed
+  /// while the app is open varies by class and can be much faster.
   final int ratePct;
 
   /// 8 h + 10 min per `offline_cap` research level (capped at max level).

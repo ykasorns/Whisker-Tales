@@ -41,7 +41,11 @@ class PlayIapStore implements IapStore {
         PurchaseStatus.error => StoreEventKind.failed,
         PurchaseStatus.canceled => StoreEventKind.canceled,
       };
-      _emit(StoreEvent(kind, p.productID));
+      final transactionId = p.purchaseID ??
+          (p.verificationData.serverVerificationData.isEmpty
+              ? null
+              : p.verificationData.serverVerificationData);
+      _emit(StoreEvent(kind, p.productID, transactionId: transactionId));
       // granted above (synchronously), so it is safe to acknowledge now
       if (p.pendingCompletePurchase) await _iap.completePurchase(p);
     }
@@ -72,13 +76,14 @@ class PlayIapStore implements IapStore {
     return _details[sku];
   }
 
-  /// Every SKU is non-consumable (bought once, kept for good).
   @override
-  Future<bool> buy(String sku) async {
+  Future<bool> buy(String sku, {required bool consumable}) async {
     final d = await _detail(sku);
     if (d == null) return false;
-    return _iap.buyNonConsumable(
-        purchaseParam: PurchaseParam(productDetails: d));
+    final param = PurchaseParam(productDetails: d);
+    return consumable
+        ? _iap.buyConsumable(purchaseParam: param, autoConsume: true)
+        : _iap.buyNonConsumable(purchaseParam: param);
   }
 
   @override

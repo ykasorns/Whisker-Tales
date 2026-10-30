@@ -18,8 +18,10 @@ import '../offline/offline_reward.dart';
 import '../pets/pets.dart';
 import '../audio/audio.dart';
 import '../research/research.dart';
+import '../story/story_content.dart';
 import '../wardrobe/wardrobe.dart';
 import 'contracts/wallet.dart';
+import 'run_manager.dart';
 import 'wallet/memory_wallet.dart';
 import 'state/game_state.dart';
 import 'game_save.dart';
@@ -46,6 +48,15 @@ final gameStateProvider = StateNotifierProvider<GameStateMachine, GameState>(
 /// Phase of the current run in a run-based side mode (T-002, used by T-005).
 final runStateProvider = StateNotifierProvider<RunStateMachine, RunState>(
     (ref) => RunStateMachine());
+
+/// The shared run lifecycle. Mode-specific screens feed choices and encounter
+/// results into this one manager so rewards and progress resolve once.
+final runManagerProvider = Provider<RunManager>(
+    (ref) => RunManager(ref.watch(runStateProvider.notifier)));
+
+/// Validated content for the Story Challenge (T-026).
+final storyContentProvider = Provider<StoryContent>(
+    (ref) => throw UnimplementedError('override with loaded StoryContent'));
 
 /// Combat numbers (`idle_balance_v1.json` → `combat`). Overridden at boot
 /// with the rules the data loader (T-003) reads.
@@ -331,7 +342,8 @@ final iapStoreProvider =
 final parentalGateProvider = Provider<ParentalGate>(
     (ref) => ParentalGate(clock: ref.watch(gameClockProvider)));
 
-/// Purchases: cosmetics + Supporter Pack, behind the parental gate (T-025).
+/// Purchases: permanent rights and repeatable supply packs, behind the
+/// parental gate. Currency grants go through the same saved wallet as play.
 /// The app calls `start()` once at boot so store events are delivered.
 final Provider<IapService?> iapServiceProvider = Provider<IapService?>((ref) {
   final catalog = ref.watch(iapCatalogProvider);
@@ -340,6 +352,7 @@ final Provider<IapService?> iapServiceProvider = Provider<IapService?>((ref) {
     catalog: catalog,
     store: ref.watch(iapStoreProvider),
     gate: ref.watch(parentalGateProvider),
+    wallet: ref.watch(walletProvider),
   );
   ref.onDispose(iap.dispose);
   return iap;

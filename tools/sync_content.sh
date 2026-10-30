@@ -6,10 +6,11 @@ set -e
 cd "$(dirname "$0")/.."
 dest=app/assets/content
 rm -rf "$dest"
-mkdir -p "$dest/design/balance" "$dest/design/data" "$dest/design/art"
+mkdir -p "$dest/design/balance" "$dest/design/data/story" "$dest/design/art"
 cp design/balance/idle_balance_v1.json "$dest/design/balance/"
 cp design/data/*.json "$dest/design/data/"
+cp design/data/story/*.json "$dest/design/data/story/"
 cp design/art/mochi_sprites.json "$dest/design/art/"
 cp design/art/icons.json "$dest/design/art/"
 cp design/art/home_basket.json "$dest/design/art/"
-echo "synced $(ls "$dest/design/data" | wc -l | tr -d ' ') data files + balance into $dest"
+echo "synced $(find "$dest/design/data" -name '*.json' | wc -l | tr -d ' ') data files + balance into $dest"

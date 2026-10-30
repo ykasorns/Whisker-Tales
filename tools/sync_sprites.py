@@ -26,11 +26,21 @@ OUTFIT_SCALE = 0.85
 outfits = 0
 for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/outfit/*/*.png')):
     cls = os.path.basename(os.path.dirname(src))
+    name = os.path.basename(src)
+    # The Warrior attacks with the sword in the left paw and the shield
+    # strapped to the right forearm. Keep the original sheet slice as the
+    # fallback source, but publish the corrected hand assignment as attack.
+    if name == 'attack_right_shield.png':
+        continue
+    if cls == 'warrior' and name == 'attack.png':
+        corrected = f'{os.path.dirname(src)}/attack_right_shield.png'
+        if os.path.exists(corrected):
+            src = corrected
     im = Image.open(src).convert('RGBA')
     im = im.resize((round(im.width * OUTFIT_SCALE), round(im.height * OUTFIT_SCALE)),
                    Image.LANCZOS)
     im = im.quantize(colors=256, method=Image.Quantize.FASTOCTREE)
-    im.save(f'{OUT}/cat/outfit_{cls}_{os.path.basename(src)}', optimize=True)
+    im.save(f'{OUT}/cat/outfit_{cls}_{name}', optimize=True)
     outfits += 1
 # gear: slot icons only (D-024: gear is never drawn on the cat)
 n = 0
@@ -97,6 +107,44 @@ for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/ui/*.png')):
     im = Image.open(src)
     im.thumbnail((160, 160), Image.LANCZOS)  # drawn at ~58 px
     im.save(f'{OUT}/ui/{os.path.basename(src)}', optimize=True)
+# Full-size storybook surfaces are already optimized as WebP. Keep them in
+# the source tree so a sprite sync cannot remove the live UI's background.
+for src in sorted(glob.glob(f'{ROOT}/assets/raw/ui/*.webp')):
+    shutil.copy(src, f'{OUT}/ui/{os.path.basename(src)}')
+# Storybook UI kit generated from the approved D-054 mockup. Keep the full
+# source atlas in assets/raw and publish tight transparent slices so Flutter
+# lays live text and icons over painted frames rather than simulated boxes.
+ui_kit = f'{ROOT}/assets/raw/ui/ui_storybook_kit.png'
+if os.path.exists(ui_kit):
+    atlas = Image.open(ui_kit).convert('RGBA')
+    slices = {
+        'ui_frame_profile.png': (30, 95, 650, 415),
+        'ui_frame_chapter.png': (675, 135, 1254, 400),
+        'ui_frame_currency.png': (35, 535, 650, 795),
+        'ui_frame_action.png': (650, 540, 1254, 795),
+        'ui_frame_nav_dock.png': (15, 885, 925, 1160),
+        'ui_frame_nav_selected.png': (920, 820, 1240, 1230),
+    }
+    for name, box in slices.items():
+        im = atlas.crop(box)
+        if bbox := im.getbbox():
+            im = im.crop(bbox)
+        im.thumbnail((960, 480), Image.LANCZOS)
+        im.save(f'{OUT}/ui/{name}', optimize=True)
+# The phone pass found that the atlas currency plaque was too short and had
+# to be stretched almost 2×. Publish a native 4.5:1 version instead so leaves,
+# paper grain and the plus medallion keep their painted proportions.
+currency_tag = f'{ROOT}/assets/raw/ui/ui_currency_tag_wide.png'
+if os.path.exists(currency_tag):
+    im = Image.open(currency_tag).convert('RGBA')
+    # Image generation may leave almost-transparent specks in the empty
+    # canvas. Ignore them or the nominal canvas stays tall and Flutter still
+    # has to stretch the visible plaque.
+    visible_alpha = im.getchannel('A').point(lambda a: 255 if a >= 24 else 0)
+    if bbox := visible_alpha.getbbox():
+        im = im.crop(bbox)
+    im.thumbnail((960, 240), Image.LANCZOS)
+    im.save(f'{OUT}/ui/ui_frame_currency.png', optimize=True)
 # 256 colours for every sprite (not the painted backgrounds, which band):
 # the art is flat-shaded, so it looks the same and the APK stays under the
 # 30 MB send limit (D-030)

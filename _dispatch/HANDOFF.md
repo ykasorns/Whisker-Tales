@@ -8,7 +8,8 @@ For background, also read `DECISIONS.md` (D-001 … D-058), `_contract/GAME_CONT
 ## 0. How to work with YK (owner)
 
 - **YK writes in Thai** and drives one card at a time ("ต่อเลย", "ลุยโลด", "commit + push"). Reply in Thai and keep code and comments in English.
-- **Current model preference (updated by YK):** use **GPT-6 Sol, medium effort** for routine continuation and polish. The project is already mature, so the more expensive model is not needed by default.
+- **Models (YK, 2026-10-31):** default is **Sonnet medium, with Opus as advisor** for planning and tricky logic (token cost). GPT-6 Sol (Codex) was used only as a stand-in while Claude hit its usage limit, and for generating visual assets; D-043–D-058 were made that way.
+- **Release is on hold** until the game's layout looks right (see §8). Fixing the crooked UI layout comes before store steps.
 - **Build cadence:** do **not** build an APK after every edit. Build only when YK explicitly asks, after a useful review batch is ready.
 - **Visual-work rule:** whenever a task creates or redesigns visual UI, buttons, frames, backgrounds, icons or decorative art, use the relevant image/visual skill to create a real asset and integrate that asset into the game. A code-only approximation or mockup-only delivery is not considered finished (D-057).
 - **Commits:**

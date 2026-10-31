@@ -7,6 +7,7 @@ import 'package:flame/game.dart';
 import 'package:whisker_tales/game_view.dart';
 import 'package:whisker_tales/debug/telemetry.dart';
 import 'package:whisker_tales/main.dart';
+import 'package:whisker_tales/ui/frames.dart';
 import 'package:wt_core/wt_core.dart';
 
 /// Reads the bundled copies straight from disk (no asset bundle in tests).
@@ -57,6 +58,7 @@ void main() {
     tester.view.devicePixelRatio = 2.75;
     addTearDown(tester.view.reset);
     await tester.runAsync(() async {
+      await FrameArt.load();
       await tester.pumpWidget(UncontrolledProviderScope(
           container: container,
           child: WhiskerTalesApp(avatarRules: content.avatar)));

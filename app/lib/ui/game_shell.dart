@@ -152,11 +152,11 @@ class _GameShellState extends ConsumerState<GameShell>
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final items = [
-      ('🐱', s.navCharacter),
-      ('📖', s.navDungeon),
-      ('🏠', s.navHome),
-      ('🎁', s.navEvents),
-      ('🛒', s.navShop),
+      ('nav_character', s.navCharacter),
+      ('nav_adventure', s.navDungeon),
+      ('nav_home', s.navHome),
+      ('nav_events', s.navEvents),
+      ('nav_shop', s.navShop),
     ];
     return Scaffold(
       backgroundColor: Palette.paper,
@@ -240,7 +240,7 @@ class _BottomDock extends StatelessWidget {
                   duration: const Duration(milliseconds: 170),
                   curve: Curves.easeOut,
                   left: slot.center.dx - w / 2,
-                  top: slot.top - 16,
+                  top: slot.top - 18,
                   width: w,
                   height: h,
                   child: const StretchFrame(
@@ -260,37 +260,10 @@ class _BottomDock extends StatelessWidget {
                       child: GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: () => onSelected(i),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 1),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Flexible(
-                                flex: 3,
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: IconText(items[i].$1,
-                                      style: const TextStyle(fontSize: 22)),
-                                ),
-                              ),
-                              Flexible(
-                                flex: 2,
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: IconText(
-                                    items[i].$2,
-                                    maxLines: 1,
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w900,
-                                      color: Palette.ink,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        child: _DockTab(
+                            icon: items[i].$1,
+                            label: items[i].$2,
+                            size: slots[i].size),
                       ),
                     ),
                   ),
@@ -299,4 +272,48 @@ class _BottomDock extends StatelessWidget {
           ),
         ),
       );
+}
+
+/// One dock tab: the painted icon stands a little above the slot's paper (the
+/// dock art leaves transparent room there) and the label sits on the paper.
+class _DockTab extends StatelessWidget {
+  const _DockTab({required this.icon, required this.label, required this.size});
+
+  final String icon, label;
+  final Size size;
+
+  static const _labelH = 13.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final iconSize = (size.width - 4).clamp(0.0, size.height * 1.15);
+    return Stack(clipBehavior: Clip.none, children: [
+      Positioned(
+        left: 0,
+        right: 0,
+        top: size.height - _labelH - iconSize + 2,
+        height: iconSize,
+        child: Image.asset('assets/game/ui/$icon.png',
+            fit: BoxFit.contain, filterQuality: FilterQuality.medium),
+      ),
+      Positioned(
+        left: 1,
+        right: 1,
+        bottom: 0,
+        height: _labelH,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: IconText(
+            label,
+            maxLines: 1,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              color: Palette.ink,
+            ),
+          ),
+        ),
+      ),
+    ]);
+  }
 }

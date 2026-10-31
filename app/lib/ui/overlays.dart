@@ -165,16 +165,27 @@ class RoadChips extends ConsumerWidget {
 /// seconds left shows when each skill is ready again (YK 2026-10-23); no
 /// sweep between fights. [speed] is the game speed, so the count is in real
 /// seconds.
-TextStyle _cooldownText(double size) => TextStyle(
-        color: Colors.white,
-        fontSize: size,
-        height: 1,
-        fontWeight: FontWeight.w900,
-        shadows: const [
-          Shadow(color: Colors.black, blurRadius: 3),
-          Shadow(color: Colors.black, blurRadius: 1.5),
-          Shadow(color: Colors.black, offset: Offset(0.5, 0.5)),
-        ]);
+/// Seconds left on a painted round badge hung on the circle's bottom-right.
+Widget _cooldownBadge(int secs, double d, double out) => Positioned(
+      right: -out,
+      bottom: -out,
+      width: d,
+      height: d,
+      child: Stack(alignment: Alignment.center, children: [
+        Positioned.fill(
+            child: Image.asset('assets/game/ui/ui_badge_cooldown.png',
+                fit: BoxFit.contain)),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text('$secs',
+              style: TextStyle(
+                  color: Palette.ink,
+                  fontSize: d * 0.5,
+                  height: 1,
+                  fontWeight: FontWeight.w900)),
+        ),
+      ]),
+    );
 
 class SkillBar extends ConsumerStatefulWidget {
   const SkillBar({super.key, required this.speed});
@@ -268,22 +279,21 @@ class _SkillBarState extends ConsumerState<SkillBar> {
                   spreadRadius: 4)
             ],
           ),
-          child: ClipOval(
-            child: Stack(alignment: Alignment.center, children: [
-              face,
-              if (frac > 0)
-                Positioned.fill(
-                    child: CustomPaint(painter: _CooldownPainter(frac))),
-              if (secs > 0)
-                // the count sits in the corner so the skill's picture stays
-                // readable while it recharges
-                Positioned(
-                  right: size * 0.08,
-                  bottom: size * 0.02,
-                  child: Text('$secs', style: _cooldownText(size * 0.34)),
-                ),
-            ]),
-          ),
+          // the count sits on a painted badge at the corner, outside the
+          // circle, so the skill's picture stays readable while it recharges
+          child: Stack(clipBehavior: Clip.none, children: [
+            Positioned.fill(
+              child: ClipOval(
+                child: Stack(alignment: Alignment.center, children: [
+                  face,
+                  if (frac > 0)
+                    Positioned.fill(
+                        child: CustomPaint(painter: _CooldownPainter(frac))),
+                ]),
+              ),
+            ),
+            if (secs > 0) _cooldownBadge(secs, size * 0.46, size * 0.04),
+          ]),
         ),
       );
     }
@@ -318,20 +328,20 @@ class _SkillBarState extends ConsumerState<SkillBar> {
                       spreadRadius: 4)
                 ],
               ),
-              child: ClipOval(
-                child: Stack(alignment: Alignment.center, children: [
-                  GameIcon.skill(sk.id, info[sk.id]?.icon ?? '✨', size: 32),
-                  if (frac > 0)
-                    Positioned.fill(
-                        child: CustomPaint(painter: _CooldownPainter(frac))),
-                  if (secs > 0)
-                    Positioned(
-                      right: 4,
-                      bottom: 1,
-                      child: Text('$secs', style: _cooldownText(16)),
-                    ),
-                ]),
-              ),
+              child: Stack(clipBehavior: Clip.none, children: [
+                Positioned.fill(
+                  child: ClipOval(
+                    child: Stack(alignment: Alignment.center, children: [
+                      GameIcon.skill(sk.id, info[sk.id]?.icon ?? '✨', size: 32),
+                      if (frac > 0)
+                        Positioned.fill(
+                            child:
+                                CustomPaint(painter: _CooldownPainter(frac))),
+                    ]),
+                  ),
+                ),
+                if (secs > 0) _cooldownBadge(secs, 22, 2),
+              ]),
             ),
           );
         }),

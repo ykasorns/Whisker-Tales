@@ -145,6 +145,25 @@ if os.path.exists(currency_tag):
         im = im.crop(bbox)
     im.thumbnail((960, 240), Image.LANCZOS)
     im.save(f'{OUT}/ui/ui_frame_currency.png', optimize=True)
+# D-060: calmer UI frames (GPT, assets/raw/frames/ui_v2). They are generated at
+# the exact size ui_frames.json was measured on, so they replace the atlas
+# slices above under the same published names. Tab icons and the cooldown
+# badge are new, small pieces.
+v2 = f'{ROOT}/assets/raw/frames/ui_v2'
+if os.path.isdir(v2):
+    for name in ('profile', 'chapter', 'currency', 'action', 'nav_dock',
+                 'nav_selected'):
+        src = f'{v2}/ui_frame_{name}_v2.png'
+        if os.path.exists(src):
+            Image.open(src).convert('RGBA').save(
+                f'{OUT}/ui/ui_frame_{name}.png', optimize=True)
+    badge = f'{v2}/ui_badge_cooldown_v2.png'
+    if os.path.exists(badge):
+        Image.open(badge).convert('RGBA').save(
+            f'{OUT}/ui/ui_badge_cooldown.png', optimize=True)
+    for src in sorted(glob.glob(f'{v2}/ui_dock_icons_v2/nav_*.png')):
+        Image.open(src).convert('RGBA').save(
+            f'{OUT}/ui/{os.path.basename(src)}', optimize=True)
 # 256 colours for every sprite (not the painted backgrounds, which band):
 # the art is flat-shaded, so it looks the same and the APK stays under the
 # 30 MB send limit (D-030)

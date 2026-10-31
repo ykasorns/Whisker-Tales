@@ -1,34 +1,144 @@
 {
-  "_doc": "Storybook UI frames (D-059). Measured on the shipped PNGs in app/assets/game/ui (tools/sync_sprites.py crops them from assets/raw/ui). w/h = the PNG's pixel size (a test fails if the file changes size: re-measure then). cap_l/cap_r = columns kept at the frame's height ratio (leaves, knobs, plus button, medallion); only the middle between them stretches, so a frame is never squashed. content = the paper area [x1,y1,x2,y2] where live text may go; rects = other named areas; slots = the dock's five paper slots. All numbers are source pixels.",
+  "_doc": "Storybook UI frames (D-059, art v2 D-060; rects re-measured from the v2 PNGs with a cream-pixel flood fill, not taken from the generator's notes). Measured on the shipped PNGs in app/assets/game/ui (tools/sync_sprites.py crops them from assets/raw/ui). w/h = the PNG's pixel size (a test fails if the file changes size: re-measure then). cap_l/cap_r = columns kept at the frame's height ratio (leaves, knobs, plus button, medallion); only the middle between them stretches, so a frame is never squashed. content = the paper area [x1,y1,x2,y2] where live text may go; rects = other named areas; slots = the dock's five paper slots. All numbers are source pixels.",
   "frames": {
     "profile": {
-      "asset": "ui_frame_profile.png", "w": 620, "h": 320, "cap_l": 275, "cap_r": 40,
-      "content": [285, 124, 560, 262],
-      "rects": { "medallion": [112, 162, 218, 248] }
+      "asset": "ui_frame_profile.png",
+      "w": 620,
+      "h": 320,
+      "cap_l": 335,
+      "cap_r": 40,
+      "content": [
+        348,
+        114,
+        562,
+        228
+      ],
+      "rects": {
+        "medallion": [
+          97,
+          81,
+          257,
+          241
+        ]
+      }
     },
     "currency": {
-      "asset": "ui_frame_currency.png", "w": 960, "h": 209, "cap_l": 40, "cap_r": 175,
-      "content": [62, 62, 790, 158]
+      "asset": "ui_frame_currency.png",
+      "w": 960,
+      "h": 209,
+      "cap_l": 40,
+      "cap_r": 175,
+      "content": [
+        52,
+        64,
+        738,
+        150
+      ],
+      "rects": {
+        "button": [
+          785,
+          17,
+          955,
+          198
+        ]
+      }
     },
     "chapter": {
-      "asset": "ui_frame_chapter.png", "w": 561, "h": 251, "cap_l": 105, "cap_r": 85,
-      "content": [118, 124, 462, 212]
+      "asset": "ui_frame_chapter.png",
+      "w": 561,
+      "h": 251,
+      "cap_l": 105,
+      "cap_r": 85,
+      "content": [
+        112,
+        56,
+        452,
+        206
+      ]
     },
     "action": {
-      "asset": "ui_frame_action.png", "w": 590, "h": 254, "cap_l": 92, "cap_r": 90,
-      "content": [118, 96, 474, 166]
+      "asset": "ui_frame_action.png",
+      "w": 590,
+      "h": 254,
+      "cap_l": 92,
+      "cap_r": 90,
+      "content": [
+        92,
+        40,
+        498,
+        218
+      ]
     },
     "dock": {
-      "asset": "ui_frame_nav_dock.png", "w": 891, "h": 275, "cap_l": 65, "cap_r": 75,
-      "content": [78, 80, 804, 186],
+      "asset": "ui_frame_nav_dock.png",
+      "w": 891,
+      "h": 275,
+      "cap_l": 65,
+      "cap_r": 75,
+      "content": [
+        39,
+        84,
+        854,
+        182
+      ],
       "slots": [
-        [84, 80, 206, 186], [232, 80, 354, 186], [380, 80, 502, 186],
-        [527, 80, 649, 186], [676, 80, 798, 186]
+        [
+          39,
+          84,
+          183,
+          182
+        ],
+        [
+          207,
+          84,
+          351,
+          182
+        ],
+        [
+          375,
+          84,
+          518,
+          182
+        ],
+        [
+          542,
+          84,
+          685,
+          182
+        ],
+        [
+          711,
+          84,
+          854,
+          182
+        ]
       ]
     },
     "dock_selected": {
-      "asset": "ui_frame_nav_selected.png", "w": 309, "h": 348, "cap_l": 0, "cap_r": 0,
-      "content": [60, 60, 250, 280]
+      "asset": "ui_frame_nav_selected.png",
+      "w": 309,
+      "h": 348,
+      "cap_l": 0,
+      "cap_r": 0,
+      "content": [
+        54,
+        34,
+        255,
+        215
+      ]
+    },
+    "badge": {
+      "asset": "ui_badge_cooldown.png",
+      "w": 128,
+      "h": 128,
+      "cap_l": 0,
+      "cap_r": 0,
+      "content": [
+        24,
+        24,
+        104,
+        104
+      ]
     }
   }
 }

@@ -219,8 +219,8 @@ class _TopLeftCluster extends StatelessWidget {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       SizedBox(
         key: const Key('hud-profile'),
-        width: 200,
-        height: 80,
+        width: 220,
+        height: 90,
         child: StretchFrame(
           frame: 'profile',
           builder: (context, g) {
@@ -231,7 +231,7 @@ class _TopLeftCluster extends StatelessWidget {
                 child: Center(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: IconText(level, style: _ink.copyWith(fontSize: 12)),
+                    child: IconText(level, style: _ink.copyWith(fontSize: 16)),
                   ),
                 ),
               ),
@@ -246,7 +246,7 @@ class _TopLeftCluster extends StatelessWidget {
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerLeft,
                           child: IconText(profileTitle,
-                              maxLines: 1, style: _ink.copyWith(fontSize: 12)),
+                              maxLines: 1, style: _ink.copyWith(fontSize: 14)),
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -256,7 +256,7 @@ class _TopLeftCluster extends StatelessWidget {
                             value: expFraction,
                             color: Palette.teal,
                             backgroundColor: Palette.sheet,
-                            minHeight: 4),
+                            minHeight: 5),
                       ),
                       const SizedBox(height: 2),
                       Flexible(
@@ -266,7 +266,7 @@ class _TopLeftCluster extends StatelessWidget {
                           child: IconText('🐾 $power',
                               maxLines: 1,
                               style: _ink.copyWith(
-                                  fontSize: 11, fontWeight: FontWeight.w800)),
+                                  fontSize: 13, fontWeight: FontWeight.w800)),
                         ),
                       ),
                     ]),
@@ -311,7 +311,9 @@ class _TopLeftCluster extends StatelessWidget {
                       margin: const EdgeInsets.all(1.5),
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: i < wavesDone ? Palette.lime : Palette.sheet),
+                          color: i < wavesDone
+                              ? Palette.lime
+                              : Palette.ink.withValues(alpha: .2)),
                     ),
                 ]),
             ]),
@@ -370,18 +372,38 @@ class _WalletTag extends StatelessWidget {
         height: _h,
         child: StretchFrame(
           frame: 'currency',
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: IconText(
-                '$icon $label  $value',
-                maxLines: 1,
-                style: _Hud._bold.copyWith(fontSize: 11.5),
+          builder: (context, g) => Stack(children: [
+            Positioned.fromRect(
+              rect: g.content,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: IconText(
+                    '$icon $label  $value',
+                    maxLines: 1,
+                    style: _Hud._bold.copyWith(fontSize: 11.5),
+                  ),
+                ),
               ),
             ),
-          ),
+            // the art's round button is empty: the plus is live type
+            Positioned.fromRect(
+              rect: g.named('button'),
+              child: const Center(
+                child: Text('+',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 15,
+                        height: 1,
+                        shadows: [
+                          Shadow(color: Palette.ink, blurRadius: 2),
+                        ])),
+              ),
+            ),
+          ]),
         ),
       );
 }

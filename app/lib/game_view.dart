@@ -159,7 +159,12 @@ class BattleGame extends FlameGame {
     'defeated',
   ];
 
-  double get groundY => size.y * 0.84;
+  /// Ground line and Mochi's health bar as fractions of the scene height;
+  /// the HUD keeps clear of the bar using these.
+  static const groundFrac = 0.84;
+  static const mochiBarFrac = 0.235;
+
+  double get groundY => size.y * groundFrac;
 
   @override
   Future<void> onLoad() async {
@@ -334,7 +339,8 @@ class BattleGame extends FlameGame {
             target.flash = 0.15;
             _float(
                 outcome == HitOutcome.dodge ? '·' : '$damage',
-                target.position + Vector2(0, -target.heightPx - 8),
+                target.position +
+                    Vector2(0, -target.heightPx - 8 - size.y * 0.09),
                 outcome == HitOutcome.crit
                     ? Palette.coral
                     : source == AttackSource.skill
@@ -363,7 +369,7 @@ class BattleGame extends FlameGame {
           _monsters[attackerId]?.attackT = 0.3;
           _float(
               outcome == HitOutcome.dodge ? '💨' : '-$damage',
-              mochi.position + Vector2(-10, -size.y * 0.25),
+              mochi.position + Vector2(-10, -size.y * 0.33),
               outcome == HitOutcome.dodge ? Palette.plum : Palette.coral,
               icon: outcome == HitOutcome.dodge ? 'icon/evade.png' : null);
         }
@@ -396,12 +402,17 @@ class BattleGame extends FlameGame {
     }
   }
 
+  int _floatCount = 0;
+
   void _float(String text, Vector2 at, Color color,
       {String? icon, double scale = 1}) {
     final im = icon != null && images.containsKey(icon)
         ? images.fromCache(icon)
         : null;
-    add(_FloatText(text, at, color, size.y * 0.06 * scale, image: im));
+    // numbers that land together fan out sideways instead of stacking
+    final fan = ((_floatCount++ % 3) - 1) * size.y * 0.05;
+    add(_FloatText(text, at + Vector2(fan, 0), color, size.y * 0.06 * scale,
+        image: im));
   }
 }
 
@@ -633,7 +644,8 @@ class _HpBars extends Component {
       final double w;
       if (v.side == CombatSide.cat) {
         w = u * 0.17;
-        top = Offset(game.mochi.position.x, game.mochi.position.y - u * 0.235);
+        top = Offset(game.mochi.position.x,
+            game.mochi.position.y - u * BattleGame.mochiBarFrac);
       } else if (mon != null && !mon.dead) {
         w = mon.boss ? u * 0.25 : u * 0.11;
         top = Offset(mon.position.x, mon.position.y - mon.heightPx - 8);

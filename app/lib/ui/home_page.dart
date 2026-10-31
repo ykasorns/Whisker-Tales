@@ -8,6 +8,7 @@ import 'package:wt_core/wt_core.dart';
 import '../game_view.dart';
 import '../l10n/strings.dart';
 import 'craft_sheet.dart';
+import 'frames.dart';
 import 'overlays.dart';
 import 'game_icon.dart';
 import 'palette.dart';
@@ -71,221 +72,93 @@ class _Hud extends ConsumerWidget {
         final boss = loop.isBossFight;
         final speeds = rules.speedsFor(st.clearedPage);
         return Stack(children: [
-          // profile card (top-left)
-          Positioned(
-            left: 8,
-            top: 8,
-            child: SizedBox(
-              width: 228,
-              height: 82,
-              child: PaintedFrame(
-                asset: 'ui_frame_profile.png',
-                child: Stack(children: [
-                  Positioned(
-                    left: 6,
-                    top: 14,
-                    width: 62,
-                    height: 50,
-                    child: Center(
-                      child: IconText(s.level(cat.level),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w900,
-                              color: Palette.ink)),
-                    ),
-                  ),
-                  Positioned(
-                    left: 83,
-                    right: 14,
-                    top: 17,
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          IconText(s.catTitle(s.className(cls.current)),
-                              maxLines: 1,
-                              overflow: TextOverflow.fade,
-                              style: const TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.w900)),
-                          LinearProgressIndicator(
-                              value: cat.expToNext == 0
-                                  ? 1
-                                  : cat.exp / cat.expToNext,
-                              color: Palette.teal,
-                              backgroundColor: Palette.sheet,
-                              minHeight: 5),
-                          IconText('🐾 ${s.shortPower} ${fmtNum(power)}',
-                              maxLines: 1,
-                              style: const TextStyle(
-                                  fontSize: 11, fontWeight: FontWeight.w800)),
-                        ]),
-                  ),
-                ]),
-              ),
-            ),
-          ),
-          // wallet (top-right)
-          Positioned(
-            right: 10,
-            top: 10,
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              _WalletTag(
-                label: s.curFish,
-                icon: '🐟',
-                value: fmtNum(wallet.balance(Currency.goldfish)),
-                color: const Color(0xFFFFEDB7),
-                accent: Palette.mochi,
-              ),
-              const SizedBox(height: 3),
-              _WalletTag(
-                label: s.curYarn,
-                icon: '🧶',
-                value: fmtNum(wallet.balance(Currency.yarn)),
-                color: const Color(0xFFDDF1F2),
-                accent: Palette.teal,
-              ),
-              const SizedBox(height: 3),
-              _WalletTag(
-                label: s.curEggs,
-                icon: '🥚',
-                value: '${wallet.balance(Currency.eggs)}',
-                color: const Color(0xFFF3E7F7),
-                accent: Palette.plum,
-              ),
-              const SizedBox(height: 3),
-              _SpeedControl(driver: driver, speeds: speeds),
-              const RoadChips(),
-            ]),
-          ),
-          // page tag + boss button (top-centre)
-          // (below the profile card; squeezed on a short scene so it never
-          // reaches Mochi's health bar)
+          // top-left: profile, chapter banner and the boss button stacked
+          // (kept above Mochi's health bar: see [_clusterRoom])
           Positioned.fill(
             child: LayoutBuilder(builder: (context, area) {
-              final room = (area.maxHeight * 0.595 - 88).clamp(60.0, 400.0);
+              final room = _clusterRoom(area.maxHeight);
               return Align(
-                alignment: Alignment.topCenter,
+                alignment: Alignment.topLeft,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 105),
+                  padding: const EdgeInsets.only(left: 6, top: 6),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxHeight: room),
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: Column(mainAxisSize: MainAxisSize.min, children: [
-                        SizedBox(
-                          width: 210,
-                          height: 58,
-                          child: PaintedFrame(
-                            asset: 'ui_frame_chapter.png',
-                            padding: const EdgeInsets.fromLTRB(42, 10, 36, 8),
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconText(
-                                      s.chapterPage(
-                                          rules.chapterOf(st.farmPage),
-                                          rules.pageInChapter(st.farmPage)),
-                                      maxLines: 1,
-                                      style: _bold),
-                                  Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        for (var i = 0; i < plan.waves; i++)
-                                          Container(
-                                            width: 8,
-                                            height: 8,
-                                            margin: const EdgeInsets.all(1.5),
-                                            decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: i < loop.waveIndex
-                                                    ? Palette.lime
-                                                    : Palette.sheet),
-                                          ),
-                                      ]),
-                                ]),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Row(mainAxisSize: MainAxisSize.min, children: [
-                          Semantics(
-                            button: true,
-                            label: ready
+                      alignment: Alignment.topLeft,
+                      child: _TopLeftCluster(
+                        key: const Key('hud-cluster'),
+                        profileTitle: s.catTitle(s.className(cls.current)),
+                        level: s.level(cat.level),
+                        expFraction:
+                            cat.expToNext == 0 ? 1 : cat.exp / cat.expToNext,
+                        power: '${s.shortPower} ${fmtNum(power)}',
+                        chapter: s.chapterPage(rules.chapterOf(st.farmPage),
+                            rules.pageInChapter(st.farmPage)),
+                        waves: plan.waves,
+                        wavesDone: loop.waveIndex,
+                        state: boss
+                            ? s.fightingBoss
+                            : ready && frontier
                                 ? s.tapForBoss
-                                : s.farm(math.min(loop.waveIndex, plan.waves),
-                                    plan.waves),
-                            child: GestureDetector(
-                              onTap: ready && frontier && !boss
-                                  ? () => loop.challengeBoss()
-                                  : null,
-                              child: _BossButton(
-                                progress: boss
-                                    ? 1
-                                    : math.min(1, loop.waveIndex / plan.waves),
-                                ready: ready && frontier,
-                                face: ref
-                                    .read(chapterBookProvider)
-                                    .bossOf(rules, st.clearedPage + 1),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () => loop.autoBoss = !loop.autoBoss,
-                            child: SizedBox(
-                              width: 88,
-                              height: 54,
-                              child: PaintedFrame(
-                                asset: 'ui_frame_action.png',
-                                padding:
-                                    const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                                child: Center(
-                                  child: IconText(
-                                      '${s.auto}\n${loop.autoBoss ? s.on : s.off}',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w900,
-                                          fontSize: 12,
-                                          color: loop.autoBoss
-                                              ? Palette.coral
-                                              : Palette.ink)),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ]),
-                        const SizedBox(height: 4),
-                        SizedBox(
-                          width: 144,
-                          height: 34,
-                          child: PaintedFrame(
-                            asset: 'ui_frame_action.png',
-                            padding: const EdgeInsets.symmetric(horizontal: 18),
-                            child: Center(
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: IconText(
-                                    boss
-                                        ? s.fightingBoss
-                                        : ready && frontier
-                                            ? s.tapForBoss
-                                            : s.farm(
-                                                math.min(
-                                                    loop.waveIndex, plan.waves),
-                                                plan.waves),
-                                    style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w800)),
-                              ),
-                            ),
+                                : null,
+                        semantics: ready
+                            ? s.tapForBoss
+                            : s.farm(math.min(loop.waveIndex, plan.waves),
+                                plan.waves),
+                        bossButton: GestureDetector(
+                          onTap: ready && frontier && !boss
+                              ? () => loop.challengeBoss()
+                              : null,
+                          child: _BossButton(
+                            progress: boss
+                                ? 1
+                                : math.min(1, loop.waveIndex / plan.waves),
+                            ready: ready && frontier,
+                            face: ref
+                                .read(chapterBookProvider)
+                                .bossOf(rules, st.clearedPage + 1),
                           ),
                         ),
-                      ]),
+                        autoLabel: '${s.auto} ${loop.autoBoss ? s.on : s.off}',
+                        autoOn: loop.autoBoss,
+                        onAuto: () => loop.autoBoss = !loop.autoBoss,
+                      ),
                     ),
                   ),
                 ),
               );
             }),
+          ),
+          // wallet (top-right)
+          Positioned(
+            right: 6,
+            top: 6,
+            child: Column(
+                key: const Key('hud-wallet'),
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  _WalletTag(
+                    label: s.curFish,
+                    icon: '🐟',
+                    value: fmtNum(wallet.balance(Currency.goldfish)),
+                  ),
+                  const SizedBox(height: 2),
+                  _WalletTag(
+                    label: s.curYarn,
+                    icon: '🧶',
+                    value: fmtNum(wallet.balance(Currency.yarn)),
+                  ),
+                  const SizedBox(height: 2),
+                  _WalletTag(
+                    label: s.curEggs,
+                    icon: '🥚',
+                    value: '${wallet.balance(Currency.eggs)}',
+                  ),
+                  const SizedBox(height: 4),
+                  _SpeedControl(driver: driver, speeds: speeds),
+                  const RoadChips(),
+                ]),
           ),
           Positioned(
               left: 10, bottom: 10, child: SkillBar(speed: () => driver.speed)),
@@ -294,8 +167,188 @@ class _Hud extends ConsumerWidget {
     );
   }
 
+  /// Height the top-left cluster may use: from the top edge down to just
+  /// above Mochi's status icons and health bar (the scene puts his bar at
+  /// `kMochiBarFrac` of the scene height above the ground line).
+  static double _clusterRoom(double sceneHeight) {
+    final barTop =
+        sceneHeight * (BattleGame.groundFrac - BattleGame.mochiBarFrac);
+    return math.max(60, barTop - 34 - 6);
+  }
+
   static const _bold =
       TextStyle(fontWeight: FontWeight.w800, color: Palette.ink, fontSize: 14);
+}
+
+/// Profile card, chapter banner and the boss button, one column on the
+/// painted frames. Every text sits in its frame's measured paper area and
+/// scales down rather than spilling out.
+class _TopLeftCluster extends StatelessWidget {
+  const _TopLeftCluster({
+    super.key,
+    required this.profileTitle,
+    required this.level,
+    required this.expFraction,
+    required this.power,
+    required this.chapter,
+    required this.waves,
+    required this.wavesDone,
+    required this.state,
+    required this.semantics,
+    required this.bossButton,
+    required this.autoLabel,
+    required this.autoOn,
+    required this.onAuto,
+  });
+
+  final String profileTitle, level, power, chapter, autoLabel, semantics;
+
+  /// "Tap for boss" / "Fighting boss", or null while farming (wave dots).
+  final String? state;
+  final double expFraction;
+  final int waves, wavesDone;
+  final Widget bossButton;
+  final bool autoOn;
+  final VoidCallback onAuto;
+
+  static const _ink =
+      TextStyle(fontWeight: FontWeight.w900, color: Palette.ink);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      SizedBox(
+        key: const Key('hud-profile'),
+        width: 200,
+        height: 80,
+        child: StretchFrame(
+          frame: 'profile',
+          builder: (context, g) {
+            final medal = g.named('medallion');
+            return Stack(children: [
+              Positioned.fromRect(
+                rect: medal,
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: IconText(level, style: _ink.copyWith(fontSize: 12)),
+                  ),
+                ),
+              ),
+              Positioned.fromRect(
+                rect: g.content,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: IconText(profileTitle,
+                              maxLines: 1, style: _ink.copyWith(fontSize: 12)),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(3),
+                        child: LinearProgressIndicator(
+                            value: expFraction,
+                            color: Palette.teal,
+                            backgroundColor: Palette.sheet,
+                            minHeight: 4),
+                      ),
+                      const SizedBox(height: 2),
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: IconText('🐾 $power',
+                              maxLines: 1,
+                              style: _ink.copyWith(
+                                  fontSize: 11, fontWeight: FontWeight.w800)),
+                        ),
+                      ),
+                    ]),
+              ),
+            ]);
+          },
+        ),
+      ),
+      const SizedBox(height: 2),
+      Semantics(
+        label: '$chapter, $semantics',
+        child: SizedBox(
+          width: 196,
+          height: 66,
+          child: StretchFrame(
+            frame: 'chapter',
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: IconText(chapter,
+                      maxLines: 1, style: _ink.copyWith(fontSize: 12.5)),
+                ),
+              ),
+              if (state != null)
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: IconText(state!,
+                        maxLines: 1,
+                        style: _ink.copyWith(
+                            fontSize: 10.5, color: Palette.coral)),
+                  ),
+                )
+              else
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  for (var i = 0; i < waves; i++)
+                    Container(
+                      width: 7,
+                      height: 7,
+                      margin: const EdgeInsets.all(1.5),
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: i < wavesDone ? Palette.lime : Palette.sheet),
+                    ),
+                ]),
+            ]),
+          ),
+        ),
+      ),
+      const SizedBox(height: 2),
+      Row(mainAxisSize: MainAxisSize.min, children: [
+        Semantics(
+            button: true,
+            label: semantics,
+            child: SizedBox(
+                width: 60, height: 60, child: FittedBox(child: bossButton))),
+        const SizedBox(width: 6),
+        GestureDetector(
+          onTap: onAuto,
+          child: SizedBox(
+            width: 96,
+            height: 42,
+            child: StretchFrame(
+              frame: 'action',
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: IconText(autoLabel,
+                      maxLines: 1,
+                      style: _ink.copyWith(
+                          fontSize: 12,
+                          color: autoOn ? Palette.coral : Palette.ink)),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ]),
+    ]);
+  }
 }
 
 class _WalletTag extends StatelessWidget {
@@ -303,26 +356,30 @@ class _WalletTag extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.value,
-    required this.color,
-    required this.accent,
   });
 
   final String label, icon, value;
-  final Color color, accent;
+
+  /// Natural width of the currency frame at this height is 143 dp: the plus
+  /// button sits in the right cap, text only in the paper.
+  static const _h = 31.0;
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        width: 145,
-        height: 31,
-        child: PaintedFrame(
-          asset: 'ui_frame_currency.png',
-          padding: const EdgeInsets.fromLTRB(11, 5, 39, 5),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
+        width: 146,
+        height: _h,
+        child: StretchFrame(
+          frame: 'currency',
+          child: Align(
             alignment: Alignment.centerLeft,
-            child: IconText(
-              '$icon $label  $value',
-              style: _Hud._bold.copyWith(fontSize: 11.5),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: IconText(
+                '$icon $label  $value',
+                maxLines: 1,
+                style: _Hud._bold.copyWith(fontSize: 11.5),
+              ),
             ),
           ),
         ),
@@ -349,15 +406,18 @@ class _SpeedControl extends StatelessWidget {
         child: Opacity(
           opacity: speeds.length < 2 ? 0.5 : 1,
           child: SizedBox(
-            width: 88,
-            height: 28,
-            child: PaintedFrame(
-              asset: 'ui_frame_action.png',
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+            width: 90,
+            height: 40,
+            child: StretchFrame(
+              frame: 'action',
               child: Center(
-                child: IconText(
-                  '▶ x${driver.speed == driver.speed.roundToDouble() ? driver.speed.toInt() : driver.speed}',
-                  style: _Hud._bold.copyWith(fontSize: 12),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: IconText(
+                    '▶ x${driver.speed == driver.speed.roundToDouble() ? driver.speed.toInt() : driver.speed}',
+                    maxLines: 1,
+                    style: _Hud._bold.copyWith(fontSize: 12),
+                  ),
                 ),
               ),
             ),
@@ -557,13 +617,13 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
                 child: Row(children: [
                   // the two auto-knit switches, one above the other
                   SizedBox(
-                    width: box.maxWidth * 0.39,
+                    width: box.maxWidth * 0.42,
                     // ≥ 48 dp tall on a normal phone; scaled down only when
                     // the panel is too short for both
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: SizedBox(
-                        width: box.maxWidth * 0.39,
+                        width: box.maxWidth * 0.42,
                         child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -629,11 +689,9 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
                                       constraints: BoxConstraints(
                                           maxWidth: area.maxWidth * .96),
                                       child: SizedBox(
-                                        height: tagH + 4,
-                                        child: PaintedFrame(
-                                          asset: 'ui_frame_action.png',
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20),
+                                        height: tagH + 14,
+                                        child: StretchFrame(
+                                          frame: 'action',
                                           child: Center(
                                             child: FittedBox(
                                               fit: BoxFit.scaleDown,
@@ -744,32 +802,33 @@ class _Toggle extends StatelessWidget {
   Widget build(BuildContext context) => GestureDetector(
         onTap: onTap,
         child: SizedBox(
-          height: 48,
-          child: PaintedFrame(
-            asset: 'ui_frame_action.png',
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              on
-                  ? const GameIcon('check', size: 16)
-                  : Container(
-                      width: 12,
-                      height: 12,
-                      decoration: const BoxDecoration(
-                          shape: BoxShape.circle, color: Palette.storyPaper)),
-              const SizedBox(width: 6),
+          height: 52,
+          child: StretchFrame(
+            frame: 'action',
+            child: Row(children: [
+              SizedBox(
+                width: 16,
+                child: on
+                    ? const GameIcon('check', size: 16)
+                    : Center(
+                        child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Palette.storyEdge))),
+              ),
+              const SizedBox(width: 4),
               Expanded(
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: SizedBox(
-                    width: 105,
-                    child: IconText(label,
-                        maxLines: 2,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 11.5,
-                            color: on ? const Color(0xFF467B35) : Palette.ink,
-                            fontWeight: FontWeight.w800)),
-                  ),
+                  alignment: Alignment.centerLeft,
+                  child: IconText(label,
+                      maxLines: 1,
+                      style: TextStyle(
+                          fontSize: 11.5,
+                          color: on ? const Color(0xFF2F6B25) : Palette.ink,
+                          fontWeight: FontWeight.w800)),
                 ),
               ),
             ]),
@@ -831,14 +890,13 @@ class _AutoKnitToggleState extends State<_AutoKnitToggle>
   Widget build(BuildContext context) => GestureDetector(
         onTap: widget.onTap,
         child: SizedBox(
-          height: 48,
-          child: PaintedFrame(
-            asset: 'ui_frame_action.png',
-            padding: const EdgeInsets.fromLTRB(9, 5, 9, 5),
+          height: 52,
+          child: StretchFrame(
+            frame: 'action',
             child: Row(children: [
               SizedBox(
-                width: 38,
-                height: 36,
+                width: 30,
+                height: 24,
                 child: AnimatedBuilder(
                   animation: _run,
                   builder: (context, child) {
@@ -867,13 +925,13 @@ class _AutoKnitToggleState extends State<_AutoKnitToggle>
               Expanded(
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
                   child: IconText(widget.label,
                       maxLines: 1,
-                      textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 11.5,
                           color:
-                              widget.on ? const Color(0xFF467B35) : Palette.ink,
+                              widget.on ? const Color(0xFF2F6B25) : Palette.ink,
                           fontWeight: FontWeight.w800)),
                 ),
               ),

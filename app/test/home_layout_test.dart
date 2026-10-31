@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:whisker_tales/game_view.dart';
 import 'package:whisker_tales/ui/game_icon.dart';
 import 'package:whisker_tales/ui/home_page.dart';
+import 'package:whisker_tales/ui/frames.dart';
 import 'package:whisker_tales/ui/yarn_basket.dart';
 import 'package:wt_core/wt_core.dart';
 
@@ -25,6 +26,7 @@ void main() {
     content = await ContentRepository(DiskSource()).loadAll();
     await IconRegistry.load();
     await BasketArt.load();
+    await FrameArt.load(); // painted UI frames (D-059)
   });
 
   // panel sizes in dp: a 1080×2340 phone (≈ 411×892), a 720×1280 phone

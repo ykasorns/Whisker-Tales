@@ -1,0 +1,34 @@
+{
+  "_doc": "Storybook UI frames (D-059). Measured on the shipped PNGs in app/assets/game/ui (tools/sync_sprites.py crops them from assets/raw/ui). w/h = the PNG's pixel size (a test fails if the file changes size: re-measure then). cap_l/cap_r = columns kept at the frame's height ratio (leaves, knobs, plus button, medallion); only the middle between them stretches, so a frame is never squashed. content = the paper area [x1,y1,x2,y2] where live text may go; rects = other named areas; slots = the dock's five paper slots. All numbers are source pixels.",
+  "frames": {
+    "profile": {
+      "asset": "ui_frame_profile.png", "w": 620, "h": 320, "cap_l": 275, "cap_r": 40,
+      "content": [285, 124, 560, 262],
+      "rects": { "medallion": [112, 162, 218, 248] }
+    },
+    "currency": {
+      "asset": "ui_frame_currency.png", "w": 960, "h": 209, "cap_l": 40, "cap_r": 175,
+      "content": [62, 62, 790, 158]
+    },
+    "chapter": {
+      "asset": "ui_frame_chapter.png", "w": 561, "h": 251, "cap_l": 105, "cap_r": 85,
+      "content": [118, 124, 462, 212]
+    },
+    "action": {
+      "asset": "ui_frame_action.png", "w": 590, "h": 254, "cap_l": 92, "cap_r": 90,
+      "content": [118, 96, 474, 166]
+    },
+    "dock": {
+      "asset": "ui_frame_nav_dock.png", "w": 891, "h": 275, "cap_l": 65, "cap_r": 75,
+      "content": [78, 80, 804, 186],
+      "slots": [
+        [84, 80, 206, 186], [232, 80, 354, 186], [380, 80, 502, 186],
+        [527, 80, 649, 186], [676, 80, 798, 186]
+      ]
+    },
+    "dock_selected": {
+      "asset": "ui_frame_nav_selected.png", "w": 309, "h": 348, "cap_l": 0, "cap_r": 0,
+      "content": [60, 60, 250, 280]
+    }
+  }
+}

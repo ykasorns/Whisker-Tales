@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:whisker_tales/main.dart';
+import 'package:whisker_tales/ui/frames.dart';
 import 'package:whisker_tales/ui/game_icon.dart';
 import 'package:whisker_tales/ui/game_shell.dart';
 import 'package:whisker_tales/ui/story_adventure.dart';
@@ -92,6 +93,7 @@ void main() {
   setUpAll(() async {
     content = await ContentRepository(_DiskSource()).loadAll();
     await IconRegistry.load();
+    await FrameArt.load();
     mode = StoryMode(
       const ModeManifest(
         id: 'story',

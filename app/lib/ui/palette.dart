@@ -83,37 +83,6 @@ class StorybookPaper extends StatelessWidget {
       );
 }
 
-/// A live widget laid over a painted, transparent storybook frame. These
-/// assets are generated from the approved UI mockup; text and state remain
-/// native Flutter so localization and accessibility still work.
-class PaintedFrame extends StatelessWidget {
-  const PaintedFrame({
-    super.key,
-    required this.asset,
-    required this.child,
-    this.padding = EdgeInsets.zero,
-    this.fit = BoxFit.fill,
-  });
-
-  final String asset;
-  final Widget child;
-  final EdgeInsets padding;
-  final BoxFit fit;
-
-  @override
-  Widget build(BuildContext context) => Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            'assets/game/ui/$asset',
-            fit: fit,
-            filterQuality: FilterQuality.medium,
-          ),
-          Padding(padding: padding, child: child),
-        ],
-      );
-}
-
 /// Light paper slip. Accent colour appears in the paper tint and shadow,
 /// keeping neighbouring menu items distinct without a frame.
 BoxDecoration storybookCard({

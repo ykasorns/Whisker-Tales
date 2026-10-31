@@ -13,6 +13,7 @@ import 'overlays.dart';
 import 'pages.dart';
 import 'away_tracker.dart';
 import 'game_icon.dart';
+import 'frames.dart';
 import 'palette.dart';
 import 'story_adventure.dart';
 
@@ -193,13 +194,19 @@ class _GameShellState extends ConsumerState<GameShell>
 }
 
 /// One shared illustrated dock instead of five unrelated rounded cards.
-/// The selected page lifts like a cloth bookmark, leaving quiet tabs flat.
+/// Icon and label sit inside the dock's five paper slots (measured in
+/// `ui_frames.json`, D-059); the selected page lifts a cloth bookmark over its
+/// slot, leaving quiet tabs flat.
 class _BottomDock extends StatelessWidget {
   const _BottomDock({
     required this.items,
     required this.selected,
     required this.onSelected,
   });
+
+  /// Dock height: the slots are about 38 dp tall, room for an icon and a
+  /// one-line label.
+  static const height = 100.0;
 
   final List<(String, String)> items;
   final int selected;
@@ -208,77 +215,88 @@ class _BottomDock extends StatelessWidget {
   @override
   Widget build(BuildContext context) => StorybookPaper(
         child: SizedBox(
-          height: 78,
-          child: LayoutBuilder(builder: (context, box) {
-            final tabWidth = box.maxWidth / items.length;
-            return Stack(clipBehavior: Clip.none, children: [
-              Positioned.fill(
-                child: Image.asset(
-                  'assets/game/ui/ui_frame_nav_dock.png',
-                  fit: BoxFit.fill,
-                  filterQuality: FilterQuality.medium,
-                ),
-              ),
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 170),
-                curve: Curves.easeOut,
-                left: tabWidth * selected + tabWidth * .16,
-                top: -2,
-                width: tabWidth * .68,
-                height: 74,
-                child: Image.asset(
-                  'assets/game/ui/ui_frame_nav_selected.png',
-                  fit: BoxFit.fill,
-                  filterQuality: FilterQuality.medium,
-                ),
-              ),
-              Positioned.fill(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 2, 8, 12),
-                  child: Row(children: [
-                    for (var i = 0; i < items.length; i++)
-                      Expanded(
-                        child: Semantics(
-                          button: true,
-                          selected: i == selected,
-                          label: items[i].$2,
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () => onSelected(i),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                AnimatedScale(
-                                  scale: i == selected ? 1.18 : 1,
-                                  duration: const Duration(milliseconds: 170),
+          height: height,
+          child: StretchFrame(
+            frame: 'dock',
+            builder: (context, g) {
+              // without the frame data the five tabs still share the width
+              final slots = g.spec.slots.length == items.length
+                  ? [for (final r in g.spec.slots) g.rect(r)]
+                  : [
+                      for (var i = 0; i < items.length; i++)
+                        Rect.fromLTWH(
+                            g.content.left + g.content.width / items.length * i,
+                            g.content.top,
+                            g.content.width / items.length,
+                            g.content.height)
+                    ];
+              final tab = FrameArt.spec('dock_selected');
+              Widget bookmark(Rect slot) {
+                // the ribbon keeps its own proportions, a little wider than
+                // the slot's paper so the knobs hang over its top edge
+                final w = slot.width * .62;
+                final h = w * tab.h / tab.w;
+                return AnimatedPositioned(
+                  duration: const Duration(milliseconds: 170),
+                  curve: Curves.easeOut,
+                  left: slot.center.dx - w / 2,
+                  top: slot.top - 16,
+                  width: w,
+                  height: h,
+                  child: const StretchFrame(
+                      frame: 'dock_selected', child: SizedBox()),
+                );
+              }
+
+              return Stack(clipBehavior: Clip.none, children: [
+                bookmark(slots[selected]),
+                for (var i = 0; i < items.length; i++)
+                  Positioned.fromRect(
+                    rect: slots[i],
+                    child: Semantics(
+                      button: true,
+                      selected: i == selected,
+                      label: items[i].$2,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => onSelected(i),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 1),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                flex: 3,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
                                   child: IconText(items[i].$1,
-                                      style: const TextStyle(fontSize: 23)),
+                                      style: const TextStyle(fontSize: 22)),
                                 ),
-                                const SizedBox(height: 1),
-                                IconText(
-                                  items[i].$2,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.fade,
-                                  style: TextStyle(
-                                    fontSize: 10.5,
-                                    fontWeight: i == selected
-                                        ? FontWeight.w900
-                                        : FontWeight.w700,
-                                    color: i == selected
-                                        ? Palette.ink
-                                        : Palette.inkSoft,
+                              ),
+                              Flexible(
+                                flex: 2,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: IconText(
+                                    items[i].$2,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w900,
+                                      color: Palette.ink,
+                                    ),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                  ]),
-                ),
-              ),
-            ]);
-          }),
+                    ),
+                  ),
+              ]);
+            },
+          ),
         ),
       );
 }

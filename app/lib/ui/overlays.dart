@@ -165,6 +165,17 @@ class RoadChips extends ConsumerWidget {
 /// seconds left shows when each skill is ready again (YK 2026-10-23); no
 /// sweep between fights. [speed] is the game speed, so the count is in real
 /// seconds.
+TextStyle _cooldownText(double size) => TextStyle(
+        color: Colors.white,
+        fontSize: size,
+        height: 1,
+        fontWeight: FontWeight.w900,
+        shadows: const [
+          Shadow(color: Colors.black, blurRadius: 3),
+          Shadow(color: Colors.black, blurRadius: 1.5),
+          Shadow(color: Colors.black, offset: Offset(0.5, 0.5)),
+        ]);
+
 class SkillBar extends ConsumerStatefulWidget {
   const SkillBar({super.key, required this.speed});
 
@@ -264,15 +275,13 @@ class _SkillBarState extends ConsumerState<SkillBar> {
                 Positioned.fill(
                     child: CustomPaint(painter: _CooldownPainter(frac))),
               if (secs > 0)
-                Text('$secs',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: size * 0.42,
-                        fontWeight: FontWeight.w900,
-                        shadows: const [
-                          Shadow(color: Colors.black, blurRadius: 4),
-                          Shadow(color: Colors.black, blurRadius: 2),
-                        ])),
+                // the count sits in the corner so the skill's picture stays
+                // readable while it recharges
+                Positioned(
+                  right: size * 0.08,
+                  bottom: size * 0.02,
+                  child: Text('$secs', style: _cooldownText(size * 0.34)),
+                ),
             ]),
           ),
         ),
@@ -316,15 +325,11 @@ class _SkillBarState extends ConsumerState<SkillBar> {
                     Positioned.fill(
                         child: CustomPaint(painter: _CooldownPainter(frac))),
                   if (secs > 0)
-                    Text('$secs',
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            shadows: [
-                              Shadow(color: Colors.black, blurRadius: 4),
-                              Shadow(color: Colors.black, blurRadius: 2),
-                            ])),
+                    Positioned(
+                      right: 4,
+                      bottom: 1,
+                      child: Text('$secs', style: _cooldownText(16)),
+                    ),
                 ]),
               ),
             ),

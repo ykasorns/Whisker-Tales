@@ -9,6 +9,7 @@ import 'audio/player_output.dart';
 import 'cloud/play_cloud.dart';
 import 'iap/play_store.dart';
 import 'ui/age_screen.dart';
+import 'ui/frames.dart';
 import 'ui/game_icon.dart';
 import 'ui/yarn_basket.dart';
 import 'ui/game_shell.dart';
@@ -39,6 +40,11 @@ Future<void> main() async {
       await IconRegistry.load(); // painted icons replace the emoji (D-037)
     } catch (e) {
       debugPrint('icons.json not loaded, showing emoji: $e'); // never a hole
+    }
+    try {
+      await FrameArt.load(); // painted UI frames (D-059)
+    } catch (e) {
+      debugPrint('ui_frames.json not loaded, plain boxes: $e');
     }
     try {
       await BasketArt.load(); // the home basket (D-040)

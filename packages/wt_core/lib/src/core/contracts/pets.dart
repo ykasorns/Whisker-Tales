@@ -33,10 +33,14 @@ class PetsState {
     this.owned = const {},
     this.deployed = const [],
     this.pity = 0,
+    this.levels = const {},
   });
 
   /// Pet id → stars.
   final Map<String, int> owned;
+
+  /// Pet id → level (missing = 1), raised with treats.
+  final Map<String, int> levels;
   final List<String> deployed;
 
   /// Hatches since the last legend.
@@ -44,7 +48,8 @@ class PetsState {
 
   Map<String, dynamic> toJson() => {
         'owned': {
-          for (final e in owned.entries) e.key: {'stars': e.value, 'level': 1}
+          for (final e in owned.entries)
+            e.key: {'stars': e.value, 'level': levels[e.key] ?? 1}
         },
         'deployed': deployed,
         'pity': pity,
@@ -69,6 +74,11 @@ class PetsState {
               : throw const FormatException('pets: deployed must be ids'),
       ],
       pity: pity,
+      levels: {
+        for (final e in owned.entries)
+          if (e.value is Map && (e.value as Map)['level'] is int)
+            e.key: (e.value as Map)['level'] as int,
+      },
     );
   }
 }

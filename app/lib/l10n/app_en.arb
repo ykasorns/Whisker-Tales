@@ -388,5 +388,16 @@
   "storyAheadEvent": "A story waits",
   "storyAheadCampfire": "A cozy campfire",
   "storyAheadShop": "The owl's stall",
-  "storyAheadBoss": "The Paper Wolf!"
+  "storyAheadBoss": "The Paper Wolf!",
+  "storyNext": "Next ▸",
+  "storyOk": "OK ▸",
+  "petLevel": "Lv.{n}/{max}",
+  "petOwnStats": "Its own strength",
+  "petShareTitle": "Shares with Mochi while on the field",
+  "petLevelUp": "Level up 🍪 {cost}",
+  "petLevelMax": "Max level",
+  "petTreatsHave": "You have 🍪 {n} — duplicate pets give more",
+  "@petLevel": {"placeholders": {"n": {"type": "String"}, "max": {"type": "String"}}},
+  "@petLevelUp": {"placeholders": {"cost": {"type": "String"}}},
+  "@petTreatsHave": {"placeholders": {"n": {"type": "String"}}}
 }

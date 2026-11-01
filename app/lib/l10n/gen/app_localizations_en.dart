@@ -592,4 +592,34 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storyAheadBoss => 'The Paper Wolf!';
+
+  @override
+  String get storyNext => 'Next ▸';
+
+  @override
+  String get storyOk => 'OK ▸';
+
+  @override
+  String petLevel(String n, String max) {
+    return 'Lv.$n/$max';
+  }
+
+  @override
+  String get petOwnStats => 'Its own strength';
+
+  @override
+  String get petShareTitle => 'Shares with Mochi while on the field';
+
+  @override
+  String petLevelUp(String cost) {
+    return 'Level up 🍪 $cost';
+  }
+
+  @override
+  String get petLevelMax => 'Max level';
+
+  @override
+  String petTreatsHave(String n) {
+    return 'You have 🍪 $n — duplicate pets give more';
+  }
 }

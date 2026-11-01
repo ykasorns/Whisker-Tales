@@ -164,7 +164,11 @@ void main() {
       final r = (await p.hatch(HatchSource.egg))!;
       if (r.isNew) expect(r.stars, 1);
       if (r.cookies > 0) {
-        expect(stars[r.petId], rules.maxStars);
+        // a duplicate always pays treats; more once the pet is at max stars
+        expect(r.isNew, isFalse);
+        if (stars[r.petId] == rules.maxStars) {
+          expect(r.cookies, rules.dupCookies);
+        }
         treats += r.cookies;
       }
       stars[r.petId] = r.stars;
@@ -285,7 +289,10 @@ void main() {
             hp: 1000, atk: 100, def: 0, attrs: {Attribute.petDmg: 5000}),
         attackIntervalMs: 900);
     final own = rules.ownedBp[r.rarity.index];
-    expect(p.withPassive(cat).stats.atk, 100 * (kBp + own) ~/ kBp);
+    final def = rules.byId(r.petId)!;
+    // the owned bonus, plus what the deployed pet shares with Mochi
+    expect(p.withPassive(cat).stats.atk,
+        100 * (kBp + own) ~/ kBp + p.shareOf(cat, def).atk);
     final partner = p.partners(cat).single;
     expect(partner.isPartner, isTrue);
     expect(partner.stats.atk, 100 * rules.deployedBp[r.rarity.index] ~/ kBp);
@@ -330,6 +337,62 @@ void main() {
       eggs = wallet.balance(Currency.eggs);
       fish = wallet.balance(Currency.goldfish);
     }
+  });
+
+  test('treats level a pet up, to the cap; stats and share rise', () {
+    final p = pets()
+      ..restore(const PetsState(owned: {'rabbit': 2}, deployed: ['rabbit']));
+    final cat = CombatUnitSpec(
+        id: 'mochi',
+        side: CombatSide.cat,
+        stats: StatBlock(hp: 1000, atk: 100, def: 40),
+        attackIntervalMs: 900);
+    final def = rules.byId('rabbit')!;
+    expect(p.levelOf('rabbit'), 1);
+    expect(p.levelUp('rabbit'), isFalse, reason: 'no treats yet');
+    final before = p.statsOf(cat, def), shareBefore = p.shareOf(cat, def);
+    wallet.add(RewardBundle({Currency.cookies: 100000}));
+    var spent = 0;
+    for (var c = p.nextLevelCost('rabbit');
+        c != null;
+        c = p.nextLevelCost('rabbit')) {
+      spent += c;
+      expect(p.levelUp('rabbit'), isTrue);
+    }
+    expect(p.levelOf('rabbit'), rules.maxLevel);
+    expect(p.levelUp('rabbit'), isFalse, reason: 'at the cap');
+    expect(wallet.balance(Currency.cookies), 100000 - spent);
+    final after = p.statsOf(cat, def), shareAfter = p.shareOf(cat, def);
+    expect(after.atk, greaterThan(before.atk));
+    expect(after.hp, greaterThan(before.hp));
+    expect(shareAfter.atk, greaterThan(shareBefore.atk));
+    expect(shareAfter.hp, greaterThan(shareBefore.hp));
+  });
+
+  test('what a pet shares never feeds back into the pet', () {
+    final p = pets()
+      ..restore(const PetsState(owned: {'rabbit': 5}, deployed: ['rabbit']));
+    final cat = CombatUnitSpec(
+        id: 'mochi',
+        side: CombatSide.cat,
+        stats: StatBlock(hp: 1000, atk: 100, def: 40),
+        attackIntervalMs: 900);
+    final once = p.withPassive(cat);
+    expect(p.withPassive(cat).stats, once.stats);
+    expect(p.statsOf(cat, rules.byId('rabbit')!).atk,
+        p.partners(cat).single.stats.atk);
+  });
+
+  test('levels survive a save and bad levels are refused', () {
+    final p = pets()
+      ..restore(const PetsState(owned: {'frog': 1}, levels: {'frog': 4}));
+    final json = p.snapshot().toJson();
+    expect((json['owned'] as Map)['frog'], {'stars': 1, 'level': 4});
+    expect(PetsState.fromJson(json).levels, {'frog': 4});
+    expect(
+        () => pets()
+            .restore(const PetsState(owned: {'frog': 1}, levels: {'frog': 99})),
+        throwsFormatException);
   });
 
   test('save round-trip; bad saves fail', () async {

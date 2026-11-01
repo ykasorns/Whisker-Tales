@@ -170,5 +170,13 @@
   "storyAheadEvent": "มีเรื่องราวรออยู่",
   "storyAheadCampfire": "กองไฟอบอุ่น",
   "storyAheadShop": "แผงของนกฮูก",
-  "storyAheadBoss": "หมาป่ากระดาษ!"
+  "storyAheadBoss": "หมาป่ากระดาษ!",
+  "storyNext": "ถัดไป ▸",
+  "storyOk": "ตกลง ▸",
+  "petLevel": "Lv.{n}/{max}",
+  "petOwnStats": "พลังของตัวเอง",
+  "petShareTitle": "แบ่งให้โมจิตอนออกรบ",
+  "petLevelUp": "เลเวลอัป 🍪 {cost}",
+  "petLevelMax": "เลเวลสูงสุดแล้ว",
+  "petTreatsHave": "มีขนม 🍪 {n} — ได้เพิ่มเมื่อได้สัตว์ซ้ำ"
 }

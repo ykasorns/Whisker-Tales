@@ -1123,6 +1123,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The Paper Wolf!'**
   String get storyAheadBoss;
+
+  /// No description provided for @storyNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next ▸'**
+  String get storyNext;
+
+  /// No description provided for @storyOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK ▸'**
+  String get storyOk;
+
+  /// No description provided for @petLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Lv.{n}/{max}'**
+  String petLevel(String n, String max);
+
+  /// No description provided for @petOwnStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Its own strength'**
+  String get petOwnStats;
+
+  /// No description provided for @petShareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shares with Mochi while on the field'**
+  String get petShareTitle;
+
+  /// No description provided for @petLevelUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Level up 🍪 {cost}'**
+  String petLevelUp(String cost);
+
+  /// No description provided for @petLevelMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Max level'**
+  String get petLevelMax;
+
+  /// No description provided for @petTreatsHave.
+  ///
+  /// In en, this message translates to:
+  /// **'You have 🍪 {n} — duplicate pets give more'**
+  String petTreatsHave(String n);
 }
 
 class _AppLocalizationsDelegate

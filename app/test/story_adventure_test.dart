@@ -282,6 +282,23 @@ void main() {
     expect(run.captionLines('th'), hasLength(1));
   });
 
+  testWidgets('a story line stays until the player taps Next', (tester) async {
+    final run = makeRun(2);
+    addTearDown(run.dispose);
+    await mount(tester, run);
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump(const Duration(seconds: 6));
+    // long after it has been typed, it is still there, waiting
+    expect(find.byKey(const Key('story-caption')), findsOneWidget);
+    expect(find.byKey(const Key('story-caption-next')), findsOneWidget);
+    for (var i = 0; i < 3; i++) {
+      await tester.tap(find.byKey(const Key('story-caption-tap')));
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(seconds: 6));
+    }
+    expect(find.byKey(const Key('story-caption-tap')), findsNothing);
+  });
+
   testWidgets('hits of a fight are recorded for floating numbers',
       (tester) async {
     final run = combatRun();

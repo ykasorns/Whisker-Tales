@@ -232,7 +232,10 @@ class _PetsTabState extends ConsumerState<PetsTab> {
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                                 fontSize: 11, fontWeight: FontWeight.w700)),
-                        IconText(stars == null ? '' : '★' * stars,
+                        IconText(
+                            stars == null
+                                ? ''
+                                : '${'★' * stars} Lv.${pets.levelOf(def.id)}',
                             style: const TextStyle(color: Palette.sun)),
                       ]),
                 ),
@@ -293,10 +296,15 @@ class _PetSheetState extends ConsumerState<PetSheet> {
     final stars = pets.owned[def.id] ?? 1;
     final out = pets.deployed.contains(def.id);
     final full = !out && pets.deployed.length >= pets.deploySlots;
-    final cat = ref.read(catSpecProvider)();
+    final cat = ref.read(catBaseSpecProvider)();
     final atk = pets.attackOf(cat, def);
     final mult = pets.rules.starMultBp(stars) / kBp;
     final p = def.passive, k = def.skill;
+    final level = pets.levelOf(def.id);
+    final own = pets.statsOf(cat, def);
+    final share = pets.shareOf(cat, def);
+    final treats = ref.read(walletProvider).balance(Currency.cookies);
+    final cost = pets.nextLevelCost(def.id);
     final rarity = switch (def.rarity) {
       PetRarity.common => s.rarityCommon,
       PetRarity.rare => s.rarityRare,
@@ -339,7 +347,9 @@ class _PetSheetState extends ConsumerState<PetSheet> {
                         style: TextStyle(
                             fontWeight: FontWeight.w800,
                             color: _PetsTabState._rarityColor(def.rarity))),
-                    IconText('★' * stars,
+                    IconText(
+                        '${'★' * stars}  ${s.petLevel('$level', '${pets.rules.maxLevel}')}',
+                        key: const Key('pet-level'),
                         style:
                             const TextStyle(fontSize: 18, color: Palette.sun)),
                     IconText('⚔️ ${s.petAttack} ${fmtNum(atk)}',
@@ -347,6 +357,19 @@ class _PetSheetState extends ConsumerState<PetSheet> {
                   ]),
             ),
           ]),
+          section(
+              s.petOwnStats,
+              IconText(
+                  '❤️ ${fmtNum(own.hp)}   ⚔️ ${fmtNum(own.atk)}   🛡 ${fmtNum(own.def)}',
+                  key: const Key('pet-own-stats'),
+                  style: const TextStyle(fontWeight: FontWeight.w800))),
+          section(
+              s.petShareTitle,
+              IconText(
+                  '❤️ +${fmtNum(share.hp)}   ⚔️ +${fmtNum(share.atk)}   🛡 +${fmtNum(share.def)}',
+                  key: const Key('pet-share-stats'),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w800, color: Palette.teal))),
           if (p != null)
             section(
                 s.petPassive,
@@ -374,7 +397,36 @@ class _PetSheetState extends ConsumerState<PetSheet> {
                         ]),
                   ),
                 ])),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
+          GestureDetector(
+            key: const Key('pet-level-up'),
+            onTap: cost == null || treats < cost
+                ? null
+                : () => setState(() => pets.levelUp(def.id)),
+            child: Opacity(
+              opacity: cost != null && treats >= cost ? 1 : 0.45,
+              child: Container(
+                height: 50,
+                alignment: Alignment.center,
+                decoration: storybookButton(
+                    fill: Palette.sun,
+                    accent: Palette.storyEdge,
+                    enabled: cost != null && treats >= cost,
+                    radius: 10),
+                child: IconText(
+                    cost == null ? s.petLevelMax : s.petLevelUp(fmtNum(cost)),
+                    style: const TextStyle(
+                        fontSize: 17, fontWeight: FontWeight.w900)),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: IconText(s.petTreatsHave(fmtNum(treats)),
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 11, color: Palette.inkSoft)),
+          ),
+          const SizedBox(height: 10),
           if (full)
             Padding(
               padding: const EdgeInsets.only(bottom: 6),

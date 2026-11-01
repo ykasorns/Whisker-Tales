@@ -637,13 +637,13 @@ class _StoryCaptionState extends State<StoryCaption>
   late final AnimationController _c;
   int _index = 0;
   bool _gone = false;
+  bool _typed = false;
 
   static const _typeMs = 28;
-  static const _holdMs = 2400;
 
   String get _line => widget.lines.isEmpty ? '' : widget.lines[_index];
 
-  int get _typeDuration => _line.characters.length * _typeMs;
+  bool get _last => _index + 1 >= widget.lines.length;
 
   @override
   void initState() {
@@ -659,19 +659,16 @@ class _StoryCaptionState extends State<StoryCaption>
       return;
     }
     final reduced = MediaQuery.disableAnimationsOf(context);
+    _typed = false;
     _c.duration =
-        Duration(milliseconds: (reduced ? 0 : _typeDuration) + _holdMs);
+        Duration(milliseconds: reduced ? 0 : _line.characters.length * _typeMs);
     _c.forward(from: 0);
     setState(() {});
   }
 
   void _onStatus(AnimationStatus status) {
-    if (status != AnimationStatus.completed || !mounted) return;
-    if (_index + 1 < widget.lines.length) {
-      _index++;
-      _begin();
-    } else {
-      setState(() => _gone = true);
+    if (status == AnimationStatus.completed && mounted) {
+      setState(() => _typed = true);
     }
   }
 
@@ -691,14 +688,16 @@ class _StoryCaptionState extends State<StoryCaption>
     super.dispose();
   }
 
+  /// The line stays until it is read: a tap shows it whole, the next tap
+  /// moves on (and closes the caption after the last line).
   void _tap() {
-    final reduced = MediaQuery.disableAnimationsOf(context);
-    final typeMs = reduced ? 0 : _typeDuration;
-    final total = typeMs + _holdMs;
-    if (_c.value * total < typeMs) {
-      _c.value = typeMs / total; // show the line whole
+    if (!_typed) {
+      _c.value = 1;
+    } else if (!_last) {
+      _index++;
+      _begin();
     } else {
-      _c.value = 1; // on to the next line
+      setState(() => _gone = true);
     }
   }
 
@@ -707,47 +706,53 @@ class _StoryCaptionState extends State<StoryCaption>
     if (_gone || widget.lines.isEmpty || !_c.isAnimating && _c.value == 0) {
       return const SizedBox.shrink();
     }
-    final reduced = MediaQuery.disableAnimationsOf(context);
+    final s = AppLocalizations.of(context);
     return AnimatedBuilder(
       animation: _c,
       builder: (_, __) {
-        final typeMs = reduced ? 0 : _typeDuration;
-        final total = typeMs + _holdMs;
-        final elapsed = _c.value * total;
-        final shown = typeMs == 0
-            ? _line.characters.length
-            : (elapsed / _typeMs).floor().clamp(0, _line.characters.length);
-        final fade = ((total - elapsed) / 300).clamp(0.0, 1.0);
-        final last = _index + 1 >= widget.lines.length;
-        return Opacity(
-          opacity: last ? fade : 1,
-          child: GestureDetector(
-            onTap: _tap,
-            behavior: HitTestBehavior.opaque,
-            child: SizedBox(
-              height: 58,
-              child: Row(children: [
-                storyPortrait('bobbin', 48),
-                const SizedBox(width: 2),
-                Expanded(
-                    child: StretchFrame(
+        final n = _line.characters.length;
+        final shown = _c.duration == Duration.zero
+            ? n
+            : (_c.value * n).floor().clamp(0, n);
+        return GestureDetector(
+          key: const Key('story-caption-tap'),
+          onTap: _tap,
+          behavior: HitTestBehavior.opaque,
+          child: SizedBox(
+            height: 58,
+            child: Row(children: [
+              storyPortrait('bobbin', 48),
+              const SizedBox(width: 2),
+              Expanded(
+                child: StretchFrame(
                   frame: 'action',
                   builder: (context, g) => Positioned.fromRect(
                     rect: g.content,
-                    child: Center(
-                      child: _TypedText(
-                          text: _line,
-                          shown: shown,
-                          style: const TextStyle(
-                              fontSize: 13,
-                              height: 1.25,
-                              fontWeight: FontWeight.w800,
-                              color: Palette.ink)),
-                    ),
+                    child: Row(children: [
+                      Expanded(
+                        child: Center(
+                          child: _TypedText(
+                              text: _line,
+                              shown: shown,
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  height: 1.25,
+                                  fontWeight: FontWeight.w800,
+                                  color: Palette.ink)),
+                        ),
+                      ),
+                      if (_typed)
+                        IconText(_last ? s.storyOk : s.storyNext,
+                            key: const Key('story-caption-next'),
+                            style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w900,
+                                color: Palette.teal)),
+                    ]),
                   ),
-                )),
-              ]),
-            ),
+                ),
+              ),
+            ]),
           ),
         );
       },

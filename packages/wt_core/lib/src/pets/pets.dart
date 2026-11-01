@@ -140,6 +140,12 @@ class PetsRules {
     required this.attackIntervalMs,
     required this.dupCookies,
     required this.pagesPerChapter,
+    required this.maxLevel,
+    required this.levelBonusBp,
+    required this.levelCostBase,
+    required this.levelCostGrowth,
+    required this.shareBp,
+    required this.dupStarCookies,
   });
 
   final List<PetDef> pets;
@@ -166,6 +172,21 @@ class PetsRules {
   final int dupCookies;
   final int pagesPerChapter;
 
+  /// Level cap; each level above 1 adds [levelBonusBp] to the pet's stats.
+  final int maxLevel;
+  final int levelBonusBp;
+
+  /// Treats for level 1 → 2; each next level costs [levelCostGrowth] times
+  /// the last.
+  final int levelCostBase;
+  final num levelCostGrowth;
+
+  /// Share of a deployed pet's HP/ATK/DEF that Mochi gets, per rarity (bp).
+  final List<int> shareBp;
+
+  /// Treats for a duplicate that still adds a star, per rarity.
+  final List<int> dupStarCookies;
+
   PetDef? byId(String id) {
     for (final p in pets) {
       if (p.id == id) return p;
@@ -174,6 +195,12 @@ class PetsRules {
   }
 
   int starMultBp(int stars) => kBp + starBonusBp * (stars - 1);
+
+  int levelMultBp(int level) => kBp + levelBonusBp * (level - 1);
+
+  /// Treats to raise a pet from [level] to the next.
+  int levelCost(int level) =>
+      (levelCostBase * math.pow(levelCostGrowth, level - 1)).round();
 
   /// The pet that owns skill [skillId], if any.
   PetDef? bySkill(String skillId) {
@@ -252,6 +279,14 @@ class PetsRules {
       attackIntervalMs: data['attack_interval_ms'] as int? ?? 1500,
       dupCookies: data['dup_over_max_cookies'] as int? ?? 0,
       pagesPerChapter: (e['pages_per_chapter'] as num).toInt(),
+      maxLevel: n('max_level').toInt(),
+      levelBonusBp: (n('level_bonus_pct') * kBp).round(),
+      levelCostBase: n('level_cost_base').toInt(),
+      levelCostGrowth: n('level_cost_growth'),
+      shareBp: List.unmodifiable(
+          [for (final x in l('share_pct')) (x * kBp).round()]),
+      dupStarCookies:
+          List.unmodifiable([for (final x in l('dup_star_cookies')) x.toInt()]),
     );
   }
 }
@@ -280,12 +315,57 @@ class Pets implements IPets {
   SeededRng _rng;
   final _owned = <String, int>{};
   final _deployed = <String>[];
+  final _levels = <String, int>{};
   int _pity = 0;
   int _fishPulls = 0;
   String _dateKey;
 
   Map<String, int> get owned => Map.unmodifiable(_owned);
   List<String> get deployed => List.unmodifiable(_deployed);
+
+  int levelOf(String id) => _levels[id] ?? 1;
+
+  /// Treats the next level of [id] costs; null at the level cap or if the
+  /// pet is not owned.
+  int? nextLevelCost(String id) {
+    if (!_owned.containsKey(id) || levelOf(id) >= rules.maxLevel) return null;
+    return rules.levelCost(levelOf(id));
+  }
+
+  /// Spends treats to raise [id] one level. False when not owned, at the cap
+  /// or too few treats.
+  bool levelUp(String id) {
+    final cost = nextLevelCost(id);
+    if (cost == null || !wallet.spend(Currency.cookies, cost)) return false;
+    _levels[id] = levelOf(id) + 1;
+    return true;
+  }
+
+  /// The pet's own HP/ATK/DEF: a rarity share of [cat] (the cat before any
+  /// pet bonus, so nothing compounds) × stars × level. Enemies never hit
+  /// pets, so HP and DEF only matter for what Mochi gets from them.
+  StatBlock statsOf(CombatUnitSpec cat, PetDef def) {
+    final bp = rules.deployedBp[def.rarity.index] *
+        rules.starMultBp(_owned[def.id] ?? 1) ~/
+        kBp *
+        rules.levelMultBp(levelOf(def.id)) ~/
+        kBp;
+    return StatBlock(
+      hp: math.max(1, cat.stats.hp * bp ~/ kBp),
+      atk: math.max(1, cat.stats.atk * bp ~/ kBp),
+      def: cat.stats.def * bp ~/ kBp,
+    );
+  }
+
+  /// What a deployed pet gives Mochi: [PetsRules.shareBp] of its own stats.
+  StatBlock shareOf(CombatUnitSpec cat, PetDef def) {
+    final own = statsOf(cat, def);
+    final bp = rules.shareBp[def.rarity.index];
+    return StatBlock(
+        hp: own.hp * bp ~/ kBp,
+        atk: own.atk * bp ~/ kBp,
+        def: own.def * bp ~/ kBp);
+  }
 
   /// Hatches since the last legend; the next legend is guaranteed at
   /// [PetsRules.pityLegendEvery].
@@ -381,6 +461,8 @@ class Pets implements IPets {
       if (_deployed.length < deploySlots) _deployed.add(pet.id);
     } else if (had < rules.maxStars) {
       _owned[pet.id] = had + 1;
+      cookies = rules.dupStarCookies[rarity.index];
+      wallet.add(RewardBundle({Currency.cookies: cookies}));
     } else {
       cookies = rules.dupCookies;
       wallet.add(RewardBundle({Currency.cookies: cookies}));
@@ -433,7 +515,13 @@ class Pets implements IPets {
   /// The deployed pet's own bonus, scaled by its stars (bp).
   int passiveBpOf(PetDef def) {
     final p = def.passive;
-    return p == null ? 0 : p.bp * rules.starMultBp(_owned[def.id] ?? 1) ~/ kBp;
+    return p == null
+        ? 0
+        : p.bp *
+            rules.starMultBp(_owned[def.id] ?? 1) ~/
+            kBp *
+            rules.levelMultBp(levelOf(def.id)) ~/
+            kBp;
   }
 
   /// The cat with the owned-pet passive and the deployed pets' bonuses
@@ -465,9 +553,26 @@ class Pets implements IPets {
           if (a != null) extra[a] = (extra[a] ?? 0) + b;
       }
     }
-    if (hp == 0 && atk == 0 && def == 0 && extra.isEmpty) return out;
+    var shareHp = 0, shareAtk = 0, shareDef = 0;
+    for (final pet in fieldPets) {
+      final sh = shareOf(cat, pet);
+      shareHp += sh.hp;
+      shareAtk += sh.atk;
+      shareDef += sh.def;
+    }
+    if (hp == 0 &&
+        atk == 0 &&
+        def == 0 &&
+        extra.isEmpty &&
+        shareHp + shareAtk + shareDef == 0) {
+      return out;
+    }
     var stats =
         out.stats.scaledBp(hp: kBp + hp, atk: kBp + atk, def: kBp + def);
+    stats = stats.copyWith(
+        hp: stats.hp + shareHp,
+        atk: stats.atk + shareAtk,
+        def: stats.def + shareDef);
     if (extra.isNotEmpty) {
       stats = stats.copyWith(attrs: {
         ...stats.attrs,
@@ -477,14 +582,8 @@ class Pets implements IPets {
     return out.copyWith(stats: stats);
   }
 
-  /// The ATK pet [def] fights with beside [cat] (rarity share × stars).
-  int attackOf(CombatUnitSpec cat, PetDef def) => math.max(
-      1,
-      cat.stats.atk *
-          rules.deployedBp[def.rarity.index] ~/
-          kBp *
-          rules.starMultBp(_owned[def.id] ?? 1) ~/
-          kBp);
+  /// The ATK pet [def] fights with beside [cat] (its own stats).
+  int attackOf(CombatUnitSpec cat, PetDef def) => statsOf(cat, def).atk;
 
   /// Deployed pets as partner units for a fight beside [cat].
   List<CombatUnitSpec> partners(CombatUnitSpec cat) => [
@@ -512,7 +611,8 @@ class Pets implements IPets {
   PetsState snapshot() => PetsState(
       owned: Map.unmodifiable(_owned),
       deployed: List.unmodifiable(_deployed),
-      pity: _pity);
+      pity: _pity,
+      levels: Map.unmodifiable(_levels));
 
   /// Loads pets + today's fish hatches (`daily.fish_pulls` of [dateKey]).
   void restore(PetsState s, {int fishPulls = 0, String? dateKey}) {
@@ -529,6 +629,13 @@ class Pets implements IPets {
         throw FormatException('pets: deployed $d is not owned');
       }
     }
+    for (final e in s.levels.entries) {
+      if (!s.owned.containsKey(e.key) ||
+          e.value < 1 ||
+          e.value > rules.maxLevel) {
+        throw FormatException('pets: ${e.key} level ${e.value}');
+      }
+    }
     if (s.pity < 0) throw const FormatException('pets: pity < 0');
     _owned
       ..clear()
@@ -536,6 +643,9 @@ class Pets implements IPets {
     _deployed
       ..clear()
       ..addAll(s.deployed);
+    _levels
+      ..clear()
+      ..addAll(s.levels);
     _pity = s.pity;
     _fishPulls = fishPulls;
     _dateKey = dateKey ?? _dateKey;

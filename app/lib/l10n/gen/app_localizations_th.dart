@@ -590,4 +590,34 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get storyAheadBoss => 'หมาป่ากระดาษ!';
+
+  @override
+  String get storyNext => 'ถัดไป ▸';
+
+  @override
+  String get storyOk => 'ตกลง ▸';
+
+  @override
+  String petLevel(String n, String max) {
+    return 'Lv.$n/$max';
+  }
+
+  @override
+  String get petOwnStats => 'พลังของตัวเอง';
+
+  @override
+  String get petShareTitle => 'แบ่งให้โมจิตอนออกรบ';
+
+  @override
+  String petLevelUp(String cost) {
+    return 'เลเวลอัป 🍪 $cost';
+  }
+
+  @override
+  String get petLevelMax => 'เลเวลสูงสุดแล้ว';
+
+  @override
+  String petTreatsHave(String n) {
+    return 'มีขนม 🍪 $n — ได้เพิ่มเมื่อได้สัตว์ซ้ำ';
+  }
 }

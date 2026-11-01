@@ -81,4 +81,39 @@ void main() {
     expect(pets.deployed, ['mouse']);
     expect(pets.deploySlots, 1);
   });
+
+  testWidgets('treats level a pet up; its own and shared stats rise',
+      (tester) async {
+    final c = await open(tester,
+        const PetsState(owned: {'hedgehog': 1}, deployed: [], pity: 0));
+    final pets = c.read(petsProvider)!;
+    expect(find.byKey(const Key('pet-level')), findsOneWidget);
+    expect(find.byKey(const Key('pet-own-stats')), findsOneWidget);
+    expect(find.byKey(const Key('pet-share-stats')), findsOneWidget);
+    // no treats: the button does nothing
+    await tester.ensureVisible(find.byKey(const Key('pet-level-up')));
+    await tester.tap(find.byKey(const Key('pet-level-up')));
+    await tester.pump();
+    expect(pets.levelOf('hedgehog'), 1);
+    final before = (tester
+            .widget<Text>(find.descendant(
+                of: find.byKey(const Key('pet-own-stats')),
+                matching: find.byType(Text)))
+            .data ??
+        '');
+    c.read(walletProvider).add(RewardBundle({Currency.cookies: 500}));
+    tester.element(find.byType(PetSheet)).markNeedsBuild();
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('pet-level-up')));
+    await tester.pump();
+    expect(pets.levelOf('hedgehog'), 2);
+    expect(find.textContaining('Lv.2/'), findsOneWidget);
+    final after = tester
+            .widget<Text>(find.descendant(
+                of: find.byKey(const Key('pet-own-stats')),
+                matching: find.byType(Text)))
+            .data ??
+        '';
+    expect(after, isNot(before));
+  });
 }

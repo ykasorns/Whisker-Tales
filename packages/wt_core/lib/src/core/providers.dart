@@ -165,12 +165,19 @@ final incomeModelProvider = Provider<IncomeModel>((ref) => IncomeModel(
 /// the UI shows its power and stats from it, so the two never disagree.
 final Provider<CombatUnitSpec Function()> catSpecProvider =
     Provider<CombatUnitSpec Function()>((ref) => () {
-          final cat = ref.read(roadEventsProvider).apply(ref
-              .read(catClassProvider)
-              .combatSpec(extra: ref.read(catExtraStatsProvider)()));
+          final cat = ref.read(catBaseSpecProvider)();
           final withPets = ref.read(petsProvider)?.withPassive(cat) ?? cat;
           return ref.read(researchProvider)?.withBonus(withPets) ?? withPets;
         });
+
+/// The cat before any pet bonus: pets size their own stats from this, so
+/// what a pet shares with Mochi never feeds back into the pet.
+final Provider<CombatUnitSpec Function()> catBaseSpecProvider =
+    Provider<CombatUnitSpec Function()>((ref) => () => ref
+        .read(roadEventsProvider)
+        .apply(ref
+            .read(catClassProvider)
+            .combatSpec(extra: ref.read(catExtraStatsProvider)())));
 
 /// The cat's goldfish / EXP find (gear affixes, capped by `caps_pct`) for
 /// waves, bosses and offline time.
@@ -196,7 +203,9 @@ final Provider<IdleLoop> idleLoopProvider = Provider<IdleLoop>((ref) {
     income: ref.watch(incomeModelProvider),
     engineFactory: ref.watch(combatEngineFactoryProvider),
     catSpec: ref.watch(catSpecProvider),
-    partners: (cat) => ref.read(petsProvider)?.partners(cat) ?? const [],
+    partners: (_) =>
+        ref.read(petsProvider)?.partners(ref.read(catBaseSpecProvider)()) ??
+        const [],
     finds: ref.watch(findsProvider),
     hpWeightPm: weights.hpPm,
     atkWeightPm: weights.atkPm,

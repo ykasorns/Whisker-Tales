@@ -134,10 +134,70 @@ class StoryEvent {
     required this.descriptionEn,
     required this.icon,
     required this.choices,
-  });
+    String? storyTh,
+    String? storyEn,
+    this.speaker,
+  })  : storyTh = storyTh ?? descriptionTh,
+        storyEn = storyEn ?? descriptionEn;
 
   final String id, nameTh, nameEn, descriptionTh, descriptionEn, icon;
+
+  /// The vignette told when the event opens (falls back to the description).
+  final String storyTh, storyEn;
+
+  /// Who tells it: an id in [StoryNarrative.cast], or null for the narrator.
+  final String? speaker;
   final List<StoryEventChoice> choices;
+}
+
+/// One named character of the run's story.
+class StoryCastMember {
+  const StoryCastMember({required this.nameTh, required this.nameEn});
+  final String nameTh, nameEn;
+}
+
+/// The thread of the run (D-061): opening, a few lines when Mochi reaches each
+/// kind of place, and the ending. Lines are picked by index so a seeded run
+/// always tells the same story.
+class StoryNarrative {
+  StoryNarrative({
+    required Map<String, StoryCastMember> cast,
+    required Map<String, ({List<String> th, List<String> en})> lines,
+  })  : cast = Map.unmodifiable(cast),
+        _lines = Map.unmodifiable(lines);
+
+  /// An empty narrative: every [line] is null and the UI shows nothing.
+  StoryNarrative.empty()
+      : cast = const {},
+        _lines = const {};
+
+  static const requiredKeys = [
+    'intro',
+    'arrive_combat',
+    'arrive_treasure',
+    'arrive_event',
+    'arrive_campfire',
+    'arrive_shop',
+    'arrive_boss',
+    'win',
+    'lose',
+  ];
+
+  final Map<String, StoryCastMember> cast;
+  final Map<String, ({List<String> th, List<String> en})> _lines;
+
+  /// All lines of [key] in [lang] ('en' or 'th'); empty when unknown.
+  List<String> lines(String key, String lang) {
+    final l = _lines[key];
+    if (l == null) return const [];
+    return lang == 'en' ? l.en : l.th;
+  }
+
+  /// One line of [key], chosen by [index] (wraps), or null when none exist.
+  String? line(String key, String lang, int index) {
+    final all = lines(key, lang);
+    return all.isEmpty ? null : all[index.abs() % all.length];
+  }
 }
 
 class StoryPotion {
@@ -188,7 +248,9 @@ class StoryContent {
     required Map<String, StoryMonster> monsters,
     required Map<String, StoryEvent> events,
     required this.balance,
-  })  : relics = Map.unmodifiable(relics),
+    StoryNarrative? narrative,
+  })  : narrative = narrative ?? StoryNarrative.empty(),
+        relics = Map.unmodifiable(relics),
         talents = Map.unmodifiable(talents),
         monsters = Map.unmodifiable(monsters),
         events = Map.unmodifiable(events);
@@ -198,6 +260,7 @@ class StoryContent {
   final Map<String, StoryMonster> monsters;
   final Map<String, StoryEvent> events;
   final StoryBalance balance;
+  final StoryNarrative narrative;
 
   factory StoryContent.fromJson({
     required Map<String, dynamic> relicsJson,
@@ -441,8 +504,8 @@ class StoryContent {
     }
 
     final eventRows = objects(eventsJson, 'events', 'events.json');
-    if (eventRows.length != 8) {
-      throw const FormatException('events.json: MVP needs exactly 8 events');
+    if (eventRows.length < 8 || eventRows.length > 24) {
+      throw const FormatException('events.json: needs 8–24 events');
     }
     unique('event', eventRows.map((m) => text(m, 'id', 'event')));
     final events = <String, StoryEvent>{};
@@ -460,11 +523,15 @@ class StoryContent {
         descriptionTh: text(m, 'description_th', owner),
         descriptionEn: text(m, 'description_en', owner),
         icon: text(m, 'icon', owner),
+        storyTh: m.containsKey('story_th') ? text(m, 'story_th', owner) : null,
+        storyEn: m.containsKey('story_en') ? text(m, 'story_en', owner) : null,
+        speaker: m['speaker'] as String?,
         choices: List.unmodifiable([
           for (final c in choices) _parseChoice(c, owner, text, buffs),
         ]),
       );
     }
+    final narrative = _parseNarrative(eventsJson, events, text);
 
     final rewards = balanceJson['rewards'];
     final xp = balanceJson['xp'];
@@ -530,7 +597,68 @@ class StoryContent {
       monsters: monsters,
       events: events,
       balance: balance,
+      narrative: narrative,
     );
+  }
+
+  static StoryNarrative _parseNarrative(
+    Map<String, dynamic> json,
+    Map<String, StoryEvent> events,
+    String Function(Map<String, dynamic>, String, String) text,
+  ) {
+    final castJson = json['cast'];
+    final narrativeJson = json['narrative'];
+    if (castJson == null && narrativeJson == null) {
+      for (final e in events.values) {
+        if (e.speaker != null) {
+          throw FormatException('event ${e.id}: speaker needs a cast');
+        }
+      }
+      return StoryNarrative.empty();
+    }
+    if (castJson is! Map<String, dynamic> ||
+        narrativeJson is! Map<String, dynamic>) {
+      throw const FormatException(
+          'events.json: "cast" and "narrative" must both be objects');
+    }
+    final cast = <String, StoryCastMember>{};
+    for (final entry in castJson.entries) {
+      final m = entry.value;
+      if (m is! Map<String, dynamic>) {
+        throw FormatException('cast ${entry.key}: must be an object');
+      }
+      cast[entry.key] = StoryCastMember(
+        nameTh: text(m, 'name_th', 'cast ${entry.key}'),
+        nameEn: text(m, 'name_en', 'cast ${entry.key}'),
+      );
+    }
+    for (final e in events.values) {
+      if (e.speaker != null && !cast.containsKey(e.speaker)) {
+        throw FormatException(
+            'event ${e.id}: speaker "${e.speaker}" is not in the cast');
+      }
+    }
+    List<String> list(Object? v, String owner) {
+      if (v is! List || v.isEmpty || v.any((e) => e is! String || e.isEmpty)) {
+        throw FormatException('$owner: needs a non-empty list of text');
+      }
+      return List.unmodifiable(v.cast<String>());
+    }
+
+    final lines = <String, ({List<String> th, List<String> en})>{};
+    for (final key in StoryNarrative.requiredKeys) {
+      final m = narrativeJson[key];
+      if (m is! Map<String, dynamic>) {
+        throw FormatException('narrative: "$key" is missing');
+      }
+      final th = list(m['th'], 'narrative $key th');
+      final en = list(m['en'], 'narrative $key en');
+      if (th.length != en.length) {
+        throw FormatException('narrative $key: th and en line counts differ');
+      }
+      lines[key] = (th: th, en: en);
+    }
+    return StoryNarrative(cast: cast, lines: lines);
   }
 
   static StoryEventChoice _parseChoice(

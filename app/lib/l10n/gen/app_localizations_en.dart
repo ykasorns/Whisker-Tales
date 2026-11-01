@@ -574,4 +574,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storyLevel => 'Level';
+
+  @override
+  String get storyAheadCombat => 'A fight ahead';
+
+  @override
+  String get storyAheadTreasure => 'A hidden chest';
+
+  @override
+  String get storyAheadEvent => 'A story waits';
+
+  @override
+  String get storyAheadCampfire => 'A cozy campfire';
+
+  @override
+  String get storyAheadShop => 'The owl\'s stall';
+
+  @override
+  String get storyAheadBoss => 'The Paper Wolf!';
 }

@@ -257,13 +257,13 @@ class _BottomDock extends StatelessWidget {
                       button: true,
                       selected: i == selected,
                       label: items[i].$2,
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
+                      child: PressScale(
                         onTap: () => onSelected(i),
                         child: _DockTab(
                             icon: items[i].$1,
                             label: items[i].$2,
-                            size: slots[i].size),
+                            size: slots[i].size,
+                            selected: i == selected),
                       ),
                     ),
                   ),
@@ -277,10 +277,16 @@ class _BottomDock extends StatelessWidget {
 /// One dock tab: the painted icon stands a little above the slot's paper (the
 /// dock art leaves transparent room there) and the label sits on the paper.
 class _DockTab extends StatelessWidget {
-  const _DockTab({required this.icon, required this.label, required this.size});
+  const _DockTab({
+    required this.icon,
+    required this.label,
+    required this.size,
+    required this.selected,
+  });
 
   final String icon, label;
   final Size size;
+  final bool selected;
 
   static const _labelH = 13.0;
 
@@ -293,8 +299,17 @@ class _DockTab extends StatelessWidget {
         right: 0,
         top: size.height - _labelH - iconSize + 2,
         height: iconSize,
-        child: Image.asset('assets/game/ui/$icon.png',
-            fit: BoxFit.contain, filterQuality: FilterQuality.medium),
+        // the chosen tab's picture lifts a little
+        child: AnimatedScale(
+          scale: selected ? 1.12 : 1,
+          alignment: Alignment.bottomCenter,
+          duration: MediaQuery.disableAnimationsOf(context)
+              ? Duration.zero
+              : const Duration(milliseconds: 180),
+          curve: Curves.easeOutBack,
+          child: Image.asset('assets/game/ui/$icon.png',
+              fit: BoxFit.contain, filterQuality: FilterQuality.medium),
+        ),
       ),
       Positioned(
         left: 1,

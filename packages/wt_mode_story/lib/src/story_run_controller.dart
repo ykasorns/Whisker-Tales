@@ -16,6 +16,24 @@ enum StoryRunPanel {
   result,
 }
 
+/// One landed hit of the running fight, for floating numbers in the scene.
+class StoryHit {
+  const StoryHit({
+    required this.serial,
+    required this.onCat,
+    required this.damage,
+    required this.outcome,
+  });
+
+  /// Grows with every hit, so the UI shows each one once.
+  final int serial;
+
+  /// The hit landed on Mochi (not on the enemy).
+  final bool onCat;
+  final int damage;
+  final HitOutcome outcome;
+}
+
 /// One complete Story Challenge run. UI only chooses routes/cards/actions;
 /// combat, rewards and every effect stay in the shared deterministic engine.
 class StoryRunController extends ChangeNotifier {
@@ -61,9 +79,49 @@ class StoryRunController extends ChangeNotifier {
   final List<String> _runBuffs = [];
   final Set<String> _purchasedPotionIds = {};
   bool _pickCompletesEncounter = false;
+
+  /// The last few hits of the fight, oldest first (cleared at each fight).
+  final List<StoryHit> hits = [];
+  int _hitSerial = 0;
+
+  /// What the story says now: a key of [StoryNarrative] and a serial that
+  /// grows each time a new line should be told (D-061).
+  String? captionKey;
+  int captionSerial = 0;
   bool _combatClosing = false;
 
   StorySave get save => _save;
+
+  /// The lines to tell for [captionKey]: the opening and the endings in full,
+  /// other moments one line picked by how far Mochi has come.
+  List<String> captionLines(String lang) {
+    final key = captionKey;
+    if (key == null) return const [];
+    if (key == _resultKey) {
+      final text = lang == 'en' ? _resultEn : _resultTh;
+      return text == null ? const [] : [text];
+    }
+    final all = mode.content.narrative.lines(key, lang);
+    if (all.isEmpty) return const [];
+    if (const {'intro', 'win', 'lose'}.contains(key)) return all;
+    return [all[(manager.current?.clearedNodes ?? 0) % all.length]];
+  }
+
+  static const _resultKey = '@event_result';
+  String? _resultTh, _resultEn;
+
+  void _say(String? key) {
+    captionKey = key;
+    captionSerial++;
+  }
+
+  /// Tells what an event choice led to, in the event's own words.
+  void _sayResult(StoryEventChoice choice) {
+    _resultTh = choice.resultTh;
+    _resultEn = choice.resultEn;
+    _say(_resultKey);
+  }
+
   List<UnitView> get combatView => _combat?.view ?? const [];
   UnitView? get liveCat {
     for (final unit in combatView) {
@@ -123,6 +181,8 @@ class StoryRunController extends ChangeNotifier {
     _runBuffs.clear();
     _purchasedPotionIds.clear();
     panel = StoryRunPanel.map;
+    hits.clear();
+    _say('intro');
     notifyListeners();
   }
 
@@ -131,6 +191,15 @@ class StoryRunController extends ChangeNotifier {
     final next = manager.advanceToNextNode(routeId: routeId);
     if (next == null) return;
     encounter = next;
+    _say(switch (next.type) {
+      EncounterType.combat => 'arrive_combat',
+      EncounterType.boss => 'arrive_boss',
+      EncounterType.treasure => 'arrive_treasure',
+      EncounterType.event => 'arrive_event',
+      EncounterType.shop => 'arrive_shop',
+      EncounterType.campfire => 'arrive_campfire',
+      EncounterType.fork => null,
+    });
     switch (next.type) {
       case EncounterType.combat || EncounterType.boss:
         _startCombat(next);
@@ -190,6 +259,7 @@ class StoryRunController extends ChangeNotifier {
     if (outcome.xp > 0) talents.gainXp(outcome.xp);
     if (outcome.buffId case final buff?) _runBuffs.add(buff);
     event = null;
+    _sayResult(choice);
     if (outcome.relicChoice) {
       _openRelicPick(completesEncounter: true);
       notifyListeners();
@@ -261,6 +331,7 @@ class StoryRunController extends ChangeNotifier {
     _combatSub?.cancel();
     _combat = engine;
     _combatClosing = false;
+    hits.clear();
     _combatSub = engine.events.listen(_onCombatEvent);
     final enemy = _monsterSpec(monster, manager.current!.cat.power);
     engine.start(CombatSetup(
@@ -317,7 +388,19 @@ class StoryRunController extends ChangeNotifier {
       rng: _effectRng,
     );
     switch (combatEvent) {
-      case HitResolved(:final attackerId, :final outcome, :final source):
+      case HitResolved(
+          :final attackerId,
+          :final targetId,
+          :final outcome,
+          :final damage,
+          :final source
+        ):
+        hits.add(StoryHit(
+            serial: ++_hitSerial,
+            onCat: targetId == cat.id,
+            damage: damage,
+            outcome: outcome));
+        if (hits.length > 8) hits.removeAt(0);
         if (attackerId == cat.id && source == AttackSource.normal) {
           items.resolve(EffectTrigger.onAttack, context);
           talents.resolve(EffectTrigger.onAttack, context);
@@ -405,6 +488,11 @@ class StoryRunController extends ChangeNotifier {
     _save = done.modeState as StorySave;
     onSave(_save);
     wallet.add(done.reward.reward);
+    _say(switch (done.result.outcome) {
+      RunOutcome.won => 'win',
+      RunOutcome.died => 'lose',
+      RunOutcome.abandoned => null,
+    });
     panel = StoryRunPanel.result;
     notifyListeners();
   }

@@ -164,5 +164,11 @@
   "storyFullReward": "เต็ม",
   "storyReducedReward": "25%",
   "storyBuy": "ซื้อ",
-  "storyLevel": "ระดับ"
+  "storyLevel": "ระดับ",
+  "storyAheadCombat": "เจอศัตรูข้างหน้า",
+  "storyAheadTreasure": "หีบลับ",
+  "storyAheadEvent": "มีเรื่องราวรออยู่",
+  "storyAheadCampfire": "กองไฟอบอุ่น",
+  "storyAheadShop": "แผงของนกฮูก",
+  "storyAheadBoss": "หมาป่ากระดาษ!"
 }

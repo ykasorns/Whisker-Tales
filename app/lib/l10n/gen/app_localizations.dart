@@ -1087,6 +1087,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Level'**
   String get storyLevel;
+
+  /// No description provided for @storyAheadCombat.
+  ///
+  /// In en, this message translates to:
+  /// **'A fight ahead'**
+  String get storyAheadCombat;
+
+  /// No description provided for @storyAheadTreasure.
+  ///
+  /// In en, this message translates to:
+  /// **'A hidden chest'**
+  String get storyAheadTreasure;
+
+  /// No description provided for @storyAheadEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'A story waits'**
+  String get storyAheadEvent;
+
+  /// No description provided for @storyAheadCampfire.
+  ///
+  /// In en, this message translates to:
+  /// **'A cozy campfire'**
+  String get storyAheadCampfire;
+
+  /// No description provided for @storyAheadShop.
+  ///
+  /// In en, this message translates to:
+  /// **'The owl\'s stall'**
+  String get storyAheadShop;
+
+  /// No description provided for @storyAheadBoss.
+  ///
+  /// In en, this message translates to:
+  /// **'The Paper Wolf!'**
+  String get storyAheadBoss;
 }
 
 class _AppLocalizationsDelegate

@@ -44,6 +44,9 @@ flutter:
     - assets/game/mon/
     - assets/game/bg/
     - assets/game/ui/
+    - assets/game/story/portraits/
+    - assets/game/story/cards/
+    - assets/game/story/fx/
     - assets/game/icon/
     - assets/game/home/
     - assets/game/pet/

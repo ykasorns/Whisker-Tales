@@ -164,6 +164,14 @@ if os.path.isdir(v2):
     for src in sorted(glob.glob(f'{v2}/ui_dock_icons_v2/nav_*.png')):
         Image.open(src).convert('RGBA').save(
             f'{OUT}/ui/{os.path.basename(src)}', optimize=True)
+# D-062: Story Run art (GPT, assets/raw/frames/story_v1): speaker portraits,
+# choice cards and combat hit sparks.
+sv1 = f'{ROOT}/assets/raw/frames/story_v1'
+for sub in ('portraits', 'cards', 'fx'):
+    for src in sorted(glob.glob(f'{sv1}/{sub}/*.png')):
+        os.makedirs(f'{OUT}/story/{sub}', exist_ok=True)
+        Image.open(src).convert('RGBA').save(
+            f'{OUT}/story/{sub}/{os.path.basename(src)}', optimize=True)
 # 256 colours for every sprite (not the painted backgrounds, which band):
 # the art is flat-shaded, so it looks the same and the APK stays under the
 # 30 MB send limit (D-030)

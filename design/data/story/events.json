@@ -1,102 +1,558 @@
 {
-  "schema_version": 1,
-  "_doc": "T-026 · ทุกเหตุการณ์มีสองทางเลือกแบบภาพใหญ่ เด็กเลือกจากภาพได้ · outcome ใช้ goldfish/xp/heal_pct/damage_pct/relic_choice/buff",
-  "events": [
+ "schema_version": 1,
+ "_doc": "T-026 · ทุกเหตุการณ์มีสองทางเลือกแบบภาพใหญ่ เด็กเลือกจากภาพได้ · outcome ใช้ goldfish/xp/heal_pct/damage_pct/relic_choice/buff · D-061: story_th/en = a short vignette told when the event opens (2–3 sentences, kid-safe, original cast), speaker = id in cast; narrative = lines for the run's thread.",
+ "events": [
+  {
+   "id": "whispering_chest",
+   "name_th": "หีบกระซิบ",
+   "name_en": "Whispering Chest",
+   "description_th": "หีบใบหนึ่งกระซิบว่าในนี้มีของดีแน่นอน",
+   "description_en": "A tiny chest whispers that treasure is definitely inside.",
+   "icon": "story_event_chest",
+   "choices": [
     {
-      "id": "whispering_chest",
-      "name_th": "หีบกระซิบ",
-      "name_en": "Whispering Chest",
-      "description_th": "หีบใบหนึ่งกระซิบว่าในนี้มีของดีแน่นอน",
-      "description_en": "A tiny chest whispers that treasure is definitely inside.",
-      "icon": "story_event_chest",
-      "choices": [
-        { "id": "open", "label_th": "เปิดเลย", "label_en": "Open it", "result_th": "โดนงับนิดหนึ่ง แต่เจอของวิเศษ", "result_en": "It nipped you, but a relic was hiding inside.", "icon": "story_choice_open", "outcome": { "damage_pct": 12, "relic_choice": true } },
-        { "id": "listen", "label_th": "ฟังก่อน", "label_en": "Listen first", "result_th": "หีบชอบผู้ฟัง จึงมอบปลาทองให้", "result_en": "The chest liked a good listener and shared its goldfish.", "icon": "story_choice_ear", "outcome": { "goldfish": 18 } }
-      ]
+     "id": "open",
+     "label_th": "เปิดเลย",
+     "label_en": "Open it",
+     "result_th": "โดนงับนิดหนึ่ง แต่เจอของวิเศษ",
+     "result_en": "It nipped you, but a relic was hiding inside.",
+     "icon": "story_choice_open",
+     "outcome": {
+      "damage_pct": 12,
+      "relic_choice": true
+     }
     },
     {
-      "id": "broken_pencil_bridge",
-      "name_th": "สะพานดินสอหัก",
-      "name_en": "Broken Pencil Bridge",
-      "description_th": "สะพานดินสอขาดตรงกลาง แต่ปลายทางอยู่ไม่ไกล",
-      "description_en": "The pencil bridge is snapped, though the far bank is close.",
-      "icon": "story_event_bridge",
-      "choices": [
-        { "id": "jump", "label_th": "กระโดดข้าม", "label_en": "Jump across", "result_th": "ลงพื้นแรงไปหน่อย แต่ได้ประสบการณ์", "result_en": "A bumpy landing taught you something useful.", "icon": "story_choice_jump", "outcome": { "damage_pct": 10, "xp": 18 } },
-        { "id": "detour", "label_th": "เดินอ้อม", "label_en": "Take the path", "result_th": "ทางอ้อมมีใบไม้สมุนไพรช่วยฟื้นพลัง", "result_en": "Healing leaves grew along the quiet path.", "icon": "story_choice_path", "outcome": { "heal_pct": 12 } }
-      ]
-    },
-    {
-      "id": "sleepy_owl",
-      "name_th": "นกฮูกง่วงนอน",
-      "name_en": "Sleepy Owl",
-      "description_th": "นกฮูกเฝ้าป่าหลับคาหนังสือปริศนา",
-      "description_en": "The forest owl has fallen asleep over a riddle book.",
-      "icon": "story_event_owl",
-      "choices": [
-        { "id": "answer", "label_th": "ตอบปริศนา", "label_en": "Answer the riddle", "result_th": "ตอบถูก! นกฮูกสอนเคล็ดลับให้", "result_en": "Correct! The owl shared a clever lesson.", "icon": "story_choice_riddle", "outcome": { "xp": 24 } },
-        { "id": "blanket", "label_th": "ห่มผ้าให้", "label_en": "Tuck in the owl", "result_th": "ความใจดีทำให้รู้สึกสดชื่นขึ้น", "result_en": "The kind deed left you feeling refreshed.", "icon": "story_choice_blanket", "outcome": { "heal_pct": 15 } }
-      ]
-    },
-    {
-      "id": "dancing_ink",
-      "name_th": "แอ่งหมึกเต้นรำ",
-      "name_en": "Dancing Ink Puddle",
-      "description_th": "หยดหมึกเรียงตัวเป็นลูกศรชวนให้เดินตาม",
-      "description_en": "Ink drops form a dancing arrow that invites you onward.",
-      "icon": "story_event_ink",
-      "choices": [
-        { "id": "follow", "label_th": "เดินตาม", "label_en": "Follow it", "result_th": "หมึกพาไปพบถุงปลาทอง แต่พื้นลื่นนิดหน่อย", "result_en": "The ink found a goldfish pouch, though the path was slippery.", "icon": "story_choice_ink", "outcome": { "goldfish": 28, "damage_pct": 8 } },
-        { "id": "draw", "label_th": "วาดดาว", "label_en": "Draw a star", "result_th": "ดาวหมึกนำโชคให้การต่อสู้ที่เหลือ", "result_en": "The ink star brings luck for the rest of the run.", "icon": "story_choice_star", "outcome": { "buff": "story_lucky_crit" } }
-      ]
-    },
-    {
-      "id": "paper_boat_stream",
-      "name_th": "ลำธารเรือกระดาษ",
-      "name_en": "Paper Boat Stream",
-      "description_th": "เรือกระดาษสองลำลอยวนรอผู้โดยสาร",
-      "description_en": "Two paper boats circle the stream, waiting for a passenger.",
-      "icon": "story_event_boat",
-      "choices": [
-        { "id": "sail", "label_th": "นั่งเรือ", "label_en": "Set sail", "result_th": "เรือเปียกนิดหน่อย แต่ลอยไปถึงสมบัติ", "result_en": "The soggy boat carried you to a hidden relic.", "icon": "story_choice_boat", "outcome": { "damage_pct": 6, "relic_choice": true } },
-        { "id": "fold", "label_th": "พับลำใหม่", "label_en": "Fold a new boat", "result_th": "การพับเรือทำให้เก่งขึ้นอีกนิด", "result_en": "Folding a neat boat taught you patience.", "icon": "story_choice_fold", "outcome": { "xp": 16 } }
-      ]
-    },
-    {
-      "id": "lost_mouse",
-      "name_th": "หนูน้อยหลงทาง",
-      "name_en": "Lost Little Mouse",
-      "description_th": "หนูน้อยถือป้ายกลับหัวและกำลังหาทางกลับบ้าน",
-      "description_en": "A tiny mouse holds an upside-down sign and looks lost.",
-      "icon": "story_event_mouse",
-      "choices": [
-        { "id": "escort", "label_th": "พาไปส่ง", "label_en": "Walk together", "result_th": "หนูสอนทางลัดและแบ่งเสบียงให้", "result_en": "The mouse showed a shortcut and shared a snack.", "icon": "story_choice_help", "outcome": { "xp": 14, "heal_pct": 8 } },
-        { "id": "sign", "label_th": "หมุนป้ายให้", "label_en": "Fix the sign", "result_th": "ใต้ป้ายมีปลาทองซ่อนอยู่", "result_en": "A few goldfish were tucked under the sign.", "icon": "story_choice_sign", "outcome": { "goldfish": 16 } }
-      ]
-    },
-    {
-      "id": "starfruit_tree",
-      "name_th": "ต้นผลดาว",
-      "name_en": "Starfruit Tree",
-      "description_th": "ผลไม้รูปดาวส่องแสงอยู่บนกิ่งสูง",
-      "description_en": "Star-shaped fruit glows on the highest branches.",
-      "icon": "story_event_tree",
-      "choices": [
-        { "id": "shake", "label_th": "เขย่าต้นไม้", "label_en": "Shake the tree", "result_th": "ผลดาวหล่นใส่หัวพร้อมถุงปลาทอง", "result_en": "A starfruit bonked your head beside a goldfish pouch.", "icon": "story_choice_shake", "outcome": { "damage_pct": 10, "goldfish": 32 } },
-        { "id": "wish", "label_th": "ขอพร", "label_en": "Make a wish", "result_th": "แสงดาวช่วยให้สกิลแข็งแกร่งขึ้น", "result_en": "Starlight strengthens your skills for the run.", "icon": "story_choice_wish", "outcome": { "buff": "story_skill_20" } }
-      ]
-    },
-    {
-      "id": "forest_bakery",
-      "name_th": "ร้านขนมกลางป่า",
-      "name_en": "Forest Bakery",
-      "description_th": "กลิ่นขนมปังอุ่นลอยออกมาจากโพรงไม้",
-      "description_en": "Warm bread smells drift from a bakery inside a tree.",
-      "icon": "story_event_bakery",
-      "choices": [
-        { "id": "eat", "label_th": "กินตรงนี้", "label_en": "Eat a warm bun", "result_th": "ขนมปังอุ่นช่วยฟื้นพลังมากมาย", "result_en": "The warm bun restored plenty of health.", "icon": "story_choice_bun", "outcome": { "heal_pct": 22 } },
-        { "id": "pack", "label_th": "ห่อไปแบ่ง", "label_en": "Pack some to share", "result_th": "คนทำขนมชอบน้ำใจและมอบรางวัลให้", "result_en": "The baker rewarded your thoughtful choice.", "icon": "story_choice_bag", "outcome": { "goldfish": 12, "xp": 12 } }
-      ]
+     "id": "listen",
+     "label_th": "ฟังก่อน",
+     "label_en": "Listen first",
+     "result_th": "หีบชอบผู้ฟัง จึงมอบปลาทองให้",
+     "result_en": "The chest liked a good listener and shared its goldfish.",
+     "icon": "story_choice_ear",
+     "outcome": {
+      "goldfish": 18
+     }
     }
-  ]
+   ],
+   "speaker": "chesty",
+   "story_th": "ข้างทางมีหีบใบเล็กจ้อยนั่งอยู่ มันกระซิบเสียงแหบๆ ว่า \"มาใกล้ๆ สิ ข้างในมีของดีนะ\" บ็อบบินที่เกาะผ้าพันคอโมจิหรี่ตา \"หีบที่ชอบพูดมักมีฟันนะ…\"",
+   "story_en": "A tiny chest sits by the trail and whispers in a husky voice, \"Come closer, there's treasure in here.\" Bobbin, riding on Mochi's scarf, squints. \"Chests that talk usually have teeth...\""
+  },
+  {
+   "id": "broken_pencil_bridge",
+   "name_th": "สะพานดินสอหัก",
+   "name_en": "Broken Pencil Bridge",
+   "description_th": "สะพานดินสอขาดตรงกลาง แต่ปลายทางอยู่ไม่ไกล",
+   "description_en": "The pencil bridge is snapped, though the far bank is close.",
+   "icon": "story_event_bridge",
+   "choices": [
+    {
+     "id": "jump",
+     "label_th": "กระโดดข้าม",
+     "label_en": "Jump across",
+     "result_th": "ลงพื้นแรงไปหน่อย แต่ได้ประสบการณ์",
+     "result_en": "A bumpy landing taught you something useful.",
+     "icon": "story_choice_jump",
+     "outcome": {
+      "damage_pct": 10,
+      "xp": 18
+     }
+    },
+    {
+     "id": "detour",
+     "label_th": "เดินอ้อม",
+     "label_en": "Take the path",
+     "result_th": "ทางอ้อมมีใบไม้สมุนไพรช่วยฟื้นพลัง",
+     "result_en": "Healing leaves grew along the quiet path.",
+     "icon": "story_choice_path",
+     "outcome": {
+      "heal_pct": 12
+     }
+    }
+   ],
+   "speaker": "bobbin",
+   "story_th": "สะพานดินสอหักเป็นสองท่อนกลางลำธารหมึก อีกฝั่งอยู่ไม่ไกลเลย บ็อบบินวัดระยะด้วยเส้นด้าย \"กระโดดได้ถ้ากล้า หรือจะเดินอ้อมก็ไม่เสียหน้าหรอก\"",
+   "story_en": "The pencil bridge has snapped in two over a stream of ink. The far bank is so close! Bobbin measures with a bit of thread. \"You could jump it if you're brave, or take the long way, no shame in that.\""
+  },
+  {
+   "id": "sleepy_owl",
+   "name_th": "นกฮูกง่วงนอน",
+   "name_en": "Sleepy Owl",
+   "description_th": "นกฮูกเฝ้าป่าหลับคาหนังสือปริศนา",
+   "description_en": "The forest owl has fallen asleep over a riddle book.",
+   "icon": "story_event_owl",
+   "choices": [
+    {
+     "id": "answer",
+     "label_th": "ตอบปริศนา",
+     "label_en": "Answer the riddle",
+     "result_th": "ตอบถูก! นกฮูกสอนเคล็ดลับให้",
+     "result_en": "Correct! The owl shared a clever lesson.",
+     "icon": "story_choice_riddle",
+     "outcome": {
+      "xp": 24
+     }
+    },
+    {
+     "id": "blanket",
+     "label_th": "ห่มผ้าให้",
+     "label_en": "Tuck in the owl",
+     "result_th": "ความใจดีทำให้รู้สึกสดชื่นขึ้น",
+     "result_en": "The kind deed left you feeling refreshed.",
+     "icon": "story_choice_blanket",
+     "outcome": {
+      "heal_pct": 15
+     }
+    }
+   ],
+   "speaker": "hoot",
+   "story_th": "ศาสตราจารย์ฮูตหลับคาหนังสือปริศนาเล่มหนา แว่นตาเลื่อนลงมาที่ปลายจะงอยปาก เขาละเมอว่า \"คำตอบคือ… ซู่ซ่า… ซู่ซ่า…\" ใครจะช่วยเขาดี?",
+   "story_en": "Professor Hoot has fallen asleep on a very thick riddle book, his glasses sliding down his beak. He mumbles, \"The answer is... zzz... zzz...\" Who will help him?"
+  },
+  {
+   "id": "dancing_ink",
+   "name_th": "แอ่งหมึกเต้นรำ",
+   "name_en": "Dancing Ink Puddle",
+   "description_th": "หยดหมึกเรียงตัวเป็นลูกศรชวนให้เดินตาม",
+   "description_en": "Ink drops form a dancing arrow that invites you onward.",
+   "icon": "story_event_ink",
+   "choices": [
+    {
+     "id": "follow",
+     "label_th": "เดินตาม",
+     "label_en": "Follow it",
+     "result_th": "หมึกพาไปพบถุงปลาทอง แต่พื้นลื่นนิดหน่อย",
+     "result_en": "The ink found a goldfish pouch, though the path was slippery.",
+     "icon": "story_choice_ink",
+     "outcome": {
+      "goldfish": 28,
+      "damage_pct": 8
+     }
+    },
+    {
+     "id": "draw",
+     "label_th": "วาดดาว",
+     "label_en": "Draw a star",
+     "result_th": "ดาวหมึกนำโชคให้การต่อสู้ที่เหลือ",
+     "result_en": "The ink star brings luck for the rest of the run.",
+     "icon": "story_choice_star",
+     "outcome": {
+      "buff": "story_lucky_crit"
+     }
+    }
+   ],
+   "speaker": "inkie",
+   "story_th": "หยดหมึกบนพื้นเต้นรำเป็นลูกศรตัวน้อย มันโค้งตัวทักทายราวกับกำลังบอกว่า \"ตามมาสิ!\" บ็อบบินกระซิบ \"ถ้ามันลื่นก็อย่าโทษฉันนะ\"",
+   "story_en": "A puddle of ink dances into a tiny arrow and bows as if to say, \"This way!\" Bobbin whispers, \"If it gets slippery, don't blame me.\""
+  },
+  {
+   "id": "paper_boat_stream",
+   "name_th": "ลำธารเรือกระดาษ",
+   "name_en": "Paper Boat Stream",
+   "description_th": "เรือกระดาษสองลำลอยวนรอผู้โดยสาร",
+   "description_en": "Two paper boats circle the stream, waiting for a passenger.",
+   "icon": "story_event_boat",
+   "choices": [
+    {
+     "id": "sail",
+     "label_th": "นั่งเรือ",
+     "label_en": "Set sail",
+     "result_th": "เรือเปียกนิดหน่อย แต่ลอยไปถึงสมบัติ",
+     "result_en": "The soggy boat carried you to a hidden relic.",
+     "icon": "story_choice_boat",
+     "outcome": {
+      "damage_pct": 6,
+      "relic_choice": true
+     }
+    },
+    {
+     "id": "fold",
+     "label_th": "พับลำใหม่",
+     "label_en": "Fold a new boat",
+     "result_th": "การพับเรือทำให้เก่งขึ้นอีกนิด",
+     "result_en": "Folding a neat boat taught you patience.",
+     "icon": "story_choice_fold",
+     "outcome": {
+      "xp": 16
+     }
+    }
+   ],
+   "speaker": "bobbin",
+   "story_th": "เรือกระดาษสองลำวนอยู่ในลำธาร รอผู้โดยสารอยู่เงียบๆ ลำหนึ่งเปียกนิดหน่อย อีกลำยังพับไม่เสร็จ บ็อบบินดึงผ้าพันคอ \"เลือกเลย ฉันว่ายน้ำไม่เป็นแต่ผูกเงื่อนเก่ง\"",
+   "story_en": "Two paper boats drift in circles, waiting for a passenger. One is a little soggy, the other not quite folded. Bobbin tugs the scarf. \"Pick one! I can't swim, but I do tie excellent knots.\""
+  },
+  {
+   "id": "lost_mouse",
+   "name_th": "หนูน้อยหลงทาง",
+   "name_en": "Lost Little Mouse",
+   "description_th": "หนูน้อยถือป้ายกลับหัวและกำลังหาทางกลับบ้าน",
+   "description_en": "A tiny mouse holds an upside-down sign and looks lost.",
+   "icon": "story_event_mouse",
+   "choices": [
+    {
+     "id": "escort",
+     "label_th": "พาไปส่ง",
+     "label_en": "Walk together",
+     "result_th": "หนูสอนทางลัดและแบ่งเสบียงให้",
+     "result_en": "The mouse showed a shortcut and shared a snack.",
+     "icon": "story_choice_help",
+     "outcome": {
+      "xp": 14,
+      "heal_pct": 8
+     }
+    },
+    {
+     "id": "sign",
+     "label_th": "หมุนป้ายให้",
+     "label_en": "Fix the sign",
+     "result_th": "ใต้ป้ายมีปลาทองซ่อนอยู่",
+     "result_en": "A few goldfish were tucked under the sign.",
+     "icon": "story_choice_sign",
+     "outcome": {
+      "goldfish": 16
+     }
+    }
+   ],
+   "speaker": "pip",
+   "story_th": "หนูน้อยพิพถือป้ายกลับหัวไว้ในมือ แล้วมองซ้ายมองขวาอย่างกังวล \"ฉัน… หาทางกลับบ้านไม่เจอ ป้ายมันหมุนไปมาเอง\" บ็อบบินหัวเราะเบาๆ \"มันกลับหัวอยู่ต่างหาก\"",
+   "story_en": "A little mouse called Pip holds a sign upside down and looks left and right. \"I... can't find my way home. The sign keeps spinning!\" Bobbin chuckles. \"It's just upside down.\""
+  },
+  {
+   "id": "starfruit_tree",
+   "name_th": "ต้นผลดาว",
+   "name_en": "Starfruit Tree",
+   "description_th": "ผลไม้รูปดาวส่องแสงอยู่บนกิ่งสูง",
+   "description_en": "Star-shaped fruit glows on the highest branches.",
+   "icon": "story_event_tree",
+   "choices": [
+    {
+     "id": "shake",
+     "label_th": "เขย่าต้นไม้",
+     "label_en": "Shake the tree",
+     "result_th": "ผลดาวหล่นใส่หัวพร้อมถุงปลาทอง",
+     "result_en": "A starfruit bonked your head beside a goldfish pouch.",
+     "icon": "story_choice_shake",
+     "outcome": {
+      "damage_pct": 10,
+      "goldfish": 32
+     }
+    },
+    {
+     "id": "wish",
+     "label_th": "ขอพร",
+     "label_en": "Make a wish",
+     "result_th": "แสงดาวช่วยให้สกิลแข็งแกร่งขึ้น",
+     "result_en": "Starlight strengthens your skills for the run.",
+     "icon": "story_choice_wish",
+     "outcome": {
+      "buff": "story_skill_20"
+     }
+    }
+   ],
+   "speaker": "bobbin",
+   "story_th": "บนกิ่งสูงสุดของต้นไม้ มีผลไม้รูปดาวเรืองแสงอยู่ ลมพัดมาที ดาวก็แกว่งไปมาเหมือนระฆังเล็กๆ บ็อบบินมองตาโต \"เขย่าก็ได้ ขอพรก็ได้… แต่ต้องเลือกอย่างเดียวนะ\"",
+   "story_en": "High on the tallest branch, star-shaped fruit glows and chimes in the breeze like tiny bells. Bobbin stares. \"You can shake the tree or make a wish... but only one!\""
+  },
+  {
+   "id": "forest_bakery",
+   "name_th": "ร้านขนมกลางป่า",
+   "name_en": "Forest Bakery",
+   "description_th": "กลิ่นขนมปังอุ่นลอยออกมาจากโพรงไม้",
+   "description_en": "Warm bread smells drift from a bakery inside a tree.",
+   "icon": "story_event_bakery",
+   "choices": [
+    {
+     "id": "eat",
+     "label_th": "กินตรงนี้",
+     "label_en": "Eat a warm bun",
+     "result_th": "ขนมปังอุ่นช่วยฟื้นพลังมากมาย",
+     "result_en": "The warm bun restored plenty of health.",
+     "icon": "story_choice_bun",
+     "outcome": {
+      "heal_pct": 22
+     }
+    },
+    {
+     "id": "pack",
+     "label_th": "ห่อไปแบ่ง",
+     "label_en": "Pack some to share",
+     "result_th": "คนทำขนมชอบน้ำใจและมอบรางวัลให้",
+     "result_en": "The baker rewarded your thoughtful choice.",
+     "icon": "story_choice_bag",
+     "outcome": {
+      "goldfish": 12,
+      "xp": 12
+     }
+    }
+   ],
+   "speaker": "crumb",
+   "story_th": "ในโพรงต้นไม้ใหญ่มีร้านขนมปังเล็กๆ ป้าเม่นครัมบ์ยื่นหน้าออกมา \"ขนมปังอบใหม่ๆ จ้า!\" กลิ่นหอมจนท้องโมจิร้องเอง",
+   "story_en": "Inside a hollow tree is a cozy bakery. Mrs. Crumb the hedgehog pops out. \"Fresh bread, still warm!\" The smell makes Mochi's tummy rumble."
+  },
+  {
+   "id": "sleeping_eraser",
+   "name_th": "ยางลบขี้เซา",
+   "name_en": "Sleepy Eraser",
+   "description_th": "ยางลบก้อนโตนอนขวางทางอยู่",
+   "description_en": "A big eraser naps across the path.",
+   "icon": "story_event_sleeping_eraser",
+   "speaker": "bobbin",
+   "story_th": "ยางลบก้อนโตนอนขวางทางแคบๆ ถ้าปลุกมัน มันอาจลบรอยเท้าของเราหมดเลย บ็อบบินกระซิบ \"ชู่ววว… เบาๆ นะ\"",
+   "story_en": "A huge eraser is napping right across the narrow path. If it wakes, it might rub out Mochi's footprints! Bobbin whispers, \"Shhh... gently now.\"",
+   "choices": [
+    {
+     "id": "tiptoe",
+     "label_th": "เขย่งเดินผ่าน",
+     "label_en": "Tiptoe past",
+     "result_th": "ยางลบพลิกตัวแต่ไม่ตื่น และโมจิก็ได้ฝึกการทรงตัว",
+     "result_en": "The eraser rolled over but never woke, and Mochi learned a bit of balance.",
+     "icon": "story_choice_path",
+     "outcome": {
+      "xp": 18
+     }
+    },
+    {
+     "id": "lullaby",
+     "label_th": "ร้องเพลงกล่อม",
+     "label_en": "Hum a lullaby",
+     "result_th": "เพลงกล่อมทำให้ยางลบหลับสนิท ทิ้งขนมปังไว้ให้ด้วย",
+     "result_en": "The lullaby sent it into a deep sleep, and it left a snack behind.",
+     "icon": "story_choice_ear",
+     "outcome": {
+      "heal_pct": 14,
+      "goldfish": 8
+     }
+    }
+   ]
+  },
+  {
+   "id": "glow_beetles",
+   "name_th": "ด้วงเรืองแสง",
+   "name_en": "Glow Beetles",
+   "description_th": "ด้วงตัวจิ๋วส่องไฟนำทางในที่มืด",
+   "description_en": "Tiny beetles light up the dark corner.",
+   "icon": "story_event_glow_beetles",
+   "speaker": "bobbin",
+   "story_th": "ทางข้างหน้ามืดสนิทเพราะหมึกหกใส่หน้ากระดาษ แต่มีด้วงเรืองแสงตัวจิ๋วเกาะกลุ่มกันอยู่ พวกมันกะพริบถี่ๆ เหมือนกำลังถามว่า \"จะให้ช่วยไหม?\"",
+   "story_en": "The path ahead is pitch black where ink spilled across the page. A cluster of glow beetles blinks quickly, as if asking, \"Want some help?\"",
+   "choices": [
+    {
+     "id": "follow_lights",
+     "label_th": "เดินตามแสง",
+     "label_en": "Follow the lights",
+     "result_th": "ด้วงพาไปเจอถุงปลาทองที่ใครลืมไว้",
+     "result_en": "The beetles led Mochi to a pouch of goldfish someone forgot.",
+     "icon": "story_choice_ink",
+     "outcome": {
+      "goldfish": 24
+     }
+    },
+    {
+     "id": "ask_beetles",
+     "label_th": "ขอให้ช่วยส่อง",
+     "label_en": "Ask them to shine",
+     "result_th": "แสงสว่างนุ่มๆ ทำให้โมจิรู้สึกกล้าขึ้นมาก",
+     "result_en": "The soft glow made Mochi feel braver than before.",
+     "icon": "story_choice_star",
+     "outcome": {
+      "buff": "story_lucky_crit"
+     }
+    }
+   ]
+  },
+  {
+   "id": "wobbly_ladder",
+   "name_th": "บันไดโยกเยก",
+   "name_en": "Wobbly Ladder",
+   "description_th": "บันไดไม้บรรทัดโยกไปมา",
+   "description_en": "A ruler-ladder wobbles in the breeze.",
+   "icon": "story_event_wobbly_ladder",
+   "speaker": "pip",
+   "story_th": "หนูพิพโผล่ออกมาจากหลังไม้บรรทัดอันยาว \"เจอกันอีกแล้ว! ทางลัดอยู่ข้างบนนี้เอง แต่บันไดมันโยกนิดหน่อย…\" บ็อบบินมองลงมาจากผ้าพันคอ \"นิดเดียวจริงเหรอ?\"",
+   "story_en": "Pip the mouse peeks out from behind a long ruler. \"Hey, it's you again! The shortcut is up here, but the ladder wobbles a tiny bit...\" Bobbin peers down from the scarf. \"A tiny bit, really?\"",
+   "choices": [
+    {
+     "id": "climb",
+     "label_th": "ปีนขึ้นไปเลย",
+     "label_en": "Climb up",
+     "result_th": "โยกจนตกใจ แต่ข้างบนมีของวิเศษรออยู่",
+     "result_en": "It wobbled like crazy, but a relic waited at the top.",
+     "icon": "story_choice_jump",
+     "outcome": {
+      "damage_pct": 8,
+      "relic_choice": true
+     }
+    },
+    {
+     "id": "hold_ladder",
+     "label_th": "ให้พิพช่วยจับ",
+     "label_en": "Let Pip hold it",
+     "result_th": "พิพจับบันไดไว้ มั่นคงดี แถมมีขนมแบ่งกัน",
+     "result_en": "Pip held the ladder steady, and they shared a snack up top.",
+     "icon": "story_choice_help",
+     "outcome": {
+      "xp": 12,
+      "heal_pct": 10
+     }
+    }
+   ]
+  },
+  {
+   "id": "cloud_painter",
+   "name_th": "จิตรกรเมฆ",
+   "name_en": "The Cloud Painter",
+   "description_th": "ศาสตราจารย์ฮูตกำลังวาดเมฆบนท้องฟ้า",
+   "description_en": "Professor Hoot is painting clouds across the sky.",
+   "icon": "story_event_cloud_painter",
+   "speaker": "hoot",
+   "story_th": "ศาสตราจารย์ฮูตตื่นแล้ว! เขากำลังนั่งวาดเมฆอยู่บนกิ่งไม้ \"โมจิ! มาช่วยเลือกสีหน่อย เมฆวันนี้ควรเป็นสีอะไรดี?\" บ็อบบินกระซิบ \"อย่าตอบมั่วนะ เขาเอาจริงนะเรื่องนี้\"",
+   "story_en": "Professor Hoot is awake now and painting clouds from a branch. \"Mochi! Help me choose a colour. What should today's cloud be?\" Bobbin whispers, \"Don't guess. He takes this very seriously.\"",
+   "choices": [
+    {
+     "id": "pink",
+     "label_th": "สีชมพู",
+     "label_en": "Pink",
+     "result_th": "เมฆสีชมพูหอมหวานจนโมจิหัวใจพองโต และมีปลาทองหล่นลงมาจากเมฆ",
+     "result_en": "The pink cloud smelled sweet, and a goldfish tumbled out of it.",
+     "icon": "story_choice_star",
+     "outcome": {
+      "goldfish": 20
+     }
+    },
+    {
+     "id": "gold",
+     "label_th": "สีทอง",
+     "label_en": "Gold",
+     "result_th": "เมฆสีทองให้พลังอุ่นๆ ทำให้สกิลแรงขึ้นตลอดการเดินทาง",
+     "result_en": "The golden cloud gave a warm glow that strengthened Mochi's skills.",
+     "icon": "story_choice_wish",
+     "outcome": {
+      "buff": "story_skill_20"
+     }
+    }
+   ]
+  }
+ ],
+ "cast": {
+  "bobbin": {
+   "name_th": "บ็อบบิน",
+   "name_en": "Bobbin"
+  },
+  "hoot": {
+   "name_th": "ศาสตราจารย์ฮูต",
+   "name_en": "Professor Hoot"
+  },
+  "pip": {
+   "name_th": "พิพ",
+   "name_en": "Pip"
+  },
+  "crumb": {
+   "name_th": "ป้าครัมบ์",
+   "name_en": "Mrs. Crumb"
+  },
+  "inkie": {
+   "name_th": "อิงกี้",
+   "name_en": "Inkie"
+  },
+  "chesty": {
+   "name_th": "เชสตี้",
+   "name_en": "Chesty"
+  }
+ },
+ "narrative": {
+  "intro": {
+   "th": [
+    "นานมาแล้ว หมาป่ากระดาษขยำหน้าสุดท้ายของสมุดใบใหญ่จนยับ นิทานทุกเรื่องเลยจบไม่ได้",
+    "โมจิกับบ็อบบิน เจ้าม้วนด้ายตัวจิ๋วที่เกาะผ้าพันคอ ผูกเงื่อนแล้วออกเดินตามรอยขอบกระดาษ",
+    "\"ไปกันเถอะ!\" บ็อบบินร้อง \"เราจะแก้หน้าสุดท้ายให้เรียบอีกครั้ง\""
+   ],
+   "en": [
+    "Long ago, the Paper Wolf crumpled the last pages of the Great Notebook, and no story could end.",
+    "Mochi and Bobbin, a tiny spool of thread riding on the scarf, tie their knots and follow the margin trail.",
+    "\"Let's go!\" says Bobbin. \"We'll smooth out that last page together.\""
+   ]
+  },
+  "arrive_combat": {
+   "th": [
+    "พุ่มกระดาษไหวยิกๆ มีอะไรซ่อนอยู่!",
+    "บ็อบบินดึงผ้าพันคอ \"ข้างหน้ามีเสียงฝีเท้า…\"",
+    "รอยหมึกสดๆ ตัดผ่านทางเดิน ใครบางคนมาก่อนเรา"
+   ],
+   "en": [
+    "The paper bushes rustle. Something is hiding!",
+    "Bobbin tugs the scarf. \"I hear footsteps ahead...\"",
+    "Fresh ink tracks cross the path. Someone got here first."
+   ]
+  },
+  "arrive_treasure": {
+   "th": [
+    "มีหีบเล็กๆ ซ่อนอยู่หลังก้อนหิน!",
+    "บ็อบบินตาเป็นประกาย \"ของวิเศษแน่ๆ เลย!\""
+   ],
+   "en": [
+    "A little chest hides behind a rock!",
+    "Bobbin's eyes sparkle. \"That has to be a relic!\""
+   ]
+  },
+  "arrive_event": {
+   "th": [
+    "เหมือนมีเรื่องราวรออยู่ข้างหน้า…",
+    "บ็อบบินกระซิบ \"ฉันได้ยินเสียงใครสักคนเรียกอยู่\""
+   ],
+   "en": [
+    "It feels like a story is waiting up ahead...",
+    "Bobbin whispers, \"I think someone is calling us.\""
+   ]
+  },
+  "arrive_campfire": {
+   "th": [
+    "ควันบางๆ ลอยขึ้นมาจากกองไฟเล็กๆ นั่งพักกันเถอะ",
+    "กองไฟอุ่นๆ ส่งเสียงปะทุเบาๆ ใต้ดวงดาวกระดาษ"
+   ],
+   "en": [
+    "A thin ribbon of smoke rises from a small campfire. Time for a rest.",
+    "A warm fire crackles softly under the paper stars."
+   ]
+  },
+  "arrive_shop": {
+   "th": [
+    "แผงของศาสตราจารย์ฮูตตั้งอยู่ข้างทาง \"ยินดีต้อนรับ ผู้กล้าตัวน้อย!\"",
+    "กระดิ่งลมดังกริ๊ง มีร้านเล็กๆ ของนกฮูกอยู่ตรงหน้า"
+   ],
+   "en": [
+    "Professor Hoot's little stall stands by the road. \"Welcome, small hero!\"",
+    "A wind chime tinkles. An owl's tiny shop is right ahead."
+   ]
+  },
+  "arrive_boss": {
+   "th": [
+    "ลมเย็นพัดมา กระดาษทุกแผ่นสั่นสะท้าน หมาป่ากระดาษอยู่ข้างหน้า!",
+    "บ็อบบินหดตัวเข้าไปในผ้าพันคอ \"ฉันไม่ได้กลัวนะ… แค่หนาวนิดหน่อย\""
+   ],
+   "en": [
+    "A cold wind rattles every page. The Paper Wolf is just ahead!",
+    "Bobbin tucks into the scarf. \"I'm not scared... just a little chilly.\""
+   ]
+  },
+  "win": {
+   "th": [
+    "หมาป่ากระดาษคลายตัวออก กลายเป็นแผ่นกระดาษเรียบๆ หน้าสุดท้ายของสมุดถูกแก้แล้ว!",
+    "บ็อบบินโบกด้ายดีใจ \"นิทานจบได้แล้ว! และเราคือคนเขียนบรรทัดสุดท้าย\""
+   ],
+   "en": [
+    "The Paper Wolf unfolds into a smooth, quiet sheet. The last page is mended!",
+    "Bobbin waves a bit of thread. \"The story can end now, and we wrote the final line!\""
+   ]
+  },
+  "lose": {
+   "th": [
+    "โมจิเหนื่อยจนต้องนอนพัก บ็อบบินห่มผ้าพันคอให้เบาๆ",
+    "\"ไม่เป็นไรนะ\" บ็อบบินกระซิบ \"พรุ่งนี้เราค่อยไปกันใหม่\""
+   ],
+   "en": [
+    "Mochi is too tired to go on. Bobbin gently tucks the scarf around them.",
+    "\"It's all right,\" Bobbin whispers. \"We'll try again tomorrow.\""
+   ]
+  }
+ }
 }

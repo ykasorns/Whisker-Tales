@@ -18,7 +18,7 @@ void main() {
   test('MVP roster is complete and every entry is bilingual', () {
     expect(story.relics, hasLength(15));
     expect(story.talents, hasLength(9));
-    expect(story.events, hasLength(8));
+    expect(story.events, hasLength(12));
     expect(story.monsters.values.where((m) => !m.isBoss), hasLength(5));
     expect(story.monsters.values.where((m) => m.isBoss).single.id, 'paperwolf');
     expect(story.balance.potions, hasLength(4));
@@ -47,6 +47,26 @@ void main() {
         event.descriptionEn
       ], everyElement(isNotEmpty));
       expect(event.choices, hasLength(2));
+      expect(event.storyTh, isNotEmpty);
+      expect(event.storyEn, isNotEmpty);
+      if (event.speaker != null) {
+        expect(story.narrative.cast, contains(event.speaker));
+      }
+    }
+  });
+
+  test('the run has a story thread in both languages', () {
+    final n = story.narrative;
+    for (final key in StoryNarrative.requiredKeys) {
+      expect(n.lines(key, 'th'), isNotEmpty, reason: key);
+      expect(n.lines(key, 'th'), hasLength(n.lines(key, 'en').length));
+    }
+    expect(n.line('intro', 'en', 7), isNotNull); // index wraps
+    expect(n.line('nope', 'en', 0), isNull);
+    // a vignette is told in two or three sentences, short enough to read
+    for (final e in story.events.values) {
+      expect(e.storyEn.length, lessThan(320), reason: e.id);
+      expect(e.storyTh.length, lessThan(300), reason: e.id);
     }
   });
 

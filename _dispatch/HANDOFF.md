@@ -1,7 +1,7 @@
-# HANDOFF — Whisker Tales (updated 2026-10-31, after D-060 UI frame v2)
+# HANDOFF — Whisker Tales (updated 2026-11-01, after D-062 Story Run art wired)
 
 Read this first if you are a new session or a different model picking up the work.
-For background, also read `DECISIONS.md` (D-001 … D-060), `_contract/GAME_CONTRACT.md`, `_contract/GDD_WhiskerTales_v0.5.md` and `RELEASE_CHECKLIST.md`.
+For background, also read `DECISIONS.md` (D-001 … D-062), `_contract/GAME_CONTRACT.md`, `_contract/GDD_WhiskerTales_v0.5.md` and `RELEASE_CHECKLIST.md`.
 
 ---
 
@@ -87,6 +87,8 @@ For background, also read `DECISIONS.md` (D-001 … D-060), `_contract/GAME_CONT
 | D-055 | Cat submenus v2: hero/stat board, shared wardrobe rail, focused hatch station, rarity-tinted pets and effect-tinted research rows replace equal-weight card grids |
 | D-056 | All remaining submenus v2: Adventure/Story panels, Shop/Events, age selection, knit sheet, offline/fail overlays and parental purchase flow now share the parchment hierarchy and action surfaces |
 | D-057 | Asset-first UI rule: new visual designs must be generated as real game assets; Home HUD/actions and the shared dock now use the painted six-piece storybook kit instead of code-only rounded cards |
+| D-062 | GPT story art wired: speaker portraits (event panel, caption), painted choice/shop cards, hit sparks, footstep dust (`assets/game/story/`) |
+| D-061 | Story Run: narrative/cast/12 events in `events.json`, `story_scene.dart` (parallax, hit numbers, typed captions), new frame-based panels, `PressScale`; Home skill-label lane. Art still to generate: `design/art/story_run_art_prompt.md` |
 | D-060 | UI frame art v2 (calmer GPT frames in `assets/raw/frames/ui_v2/`, tab icons, cooldown badge) wired through `sync_sprites.py`; rects re-measured by flood fill |
 | D-059 | Layout pass: frames are never squashed (`StretchFrame`, measured in `design/art/ui_frames.json`), text sits inside each frame's paper, dock slots measured, top-left HUD cluster clear of Mochi's bar, background seams fixed (`tile_background.py --gaps`), `hud_layout_test` |
 | D-058 | Phone layout correction: painted assets now have explicit live-content safe zones; profile, wallet, chapter, farm controls, basket label and shared dock no longer overlap or fall off-screen |

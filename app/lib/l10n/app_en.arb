@@ -382,5 +382,11 @@
   "storyFullReward": "Full",
   "storyReducedReward": "25%",
   "storyBuy": "Buy",
-  "storyLevel": "Level"
+  "storyLevel": "Level",
+  "storyAheadCombat": "A fight ahead",
+  "storyAheadTreasure": "A hidden chest",
+  "storyAheadEvent": "A story waits",
+  "storyAheadCampfire": "A cozy campfire",
+  "storyAheadShop": "The owl's stall",
+  "storyAheadBoss": "The Paper Wolf!"
 }

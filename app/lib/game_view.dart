@@ -396,7 +396,8 @@ class BattleGame extends FlameGame {
                   : petSpot != null
                       ? Palette.teal
                       : Palette.plum,
-              scale: 1.25);
+              scale: 1.25,
+              label: true);
         }
       default:
     }
@@ -405,13 +406,29 @@ class BattleGame extends FlameGame {
   int _floatCount = 0;
 
   void _float(String text, Vector2 at, Color color,
-      {String? icon, double scale = 1}) {
+      {String? icon, double scale = 1, bool label = false}) {
     final im = icon != null && images.containsKey(icon)
         ? images.fromCache(icon)
         : null;
-    // numbers that land together fan out sideways instead of stacking
-    final fan = ((_floatCount++ % 3) - 1) * size.y * 0.05;
-    add(_FloatText(text, at + Vector2(fan, 0), color, size.y * 0.06 * scale,
+    if (label) {
+      // a skill's name has its own lane high above the numbers, so a
+      // fireball over three monsters never lands on its own damage
+      add(_FloatText(
+          text,
+          Vector2(at.x, math.min(at.y, groundY - size.y * 0.52)),
+          color,
+          size.y * 0.06 * scale,
+          image: im));
+      return;
+    }
+    // numbers that land together step sideways and upwards instead of
+    // stacking on one spot (three monsters hit by one area skill)
+    final n = _floatCount++ % 3;
+    add(_FloatText(
+        text,
+        at + Vector2((n - 1) * size.y * 0.05, -n * size.y * 0.035),
+        color,
+        size.y * 0.06 * scale,
         image: im));
   }
 }

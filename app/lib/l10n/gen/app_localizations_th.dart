@@ -572,4 +572,22 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get storyLevel => 'ระดับ';
+
+  @override
+  String get storyAheadCombat => 'เจอศัตรูข้างหน้า';
+
+  @override
+  String get storyAheadTreasure => 'หีบลับ';
+
+  @override
+  String get storyAheadEvent => 'มีเรื่องราวรออยู่';
+
+  @override
+  String get storyAheadCampfire => 'กองไฟอบอุ่น';
+
+  @override
+  String get storyAheadShop => 'แผงของนกฮูก';
+
+  @override
+  String get storyAheadBoss => 'หมาป่ากระดาษ!';
 }

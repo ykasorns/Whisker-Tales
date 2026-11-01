@@ -238,6 +238,57 @@ void main() {
     await golden('result');
   });
 
+  testWidgets('an event tells its story, and the choice tells what came of it',
+      (tester) async {
+    late StoryRunController run;
+    for (var seed = 0;; seed++) {
+      run = makeRun(seed);
+      final ahead = run.routeChoices
+          .where((c) => c.type == EncounterType.event)
+          .firstOrNull;
+      if (ahead != null) {
+        run.advance(routeId: ahead.routeId);
+        break;
+      }
+      run.dispose();
+      expect(seed, lessThan(400), reason: 'no seed starts with an event');
+    }
+    addTearDown(run.dispose);
+    final event = run.event!;
+    await mount(tester, run, disableAnimations: true);
+    await tester.pump(const Duration(milliseconds: 400));
+    // the vignette and who tells it are on the panel, in full
+    expect(find.textContaining(event.storyEn.substring(0, 40)), findsOneWidget);
+    final cast = content.story.narrative.cast[event.speaker];
+    if (cast != null) expect(find.text(cast.nameEn), findsOneWidget);
+    // choosing ends the event and the caption tells the result
+    final choice = event.choices.first;
+    run.chooseEvent(choice);
+    await tester.pump();
+    expect(run.captionLines('en'), [choice.resultEn]);
+    expect(run.captionLines('th'), [choice.resultTh]);
+  });
+
+  testWidgets('a run opens with its story and lines vary by place',
+      (tester) async {
+    final run = makeRun(2);
+    addTearDown(run.dispose);
+    expect(run.captionKey, 'intro');
+    expect(run.captionLines('en'), hasLength(3));
+    final serial = run.captionSerial;
+    run.advance(routeId: run.routeChoices.first.routeId);
+    expect(run.captionSerial, greaterThan(serial));
+    expect(run.captionKey, startsWith('arrive_'));
+    expect(run.captionLines('th'), hasLength(1));
+  });
+
+  testWidgets('hits of a fight are recorded for floating numbers',
+      (tester) async {
+    final run = combatRun();
+    addTearDown(run.dispose);
+    expect(run.hits, isEmpty);
+  });
+
   testWidgets('node map expands and collapses without blocking the run',
       (tester) async {
     final run = makeRun(3);

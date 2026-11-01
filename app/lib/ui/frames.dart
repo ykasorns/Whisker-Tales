@@ -211,3 +211,38 @@ class _FramePainter extends CustomPainter {
   bool shouldRepaint(_FramePainter old) =>
       old.g.size != g.size || old.image != image;
 }
+
+/// Presses in a little under the finger and springs back, so painted buttons
+/// feel like they give. A still button under reduced motion.
+class PressScale extends StatefulWidget {
+  const PressScale({super.key, required this.onTap, required this.child});
+
+  final VoidCallback? onTap;
+  final Widget child;
+
+  @override
+  State<PressScale> createState() => _PressScaleState();
+}
+
+class _PressScaleState extends State<PressScale> {
+  bool _down = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final still = MediaQuery.disableAnimationsOf(context);
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown:
+          widget.onTap == null ? null : (_) => setState(() => _down = true),
+      onTapCancel: () => setState(() => _down = false),
+      onTapUp: (_) => setState(() => _down = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _down && !still ? .94 : 1,
+        duration: Duration(milliseconds: still ? 0 : 90),
+        curve: Curves.easeOut,
+        child: widget.child,
+      ),
+    );
+  }
+}

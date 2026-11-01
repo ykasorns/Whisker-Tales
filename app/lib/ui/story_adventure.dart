@@ -7,8 +7,10 @@ import 'package:wt_core/wt_core.dart';
 import 'package:wt_mode_story/wt_mode_story.dart';
 
 import '../l10n/strings.dart';
+import 'frames.dart';
 import 'game_icon.dart';
 import 'palette.dart';
+import 'story_scene.dart';
 
 class AdventurePage extends ConsumerWidget {
   const AdventurePage({super.key, required this.refresh});
@@ -248,6 +250,7 @@ class _StoryRunPageState extends ConsumerState<StoryRunPage>
   @override
   Widget build(BuildContext context) {
     final disableMotion = MediaQuery.disableAnimationsOf(context);
+    final fighting = controller.panel == StoryRunPanel.combat;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -258,11 +261,21 @@ class _StoryRunPageState extends ConsumerState<StoryRunPage>
         body: SafeArea(
           child: Column(children: [
             Expanded(
-              flex: 60,
-              child: _StoryViewport(controller: controller, onQuit: _quit),
+              flex: fighting ? 70 : 58,
+              child: StoryScene(
+                controller: controller,
+                onQuit: _quit,
+                nodeMap: controller.panel == StoryRunPanel.result
+                    ? const SizedBox(height: 64)
+                    : StoryNodeMapOverlay(
+                        previews: controller.preview,
+                        depth: controller.manager.current?.clearedNodes ?? 0,
+                      ),
+                statusIcons: (statuses) => _StatusIcons(statuses: statuses),
+              ),
             ),
             Expanded(
-              flex: 40,
+              flex: fighting ? 30 : 42,
               child: StorybookPaper(
                 child: AnimatedSwitcher(
                   duration: disableMotion
@@ -311,292 +324,6 @@ class _StoryRunPageState extends ConsumerState<StoryRunPage>
       };
 }
 
-class _StoryViewport extends StatefulWidget {
-  const _StoryViewport({required this.controller, required this.onQuit});
-
-  final StoryRunController controller;
-  final VoidCallback onQuit;
-
-  @override
-  State<_StoryViewport> createState() => _StoryViewportState();
-}
-
-class _StoryViewportState extends State<_StoryViewport>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _motion;
-  bool _precacheStarted = false;
-
-  StoryRunController get controller => widget.controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _motion = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 1200));
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_precacheStarted) {
-      _precacheStarted = true;
-      for (final frame in const [
-        'idle',
-        'walk_f1',
-        'walk_f2',
-        'walk_f3',
-        'attack',
-        'hurt',
-        'victory',
-        'sleep',
-      ]) {
-        precacheImage(
-            AssetImage(
-                'assets/game/cat/outfit_${controller.classId}_$frame.png'),
-            context);
-      }
-      for (final monster in controller.mode.content.monsters.values) {
-        for (final frame in const [
-          'idle_f1',
-          'idle_f2',
-          'idle_f3',
-          'attack',
-        ]) {
-          precacheImage(
-              AssetImage('assets/game/mon/${monster.sprite}_$frame.png'),
-              context);
-        }
-      }
-    }
-    if (MediaQuery.disableAnimationsOf(context)) {
-      _motion
-        ..stop()
-        ..value = .35;
-    } else if (!_motion.isAnimating) {
-      _motion.repeat();
-    }
-  }
-
-  @override
-  void dispose() {
-    _motion.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final cat = controller.combatView
-        .where((unit) => unit.side == CombatSide.cat && !unit.isPartner)
-        .firstOrNull;
-    final enemy = controller.combatView
-        .where((unit) => unit.side == CombatSide.enemy)
-        .firstOrNull;
-    return Stack(children: [
-      Positioned.fill(
-        child: Image.asset('assets/game/bg/bg_book1_ch1_L1_far.webp',
-            fit: BoxFit.cover),
-      ),
-      Positioned.fill(
-        child: Image.asset('assets/game/bg/bg_book1_ch1_L2_mid.webp',
-            fit: BoxFit.cover),
-      ),
-      Positioned.fill(
-        child: Image.asset('assets/game/bg/bg_book1_L3_ground.webp',
-            fit: BoxFit.cover),
-      ),
-      AnimatedBuilder(
-        animation: _motion,
-        builder: (_, __) => _StoryActors(
-          controller: controller,
-          phase: _motion.value,
-          cat: cat,
-          enemy: enemy,
-        ),
-      ),
-      Positioned(
-        left: 8,
-        right: 8,
-        top: 6,
-        child: StoryHudOverlay(controller: controller),
-      ),
-      if (controller.panel != StoryRunPanel.result)
-        Positioned(
-          left: 20,
-          right: 20,
-          top: 82,
-          child: StoryNodeMapOverlay(
-            previews: controller.preview,
-            depth: controller.manager.current?.clearedNodes ?? 0,
-          ),
-        ),
-      Positioned(
-        top: 8,
-        right: 10,
-        child: IconButton(
-          key: const Key('story-quit'),
-          tooltip: AppLocalizations.of(context).storyQuit,
-          onPressed: widget.onQuit,
-          icon: const GameIcon('cross', size: 22),
-          style: IconButton.styleFrom(backgroundColor: Palette.paper),
-        ),
-      ),
-      if (controller.panel == StoryRunPanel.result)
-        Center(
-          child: GameIcon(
-            controller.completion?.result.outcome == RunOutcome.won
-                ? 'victory'
-                : 'sadcat',
-            size: 108,
-          ),
-        ),
-    ]);
-  }
-}
-
-/// Mochi remains in the scene throughout the run. On the map Mochi walks;
-/// while reading or choosing, Mochi idles; combat alternates visible attack
-/// and hurt poses for both sides so the automatic fight reads as a fight.
-class _StoryActors extends StatelessWidget {
-  const _StoryActors({
-    required this.controller,
-    required this.phase,
-    required this.cat,
-    required this.enemy,
-  });
-
-  final StoryRunController controller;
-  final double phase;
-  final UnitView? cat;
-  final UnitView? enemy;
-
-  bool get fighting => controller.panel == StoryRunPanel.combat;
-
-  String get catFrame {
-    if (fighting) {
-      if (phase < .22) return 'attack';
-      if (phase >= .58 && phase < .72) return 'hurt';
-      return 'idle';
-    }
-    if (controller.panel == StoryRunPanel.result) {
-      return controller.completion?.result.outcome == RunOutcome.won
-          ? 'victory'
-          : 'sleep';
-    }
-    if (controller.panel == StoryRunPanel.map) {
-      return 'walk_f${(phase * 3).floor().clamp(0, 2) + 1}';
-    }
-    return 'idle';
-  }
-
-  String get enemyFrame {
-    if (phase >= .45 && phase < .66) return 'attack';
-    return 'idle_f${(phase * 3).floor().clamp(0, 2) + 1}';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final catAdvance = fighting && phase < .22 ? 16.0 : 0.0;
-    final enemyAdvance = fighting && phase >= .45 && phase < .66 ? 14.0 : 0.0;
-    final bob = math.sin(phase * math.pi * 6) *
-        (controller.panel == StoryRunPanel.map ? 3 : 1.2);
-    return Stack(children: [
-      Positioned(
-        left: 34 + catAdvance,
-        bottom: 38 + bob,
-        child: Column(children: [
-          if (cat != null) _StatusIcons(statuses: cat!.statuses),
-          Image.asset(
-            'assets/game/cat/outfit_${controller.classId}_$catFrame.png',
-            key: const Key('story-cat'),
-            width: 104,
-            height: 130,
-            fit: BoxFit.contain,
-            gaplessPlayback: true,
-            errorBuilder: (_, __, ___) => Image.asset(
-              'assets/game/cat/$catFrame.png',
-              width: 104,
-              height: 130,
-              fit: BoxFit.contain,
-              gaplessPlayback: true,
-            ),
-          ),
-        ]),
-      ),
-      if (fighting && enemy != null)
-        Positioned(
-          right: 30 + enemyAdvance,
-          bottom: 42,
-          child: Column(children: [
-            _StatusIcons(statuses: enemy!.statuses),
-            Image.asset(
-              'assets/game/mon/${enemy!.id}_$enemyFrame.png',
-              key: const Key('story-enemy'),
-              width: enemy!.isBoss ? 150 : 112,
-              height: enemy!.isBoss ? 150 : 112,
-              fit: BoxFit.contain,
-              gaplessPlayback: true,
-            ),
-          ]),
-        ),
-    ]);
-  }
-}
-
-class StoryHudOverlay extends StatelessWidget {
-  const StoryHudOverlay({super.key, required this.controller});
-
-  final StoryRunController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = AppLocalizations.of(context);
-    final currentHp = controller.displayedHp;
-    final maxHp = controller.displayedMaxHp;
-    final shield = controller.displayedShield;
-    final hp = maxHp == 0 ? 0.0 : currentHp / maxHp;
-    final xp = controller.talentXpToNext == 0
-        ? 1.0
-        : controller.talentXp / controller.talentXpToNext;
-    return Padding(
-      padding: const EdgeInsets.only(right: 48),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-        decoration: storybookCard(
-            fill: Palette.parchment.withValues(alpha: 0.96),
-            accent: hp < .3 ? Palette.coral : Palette.teal,
-            radius: 8),
-        child: Row(children: [
-          const GameIcon('heart', size: 27),
-          const SizedBox(width: 6),
-          Expanded(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              IconText(
-                  '${s.storyHp} $currentHp/$maxHp${shield > 0 ? ' · 🛡️ $shield' : ''}',
-                  style: const TextStyle(
-                      fontSize: 10, fontWeight: FontWeight.w800)),
-              LinearProgressIndicator(
-                  value: hp.clamp(0, 1),
-                  minHeight: 6,
-                  color: hp < .3 ? Palette.coral : Palette.lime,
-                  backgroundColor: Palette.sheet),
-              const SizedBox(height: 4),
-              LinearProgressIndicator(
-                  value: xp.clamp(0, 1),
-                  minHeight: 4,
-                  color: Palette.plum,
-                  backgroundColor: Palette.sheet),
-            ]),
-          ),
-          const SizedBox(width: 8),
-          _miniCount('sparkle', controller.relicIds.length),
-          _miniCount('star', controller.talentIds.length),
-        ]),
-      ),
-    );
-  }
-}
-
 class StoryNodeMapOverlay extends StatefulWidget {
   const StoryNodeMapOverlay(
       {super.key, required this.previews, required this.depth});
@@ -608,6 +335,7 @@ class StoryNodeMapOverlay extends StatefulWidget {
   State<StoryNodeMapOverlay> createState() => _StoryNodeMapOverlayState();
 }
 
+/// The next stops on a painted ribbon: where Mochi is, then what lies ahead.
 class _StoryNodeMapOverlayState extends State<StoryNodeMapOverlay> {
   bool expanded = true;
 
@@ -620,31 +348,31 @@ class _StoryNodeMapOverlayState extends State<StoryNodeMapOverlay> {
               ? Duration.zero
               : const Duration(milliseconds: 180),
           width: double.infinity,
-          padding:
-              EdgeInsets.symmetric(horizontal: 12, vertical: expanded ? 9 : 5),
-          decoration: storybookCard(
-              fill: Palette.parchmentDeep.withValues(alpha: 0.92),
-              accent: Palette.storyEdge,
-              radius: 9),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            const GameIcon('paw', size: 20),
-            if (expanded) ...[
-              const SizedBox(width: 8),
-              for (var i = 0; i < widget.previews.length; i++) ...[
-                if (i > 0)
-                  Expanded(
-                      child: Container(
-                          height: 2,
-                          color: Palette.storyEdge.withValues(alpha: .45))),
-                GameIcon(_encounterIcon(widget.previews[i].type), size: 30),
-              ],
-            ] else
-              Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: IconText('${widget.depth + 1}',
-                    style: const TextStyle(fontWeight: FontWeight.w900)),
-              ),
-          ]),
+          height: 64,
+          child: StretchFrame(
+            frame: 'chapter',
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              const GameIcon('paw', size: 18),
+              if (expanded) ...[
+                const SizedBox(width: 6),
+                for (var i = 0; i < widget.previews.length; i++) ...[
+                  if (i > 0)
+                    Expanded(
+                        child: Container(
+                            height: 2,
+                            color: Palette.ink.withValues(alpha: .3))),
+                  GameIcon(_encounterIcon(widget.previews[i].type),
+                      size: i == 0 ? 22 : 17),
+                ],
+              ] else
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: IconText('${widget.depth + 1}',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w900, color: Palette.ink)),
+                ),
+            ]),
+          ),
         ),
       );
 }
@@ -660,27 +388,33 @@ class _MapPanel extends StatelessWidget {
     return _panelFrame(
       title: s.storyMap,
       icon: 'scroll',
-      child: Row(children: [
-        for (var i = 0; i < choices.length; i++) ...[
-          if (i > 0) const SizedBox(width: 10),
-          Expanded(
-            child: _actionCard(
-              key: Key('route-${choices[i].routeId}'),
-              icon: _encounterIcon(choices[i].type),
-              label: choices.length > 1
-                  ? (choices[i].routeId?.endsWith('safe') == true
-                      ? s.storySafe
-                      : s.storyRisky)
-                  : _encounterName(s, choices[i].type),
-              color: choices.length > 1 &&
-                      choices[i].routeId?.endsWith('risky') == true
-                  ? Palette.coral
-                  : Palette.teal,
-              onTap: () => controller.advance(routeId: choices[i].routeId),
-            ),
-          ),
-        ],
-      ]),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+              maxHeight: 110, maxWidth: choices.length > 1 ? 400 : 230),
+          child: Row(children: [
+            for (var i = 0; i < choices.length; i++) ...[
+              if (i > 0) const SizedBox(width: 10),
+              Expanded(
+                child: _actionCard(
+                  key: Key('route-${choices[i].routeId}'),
+                  icon: _encounterIcon(choices[i].type),
+                  label: choices.length > 1
+                      ? (choices[i].routeId?.endsWith('safe') == true
+                          ? s.storySafe
+                          : s.storyRisky)
+                      : _encounterName(s, choices[i].type),
+                  color: choices.length > 1 &&
+                          choices[i].routeId?.endsWith('risky') == true
+                      ? Palette.coral
+                      : Palette.teal,
+                  onTap: () => controller.advance(routeId: choices[i].routeId),
+                ),
+              ),
+            ],
+          ]),
+        ),
+      ),
     );
   }
 }
@@ -701,30 +435,47 @@ class _CombatPanel extends StatelessWidget {
     return _panelFrame(
       title: s.storyCombat,
       icon: 'sword',
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        if (cat == null || cat.skills.isEmpty)
-          const GameIcon('paw', size: 58)
-        else
-          for (final skill in cat.skills)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: SizedBox(
-                width: 70,
-                height: 70,
-                child: Stack(alignment: Alignment.center, children: [
-                  CircularProgressIndicator(
-                    value: skill.totalMs == 0
-                        ? 1
-                        : 1 - skill.remainingMs / skill.totalMs,
-                    strokeWidth: 6,
-                    color: Palette.teal,
-                    backgroundColor: Palette.sheet,
+      child: Column(children: [
+        Expanded(
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            if (cat == null || cat.skills.isEmpty)
+              const GameIcon('paw', size: 48)
+            else
+              for (final skill in cat.skills)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: SizedBox(
+                    width: 54,
+                    height: 54,
+                    child: Stack(alignment: Alignment.center, children: [
+                      Positioned.fill(
+                        child: CircularProgressIndicator(
+                          value: skill.totalMs == 0
+                              ? 1
+                              : 1 - skill.remainingMs / skill.totalMs,
+                          strokeWidth: 5,
+                          color: Palette.teal,
+                          backgroundColor: Palette.sheet,
+                        ),
+                      ),
+                      GameIcon.skill(skill.id, info?[skill.id]?.icon ?? '✨',
+                          size: 36),
+                    ]),
                   ),
-                  GameIcon.skill(skill.id, info?[skill.id]?.icon ?? '✨',
-                      size: 44),
-                ]),
-              ),
-            ),
+                ),
+          ]),
+        ),
+        if (controller.relicIds.isNotEmpty)
+          SizedBox(
+            height: 26,
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              for (final id in controller.relicIds.take(8))
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: GameIcon(_relicIcon(id), size: 22),
+                ),
+            ]),
+          ),
       ]),
     );
   }
@@ -855,20 +606,9 @@ class _PickPanelState<T> extends State<_PickPanel<T>> {
             scale: chosen ? 1.04 : 1,
             duration: const Duration(milliseconds: 120),
             child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: chosen
-                  ? storybookButton(
-                      fill: Color.lerp(
-                          Palette.parchment, widget.colorOf(choice), .34)!,
-                      accent: widget.colorOf(choice),
-                      radius: 9,
-                    )
-                  : storybookCard(
-                      fill: Color.lerp(
-                          Palette.parchment, widget.colorOf(choice), .12)!,
-                      accent: widget.colorOf(choice),
-                      radius: 7,
-                    ),
+              padding: const EdgeInsets.fromLTRB(13, 15, 13, 13),
+              decoration:
+                  _cardDecoration(chosen ? 'card_pick_selected' : 'card_pick'),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -914,17 +654,55 @@ class _EventPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
     final event = controller.event!;
-    String name(StoryEventChoice c) => s.lang == 'en' ? c.labelEn : c.labelTh;
+    final en = s.lang == 'en';
+    String name(StoryEventChoice c) => en ? c.labelEn : c.labelTh;
+    final speaker = controller.mode.content.narrative.cast[event.speaker];
     return _panelFrame(
-      title: s.lang == 'en' ? event.nameEn : event.nameTh,
+      title: en ? event.nameEn : event.nameTh,
       icon: 'question',
       child: Column(children: [
-        IconText(s.lang == 'en' ? event.descriptionEn : event.descriptionTh,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            style: const TextStyle(fontSize: 11, color: Palette.inkSoft)),
-        const SizedBox(height: 7),
         Expanded(
+          child: SingleChildScrollView(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                if (speaker != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8, top: 2),
+                    child: storyPortrait(event.speaker!, 62),
+                  ),
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (speaker != null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 2),
+                            child: IconText(
+                                en ? speaker.nameEn : speaker.nameTh,
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w900,
+                                    color: Palette.teal)),
+                          ),
+                        StoryTypewriter(
+                          key: ValueKey(event.id),
+                          text: en ? event.storyEn : event.storyTh,
+                          style: const TextStyle(
+                              fontSize: 13.5,
+                              height: 1.3,
+                              fontWeight: FontWeight.w700,
+                              color: Palette.ink),
+                        ),
+                      ]),
+                ),
+              ]),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 6),
+        SizedBox(
+          height: 92,
           child: Row(children: [
             for (var i = 0; i < event.choices.length; i++) ...[
               if (i > 0) const SizedBox(width: 10),
@@ -1012,14 +790,9 @@ class _ShopPanel extends StatelessWidget {
       child: Opacity(
         opacity: usable ? 1 : .48,
         child: Container(
-          padding: const EdgeInsets.all(7),
-          decoration: usable && !purchased
-              ? storybookButton(
-                  fill: const Color(0xFFE8F5EB),
-                  accent: Palette.teal,
-                  radius: 8)
-              : storybookCard(
-                  fill: Palette.parchment, accent: Palette.lime, radius: 8),
+          padding: const EdgeInsets.fromLTRB(12, 13, 12, 12),
+          decoration:
+              _cardDecoration(usable && !purchased ? 'card_shop' : 'card_pick'),
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             GameIcon(
                 usable && !purchased ? _potionIcon(potion.buffId) : 'check',
@@ -1200,29 +973,52 @@ class _DottedLinkPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+/// A painted choice card that stretches its middle; the corners keep their
+/// shape (GPT art, story_v1/cards, drawn at 2x).
+BoxDecoration _cardDecoration(String name) => BoxDecoration(
+      image: DecorationImage(
+        image: AssetImage('assets/game/story/cards/$name.png'),
+        scale: 2,
+        centerSlice: const Rect.fromLTRB(20, 20, 80, 120),
+        fit: BoxFit.fill,
+        filterQuality: FilterQuality.medium,
+      ),
+    );
+
 Widget _panelFrame({
   Key? key,
   required String title,
   required String icon,
   required Widget child,
-  EdgeInsets padding = const EdgeInsets.fromLTRB(12, 8, 12, 12),
+  EdgeInsets padding = const EdgeInsets.fromLTRB(12, 6, 12, 10),
 }) =>
     Padding(
       key: key,
       padding: padding,
       child: Column(children: [
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          GameIcon(icon, size: 24),
-          const SizedBox(width: 7),
-          Flexible(
-            child: IconText(title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+        SizedBox(
+          height: 38,
+          width: 250,
+          child: StretchFrame(
+            frame: 'chapter',
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              GameIcon(icon, size: 20),
+              const SizedBox(width: 6),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: IconText(title,
+                      maxLines: 1,
+                      style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                          color: Palette.ink)),
+                ),
+              ),
+            ]),
           ),
-        ]),
-        const SizedBox(height: 7),
+        ),
+        const SizedBox(height: 6),
         Expanded(child: child),
       ]),
     );
@@ -1234,28 +1030,38 @@ Widget _actionCard({
   required Color color,
   required VoidCallback onTap,
 }) =>
-    Semantics(
-      button: true,
-      label: label,
-      child: GestureDetector(
-        key: key,
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: storybookButton(
-              fill: Color.lerp(Palette.parchment, color, .30)!,
-              accent: color,
-              radius: 10),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            GameIcon(icon, size: 44),
-            const SizedBox(height: 5),
-            IconText(label,
-                textAlign: TextAlign.center,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style:
-                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w900)),
-          ]),
+    Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 108, maxWidth: 240),
+        child: Semantics(
+          button: true,
+          label: label,
+          child: PressScale(
+            onTap: onTap,
+            child: StretchFrame(
+              key: key,
+              frame: 'action',
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  GameIcon(icon, size: 40),
+                  const SizedBox(height: 3),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 130),
+                    child: IconText(label,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
+                            color: color == Palette.coral
+                                ? Color.lerp(Palette.ink, Palette.coral, .7)
+                                : Palette.ink)),
+                  ),
+                ]),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -1277,15 +1083,6 @@ Widget _paperMessage(String icon, String label, Color color) => Container(
       child: Column(children: [GameIcon(icon, size: 52), IconText(label)]),
     );
 
-Widget _miniCount(String icon, int count) => Padding(
-      padding: const EdgeInsets.only(left: 5),
-      child: Column(children: [
-        GameIcon(icon, size: 20),
-        Text('$count',
-            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w900)),
-      ]),
-    );
-
 String _encounterIcon(EncounterType type) => switch (type) {
       EncounterType.combat => 'sword',
       EncounterType.treasure => 'gift',
@@ -1297,13 +1094,13 @@ String _encounterIcon(EncounterType type) => switch (type) {
     };
 
 String _encounterName(AppLocalizations s, EncounterType type) => switch (type) {
-      EncounterType.combat => s.storyCombat,
-      EncounterType.treasure => s.storyPickRelic,
-      EncounterType.event => s.storyEvent,
-      EncounterType.campfire => s.storyCampfire,
-      EncounterType.shop => s.storyOwlShop,
+      EncounterType.combat => s.storyAheadCombat,
+      EncounterType.treasure => s.storyAheadTreasure,
+      EncounterType.event => s.storyAheadEvent,
+      EncounterType.campfire => s.storyAheadCampfire,
+      EncounterType.shop => s.storyAheadShop,
       EncounterType.fork => s.storyMap,
-      EncounterType.boss => s.fightingBoss,
+      EncounterType.boss => s.storyAheadBoss,
     };
 
 String _relicIcon(String id) {

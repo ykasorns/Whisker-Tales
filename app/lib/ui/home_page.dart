@@ -328,7 +328,7 @@ class _TopLeftCluster extends StatelessWidget {
             child: SizedBox(
                 width: 60, height: 60, child: FittedBox(child: bossButton))),
         const SizedBox(width: 6),
-        GestureDetector(
+        PressScale(
           onTap: onAuto,
           child: SizedBox(
             width: 96,
@@ -417,7 +417,7 @@ class _SpeedControl extends StatelessWidget {
   final List<double> speeds;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PressScale(
         key: const Key('game-speed-control'),
         onTap: speeds.length < 2
             ? null
@@ -821,7 +821,7 @@ class _Toggle extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => PressScale(
         onTap: onTap,
         child: SizedBox(
           height: 52,

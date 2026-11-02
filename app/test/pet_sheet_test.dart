@@ -84,8 +84,8 @@ void main() {
 
   testWidgets('treats level a pet up; its own and shared stats rise',
       (tester) async {
-    final c = await open(tester,
-        const PetsState(owned: {'hedgehog': 1}, deployed: [], pity: 0));
+    final c = await open(
+        tester, const PetsState(owned: {'hedgehog': 1}, deployed: [], pity: 0));
     final pets = c.read(petsProvider)!;
     expect(find.byKey(const Key('pet-level')), findsOneWidget);
     expect(find.byKey(const Key('pet-own-stats')), findsOneWidget);

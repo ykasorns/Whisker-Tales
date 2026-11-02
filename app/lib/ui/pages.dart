@@ -484,6 +484,48 @@ class _ShopPageState extends ConsumerState<ShopPage> {
     }
   }
 
+  /// A row of the packs that give [c]: amounts only (Play shows the price
+  /// after the parental gate, which opens on any tap).
+  Widget _packShelf(AppLocalizations s, Currency c, String icon) {
+    final packs = [
+      for (final p in (ref.read(iapCatalogProvider)?.products ?? const <IapProduct>[]))
+        if (p.consumable && p.grants[c] > 0) p
+    ];
+    return SizedBox(
+      height: 66,
+      child: Row(children: [
+        for (final p in packs)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: GestureDetector(
+                key: ValueKey('pack-${p.sku}'),
+                onTap: () => openShop(context, ref),
+                child: Container(
+                  alignment: Alignment.center,
+                  decoration: storybookCard(
+                      fill: c == Currency.yarn
+                          ? const Color(0xFFE5F5F2)
+                          : const Color(0xFFFFF1C7),
+                      accent: c == Currency.yarn ? Palette.teal : Palette.sun,
+                      radius: 9),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      IconText(icon, style: const TextStyle(fontSize: 22)),
+                      IconText(fmtNum(p.grants[c]),
+                          style: const TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w800)),
+                    ]),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = AppLocalizations.of(context);
@@ -564,6 +606,10 @@ class _ShopPageState extends ConsumerState<ShopPage> {
             IconText(s.lang == 'th'
                 ? 'แพ็กเริ่ม \$0.99 ถึง \$99.99 · ราคาในหน้าซื้อจะแสดงตามประเทศ'
                 : 'Packs from \$0.99 to \$99.99 · checkout shows the local price'),
+            const SizedBox(height: 12),
+            _packShelf(s, Currency.goldfish, '🐟'),
+            const SizedBox(height: 6),
+            _packShelf(s, Currency.yarn, '🧶'),
             const SizedBox(height: 12),
             // the parental gate comes first, always (T-025)
             Semantics(

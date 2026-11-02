@@ -48,11 +48,15 @@ void main() {
         of: find.ancestor(of: findLabel(label), matching: find.byType(Row)),
         matching: find.byType(Switch));
 
+    await tester.ensureVisible(switchOf(en.music));
+    await tester.pump();
     await tester.tap(switchOf(en.music));
     await tester.pump();
     expect(audio.bgmEnabled, isFalse);
     expect(out.stopped, containsAll([0, 1])); // silent right away
 
+    await tester.ensureVisible(switchOf(en.sounds));
+    await tester.pump();
     await tester.tap(switchOf(en.sounds));
     await tester.pump();
     await audio.playSfx('coin');

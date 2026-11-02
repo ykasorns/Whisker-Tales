@@ -131,8 +131,7 @@ void main() {
     ]);
     addTearDown(c.dispose);
     await tester.pumpWidget(UncontrolledProviderScope(
-        container: c,
-        child: localized(const Scaffold(body: ShopPage()))));
+        container: c, child: localized(const Scaffold(body: ShopPage()))));
     expect(find.text('Daily gift'), findsOneWidget);
     expect(find.text('Yarn bundle'), findsOneWidget);
     expect(c.read(adServiceProvider).remainingToday('daily_gift'), 2);

@@ -1,13 +1,149 @@
 {
-  "schema_version": 1,
-  "_doc": "D-053 — ร้านใช้ catalog เดียวเพื่อเพิ่มสินค้าในอนาคต · ทุกการซื้อผ่าน parental gate · ราคา USD เป็น tier อ้างอิงสำหรับตั้ง Play Console เท่านั้น หน้าจอแสดงราคาท้องถิ่นจาก Google Play · supply pack เป็น consumable ซื้อซ้ำได้และให้เฉพาะปลาทอง/ไหมพรม (ไม่ขายไข่) · ไหมพรมใช้สุ่มอุปกรณ์ จึงต้องแสดงอัตราเกรดปัจจุบันใกล้ปุ่มซื้อ · supporter_pack เป็น non-consumable และทำให้รางวัลฟรี 2 ครั้ง/วันรับได้ทันทีโดยไม่เปิดวิดีโอ",
-  "products": [
-    {"sku":"story_supplies_099","kind":"currency_pack","icon":"🧶","name_th":"ตะกร้าใบเล็ก","name_en":"Little Basket","desc_th":"ไหมพรม 80 · ปลาทอง 1,200","desc_en":"80 yarn · 1,200 goldfish","reference_price_usd":0.99,"grants":{"yarn":80,"goldfish":1200}},
-    {"sku":"story_supplies_499","kind":"currency_pack","icon":"🧶","name_th":"ตะกร้าสำหรับเดินทาง","name_en":"Travel Basket","desc_th":"ไหมพรม 450 · ปลาทอง 7,000","desc_en":"450 yarn · 7,000 goldfish","reference_price_usd":4.99,"grants":{"yarn":450,"goldfish":7000}},
-    {"sku":"story_supplies_999","kind":"currency_pack","icon":"🎁","name_th":"หีบช่างถัก","name_en":"Knitter's Chest","desc_th":"ไหมพรม 1,000 · ปลาทอง 16,000","desc_en":"1,000 yarn · 16,000 goldfish","reference_price_usd":9.99,"grants":{"yarn":1000,"goldfish":16000}},
-    {"sku":"story_supplies_1999","kind":"currency_pack","icon":"🎁","name_th":"เสบียงนักผจญภัย","name_en":"Adventure Supplies","desc_th":"ไหมพรม 2,250 · ปลาทอง 38,000","desc_en":"2,250 yarn · 38,000 goldfish","reference_price_usd":19.99,"grants":{"yarn":2250,"goldfish":38000}},
-    {"sku":"story_supplies_4999","kind":"currency_pack","icon":"🎁","name_th":"หีบนิทานใหญ่","name_en":"Grand Story Chest","desc_th":"ไหมพรม 6,250 · ปลาทอง 115,000","desc_en":"6,250 yarn · 115,000 goldfish","reference_price_usd":49.99,"grants":{"yarn":6250,"goldfish":115000}},
-    {"sku":"story_supplies_9999","kind":"currency_pack","icon":"✨","name_th":"คลังเทพนิยาย","name_en":"Fairytale Treasury","desc_th":"ไหมพรม 14,000 · ปลาทอง 280,000","desc_en":"14,000 yarn · 280,000 goldfish","reference_price_usd":99.99,"grants":{"yarn":14000,"goldfish":280000}},
-    {"sku":"supporter_pack","kind":"supporter","icon":"💛","name_th":"นิทานไร้โฆษณา","name_en":"Ad-free Story","desc_th":"ปิดโฆษณาถาวร และรับรางวัลปลา/ไหมฟรีได้ทันทีวันละ 2 ครั้ง","desc_en":"Remove ads forever and instantly claim both free rewards twice a day","reference_price_usd":4.99,"entitlements":["no_ads"]}
-  ]
+ "schema_version": 1,
+ "_doc": "D-053 — ร้านใช้ catalog เดียวเพื่อเพิ่มสินค้าในอนาคต · ทุกการซื้อผ่าน parental gate · ราคา USD เป็น tier อ้างอิงสำหรับตั้ง Play Console เท่านั้น หน้าจอแสดงราคาท้องถิ่นจาก Google Play · supply pack เป็น consumable ซื้อซ้ำได้ แยกปลาทอง 5 แพ็ก / ไหมพรม 5 แพ็ก (แพ็กละสกุล, ไม่ขายไข่) · ไหมพรมใช้สุ่มอุปกรณ์ จึงต้องแสดงอัตราเกรดปัจจุบันใกล้ปุ่มซื้อ · supporter_pack เป็น non-consumable และทำให้รางวัลฟรี 2 ครั้ง/วันรับได้ทันทีโดยไม่เปิดวิดีโอ",
+ "products": [
+  {
+   "sku": "goldfish_pack_099",
+   "kind": "currency_pack",
+   "icon": "🐟",
+   "name_th": "ถังปลาเล็ก",
+   "name_en": "Little Fish Pail",
+   "desc_th": "ปลาทอง 1,200",
+   "desc_en": "1,200 goldfish",
+   "reference_price_usd": 0.99,
+   "grants": {
+    "goldfish": 1200
+   }
+  },
+  {
+   "sku": "goldfish_pack_299",
+   "kind": "currency_pack",
+   "icon": "🐟",
+   "name_th": "ถังปลาใหญ่",
+   "name_en": "Big Fish Pail",
+   "desc_th": "ปลาทอง 4,000",
+   "desc_en": "4,000 goldfish",
+   "reference_price_usd": 2.99,
+   "grants": {
+    "goldfish": 4000
+   }
+  },
+  {
+   "sku": "goldfish_pack_499",
+   "kind": "currency_pack",
+   "icon": "🐟",
+   "name_th": "ตะกร้าปลา",
+   "name_en": "Fish Basket",
+   "desc_th": "ปลาทอง 7,000",
+   "desc_en": "7,000 goldfish",
+   "reference_price_usd": 4.99,
+   "grants": {
+    "goldfish": 7000
+   }
+  },
+  {
+   "sku": "goldfish_pack_999",
+   "kind": "currency_pack",
+   "icon": "🐟",
+   "name_th": "เรือประมง",
+   "name_en": "Fishing Boat",
+   "desc_th": "ปลาทอง 16,000",
+   "desc_en": "16,000 goldfish",
+   "reference_price_usd": 9.99,
+   "grants": {
+    "goldfish": 16000
+   }
+  },
+  {
+   "sku": "goldfish_pack_1999",
+   "kind": "currency_pack",
+   "icon": "🐟",
+   "name_th": "คลังปลาทอง",
+   "name_en": "Goldfish Hoard",
+   "desc_th": "ปลาทอง 38,000",
+   "desc_en": "38,000 goldfish",
+   "reference_price_usd": 19.99,
+   "grants": {
+    "goldfish": 38000
+   }
+  },
+  {
+   "sku": "yarn_pack_099",
+   "kind": "currency_pack",
+   "icon": "🧶",
+   "name_th": "ลูกไหมน้อย",
+   "name_en": "Tiny Yarn Ball",
+   "desc_th": "ไหมพรม 80",
+   "desc_en": "80 yarn",
+   "reference_price_usd": 0.99,
+   "grants": {
+    "yarn": 80
+   }
+  },
+  {
+   "sku": "yarn_pack_299",
+   "kind": "currency_pack",
+   "icon": "🧶",
+   "name_th": "ตะกร้าไหม",
+   "name_en": "Yarn Basket",
+   "desc_th": "ไหมพรม 260",
+   "desc_en": "260 yarn",
+   "reference_price_usd": 2.99,
+   "grants": {
+    "yarn": 260
+   }
+  },
+  {
+   "sku": "yarn_pack_499",
+   "kind": "currency_pack",
+   "icon": "🧶",
+   "name_th": "กองไหมพรม",
+   "name_en": "Yarn Pile",
+   "desc_th": "ไหมพรม 450",
+   "desc_en": "450 yarn",
+   "reference_price_usd": 4.99,
+   "grants": {
+    "yarn": 450
+   }
+  },
+  {
+   "sku": "yarn_pack_999",
+   "kind": "currency_pack",
+   "icon": "🧶",
+   "name_th": "หีบช่างถัก",
+   "name_en": "Knitter's Chest",
+   "desc_th": "ไหมพรม 1,000",
+   "desc_en": "1,000 yarn",
+   "reference_price_usd": 9.99,
+   "grants": {
+    "yarn": 1000
+   }
+  },
+  {
+   "sku": "yarn_pack_1999",
+   "kind": "currency_pack",
+   "icon": "🧶",
+   "name_th": "คลังไหมพรม",
+   "name_en": "Yarn Treasury",
+   "desc_th": "ไหมพรม 2,250",
+   "desc_en": "2,250 yarn",
+   "reference_price_usd": 19.99,
+   "grants": {
+    "yarn": 2250
+   }
+  },
+  {
+   "sku": "supporter_pack",
+   "kind": "supporter",
+   "icon": "💛",
+   "name_th": "นิทานไร้โฆษณา",
+   "name_en": "Ad-free Story",
+   "desc_th": "ปิดโฆษณาถาวร และรับรางวัลปลา/ไหมฟรีได้ทันทีวันละ 2 ครั้ง",
+   "desc_en": "Remove ads forever and instantly claim both free rewards twice a day",
+   "reference_price_usd": 4.99,
+   "entitlements": [
+    "no_ads"
+   ]
+  }
+ ]
 }

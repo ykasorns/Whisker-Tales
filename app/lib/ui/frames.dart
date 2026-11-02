@@ -246,3 +246,15 @@ class _PressScaleState extends State<PressScale> {
     );
   }
 }
+
+/// A painted choice card that stretches its middle; the corners keep their
+/// shape (GPT art, story_v1/cards, drawn at 2x).
+BoxDecoration paintedCardDecoration(String name) => BoxDecoration(
+      image: DecorationImage(
+        image: AssetImage('assets/game/story/cards/$name.png'),
+        scale: 2,
+        centerSlice: const Rect.fromLTRB(20, 20, 80, 120),
+        fit: BoxFit.fill,
+        filterQuality: FilterQuality.medium,
+      ),
+    );

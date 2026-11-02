@@ -23,7 +23,15 @@ String fmtNum(int n) => n >= 1000000
 /// 🏠 Home (GDD v0.4 §11 + v0.5 §1): the fight on top (60%), the farm panel
 /// below (40%) — gear slots, auto-knit and the yarn ball.
 class HomePage extends ConsumerWidget {
-  const HomePage({super.key, required this.avatarRules, required this.driver});
+  const HomePage({
+    super.key,
+    required this.avatarRules,
+    required this.driver,
+    this.onOpenShop,
+  });
+
+  /// Opens the Shop tab; the wallet plus buttons call it.
+  final VoidCallback? onOpenShop;
   final AvatarRules avatarRules;
   final GameDriver driver;
 
@@ -35,7 +43,7 @@ class HomePage extends ConsumerWidget {
         child: Stack(children: [
           Positioned.fill(
               child: GameView(avatarRules: avatarRules, driver: driver)),
-          Positioned.fill(child: _Hud(driver: driver)),
+          Positioned.fill(child: _Hud(driver: driver, onOpenShop: onOpenShop)),
           const Positioned.fill(child: FailCard()),
         ]),
       ),
@@ -48,8 +56,9 @@ class HomePage extends ConsumerWidget {
 }
 
 class _Hud extends ConsumerWidget {
-  const _Hud({required this.driver});
+  const _Hud({required this.driver, this.onOpenShop});
   final GameDriver driver;
+  final VoidCallback? onOpenShop;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -141,18 +150,21 @@ class _Hud extends ConsumerWidget {
                   _WalletTag(
                     label: s.curFish,
                     icon: '🐟',
+                    onPlus: onOpenShop,
                     value: fmtNum(wallet.balance(Currency.goldfish)),
                   ),
                   const SizedBox(height: 2),
                   _WalletTag(
                     label: s.curYarn,
                     icon: '🧶',
+                    onPlus: onOpenShop,
                     value: fmtNum(wallet.balance(Currency.yarn)),
                   ),
                   const SizedBox(height: 2),
                   _WalletTag(
                     label: s.curEggs,
                     icon: '🥚',
+                    onPlus: onOpenShop,
                     value: '${wallet.balance(Currency.eggs)}',
                   ),
                   const SizedBox(height: 4),
@@ -358,9 +370,11 @@ class _WalletTag extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.value,
+    this.onPlus,
   });
 
   final String label, icon, value;
+  final VoidCallback? onPlus;
 
   /// Natural width of the currency frame at this height is 143 dp: the plus
   /// button sits in the right cap, text only in the paper.
@@ -388,19 +402,14 @@ class _WalletTag extends StatelessWidget {
                 ),
               ),
             ),
-            // the art's round button is empty: the plus is live type
+            // the art's round button is empty: the plus is drawn, not typed,
+            // so it sits exactly on the circle's centre
             Positioned.fromRect(
               rect: g.named('button'),
-              child: const Center(
-                child: Text('+',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 15,
-                        height: 1,
-                        shadows: [
-                          Shadow(color: Palette.ink, blurRadius: 2),
-                        ])),
+              child: PressScale(
+                key: const Key('wallet-plus'),
+                onTap: onPlus,
+                child: const CustomPaint(painter: _PlusPainter()),
               ),
             ),
           ]),
@@ -1127,4 +1136,28 @@ class _YarnPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _PlusPainter extends CustomPainter {
+  const _PlusPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = size.center(Offset.zero);
+    final r = math.min(size.width, size.height) * 0.21;
+    final w = math.min(size.width, size.height) * 0.14;
+    for (final (paint, extra) in [
+      (Paint()..color = Palette.ink, w * 0.7),
+      (Paint()..color = Colors.white, 0.0),
+    ]) {
+      paint
+        ..strokeWidth = w + extra
+        ..strokeCap = StrokeCap.round;
+      canvas.drawLine(c - Offset(r, 0), c + Offset(r, 0), paint);
+      canvas.drawLine(c - Offset(0, r), c + Offset(0, r), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_PlusPainter old) => false;
 }

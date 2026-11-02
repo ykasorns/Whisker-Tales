@@ -34,6 +34,7 @@ class GameShell extends ConsumerStatefulWidget {
 class _GameShellState extends ConsumerState<GameShell>
     with SingleTickerProviderStateMixin {
   static const home = 2;
+  static const shop = 4;
   int _tab = home;
   late final GameDriver _driver = GameDriver(ref);
   late final Ticker _ticker;
@@ -167,7 +168,11 @@ class _GameShellState extends ConsumerState<GameShell>
               child: IndexedStack(index: _tab, children: [
                 CharacterPage(refresh: _driver.ui$),
                 AdventurePage(refresh: _driver.ui$),
-                HomePage(avatarRules: widget.avatarRules, driver: _driver),
+                HomePage(
+                  avatarRules: widget.avatarRules,
+                  driver: _driver,
+                  onOpenShop: () => setState(() => _tab = shop),
+                ),
                 const EventsPage(),
                 const ShopPage(),
               ]),

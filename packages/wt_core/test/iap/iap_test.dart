@@ -170,17 +170,16 @@ void main() {
 
     test('a currency pack can be bought again and each transaction grants once',
         () async {
-      const sku = 'story_supplies_099';
+      const sku = 'yarn_pack_099';
       final p = catalog.bySku(sku)!;
       expect(p.consumable, isTrue);
       expect(await iap.purchase(sku, pass()), PurchaseStart.started);
       expect(wallet.balance(Currency.yarn), p.grants[Currency.yarn]);
-      expect(wallet.balance(Currency.goldfish), p.grants[Currency.goldfish]);
       expect(await iap.purchase(sku, pass()), PurchaseStart.started);
       expect(wallet.balance(Currency.yarn), p.grants[Currency.yarn] * 2);
-      final before = wallet.balance(Currency.goldfish);
+      final before = wallet.balance(Currency.yarn);
       expect(iap.deliver(sku, transactionId: '${sku}_0'), isFalse);
-      expect(wallet.balance(Currency.goldfish), before);
+      expect(wallet.balance(Currency.yarn), before);
       expect(iap.owned, isEmpty);
     });
 
@@ -256,16 +255,24 @@ void main() {
   });
 
   group('catalog safety', () {
-    test('shipped data has six repeatable supply packs and one no-ads item',
+    test('shipped data has five goldfish packs, five yarn packs, one no-ads',
         () {
-      expect(catalog.products.where((p) => p.consumable), hasLength(6));
+      final packs = catalog.products.where((p) => p.consumable).toList();
+      expect(packs, hasLength(10));
       expect(catalog.products.where((p) => !p.consumable).single.sku,
           'supporter_pack');
-      expect(catalog.products.first.referencePriceUsd, 0.99);
-      expect(catalog.products[5].referencePriceUsd, 99.99);
-      for (final p in catalog.products.where((p) => p.consumable)) {
-        expect(p.grants[Currency.yarn], greaterThan(0));
-        expect(p.grants[Currency.goldfish], greaterThan(0));
+      for (final c in [Currency.goldfish, Currency.yarn]) {
+        final mine = packs.where((p) => p.grants[c] > 0).toList();
+        expect(mine, hasLength(5));
+        // each step costs more and gives more
+        for (var i = 1; i < 5; i++) {
+          expect(mine[i].referencePriceUsd!,
+              greaterThan(mine[i - 1].referencePriceUsd!));
+          expect(mine[i].grants[c], greaterThan(mine[i - 1].grants[c]));
+        }
+      }
+      for (final p in packs) {
+        expect(p.grants.amounts, hasLength(1));
         expect(p.grants[Currency.eggs], 0);
       }
     });

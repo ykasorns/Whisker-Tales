@@ -8,6 +8,7 @@ import 'package:wt_core/wt_core.dart';
 import '../debug/telemetry.dart';
 import '../l10n/strings.dart';
 import 'home_page.dart';
+import 'frames.dart';
 import 'game_icon.dart';
 import 'palette.dart';
 import 'pets_tab.dart' show PetPicture;
@@ -25,54 +26,91 @@ Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
     return;
   }
   final s = AppLocalizations.of(context);
+  final rewards = [
+    ('🐟', s.curFish, r.reward[Currency.goldfish]),
+    ('🧶', s.curYarn, r.reward[Currency.yarn]),
+    ('🥚', s.curEggs, r.reward[Currency.eggs]),
+    ('⭐', 'EXP', r.exp),
+  ].where((e) => e.$3 > 0).toList();
+  Widget tag((String, String, int) e) => SizedBox(
+        height: 50,
+        child: StretchFrame(
+          frame: 'action',
+          child: Center(
+            child: IconText('${e.$1} +${fmtNum(e.$3)}',
+                maxLines: 1,
+                style:
+                    const TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+          ),
+        ),
+      );
   await showDialog<void>(
     context: context,
     barrierDismissible: false,
     builder: (ctx) => Dialog(
-      backgroundColor: Palette.storyPaper,
-      shadowColor: Palette.inkSoft.withValues(alpha: 0.32),
-      shape: const ContinuousRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(30))),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
+      child: Container(
+        decoration: paintedCardDecoration('card_pick'),
+        padding: const EdgeInsets.fromLTRB(22, 26, 22, 24),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Image.asset('assets/game/cat/sleep.png', height: 110),
-          IconText(s.welcomeBack,
-              style:
-                  const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
+          Image.asset('assets/game/cat/sleep.png', height: 104),
           const SizedBox(height: 6),
+          SizedBox(
+            height: 54,
+            child: StretchFrame(
+              frame: 'chapter',
+              child: Center(
+                child: IconText(s.welcomeBack,
+                    maxLines: 1,
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.w900)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
           IconText(s.awayFarmed(r.creditedMinutes),
-              textAlign: TextAlign.center),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: Palette.inkSoft)),
           const SizedBox(height: 12),
-          Wrap(spacing: 8, runSpacing: 8, children: [
-            for (final (icon, v) in [
-              ('🐟 ${s.curFish}', r.reward[Currency.goldfish]),
-              ('🧶 ${s.curYarn}', r.reward[Currency.yarn]),
-              ('🥚 ${s.curEggs}', r.reward[Currency.eggs]),
-              ('⭐ EXP', r.exp),
-            ])
-              if (v > 0)
-                StoryTag(
-                  color: const Color(0xFFFFEDCF),
-                  child: IconText('$icon +${fmtNum(v)}',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w900)),
-                ),
-          ]),
-          const SizedBox(height: 16),
-          GestureDetector(
+          for (var i = 0; i < rewards.length; i += 2)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(children: [
+                Expanded(child: tag(rewards[i])),
+                const SizedBox(width: 8),
+                Expanded(
+                    child: i + 1 < rewards.length
+                        ? tag(rewards[i + 1])
+                        : const SizedBox.shrink()),
+              ]),
+            ),
+          const SizedBox(height: 10),
+          PressScale(
             onTap: () {
               offline.claim();
               Navigator.of(ctx).pop();
             },
-            child: Container(
-              height: 56,
-              alignment: Alignment.center,
-              decoration: storybookButton(
-                  fill: Palette.lime, accent: Palette.teal, radius: 10),
-              child: IconText(s.claim,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w800)),
+            child: SizedBox(
+              height: 62,
+              child: StretchFrame(
+                frame: 'action',
+                child: Center(
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const GameIcon('check', size: 26),
+                    const SizedBox(width: 8),
+                    IconText(s.claim,
+                        style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            color: Palette.teal)),
+                  ]),
+                ),
+              ),
             ),
           ),
         ]),

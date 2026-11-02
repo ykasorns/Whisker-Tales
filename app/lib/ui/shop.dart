@@ -8,6 +8,13 @@ import '../l10n/strings.dart';
 import 'game_icon.dart';
 import 'palette.dart';
 
+/// Which shelf of the shop a product sits on: one per currency it grants.
+String packGroup(IapProduct p) => !p.consumable
+    ? 'supporter'
+    : p.grants[Currency.goldfish] > 0
+        ? 'goldfish'
+        : 'yarn';
+
 /// The only way into buying (T-025): the parental gate first, then the
 /// shop sheet. A pass that runs out sends the player back to the gate.
 Future<void> openShop(BuildContext context, WidgetRef ref) async {
@@ -225,24 +232,29 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
                             textAlign: TextAlign.center));
                   }
                   final cards = <Widget>[];
-                  IapKind? previous;
+                  String? previous;
                   for (final sp in sold) {
                     final p = iap.catalog.bySku(sp.sku);
                     if (p == null) continue;
-                    if (p.kind != previous) {
-                      previous = p.kind;
+                    final group = packGroup(p);
+                    if (group != previous) {
+                      previous = group;
                       cards.add(Padding(
                         padding: const EdgeInsets.fromLTRB(2, 12, 2, 8),
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: IconText(
-                            p.consumable
-                                ? (s.lang == 'th'
-                                    ? 'เสบียงสำหรับเดินทาง'
-                                    : 'Adventure supplies')
-                                : (s.lang == 'th'
-                                    ? 'เล่นแบบไม่มีโฆษณา'
-                                    : 'Play without ads'),
+                            switch (group) {
+                              'goldfish' => s.lang == 'th'
+                                  ? '🐟 แพ็กปลาทอง'
+                                  : '🐟 Goldfish packs',
+                              'yarn' => s.lang == 'th'
+                                  ? '🧶 แพ็กไหมพรม'
+                                  : '🧶 Yarn packs',
+                              _ => s.lang == 'th'
+                                  ? 'เล่นแบบไม่มีโฆษณา'
+                                  : 'Play without ads',
+                            },
                             style: const TextStyle(
                                 fontSize: 17, fontWeight: FontWeight.w800),
                           ),

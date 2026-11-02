@@ -189,6 +189,9 @@ void main() {
     // shop → "🌐 English"
     await tester.tap(find.text(th.navShop));
     await tester.pump(const Duration(milliseconds: 300));
+    // the shop list is long now: scroll the language button into the tree
+    await tester.drag(find.byType(ListView).last, const Offset(0, -900));
+    await tester.pump(const Duration(milliseconds: 300));
     await tester.tap(findLabel(th.switchLanguage));
     await tester.pump(const Duration(milliseconds: 300));
     expect(c.read(langProvider), 'en');
@@ -216,6 +219,10 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
     }
     expect(find.byType(Dialog), findsOneWidget);
+    // let the painted card and the cat decode before the picture is taken
+    await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 400)));
+    await tester.pump(const Duration(milliseconds: 100));
     await expectLater(find.byType(WhiskerTalesApp),
         matchesGoldenFile('goldens/th/welcome_back.png'));
   });

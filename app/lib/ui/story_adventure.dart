@@ -250,7 +250,6 @@ class _StoryRunPageState extends ConsumerState<StoryRunPage>
   @override
   Widget build(BuildContext context) {
     final disableMotion = MediaQuery.disableAnimationsOf(context);
-    final fighting = controller.panel == StoryRunPanel.combat;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
@@ -261,7 +260,7 @@ class _StoryRunPageState extends ConsumerState<StoryRunPage>
         body: SafeArea(
           child: Column(children: [
             Expanded(
-              flex: fighting ? 70 : 58,
+              flex: 60,
               child: StoryScene(
                 controller: controller,
                 onQuit: _quit,
@@ -275,7 +274,7 @@ class _StoryRunPageState extends ConsumerState<StoryRunPage>
               ),
             ),
             Expanded(
-              flex: fighting ? 30 : 42,
+              flex: 40,
               child: StorybookPaper(
                 child: AnimatedSwitcher(
                   duration: disableMotion
@@ -607,8 +606,8 @@ class _PickPanelState<T> extends State<_PickPanel<T>> {
             duration: const Duration(milliseconds: 120),
             child: Container(
               padding: const EdgeInsets.fromLTRB(13, 15, 13, 13),
-              decoration:
-                  _cardDecoration(chosen ? 'card_pick_selected' : 'card_pick'),
+              decoration: paintedCardDecoration(
+                  chosen ? 'card_pick_selected' : 'card_pick'),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -791,8 +790,8 @@ class _ShopPanel extends StatelessWidget {
         opacity: usable ? 1 : .48,
         child: Container(
           padding: const EdgeInsets.fromLTRB(12, 13, 12, 12),
-          decoration:
-              _cardDecoration(usable && !purchased ? 'card_shop' : 'card_pick'),
+          decoration: paintedCardDecoration(
+              usable && !purchased ? 'card_shop' : 'card_pick'),
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             GameIcon(
                 usable && !purchased ? _potionIcon(potion.buffId) : 'check',
@@ -972,18 +971,6 @@ class _DottedLinkPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-
-/// A painted choice card that stretches its middle; the corners keep their
-/// shape (GPT art, story_v1/cards, drawn at 2x).
-BoxDecoration _cardDecoration(String name) => BoxDecoration(
-      image: DecorationImage(
-        image: AssetImage('assets/game/story/cards/$name.png'),
-        scale: 2,
-        centerSlice: const Rect.fromLTRB(20, 20, 80, 120),
-        fit: BoxFit.fill,
-        filterQuality: FilterQuality.medium,
-      ),
-    );
 
 Widget _panelFrame({
   Key? key,

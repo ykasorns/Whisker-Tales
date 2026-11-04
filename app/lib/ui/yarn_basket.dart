@@ -136,50 +136,43 @@ class _YarnBasketState extends State<YarnBasket> with TickerProviderStateMixin {
               : math.sin(2 * math.pi * _idle.value + b.phase) * 0.012 * h;
           final hopT = k == 0 ? 0.0 : ((k - i * 0.06) / 0.4).clamp(0.0, 1.0);
           final hop = _bump(hopT) * (widget.quiet ? 0.07 : 0.15) * h;
-          var dx = b.x * w - d / 2, dy = b.y * h - d / 2 + bob - hop;
-          var angle = bob * 0.4;
-          var opacity = widget.empty ? 0.5 : 1.0;
-          var scale = 1.0;
-          final isChosen = i == chosen && k > 0 && !widget.quiet;
-          if (isChosen) {
-            // hops, flies out in an arc spinning, fades out, reappears
+          final dx = b.x * w - d / 2, dy = b.y * h - d / 2 + bob - hop;
+          Widget ball(double left, double top, double angle, double scale,
+                  double opacity, Key key) =>
+              Positioned(
+                key: key,
+                left: left,
+                top: top,
+                width: d,
+                height: d,
+                child: Opacity(
+                  opacity: opacity,
+                  child: Transform.rotate(
+                    angle: angle,
+                    child: Transform.scale(
+                      scale: scale,
+                      child: Image.asset('assets/game/home/${b.asset}.png',
+                          fit: BoxFit.contain,
+                          gaplessPlayback: true,
+                          filterQuality: FilterQuality.medium),
+                    ),
+                  ),
+                ),
+              );
+          // the basket's own ball never leaves: a copy of the chosen one
+          // flies out, so nothing blinks out of the basket and back in
+          resting.add(ball(dx, dy, bob * 0.4, 1, widget.empty ? 0.5 : 1.0,
+              ValueKey('rest$i')));
+          if (i == chosen && k > 0.12 && k < 0.85 && !widget.quiet) {
             final fly = ((k - 0.12) / 0.58).clamp(0.0, 1.0);
             final arc = _bump(fly);
-            dx += (0.5 * w - b.x * w) * Curves.easeOut.transform(fly);
-            dy += (-0.62 * h - b.y * h) * Curves.easeOut.transform(fly) -
-                arc * 0.18 * h;
-            angle = fly * 2 * math.pi * 3;
-            scale = 1 + 0.2 * arc;
-            if (k > 0.7) opacity = (1 - (k - 0.7) / 0.15).clamp(0.0, 1.0);
-            if (k > 0.85) {
-              dx = b.x * w - d / 2;
-              dy = b.y * h - d / 2;
-              angle = 0;
-              scale = 1;
-              opacity = ((k - 0.85) / 0.15).clamp(0.0, 1.0);
-            }
-          }
-          final ball = Positioned(
-            left: dx,
-            top: dy,
-            width: d,
-            height: d,
-            child: Opacity(
-              opacity: opacity,
-              child: Transform.rotate(
-                angle: angle,
-                child: Transform.scale(
-                  scale: scale,
-                  child: Image.asset('assets/game/home/${b.asset}.png',
-                      fit: BoxFit.contain, filterQuality: FilterQuality.medium),
-                ),
-              ),
-            ),
-          );
-          if (isChosen && k > 0.12 && k < 0.85) {
-            flying = ball; // drawn over the rim while it is in the air
-          } else {
-            resting.add(ball);
+            final ease = Curves.easeOut.transform(fly);
+            final x = b.x * w - d / 2 + (0.5 * w - b.x * w) * ease;
+            final y =
+                b.y * h - d / 2 + (-0.62 * h - b.y * h) * ease - arc * 0.18 * h;
+            final fade = k > 0.7 ? (1 - (k - 0.7) / 0.15).clamp(0.0, 1.0) : 1.0;
+            flying = ball(x, y, fly * 2 * math.pi * 3, 1 + 0.2 * arc, fade,
+                const ValueKey('flying'));
           }
         }
         final s = _bump(k * 2.2) * 0.9 * squash; // squash early in the knit

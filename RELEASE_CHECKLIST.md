@@ -29,16 +29,20 @@ T-030 / D-035. ฝั่งโค้ดพร้อมแล้ว ทุกอ�
   - ตอน build: `ADMOB_REWARDED_ID=ca-app-pub-…/… scripts/build_release.sh`
   - ⚠️ ระหว่างทดสอบบนเครื่องตัวเอง **ห้ามกดโฆษณาจริงของตัวเอง** (บัญชีโดนแบน) — ใช้ build ที่ยังเป็นรหัสทดสอบ หรือเพิ่มเครื่องเป็น test device ใน AdMob
 - [ ] **Play Games Services** (เซฟคลาวด์ — ไม่ทำก็ได้ เกมเล่นออฟไลน์ได้ครบ): Play Console → Play Games Services → Setup → คัดลอก Project ID → `pgsProjectId=…` ใน `app/android/gradle.properties`
-- [ ] **สินค้าในแอป**: Play Console → Monetize → Products → In-app products → สร้าง SKU ตามตารางนี้ · supply packs เป็น **consumable** และ `supporter_pack` เป็น **non-consumable** · ราคาในเกมอ่านจาก Play โดยตรง · เพิ่มอีเมลตัวเองใน **License testing** เพื่อลองซื้อแบบไม่เสียเงินจริง
+- [ ] **สินค้าในแอป**: Play Console → Monetize → Products → In-app products → สร้าง SKU ตามตารางนี้ · supply packs 10 ตัว (ปลาทอง 5 + ไหม 5, D-064) เป็น **consumable** และ `supporter_pack` เป็น **non-consumable** · ราคาในเกมอ่านจาก Play โดยตรง · เพิ่มอีเมลตัวเองใน **License testing** เพื่อลองซื้อแบบไม่เสียเงินจริง
 
 | SKU | ราคาอ้างอิง USD | ของที่ได้รับ |
 |---|---:|---:|
-| `story_supplies_099` | $0.99 | ไหม 80 + ปลา 1,200 |
-| `story_supplies_499` | $4.99 | ไหม 450 + ปลา 7,000 |
-| `story_supplies_999` | $9.99 | ไหม 1,000 + ปลา 16,000 |
-| `story_supplies_1999` | $19.99 | ไหม 2,250 + ปลา 38,000 |
-| `story_supplies_4999` | $49.99 | ไหม 6,250 + ปลา 115,000 |
-| `story_supplies_9999` | $99.99 | ไหม 14,000 + ปลา 280,000 |
+| `goldfish_pack_099` | $0.99 | ปลาทอง 1,200 |
+| `goldfish_pack_299` | $2.99 | ปลาทอง 4,000 |
+| `goldfish_pack_499` | $4.99 | ปลาทอง 7,000 |
+| `goldfish_pack_999` | $9.99 | ปลาทอง 16,000 |
+| `goldfish_pack_1999` | $19.99 | ปลาทอง 38,000 |
+| `yarn_pack_099` | $0.99 | ไหม 80 |
+| `yarn_pack_299` | $2.99 | ไหม 260 |
+| `yarn_pack_499` | $4.99 | ไหม 450 |
+| `yarn_pack_999` | $9.99 | ไหม 1,000 |
+| `yarn_pack_1999` | $19.99 | ไหม 2,250 |
 | `supporter_pack` | $4.99 | ปิดโฆษณาถาวร + รับของฟรี 2×/วันได้ทันที |
 
   - [ ] กรอกคำอธิบาย Play ให้ตรงกับจำนวนใน `design/data/iap.json` ทุกภาษา และอย่าใช้ข้อความเร่งเวลา/ของใกล้หมด/“คุ้มที่สุด” กับเด็ก

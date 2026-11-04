@@ -1,7 +1,7 @@
-# HANDOFF — Whisker Tales (updated 2026-11-01, after D-063 pet levels + story Next)
+# HANDOFF — Whisker Tales (updated 2026-11-03, after D-064 shop packs + HUD/Run layout)
 
 Read this first if you are a new session or a different model picking up the work.
-For background, also read `DECISIONS.md` (D-001 … D-063), `_contract/GAME_CONTRACT.md`, `_contract/GDD_WhiskerTales_v0.5.md` and `RELEASE_CHECKLIST.md`.
+For background, also read `DECISIONS.md` (D-001 … D-064), `_contract/GAME_CONTRACT.md`, `_contract/GDD_WhiskerTales_v0.5.md` and `RELEASE_CHECKLIST.md`.
 
 ---
 
@@ -15,7 +15,7 @@ For background, also read `DECISIONS.md` (D-001 … D-063), `_contract/GAME_CONT
 - **Commits:**
   - Commit and push straight to `main`. No branches, no PRs.
   - **Never commit `.claude/`.**
-  - End every commit message with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Keep this line unless the system reminder gives a different attribution.
+  - End every commit message with the attribution line from the system reminder (currently `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`). Keep this line unless the system reminder gives a different attribution.
 - **Hard rules for the game:**
   - Ads are rewarded only.
   - Eggs are **never** sold for real money. D-053 allows transparent yarn + goldfish supply packs behind the parental gate; yarn's current random-knit rates must stay visible by the purchase list.
@@ -82,11 +82,12 @@ For background, also read `DECISIONS.md` (D-001 … D-063), `_contract/GAME_CONT
 | D-050 | Early bosses 65% lighter through page 30, smoothly regain full power through page 120; book 1 target 2±1 days |
 | D-051 | Speed control moved beside the top-right wallet; Story Run keeps Mochi visible and animates both combat actors |
 | D-052 | Story HUD uses live combat HP/shield; shop healing updates immediately and unusable or sold potion slots cannot spend goldfish |
-| D-053 | Unified Shop: fish/yarn reward ads 2× each daily; six repeatable supply packs ($0.99–$99.99 reference tiers); no-ads buyers claim both daily gifts without video; consumable transaction ids prevent duplicate grants |
+| D-053 | Unified Shop: fish/yarn reward ads 2× each daily; supply packs (superseded by D-064: 5 goldfish + 5 yarn, $0.99–$19.99); no-ads buyers claim both daily gifts without video; consumable transaction ids prevent duplicate grants |
 | D-054 | Storybook UI v2: warm asymmetric paper surfaces, distinct action buttons, compact resource tags, one shared bottom dock and shared Cat tab rail; submenu polish continues on this system |
 | D-055 | Cat submenus v2: hero/stat board, shared wardrobe rail, focused hatch station, rarity-tinted pets and effect-tinted research rows replace equal-weight card grids |
 | D-056 | All remaining submenus v2: Adventure/Story panels, Shop/Events, age selection, knit sheet, offline/fail overlays and parental purchase flow now share the parchment hierarchy and action surfaces |
 | D-057 | Asset-first UI rule: new visual designs must be generated as real game assets; Home HUD/actions and the shared dock now use the painted six-piece storybook kit instead of code-only rounded cards |
+| D-064 | Run panel fixed 60/40; painted offline dialog; wallet plus drawn centred and opens the Shop tab; shop sells 5 goldfish + 5 yarn packs (separate SKUs `goldfish_pack_*`/`yarn_pack_*`, replace the six combined packs; eggs/cookies never sold) |
 | D-063 | Pet levels (🍪, max 10), pet HP/ATK/DEF, share to Mochi (`Pets.statsOf/shareOf/levelUp`), every duplicate pays treats; story caption waits for Next ▸ |
 | D-062 | GPT story art wired: speaker portraits (event panel, caption), painted choice/shop cards, hit sparks, footstep dust (`assets/game/story/`) |
 | D-061 | Story Run: narrative/cast/12 events in `events.json`, `story_scene.dart` (parallax, hit numbers, typed captions), new frame-based panels, `PressScale`; Home skill-label lane. Art still to generate: `design/art/story_run_art_prompt.md` |
@@ -124,7 +125,7 @@ Verification commands are in §6. After D-058: app tests 57/57 and analyze are g
 2. Create the upload keystore and `app/android/key.properties`.
 3. Set up AdMob: create the app and a rewarded unit, then set `admobAppId` and `ADMOB_REWARDED_ID`. Mark the app child-directed and set max rating G.
 4. Play Console:
-   - Create the seven in-app products listed in `RELEASE_CHECKLIST.md`: six consumable supply packs plus non-consumable `supporter_pack`.
+   - Create the eleven in-app products listed in `RELEASE_CHECKLIST.md`: ten consumable supply packs (5 goldfish + 5 yarn) plus non-consumable `supporter_pack`.
    - Set up license testers.
    - Optionally add the Play Games Services project ID (`pgsProjectId`).
 5. Fill `{{DEVELOPER}}`, `{{CONTACT_EMAIL}}` and `{{DATE}}` in `docs/privacy/index.html`, then host it (GitHub Pages `/docs` works).

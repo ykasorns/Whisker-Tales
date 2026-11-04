@@ -19,6 +19,8 @@ dependencies:
     path: ../packages/wt_core
   wt_mode_story:
     path: ../packages/wt_mode_story
+  wt_mode_dungeon:
+    path: ../packages/wt_mode_dungeon
   in_app_purchase: ^3.3.1
   games_services: ^4.1.1
   intl: any
@@ -49,6 +51,7 @@ flutter:
     - assets/game/story/fx/
     - assets/game/icon/
     - assets/game/home/
+    - assets/game/dungeon/
     - assets/game/pet/
     # Music + effects, made by tools/audio/make_sounds.py (T-024)
     - assets/audio/

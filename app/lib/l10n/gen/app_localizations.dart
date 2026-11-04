@@ -1171,6 +1171,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You have 🍪 {n} — duplicate pets give more'**
   String petTreatsHave(String n);
+
+  /// No description provided for @dungeonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Treat Dungeon'**
+  String get dungeonTitle;
+
+  /// No description provided for @dungeonSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'One boss, 30 seconds. The harder you hit, the more 🍪 you win for your pets.'**
+  String get dungeonSubtitle;
+
+  /// No description provided for @dungeonEntries.
+  ///
+  /// In en, this message translates to:
+  /// **'Runs left today: {n}'**
+  String dungeonEntries(String n);
+
+  /// No description provided for @dungeonLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Boss level {n}'**
+  String dungeonLevel(String n);
+
+  /// No description provided for @dungeonBest.
+  ///
+  /// In en, this message translates to:
+  /// **'Best'**
+  String get dungeonBest;
+
+  /// No description provided for @dungeonStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Go down!'**
+  String get dungeonStart;
+
+  /// No description provided for @dungeonWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'📺 Watch an ad: +1 run'**
+  String get dungeonWatch;
+
+  /// No description provided for @dungeonNoRuns.
+  ///
+  /// In en, this message translates to:
+  /// **'No runs left today. Come back tomorrow!'**
+  String get dungeonNoRuns;
+
+  /// No description provided for @dungeonLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish now'**
+  String get dungeonLeave;
+
+  /// No description provided for @dungeonClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get dungeonClose;
+
+  /// No description provided for @dungeonAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Again'**
+  String get dungeonAgain;
+
+  /// No description provided for @dungeonDamage.
+  ///
+  /// In en, this message translates to:
+  /// **'Damage {pct}%'**
+  String dungeonDamage(String pct);
+
+  /// No description provided for @dungeonTime.
+  ///
+  /// In en, this message translates to:
+  /// **'{n}s'**
+  String dungeonTime(String n);
+
+  /// No description provided for @dungeonResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Run over!'**
+  String get dungeonResult;
+
+  /// No description provided for @dungeonNoTier.
+  ///
+  /// In en, this message translates to:
+  /// **'The boss barely noticed. Try a lower level or come back stronger.'**
+  String get dungeonNoTier;
+
+  /// No description provided for @dungeonGot.
+  ///
+  /// In en, this message translates to:
+  /// **'You won 🍪 {n}'**
+  String dungeonGot(String n);
+
+  /// No description provided for @dungeonOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'Boss level {n} is open!'**
+  String dungeonOpened(String n);
+
+  /// No description provided for @dungeonDefeated.
+  ///
+  /// In en, this message translates to:
+  /// **'Boss defeated!'**
+  String get dungeonDefeated;
+
+  /// No description provided for @dungeonTierName.
+  ///
+  /// In en, this message translates to:
+  /// **'Tier {n}'**
+  String dungeonTierName(String n);
+
+  /// No description provided for @dungeonLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Beat the first boss to open the dungeon'**
+  String get dungeonLocked;
+
+  /// No description provided for @dungeonUnlockHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Reach tier {n} to open the next level'**
+  String dungeonUnlockHint(String n);
 }
 
 class _AppLocalizationsDelegate

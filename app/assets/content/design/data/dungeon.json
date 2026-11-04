@@ -1,0 +1,45 @@
+{
+ "schema_version": 1,
+ "_doc": "D-065 ถ้ำขนมแมว: บอสตัวเดียว 30 วินาที รางวัลเป็นขั้นตามดาเมจ (% ของเลือดบอส) · ลงฟรี 3 ครั้ง/วัน + ดูโฆษณาเพิ่ม 2 ครั้ง (placement dungeon_entry ใน idle_balance) · ไม่มีตั๋วที่เติมตามเวลา · บอสเลเวล L ใช้พลังเท่าบอสหน้าที่ page_start + (L-1)*page_step ของฟาร์ม (ค่าสัมบูรณ์ ไม่ขึ้นกับพลังแมว) · ผ่านขั้น unlock_tier ที่เลเวล N ปลดเลเวล N+1 · ขนม = (cookies_base + cookies_per_level*(L-1)) * mult ของขั้น · ตัวเลขทั้งหมดเป็น ASSUMPTION จนกว่าจะลองเล่น",
+ "time_limit_ms": 30000,
+ "free_runs_per_day": 3,
+ "ad_placement": "dungeon_entry",
+ "max_level": 30,
+ "unlock_tier": 3,
+ "boss": {
+  "page_start": 6,
+  "page_step": 3,
+  "hp_mult": 8.0,
+  "atk_mult": 0.6,
+  "interval_ms": 1600
+ },
+ "tiers": [
+  {
+   "damage_pct": 20,
+   "mult": 1
+  },
+  {
+   "damage_pct": 40,
+   "mult": 2
+  },
+  {
+   "damage_pct": 60,
+   "mult": 3
+  },
+  {
+   "damage_pct": 80,
+   "mult": 4
+  },
+  {
+   "damage_pct": 100,
+   "mult": 6
+  }
+ ],
+ "cookies_base": 4,
+ "cookies_per_level": 1.5,
+ "boss_sprites": [
+  "cookiegolem",
+  "jellyking",
+  "cakedragon"
+ ]
+}

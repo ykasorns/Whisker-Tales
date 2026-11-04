@@ -1,7 +1,7 @@
-# HANDOFF — Whisker Tales (updated 2026-11-03, after D-064 shop packs + HUD/Run layout)
+# HANDOFF — Whisker Tales (updated 2026-11-04, after D-065 Treat Dungeon + pet cap 30)
 
 Read this first if you are a new session or a different model picking up the work.
-For background, also read `DECISIONS.md` (D-001 … D-064), `_contract/GAME_CONTRACT.md`, `_contract/GDD_WhiskerTales_v0.5.md` and `RELEASE_CHECKLIST.md`.
+For background, also read `DECISIONS.md` (D-001 … D-065), `_contract/GAME_CONTRACT.md`, `_contract/GDD_WhiskerTales_v0.5.md` and `RELEASE_CHECKLIST.md`.
 
 ---
 
@@ -87,6 +87,7 @@ For background, also read `DECISIONS.md` (D-001 … D-064), `_contract/GAME_CONT
 | D-055 | Cat submenus v2: hero/stat board, shared wardrobe rail, focused hatch station, rarity-tinted pets and effect-tinted research rows replace equal-weight card grids |
 | D-056 | All remaining submenus v2: Adventure/Story panels, Shop/Events, age selection, knit sheet, offline/fail overlays and parental purchase flow now share the parchment hierarchy and action surfaces |
 | D-057 | Asset-first UI rule: new visual designs must be generated as real game assets; Home HUD/actions and the shared dock now use the painted six-piece storybook kit instead of code-only rounded cards |
+| D-065 | Treat Dungeon (`packages/wt_mode_dungeon`, `design/data/dungeon.json`, `app/lib/ui/dungeon_adventure.dart`): 1 boss / 30 s, cookies by damage tier, 3 free runs + 2 by ad (`dungeon_entry`, cap total 17), boss level 1–30; pet level cap 10 → 30 with a soft cap (`level_soft_cap`). Art delivered and wired (Cookie Golem / Jelly King / Layer-Cake Dragon, 4 cave layers, 5 prize jars, mode card; synced by `tools/sync_sprites.py`); unused so far: hurt/telegraph frames, timer/bar frames. Art prompt `design/art/dungeon_art_prompt.md` |
 | D-064 | Run panel fixed 60/40; painted offline dialog; wallet plus drawn centred and opens the Shop tab; shop sells 5 goldfish + 5 yarn packs (separate SKUs `goldfish_pack_*`/`yarn_pack_*`, replace the six combined packs; eggs/cookies never sold) |
 | D-063 | Pet levels (🍪, max 10), pet HP/ATK/DEF, share to Mochi (`Pets.statsOf/shareOf/levelUp`), every duplicate pays treats; story caption waits for Next ▸ |
 | D-062 | GPT story art wired: speaker portraits (event panel, caption), painted choice/shop cards, hit sparks, footstep dust (`assets/game/story/`) |

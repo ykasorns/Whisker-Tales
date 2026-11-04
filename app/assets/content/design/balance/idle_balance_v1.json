@@ -176,7 +176,10 @@
     ],
     "ASSUMPTION_star_bonus_pct": 0.2,
     "max_stars": 5,
-    "ASSUMPTION_max_level": 10,
+    "ASSUMPTION_max_level": 30,
+    "level_soft_cap": 10,
+    "level_late_bonus_pct": 0.03,
+    "level_late_cost_growth": 1.12,
     "ASSUMPTION_level_bonus_pct": 0.08,
     "ASSUMPTION_level_cost_base": 6,
     "ASSUMPTION_level_cost_growth": 1.35,
@@ -210,7 +213,7 @@
   },
   "ads": {
     "_doc": "rewarded เท่านั้น. cap ราย placement เป็นตัวจำกัดหลัก; daily_cap_total เท่าผลรวม cap ของ placement ที่เปิด เพื่อไม่ให้กิจกรรมหนึ่งกินสิทธิ์ของอีกกิจกรรม. D-053: yarn_bundle/daily_gift อยู่ใน Shop อย่างละ 2 ครั้ง/วัน; เมื่อมี no_ads ให้กดรับทันทีโดยไม่เปิดวิดีโอ",
-    "daily_cap_total": 15,
+    "daily_cap_total": 17,
     "placements": {
       "pet_hatch": {
         "enabled": true,
@@ -240,6 +243,13 @@
         "enabled": true,
         "per_day": 2,
         "fish_minutes_of_income": 60,
+        "no_ads_behavior": "grant",
+        "grant_allowed": true
+      },
+      "dungeon_entry": {
+        "_doc": "D-065: +1 ครั้งลงดันเจี้ยนต่อการดู 1 ครั้ง; เมื่อมี no_ads กดรับได้ทันที (เหมือน daily_gift)",
+        "enabled": true,
+        "per_day": 2,
         "no_ads_behavior": "grant",
         "grant_allowed": true
       },

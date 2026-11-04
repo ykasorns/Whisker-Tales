@@ -50,7 +50,9 @@ void main() {
   }
 
   test('placements load from data (D-003, D-008)', () {
-    expect(rules.dailyCapTotal, 15);
+    expect(rules.dailyCapTotal, 17);
+    expect(rules.placements['dungeon_entry']!.perDay, 2);
+    expect(rules.placements['dungeon_entry']!.noAds, NoAdsBehavior.grant);
     expect(rules.placements['pet_hatch']!.perDay, 3);
     expect(rules.placements['road_event']!.perDay, 3);
     expect(rules.placements['offline_x2']!.enabled, isFalse);
@@ -77,6 +79,15 @@ void main() {
     expect(await watchAll(s, 'road_event'), 3); // total now 15
     expect(await s.show('road_event'), AdOutcome.capped);
     expect(net.requests, hasLength(15));
+  });
+
+  test('usedToday counts finished ads of a placement, and resets by day',
+      () async {
+    final s = service();
+    expect(s.usedToday('dungeon_entry'), 0);
+    expect(await watchAll(s, 'dungeon_entry'), 2);
+    expect(s.usedToday('dungeon_entry'), 2);
+    expect(s.usedToday('pet_hatch'), 0);
   });
 
   test('only a finished ad counts', () async {
@@ -114,11 +125,13 @@ void main() {
     expect(net.requests.every((r) => r.nonPersonalized), isTrue);
   });
 
-  test('Supporter Pack hides ads but keeps the two shop gifts', () async {
+  test('Supporter Pack hides ads but keeps the shop gifts and dungeon entries',
+      () async {
     noAds = true;
     final s = service();
     for (final id in rules.placements.keys) {
-      final gift = id == 'daily_gift' || id == 'yarn_bundle';
+      final gift =
+          id == 'daily_gift' || id == 'yarn_bundle' || id == 'dungeon_entry';
       expect(s.canShow(id), gift, reason: id);
       expect(await s.show(id), gift ? AdOutcome.rewarded : AdOutcome.capped,
           reason: id);
@@ -214,6 +227,6 @@ void main() {
     expect(ads.remainingToday('road_event'), 3);
     expect(await ads.show('road_event'), AdOutcome.rewarded);
     expect(ads.remainingToday('road_event'), 2);
-    expect(b['ads']['daily_cap_total'], 15);
+    expect(b['ads']['daily_cap_total'], 17);
   });
 }

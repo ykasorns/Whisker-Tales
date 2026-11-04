@@ -1,0 +1,13 @@
+{
+  "id": "dungeon",
+  "name_th": "ถ้ำขนมแมว",
+  "name_en": "Treat Dungeon",
+  "icon": "mode_dungeon",
+  "order": 2,
+  "enabled": true,
+  "min_app_version": "1.0.0",
+  "unlock": {
+    "type": "boss_cleared",
+    "boss": "eraserking"
+  }
+}

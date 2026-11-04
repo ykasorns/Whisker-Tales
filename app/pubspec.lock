@@ -665,6 +665,13 @@ packages:
       relative: true
     source: path
     version: "0.1.0"
+  wt_mode_dungeon:
+    dependency: "direct main"
+    description:
+      path: "../packages/wt_mode_dungeon"
+      relative: true
+    source: path
+    version: "0.1.0"
   wt_mode_story:
     dependency: "direct main"
     description:

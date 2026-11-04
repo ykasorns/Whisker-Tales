@@ -34,6 +34,9 @@ class FakeAds implements IAdService {
 
   @override
   int remainingToday(String placementId) => allowed ? 1 : 0;
+
+  @override
+  int usedToday(String placementId) => 0;
 }
 
 void main() {

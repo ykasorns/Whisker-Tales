@@ -622,4 +622,85 @@ class AppLocalizationsEn extends AppLocalizations {
   String petTreatsHave(String n) {
     return 'You have 🍪 $n — duplicate pets give more';
   }
+
+  @override
+  String get dungeonTitle => 'Treat Dungeon';
+
+  @override
+  String get dungeonSubtitle =>
+      'One boss, 30 seconds. The harder you hit, the more 🍪 you win for your pets.';
+
+  @override
+  String dungeonEntries(String n) {
+    return 'Runs left today: $n';
+  }
+
+  @override
+  String dungeonLevel(String n) {
+    return 'Boss level $n';
+  }
+
+  @override
+  String get dungeonBest => 'Best';
+
+  @override
+  String get dungeonStart => 'Go down!';
+
+  @override
+  String get dungeonWatch => '📺 Watch an ad: +1 run';
+
+  @override
+  String get dungeonNoRuns => 'No runs left today. Come back tomorrow!';
+
+  @override
+  String get dungeonLeave => 'Finish now';
+
+  @override
+  String get dungeonClose => 'Back';
+
+  @override
+  String get dungeonAgain => 'Again';
+
+  @override
+  String dungeonDamage(String pct) {
+    return 'Damage $pct%';
+  }
+
+  @override
+  String dungeonTime(String n) {
+    return '${n}s';
+  }
+
+  @override
+  String get dungeonResult => 'Run over!';
+
+  @override
+  String get dungeonNoTier =>
+      'The boss barely noticed. Try a lower level or come back stronger.';
+
+  @override
+  String dungeonGot(String n) {
+    return 'You won 🍪 $n';
+  }
+
+  @override
+  String dungeonOpened(String n) {
+    return 'Boss level $n is open!';
+  }
+
+  @override
+  String get dungeonDefeated => 'Boss defeated!';
+
+  @override
+  String dungeonTierName(String n) {
+    return 'Tier $n';
+  }
+
+  @override
+  String get dungeonLocked => 'Beat the first boss to open the dungeon';
+
+  @override
+  String dungeonUnlockHint(String n) {
+    return 'Reach tier $n to open the next level';
+  }
 }

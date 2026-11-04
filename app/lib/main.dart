@@ -35,7 +35,8 @@ Future<void> main() async {
   try {
     final content =
         await ContentRepository(const AssetContentSource()).loadAll();
-    final modes = await registerModes(content.story);
+    final modes = await registerModes(
+        content.story, await loadDungeonJson(const AssetContentSource()));
     try {
       await IconRegistry.load(); // painted icons replace the emoji (D-037)
     } catch (e) {

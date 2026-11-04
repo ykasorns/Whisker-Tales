@@ -64,6 +64,26 @@ for src in sorted(f for k in MONSTERS
     name = os.path.basename(src)[:-4].replace('mon_', '').replace('boss_', '')
     shutil.copy(src, f'{OUT}/mon/{name}.png')
     m += 1
+# Treat Dungeon (D-065): guardians draw only idle ×3, attack and defeated, so
+# only those ship, at most 440 px wide (drawn at ~200 dp)
+DUNGEON_BOSSES = ['cookiegolem', 'jellyking', 'cakedragon']
+DUNGEON_FRAMES = ['idle_f1', 'idle_f2', 'idle_f3', 'attack', 'defeated']
+for k in DUNGEON_BOSSES:
+    for f in DUNGEON_FRAMES:
+        src = f'{ROOT}/assets/raw/frames/{k}/boss_{k}_{f}.png'
+        if not os.path.exists(src):
+            continue
+        im = Image.open(src).convert('RGBA')
+        s = min(1, 440 / im.width)
+        im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS).save(
+            f'{OUT}/mon/{k}_{f}.png', optimize=True)
+        m += 1
+os.makedirs(f'{OUT}/dungeon', exist_ok=True)
+for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/dungeon_v1/prizes/*.png')):
+    shutil.copy(src, f'{OUT}/dungeon/{os.path.basename(src)}')
+if os.path.exists(f'{ROOT}/assets/raw/frames/dungeon_v1/mode_dungeon.png'):
+    im = Image.open(f'{ROOT}/assets/raw/frames/dungeon_v1/mode_dungeon.png').convert('RGBA')
+    im.resize((192, 192), Image.LANCZOS).save(f'{OUT}/dungeon/mode_dungeon.png', optimize=True)
 # parallax layers, scaled down to a phone-sized height
 os.makedirs(f'{OUT}/bg', exist_ok=True)
 for src in sorted(glob.glob(f'{ROOT}/assets/raw/backgrounds/*.png')):

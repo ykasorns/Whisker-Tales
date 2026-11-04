@@ -620,4 +620,85 @@ class AppLocalizationsTh extends AppLocalizations {
   String petTreatsHave(String n) {
     return 'มีขนม 🍪 $n — ได้เพิ่มเมื่อได้สัตว์ซ้ำ';
   }
+
+  @override
+  String get dungeonTitle => 'ถ้ำขนมแมว';
+
+  @override
+  String get dungeonSubtitle =>
+      'บอสตัวเดียว 30 วินาที ตีแรงเท่าไหร่ ก็ได้ 🍪 ไปเลี้ยงสัตว์มากเท่านั้น';
+
+  @override
+  String dungeonEntries(String n) {
+    return 'ลงได้อีกวันนี้: $n ครั้ง';
+  }
+
+  @override
+  String dungeonLevel(String n) {
+    return 'บอสเลเวล $n';
+  }
+
+  @override
+  String get dungeonBest => 'ดีที่สุด';
+
+  @override
+  String get dungeonStart => 'ลงถ้ำ!';
+
+  @override
+  String get dungeonWatch => '📺 ดูโฆษณา: ลงเพิ่ม 1 ครั้ง';
+
+  @override
+  String get dungeonNoRuns => 'วันนี้ลงครบแล้ว พรุ่งนี้มาใหม่นะ!';
+
+  @override
+  String get dungeonLeave => 'จบเลย';
+
+  @override
+  String get dungeonClose => 'กลับ';
+
+  @override
+  String get dungeonAgain => 'ลงอีก';
+
+  @override
+  String dungeonDamage(String pct) {
+    return 'ดาเมจ $pct%';
+  }
+
+  @override
+  String dungeonTime(String n) {
+    return '$n วิ';
+  }
+
+  @override
+  String get dungeonResult => 'จบรอบแล้ว!';
+
+  @override
+  String get dungeonNoTier =>
+      'บอสแทบไม่รู้สึก ลองลดเลเวล หรือกลับมาเมื่อแข็งแกร่งขึ้นนะ';
+
+  @override
+  String dungeonGot(String n) {
+    return 'ได้ 🍪 $n';
+  }
+
+  @override
+  String dungeonOpened(String n) {
+    return 'ปลดบอสเลเวล $n แล้ว!';
+  }
+
+  @override
+  String get dungeonDefeated => 'ล้มบอสได้!';
+
+  @override
+  String dungeonTierName(String n) {
+    return 'ขั้น $n';
+  }
+
+  @override
+  String get dungeonLocked => 'ชนะบอสแรกก่อนถึงจะเปิดถ้ำนี้';
+
+  @override
+  String dungeonUnlockHint(String n) {
+    return 'ถึงขั้น $n เพื่อปลดเลเวลถัดไป';
+  }
 }

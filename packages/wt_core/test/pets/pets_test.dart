@@ -30,6 +30,9 @@ class FakeAds implements IAdService {
 
   @override
   int remainingToday(String placementId) => allowed ? 1 : 0;
+
+  @override
+  int usedToday(String placementId) => 0;
 }
 
 void main() {
@@ -367,6 +370,26 @@ void main() {
     expect(after.hp, greaterThan(before.hp));
     expect(shareAfter.atk, greaterThan(shareBefore.atk));
     expect(shareAfter.hp, greaterThan(shareBefore.hp));
+  });
+
+  test('past the soft cap levels pay less and cost more (D-065)', () {
+    expect(rules.maxLevel, 30);
+    expect(rules.levelSoftCap, 10);
+    final early = rules.levelMultBp(10) - rules.levelMultBp(9);
+    final late = rules.levelMultBp(11) - rules.levelMultBp(10);
+    expect(late, lessThan(early));
+    // each level still gives something, and the top stays well under the
+    // straight line the early levels would have drawn
+    for (var l = 2; l <= rules.maxLevel; l++) {
+      expect(rules.levelMultBp(l), greaterThan(rules.levelMultBp(l - 1)));
+    }
+    expect(
+        rules.levelMultBp(30), lessThan(kBp + rules.levelBonusBp * (30 - 1)));
+    // cost never falls, and has no jump at the cap
+    for (var l = 2; l < rules.maxLevel; l++) {
+      expect(rules.levelCost(l), greaterThanOrEqualTo(rules.levelCost(l - 1)));
+    }
+    expect(rules.levelCost(11) / rules.levelCost(10), closeTo(1.12, 0.02));
   });
 
   test('what a pet shares never feeds back into the pet', () {

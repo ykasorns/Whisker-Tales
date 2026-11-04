@@ -14,3 +14,7 @@ implements GameMode เท่านั้น
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+
+## 2026-11-04 — superseded
+YK asked for a different dungeon (D-065): one boss, 30 s, treats by damage, 3 runs + 2 by ad. Implemented in `packages/wt_mode_dungeon`; the crystal-cave / spinning-mill / secret-library design above is not planned.

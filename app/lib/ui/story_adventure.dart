@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
+import 'package:wt_mode_dungeon/wt_mode_dungeon.dart';
 import 'package:wt_mode_story/wt_mode_story.dart';
 
 import '../l10n/strings.dart';
 import 'frames.dart';
+import 'dungeon_adventure.dart';
 import 'game_icon.dart';
 import 'palette.dart';
 import 'story_scene.dart';
@@ -38,7 +40,11 @@ class AdventurePage extends ConsumerWidget {
                     style:
                         const TextStyle(color: Palette.inkSoft, height: 1.3)),
                 const SizedBox(height: 18),
-                for (final mode in modes) _modeCard(context, ref, mode),
+                for (final mode in modes)
+                  if (mode is DungeonMode)
+                    DungeonHubCard(mode: mode)
+                  else
+                    _modeCard(context, ref, mode),
                 if (modes.isEmpty)
                   _paperMessage('📖', s.comingSoon, Palette.plum),
               ],

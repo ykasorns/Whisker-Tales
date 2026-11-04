@@ -1,0 +1,25 @@
+name: wt_mode_dungeon
+description: >
+  Whisker Tales — Treat Dungeon (D-065): one boss, 30 seconds, rewards by the
+  damage dealt. Implements GameMode from wt_core (MODE_PLUGIN_SPEC.md §3).
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  wt_core:
+    path: ../wt_core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  assets:
+    - assets/manifest.json

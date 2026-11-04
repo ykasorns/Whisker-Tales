@@ -12,4 +12,8 @@ abstract class IAdService {
   Future<AdOutcome> show(String placementId);
 
   int remainingToday(String placementId);
+
+  /// Finished ads of [placementId] today (the dungeon counts its entries
+  /// from this; D-065). Fakes that do not count may leave it 0.
+  int usedToday(String placementId) => 0;
 }

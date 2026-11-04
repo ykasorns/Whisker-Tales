@@ -12,10 +12,12 @@ class _Assets implements ContentSource {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('story registers from its bundled manifest and ships enabled', () async {
+  test('story and the dungeon register from their bundled manifests',
+      () async {
     final content = await ContentRepository(_Assets()).loadAll();
-    final registry = await registerModes(content.story);
-    expect(registry.modes.map((m) => m.id), ['story']);
-    expect(registry.enabledModes.map((m) => m.id), ['story']);
+    final registry =
+        await registerModes(content.story, await loadDungeonJson(_Assets()));
+    expect(registry.modes.map((m) => m.id), ['story', 'dungeon']);
+    expect(registry.enabledModes.map((m) => m.id), ['story', 'dungeon']);
   });
 }

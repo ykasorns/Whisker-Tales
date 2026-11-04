@@ -164,6 +164,12 @@ class AdService implements IAdService {
   }
 
   @override
+  int usedToday(String placementId) {
+    _rollIfNewDay();
+    return _used[placementId] ?? 0;
+  }
+
+  @override
   bool canShow(String placementId) => remainingToday(placementId) > 0;
 
   /// Shows a rewarded ad. Only [AdOutcome.rewarded] counts toward the caps

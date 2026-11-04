@@ -144,6 +144,9 @@ class PetsRules {
     required this.levelBonusBp,
     required this.levelCostBase,
     required this.levelCostGrowth,
+    required this.levelSoftCap,
+    required this.levelLateBonusBp,
+    required this.levelLateCostGrowth,
     required this.shareBp,
     required this.dupStarCookies,
   });
@@ -181,6 +184,13 @@ class PetsRules {
   final int levelCostBase;
   final num levelCostGrowth;
 
+  /// Past this level (D-065) each level adds only [levelLateBonusBp] and each
+  /// cost step grows by [levelLateCostGrowth]: the cap can rise without the
+  /// pets' share of Mochi running away.
+  final int levelSoftCap;
+  final int levelLateBonusBp;
+  final num levelLateCostGrowth;
+
   /// Share of a deployed pet's HP/ATK/DEF that Mochi gets, per rarity (bp).
   final List<int> shareBp;
 
@@ -196,11 +206,18 @@ class PetsRules {
 
   int starMultBp(int stars) => kBp + starBonusBp * (stars - 1);
 
-  int levelMultBp(int level) => kBp + levelBonusBp * (level - 1);
+  int levelMultBp(int level) =>
+      kBp +
+      levelBonusBp * (math.min(level, levelSoftCap) - 1) +
+      levelLateBonusBp * math.max(0, level - levelSoftCap);
 
   /// Treats to raise a pet from [level] to the next.
-  int levelCost(int level) =>
-      (levelCostBase * math.pow(levelCostGrowth, level - 1)).round();
+  int levelCost(int level) {
+    final early = math.min(level, levelSoftCap);
+    final base = levelCostBase * math.pow(levelCostGrowth, early - 1);
+    return (base * math.pow(levelLateCostGrowth, math.max(0, level - early)))
+        .round();
+  }
 
   /// The pet that owns skill [skillId], if any.
   PetDef? bySkill(String skillId) {
@@ -283,6 +300,12 @@ class PetsRules {
       levelBonusBp: (n('level_bonus_pct') * kBp).round(),
       levelCostBase: n('level_cost_base').toInt(),
       levelCostGrowth: n('level_cost_growth'),
+      levelSoftCap: p['level_soft_cap'] is num
+          ? (p['level_soft_cap'] as num).toInt()
+          : n('max_level').toInt(),
+      levelLateBonusBp:
+          ((p['level_late_bonus_pct'] as num? ?? 0) * kBp).round(),
+      levelLateCostGrowth: p['level_late_cost_growth'] as num? ?? 1,
       shareBp: List.unmodifiable(
           [for (final x in l('share_pct')) (x * kBp).round()]),
       dupStarCookies:

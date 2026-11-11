@@ -701,4 +701,94 @@ class AppLocalizationsTh extends AppLocalizations {
   String dungeonUnlockHint(String n) {
     return 'ถึงขั้น $n เพื่อปลดเลเวลถัดไป';
   }
+
+  @override
+  String get attrCrit => 'คริ';
+
+  @override
+  String get attrCritDmg => 'ดาเมจคริ';
+
+  @override
+  String get attrCritRes => 'ต้านคริ';
+
+  @override
+  String get attrCritDmgRes => 'ลดดาเมจคริ';
+
+  @override
+  String get attrCombo => 'ตีติด';
+
+  @override
+  String get attrComboRes => 'ต้านตีติด';
+
+  @override
+  String get attrCounter => 'สวนกลับ';
+
+  @override
+  String get attrCounterRes => 'ต้านสวนกลับ';
+
+  @override
+  String get attrStun => 'มึน';
+
+  @override
+  String get attrStunRes => 'ต้านมึน';
+
+  @override
+  String get attrEvade => 'หลบ';
+
+  @override
+  String get attrAccuracy => 'แม่นยำ';
+
+  @override
+  String get attrLifesteal => 'ดูดเลือด';
+
+  @override
+  String get attrLifestealRes => 'ต้านดูดเลือด';
+
+  @override
+  String get attrRegen => 'ฟื้นฟู';
+
+  @override
+  String get attrAttackSpeed => 'ความเร็วตี';
+
+  @override
+  String get attrSkillDmg => 'ดาเมจสกิล';
+
+  @override
+  String get attrBossDmg => 'ดาเมจบอส';
+
+  @override
+  String get attrPetDmg => 'ดาเมจสัตว์เลี้ยง';
+
+  @override
+  String get attrCdr => 'ลดคูลดาวน์';
+
+  @override
+  String get attrYarnFind => 'หาไหมพรม';
+
+  @override
+  String get attrFishFind => 'หาปลาทอง';
+
+  @override
+  String get attrExpFind => 'หา EXP';
+
+  @override
+  String get attrCraftLuck => 'โชคถัก';
+
+  @override
+  String get attrArmorPierce => 'ทะลวงเกราะ';
+
+  @override
+  String get attrDmgReduction => 'ลดดาเมจ';
+
+  @override
+  String get attrThorns => 'หนามสะท้อน';
+
+  @override
+  String get attrExecute => 'ปลิดชีพ';
+
+  @override
+  String get attrOpeningShield => 'โล่เปิดศึก';
+
+  @override
+  String get statsMore => 'สเตตัสอื่น ๆ';
 }

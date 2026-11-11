@@ -9,17 +9,37 @@ void main() {
           {int atk = 100, int def = 30, Map<Attribute, int> a = const {}}) =>
       StatBlock(hp: 1000, atk: atk, def: def, attrs: a);
   ({HitOutcome outcome, int damage}) hit(StatBlock a, StatBlock d, int roll,
-          {bool boss = false, DamageChannel ch = DamageChannel.normal}) =>
+          {bool boss = false,
+          bool low = false,
+          DamageChannel ch = DamageChannel.normal}) =>
       resolveHit(
           rules: rules,
           attacker: a,
           defender: d,
           roll: roll,
           defenderIsBoss: boss,
+          defenderLow: low,
           channel: ch);
 
   test('base = ATK − DEF', () {
     expect(hit(s(), s(), 9999), (outcome: HitOutcome.normal, damage: 70));
+  });
+
+  test('armor pierce ignores a share of DEF, capped at 50%', () {
+    final a = s(a: {Attribute.armorPierce: 3000});
+    expect(hit(a, s(), 9999).damage, 79); // DEF 30 → 21
+    expect(hit(s(a: {Attribute.armorPierce: 9000}), s(), 9999).damage, 85);
+  });
+
+  test('damage reduction shrinks every hit, capped at 40%', () {
+    expect(hit(s(), s(a: {Attribute.dmgReduction: 1000}), 9999).damage, 63);
+    expect(hit(s(), s(a: {Attribute.dmgReduction: 9000}), 9999).damage, 42);
+  });
+
+  test('execute only adds damage against a low-HP target', () {
+    final a = s(a: {Attribute.execute: 5000});
+    expect(hit(a, s(), 9999).damage, 70);
+    expect(hit(a, s(), 9999, low: true).damage, 105);
   });
 
   test('DEF floor: always at least 5% of ATK, never 0', () {

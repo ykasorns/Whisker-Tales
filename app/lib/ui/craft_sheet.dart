@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'attr_names.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
 
@@ -260,7 +261,7 @@ class _Compare extends StatelessWidget {
             IconText(
                 '🛡️ ${s.shortDef} ${g.stats.def}${arrow(g.stats.def, other?.stats.def)}'),
             for (final e in g.stats.attrs.entries)
-              IconText('✦ ${e.key.key} +${(e.value / 100).toStringAsFixed(1)}%',
+              IconText('✦ ${attrName(s, e.key)} ${attrValue(e.value)}',
                   style: const TextStyle(fontSize: 12)),
           ],
         ]),

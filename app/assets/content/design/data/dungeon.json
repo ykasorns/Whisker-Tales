@@ -7,9 +7,9 @@
  "max_level": 30,
  "unlock_tier": 3,
  "boss": {
-  "page_start": 6,
-  "page_step": 3,
-  "hp_mult": 8.0,
+  "page_start": 14,
+  "page_step": 4,
+  "hp_mult": 30.0,
   "atk_mult": 0.6,
   "interval_ms": 1600
  },

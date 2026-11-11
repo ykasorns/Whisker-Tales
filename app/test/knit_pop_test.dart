@@ -16,7 +16,7 @@ void main() {
                       art: 'gear/sword_1',
                       kept: kept,
                       onDone: () => done++)))));
-      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(milliseconds: 1300));
       expect(done, 0);
       double opacity() => tester
           .widget<Opacity>(find
@@ -25,7 +25,7 @@ void main() {
               .first)
           .opacity;
       expect(opacity(), greaterThan(0.5)); // still visible mid-way
-      await tester.pump(const Duration(milliseconds: 800));
+      await tester.pump(const Duration(milliseconds: 1000));
       expect(done, 1);
       expect(opacity(), lessThan(0.01)); // nothing left behind
     });

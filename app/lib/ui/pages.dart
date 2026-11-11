@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'attr_names.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
 
@@ -248,6 +249,33 @@ class _CatTabState extends ConsumerState<_CatTab> {
               _statCell(
                   '✨ ${s.shortSkill}', pct(Attribute.skillDmg), Palette.sun),
             ]),
+            if (st.attrs.keys.any((k) => !const {
+                  Attribute.evade,
+                  Attribute.crit,
+                  Attribute.skillDmg
+                }.contains(k)))
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+                key: const Key('stats-more'),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IconText(s.statsMore,
+                          style: const TextStyle(fontWeight: FontWeight.w900)),
+                      const SizedBox(height: 4),
+                      Wrap(spacing: 12, runSpacing: 2, children: [
+                        for (final e in st.attrs.entries)
+                          if (!const {
+                            Attribute.evade,
+                            Attribute.crit,
+                            Attribute.skillDmg
+                          }.contains(e.key))
+                            IconText(
+                                '${attrName(s, e.key)} ${attrValue(e.value)}',
+                                style: const TextStyle(fontSize: 12)),
+                      ]),
+                    ]),
+              ),
           ]),
         ),
       ),
@@ -488,7 +516,8 @@ class _ShopPageState extends ConsumerState<ShopPage> {
   /// after the parental gate, which opens on any tap).
   Widget _packShelf(AppLocalizations s, Currency c, String icon) {
     final packs = [
-      for (final p in (ref.read(iapCatalogProvider)?.products ?? const <IapProduct>[]))
+      for (final p
+          in (ref.read(iapCatalogProvider)?.products ?? const <IapProduct>[]))
         if (p.consumable && p.grants[c] > 0) p
     ];
     return SizedBox(

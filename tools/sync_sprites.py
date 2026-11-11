@@ -100,6 +100,34 @@ for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/pets/*.png')):
     s = 200 / im.height
     im.resize((round(im.width * s), 200), Image.LANCZOS).save(
         f'{OUT}/pet/{os.path.basename(src)}', optimize=True)
+# Animated class-skill effects: eight chronological frames per skill.  The
+# raw 256 px masters stay in assets/raw; 192 px is ample for their largest
+# in-game draw size and keeps the mobile bundle compact.
+os.makedirs(f'{OUT}/skill_fx', exist_ok=True)
+skill_fx = 0
+SKILL_FX_IDS = ['shield_bash', 'iron_wall', 'war_cry', 'twin_strike',
+                'poison_blade', 'shadow_step', 'power_shot', 'arrow_rain',
+                'eagle_eye', 'fireball', 'frost_nova', 'meteor']
+for skill in SKILL_FX_IDS:
+    for src in sorted(glob.glob(
+            f'{ROOT}/assets/raw/frames/skill_fx/{skill}/{skill}_[0-9][0-9].png')):
+        frame = os.path.basename(src).removeprefix(f'{skill}_')
+        im = Image.open(src).convert('RGBA').resize((192, 192), Image.LANCZOS)
+        im.save(f'{OUT}/skill_fx/{skill}_{frame}', optimize=True)
+        skill_fx += 1
+# Hand-painted bitmap combat digits. Variable widths are preserved so a "1"
+# does not occupy the same horizontal space as an "8" when numbers compose.
+os.makedirs(f'{OUT}/damage_numbers', exist_ok=True)
+damage_glyphs = 0
+for style in ('normal', 'skill', 'crit', 'hurt'):
+    for src in sorted(glob.glob(
+            f'{ROOT}/assets/raw/frames/damage_numbers/{style}/*.png')):
+        im = Image.open(src).convert('RGBA')
+        width = round(im.width * 128 / im.height)
+        im.resize((width, 128), Image.LANCZOS).save(
+            f'{OUT}/damage_numbers/{style}_{os.path.basename(src)}',
+            optimize=True)
+        damage_glyphs += 1
 # UI icons (D-037): painted replacements for the emoji — trimmed, ≤ 128 px
 os.makedirs(f'{OUT}/icon', exist_ok=True)
 for src in sorted(glob.glob(f'{ROOT}/assets/raw/frames/icon/*.png')):
@@ -192,6 +220,14 @@ for sub in ('portraits', 'cards', 'fx'):
         os.makedirs(f'{OUT}/story/{sub}', exist_ok=True)
         Image.open(src).convert('RGBA').save(
             f'{OUT}/story/{sub}/{os.path.basename(src)}', optimize=True)
+# D-067: collectible-style Adventure pick cards. These are full portrait
+# frames rather than nine-slice boxes, so publish them at the phone draw size
+# and preserve the transparent silhouette around the raised crest.
+for src in sorted(glob.glob(
+        f'{ROOT}/assets/raw/frames/story_v2/cards/*.png')):
+    os.makedirs(f'{OUT}/story/cards_v2', exist_ok=True)
+    Image.open(src).convert('RGBA').resize((320, 480), Image.LANCZOS).save(
+        f'{OUT}/story/cards_v2/{os.path.basename(src)}', optimize=True)
 # 256 colours for every sprite (not the painted backgrounds, which band):
 # the art is flat-shaded, so it looks the same and the APK stays under the
 # 30 MB send limit (D-030)
@@ -202,4 +238,6 @@ for f in glob.glob(f'{OUT}/**/*.png', recursive=True):
     if im.mode != 'P':
         im.convert('RGBA').quantize(colors=256, method=Image.Quantize.FASTOCTREE) \
             .save(f, optimize=True)
-print(f'{len(FRAMES)} cat frames + {outfits} outfit frames + {n} gear + {m} monster frames + bg + ui → {OUT}')
+print(f'{len(FRAMES)} cat frames + {outfits} outfit frames + {n} gear + '
+      f'{m} monster frames + {skill_fx} skill FX frames + '
+      f'{damage_glyphs} damage glyphs + bg + ui → {OUT}')

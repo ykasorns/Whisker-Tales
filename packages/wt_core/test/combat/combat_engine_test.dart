@@ -186,6 +186,42 @@ void main() {
       expect(heals.every((h) => h.hp <= 1000 && h.amount > 0), isTrue);
     });
 
+    test('opening shield absorbs the first hits before any HP is lost', () {
+      final e = CombatEngine(rules)
+        ..start(CombatSetup(seed: 2, units: [
+          cat(hp: 1000, attrs: {Attribute.openingShield: 3000}),
+          mon('a', hp: 99999, atk: 60),
+        ]));
+      expect(e.view.first.shield, 300);
+      expect(e.view.first.hp, 1000);
+    });
+
+    test('thorns hurt the attacker but never finish it off', () {
+      final e = CombatEngine(rules)
+        ..start(CombatSetup(seed: 4, units: [
+          cat(hp: 99999, attrs: {Attribute.thorns: 3000}),
+          mon('a', hp: 40, atk: 200),
+        ]));
+      final before = e.view.last.hp;
+      for (var i = 0; i < 400; i++) {
+        e.tick(50);
+      }
+      expect(e.view.last.hp, lessThan(before));
+      final end = CombatEngine(rules)
+        ..start(CombatSetup(seed: 4, units: [
+          cat(
+              hp: 99999,
+              atk: 1,
+              intervalMs: 9999999,
+              attrs: {Attribute.thorns: 3000}),
+          mon('a', hp: 30, atk: 5000),
+        ]));
+      for (var i = 0; i < 400; i++) {
+        end.tick(50);
+      }
+      expect(end.view.last.hp, greaterThanOrEqualTo(1));
+    });
+
     test('counters and combos are tagged with their source', () {
       final ev = record(
           rules,

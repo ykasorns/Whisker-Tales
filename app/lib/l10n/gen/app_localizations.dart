@@ -1297,6 +1297,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reach tier {n} to open the next level'**
   String dungeonUnlockHint(String n);
+
+  /// No description provided for @attrCrit.
+  ///
+  /// In en, this message translates to:
+  /// **'Crit'**
+  String get attrCrit;
+
+  /// No description provided for @attrCritDmg.
+  ///
+  /// In en, this message translates to:
+  /// **'Crit damage'**
+  String get attrCritDmg;
+
+  /// No description provided for @attrCritRes.
+  ///
+  /// In en, this message translates to:
+  /// **'Crit resist'**
+  String get attrCritRes;
+
+  /// No description provided for @attrCritDmgRes.
+  ///
+  /// In en, this message translates to:
+  /// **'Crit dmg resist'**
+  String get attrCritDmgRes;
+
+  /// No description provided for @attrCombo.
+  ///
+  /// In en, this message translates to:
+  /// **'Combo'**
+  String get attrCombo;
+
+  /// No description provided for @attrComboRes.
+  ///
+  /// In en, this message translates to:
+  /// **'Combo resist'**
+  String get attrComboRes;
+
+  /// No description provided for @attrCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'Counter'**
+  String get attrCounter;
+
+  /// No description provided for @attrCounterRes.
+  ///
+  /// In en, this message translates to:
+  /// **'Counter resist'**
+  String get attrCounterRes;
+
+  /// No description provided for @attrStun.
+  ///
+  /// In en, this message translates to:
+  /// **'Stun'**
+  String get attrStun;
+
+  /// No description provided for @attrStunRes.
+  ///
+  /// In en, this message translates to:
+  /// **'Stun resist'**
+  String get attrStunRes;
+
+  /// No description provided for @attrEvade.
+  ///
+  /// In en, this message translates to:
+  /// **'Dodge'**
+  String get attrEvade;
+
+  /// No description provided for @attrAccuracy.
+  ///
+  /// In en, this message translates to:
+  /// **'Accuracy'**
+  String get attrAccuracy;
+
+  /// No description provided for @attrLifesteal.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifesteal'**
+  String get attrLifesteal;
+
+  /// No description provided for @attrLifestealRes.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifesteal resist'**
+  String get attrLifestealRes;
+
+  /// No description provided for @attrRegen.
+  ///
+  /// In en, this message translates to:
+  /// **'Regen'**
+  String get attrRegen;
+
+  /// No description provided for @attrAttackSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Attack speed'**
+  String get attrAttackSpeed;
+
+  /// No description provided for @attrSkillDmg.
+  ///
+  /// In en, this message translates to:
+  /// **'Skill damage'**
+  String get attrSkillDmg;
+
+  /// No description provided for @attrBossDmg.
+  ///
+  /// In en, this message translates to:
+  /// **'Boss damage'**
+  String get attrBossDmg;
+
+  /// No description provided for @attrPetDmg.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet damage'**
+  String get attrPetDmg;
+
+  /// No description provided for @attrCdr.
+  ///
+  /// In en, this message translates to:
+  /// **'Cooldown'**
+  String get attrCdr;
+
+  /// No description provided for @attrYarnFind.
+  ///
+  /// In en, this message translates to:
+  /// **'Yarn find'**
+  String get attrYarnFind;
+
+  /// No description provided for @attrFishFind.
+  ///
+  /// In en, this message translates to:
+  /// **'Goldfish find'**
+  String get attrFishFind;
+
+  /// No description provided for @attrExpFind.
+  ///
+  /// In en, this message translates to:
+  /// **'EXP find'**
+  String get attrExpFind;
+
+  /// No description provided for @attrCraftLuck.
+  ///
+  /// In en, this message translates to:
+  /// **'Knit luck'**
+  String get attrCraftLuck;
+
+  /// No description provided for @attrArmorPierce.
+  ///
+  /// In en, this message translates to:
+  /// **'Armor pierce'**
+  String get attrArmorPierce;
+
+  /// No description provided for @attrDmgReduction.
+  ///
+  /// In en, this message translates to:
+  /// **'Damage cut'**
+  String get attrDmgReduction;
+
+  /// No description provided for @attrThorns.
+  ///
+  /// In en, this message translates to:
+  /// **'Thorns'**
+  String get attrThorns;
+
+  /// No description provided for @attrExecute.
+  ///
+  /// In en, this message translates to:
+  /// **'Execute'**
+  String get attrExecute;
+
+  /// No description provided for @attrOpeningShield.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening shield'**
+  String get attrOpeningShield;
+
+  /// No description provided for @statsMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Other stats'**
+  String get statsMore;
 }
 
 class _AppLocalizationsDelegate

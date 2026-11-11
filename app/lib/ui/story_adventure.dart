@@ -507,6 +507,12 @@ class _RelicPickPanel extends StatelessWidget {
           : r.descriptionTh,
       iconOf: (r) => _relicIcon(r.id),
       colorOf: (_) => Palette.sun,
+      variantOf: (r) => 'relic_${r.rarity}',
+      rankOf: (r) => switch (r.rarity) {
+        'epic' => 3,
+        'rare' => 2,
+        _ => 1,
+      },
       synergyOf: (r) => _hasSynergy(content, controller.relicIds, r.id),
       onPick: controller.chooseRelic,
     );
@@ -541,6 +547,8 @@ class _TalentPickPanel extends StatelessWidget {
         'shadow' => Palette.plum,
         _ => Palette.teal
       },
+      variantOf: (t) => 'talent_${t.tree}',
+      rankOf: (t) => t.tier,
       synergyOf: (t) =>
           t.crossSynergies.any((x) => controller.relicIds.contains(x.relicId)),
       onPick: controller.chooseTalent,
@@ -557,6 +565,8 @@ class _PickPanel<T> extends StatefulWidget {
     required this.descriptionOf,
     required this.iconOf,
     required this.colorOf,
+    required this.variantOf,
+    required this.rankOf,
     required this.synergyOf,
     required this.onPick,
   });
@@ -565,6 +575,8 @@ class _PickPanel<T> extends StatefulWidget {
   final List<T> choices;
   final String Function(T) idOf, nameOf, descriptionOf, iconOf;
   final Color Function(T) colorOf;
+  final String Function(T) variantOf;
+  final int Function(T) rankOf;
   final bool Function(T) synergyOf;
   final void Function(String) onPick;
 
@@ -592,6 +604,9 @@ class _PickPanelState<T> extends State<_PickPanel<T>> {
     final id = widget.idOf(choice);
     final chosen = selected == id;
     final synergy = widget.synergyOf(choice);
+    final variant = widget.variantOf(choice);
+    final rank = widget.rankOf(choice);
+    final accent = widget.colorOf(choice);
     return Semantics(
       button: true,
       selected: chosen,
@@ -608,41 +623,116 @@ class _PickPanelState<T> extends State<_PickPanel<T>> {
         child: CustomPaint(
           foregroundPainter: synergy ? _DottedLinkPainter() : null,
           child: AnimatedScale(
-            scale: chosen ? 1.04 : 1,
+            scale: chosen ? 1.045 : 1,
             duration: const Duration(milliseconds: 120),
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(13, 15, 13, 13),
-              decoration: paintedCardDecoration(
-                  chosen ? 'card_pick_selected' : 'card_pick'),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GameIcon(widget.iconOf(choice), size: chosen ? 45 : 38),
-                    const SizedBox(height: 4),
-                    IconText(widget.nameOf(choice),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.w900)),
-                    if (chosen) ...[
-                      const SizedBox(height: 3),
-                      IconText(widget.descriptionOf(choice),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 140),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: chosen
+                    ? [
+                        BoxShadow(
+                          color: accent.withValues(alpha: .65),
+                          blurRadius: 12,
+                          spreadRadius: 2,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: LayoutBuilder(builder: (context, box) {
+                final h = box.maxHeight;
+                final iconSize = math.min(box.maxWidth * .42, h * .16);
+                return Stack(children: [
+                  Positioned.fill(
+                    child: Image.asset(
+                      'assets/game/story/cards_v2/card_$variant.png',
+                      fit: BoxFit.fill,
+                      filterQuality: FilterQuality.medium,
+                    ),
+                  ),
+                  Positioned(
+                    left: 8,
+                    right: 8,
+                    top: h * .075,
+                    height: h * .36,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GameIcon(widget.iconOf(choice),
+                            size: chosen ? iconSize * 1.08 : iconSize),
+                        SizedBox(height: h * .015),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            for (var i = 0; i < rank; i++)
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 1),
+                                child: GameIcon('star', size: 12),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    left: 11,
+                    right: 11,
+                    top: h * .49,
+                    height: h * .105,
+                    child: Center(
+                      child: IconText(widget.nameOf(choice),
                           textAlign: TextAlign.center,
-                          maxLines: 3,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                              fontSize: 9, color: Palette.inkSoft)),
-                      IconText(AppLocalizations.of(context).storyTapAgain,
-                          style: const TextStyle(
-                              fontSize: 9, fontWeight: FontWeight.w800)),
-                    ],
-                    if (synergy)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 2),
-                        child: GameIcon('bolt', size: 15),
-                      ),
-                  ]),
+                              fontSize: 11.5,
+                              height: 1.05,
+                              fontWeight: FontWeight.w900)),
+                    ),
+                  ),
+                  Positioned(
+                    left: 13,
+                    right: 13,
+                    top: h * .625,
+                    bottom: h * .075,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconText(widget.descriptionOf(choice),
+                            textAlign: TextAlign.center,
+                            maxLines: 4,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontSize: 9.5,
+                                height: 1.18,
+                                fontWeight: FontWeight.w700,
+                                color: Palette.inkSoft)),
+                        if (chosen) ...[
+                          const SizedBox(height: 4),
+                          IconText(AppLocalizations.of(context).storyTapAgain,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                  fontSize: 8.5,
+                                  color: Palette.coral,
+                                  fontWeight: FontWeight.w900)),
+                        ],
+                      ],
+                    ),
+                  ),
+                  if (chosen)
+                    const Positioned(
+                      right: 7,
+                      top: 8,
+                      child: GameIcon('check', size: 22),
+                    ),
+                  if (synergy)
+                    const Positioned(
+                      left: 7,
+                      bottom: 8,
+                      child: GameIcon('bolt', size: 17),
+                    ),
+                ]);
+              }),
             ),
           ),
         ),
@@ -794,29 +884,70 @@ class _ShopPanel extends StatelessWidget {
             },
       child: Opacity(
         opacity: usable ? 1 : .48,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(12, 13, 12, 12),
-          decoration: paintedCardDecoration(
-              usable && !purchased ? 'card_shop' : 'card_pick'),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            GameIcon(
-                usable && !purchased ? _potionIcon(potion.buffId) : 'check',
-                size: 32),
-            IconText(s.lang == 'en' ? potion.nameEn : potion.nameTh,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                style:
-                    const TextStyle(fontSize: 10, fontWeight: FontWeight.w900)),
-            const SizedBox(height: 2),
-            IconText(
-                s.lang == 'en' ? potion.descriptionEn : potion.descriptionTh,
-                textAlign: TextAlign.center,
-                maxLines: 3,
-                style: const TextStyle(fontSize: 8, color: Palette.inkSoft)),
-            IconText('🐟 ${potion.price}',
-                style: const TextStyle(fontSize: 11)),
-          ]),
-        ),
+        child: LayoutBuilder(builder: (context, box) {
+          final h = box.maxHeight;
+          return Stack(children: [
+            Positioned.fill(
+              child: Image.asset(
+                'assets/game/story/cards_v2/card_relic_common.png',
+                fit: BoxFit.fill,
+                filterQuality: FilterQuality.medium,
+              ),
+            ),
+            Positioned(
+              left: 8,
+              right: 8,
+              top: h * .075,
+              height: h * .36,
+              child: Center(
+                child: GameIcon(
+                    usable && !purchased ? _potionIcon(potion.buffId) : 'check',
+                    size: math.min(box.maxWidth * .42, h * .16)),
+              ),
+            ),
+            Positioned(
+              left: 11,
+              right: 11,
+              top: h * .49,
+              height: h * .105,
+              child: Center(
+                child: IconText(s.lang == 'en' ? potion.nameEn : potion.nameTh,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 11.5,
+                        height: 1.05,
+                        fontWeight: FontWeight.w900)),
+              ),
+            ),
+            Positioned(
+              left: 13,
+              right: 13,
+              top: h * .625,
+              bottom: h * .075,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: IconText(
+                        s.lang == 'en'
+                            ? potion.descriptionEn
+                            : potion.descriptionTh,
+                        textAlign: TextAlign.center,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 9.5, color: Palette.inkSoft)),
+                  ),
+                  IconText('🐟 ${potion.price}',
+                      style: const TextStyle(
+                          fontSize: 11, fontWeight: FontWeight.w900)),
+                ],
+              ),
+            ),
+          ]);
+        }),
       ),
     );
   }

@@ -48,7 +48,23 @@ enum Attribute {
   yarnFind('yarn_find'),
   fishFind('fish_find'),
   expFind('exp_find'),
-  craftLuck('craft_luck');
+  craftLuck('craft_luck'),
+
+  /// Share of the defender's DEF this attacker ignores (ทะลวงเกราะ).
+  armorPierce('armor_pierce'),
+
+  /// Share of every incoming hit the defender shrugs off (ลดดาเมจ).
+  dmgReduction('dmg_reduction'),
+
+  /// Share of damage taken that is reflected to the attacker (หนามสะท้อน);
+  /// reflected damage never finishes a unit off.
+  thorns('thorns'),
+
+  /// Bonus damage against a target at or below the execute HP line (ปลิดชีพ).
+  execute('execute'),
+
+  /// A shield worth this share of max HP at the start of the fight (โล่เปิดศึก).
+  openingShield('opening_shield');
 
   const Attribute(this.key);
 

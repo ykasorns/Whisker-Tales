@@ -92,6 +92,25 @@ class _GameViewState extends ConsumerState<GameView> {
   Widget build(BuildContext context) => GameWidget(game: _game);
 }
 
+enum _SkillFxMode { target, self, area }
+
+enum _DamageNumberStyle { normal, skill, crit, hurt }
+
+const _skillFxModes = <String, _SkillFxMode>{
+  'shield_bash': _SkillFxMode.target,
+  'iron_wall': _SkillFxMode.self,
+  'war_cry': _SkillFxMode.self,
+  'twin_strike': _SkillFxMode.target,
+  'poison_blade': _SkillFxMode.target,
+  'shadow_step': _SkillFxMode.self,
+  'power_shot': _SkillFxMode.target,
+  'arrow_rain': _SkillFxMode.area,
+  'eagle_eye': _SkillFxMode.self,
+  'fireball': _SkillFxMode.target,
+  'frost_nova': _SkillFxMode.area,
+  'meteor': _SkillFxMode.area,
+};
+
 class BattleGame extends FlameGame {
   BattleGame({
     required this.rules,
@@ -186,6 +205,16 @@ class BattleGame extends FlameGame {
         if (a.startsWith('assets/game/icon/') && a.endsWith('.png'))
           a.substring('assets/game/'.length),
     ];
+    final skillFxFrames = [
+      for (final a in manifest.listAssets())
+        if (a.startsWith('assets/game/skill_fx/') && a.endsWith('.png'))
+          a.substring('assets/game/'.length),
+    ];
+    final damageNumberFrames = [
+      for (final a in manifest.listAssets())
+        if (a.startsWith('assets/game/damage_numbers/') && a.endsWith('.png'))
+          a.substring('assets/game/'.length),
+    ];
     await images.loadAll([
       ...iconFrames.where((a) =>
           a.endsWith('/crown.png') ||
@@ -195,10 +224,13 @@ class BattleGame extends FlameGame {
       for (final f in _catFrames) 'cat/$f.png',
       ...outfits,
       ...petFrames,
+      ...skillFxFrames,
+      ...damageNumberFrames,
       for (final k in chapters.kinds)
         for (final f in _monFrames) 'mon/${k}_$f.png',
       'bg/bg_book1_L0_sky.webp',
       'bg/bg_book1_L3_ground.webp',
+      'story/fx/fx_hit_crit.png',
       for (final a in chapters.chapters)
         for (final l in ['L1_far', 'L2_mid']) 'bg/bg_book1_${a.layer}_$l.webp',
     ]);
@@ -318,6 +350,59 @@ class BattleGame extends FlameGame {
     _monsters.clear();
   }
 
+  List<ui.Image>? _skillFrames(String skillId) {
+    final result = <ui.Image>[];
+    for (var frame = 1; frame <= 8; frame++) {
+      final key = 'skill_fx/${skillId}_${frame.toString().padLeft(2, '0')}.png';
+      if (!images.containsKey(key)) return null;
+      result.add(images.fromCache(key));
+    }
+    return result;
+  }
+
+  /// Plays generated storybook FX in scene coordinates. Mochi always stands
+  /// on the left, so target effects travel from her toward the enemy on the
+  /// right; self buffs stay on Mochi and area skills cover the enemy group.
+  void _playSkillFx(String skillId) {
+    final frames = _skillFrames(skillId);
+    final mode = _skillFxModes[skillId];
+    if (frames == null || mode == null) return;
+
+    final living = _monsters.values.where((monster) => !monster.dead).toList()
+      ..sort((a, b) => a.position.x.compareTo(b.position.x));
+    switch (mode) {
+      case _SkillFxMode.target:
+        if (living.isEmpty) return;
+        final target = living.first;
+        add(_AnimatedSkillFx(
+          frames: frames,
+          from: mochi.position + Vector2(size.y * 0.07, -size.y * 0.12),
+          to: target.position + Vector2(0, -target.heightPx * 0.5),
+          duration: 0.58,
+          extent: size.y * 0.22,
+          travel: true,
+        ));
+      case _SkillFxMode.self:
+        add(_AnimatedSkillFx(
+          frames: frames,
+          from: mochi.position + Vector2(0, -size.y * 0.11),
+          duration: 0.78,
+          extent: size.y * 0.27,
+        ));
+      case _SkillFxMode.area:
+        if (living.isEmpty) return;
+        final x =
+            living.fold<double>(0, (sum, monster) => sum + monster.position.x) /
+                living.length;
+        add(_AnimatedSkillFx(
+          frames: frames,
+          from: Vector2(x, groundY - size.y * 0.13),
+          duration: 0.78,
+          extent: size.y * 0.34,
+        ));
+    }
+  }
+
   void _onCombat(CombatEvent e) {
     switch (e) {
       case HitResolved(
@@ -337,15 +422,20 @@ class BattleGame extends FlameGame {
         if (target != null) {
           void land() {
             target.flash = 0.15;
-            _float(
-                outcome == HitOutcome.dodge ? '·' : '$damage',
-                target.position +
-                    Vector2(0, -target.heightPx - 8 - size.y * 0.09),
-                outcome == HitOutcome.crit
-                    ? Palette.coral
-                    : source == AttackSource.skill
-                        ? const Color(0xFFE8742B)
-                        : Palette.ink);
+            final at = target.position +
+                Vector2(0, -target.heightPx - 8 - size.y * 0.09);
+            if (outcome == HitOutcome.dodge) {
+              _float('', at, Palette.plum, icon: 'icon/evade.png');
+            } else {
+              _damage(
+                  '$damage',
+                  at,
+                  outcome == HitOutcome.crit
+                      ? _DamageNumberStyle.crit
+                      : source == AttackSource.normal
+                          ? _DamageNumberStyle.normal
+                          : _DamageNumberStyle.skill);
+            }
           }
 
           final shot = attackerId == 'mochi' && source == AttackSource.normal
@@ -367,16 +457,20 @@ class BattleGame extends FlameGame {
           }
         } else if (targetId == 'mochi') {
           _monsters[attackerId]?.attackT = 0.3;
-          _float(
-              outcome == HitOutcome.dodge ? '💨' : '-$damage',
-              mochi.position + Vector2(-10, -size.y * 0.33),
-              outcome == HitOutcome.dodge ? Palette.plum : Palette.coral,
-              icon: outcome == HitOutcome.dodge ? 'icon/evade.png' : null);
+          final at = mochi.position + Vector2(-10, -size.y * 0.33);
+          if (outcome == HitOutcome.dodge) {
+            _float('', at, Palette.plum, icon: 'icon/evade.png');
+          } else {
+            _damage('-$damage', at, _DamageNumberStyle.hurt);
+          }
         }
       case UnitDefeated(:final unitId):
         _monsters[unitId]?.dead = true;
       case SkillCast(:final unitId, :final skillId):
-        if (unitId == 'mochi') _attackT = 0.35;
+        if (unitId == 'mochi') {
+          _attackT = 0.35;
+          _playSkillFx(skillId);
+        }
         final label = skillName?.call(skillId);
         if (label != null) {
           final isMochi = unitId == 'mochi';
@@ -404,6 +498,36 @@ class BattleGame extends FlameGame {
   }
 
   int _floatCount = 0;
+
+  void _damage(String text, Vector2 at, _DamageNumberStyle style) {
+    final glyphs = <ui.Image>[];
+    for (final char in text.split('')) {
+      final glyph = switch (char) {
+        '-' => 'minus',
+        '+' => 'plus',
+        _ => char,
+      };
+      final key = 'damage_numbers/${style.name}_$glyph.png';
+      if (!images.containsKey(key)) {
+        _float(text, at, Palette.ink);
+        return;
+      }
+      glyphs.add(images.fromCache(key));
+    }
+    final lane = _floatCount++ % 3;
+    add(_DamageNumber(
+      glyphs: glyphs,
+      at: at,
+      glyphHeight: size.y * (style == _DamageNumberStyle.crit ? 0.105 : 0.08),
+      rise: size.y * (style == _DamageNumberStyle.crit ? 0.17 : 0.125),
+      drift: (lane - 1) * size.y * 0.055,
+      critical: style == _DamageNumberStyle.crit,
+      burst: style == _DamageNumberStyle.crit &&
+              images.containsKey('story/fx/fx_hit_crit.png')
+          ? images.fromCache('story/fx/fx_hit_crit.png')
+          : null,
+    ));
+  }
 
   void _float(String text, Vector2 at, Color color,
       {String? icon, double scale = 1, bool label = false}) {
@@ -592,6 +716,101 @@ class _FloatText extends PositionComponent {
   }
 }
 
+/// Composes hand-painted bitmap glyphs into one combat number. The number
+/// pops on impact, settles, drifts into its own lane and fades as a unit.
+class _DamageNumber extends PositionComponent {
+  _DamageNumber({
+    required this.glyphs,
+    required Vector2 at,
+    required this.glyphHeight,
+    required this.rise,
+    required this.drift,
+    required this.critical,
+    this.burst,
+  })  : origin = at.clone(),
+        super(position: at.clone(), priority: 21);
+
+  final List<ui.Image> glyphs;
+  final Vector2 origin;
+  final double glyphHeight;
+  final double rise;
+  final double drift;
+  final bool critical;
+  final ui.Image? burst;
+  double t = 0;
+  static const duration = 0.92;
+
+  double _easeOut(double value) => 1 - math.pow(1 - value, 3).toDouble();
+
+  @override
+  void update(double dt) {
+    t += dt;
+    final progress = (t / duration).clamp(0.0, 1.0);
+    final motion = _easeOut(progress);
+    position = origin + Vector2(drift * motion, -rise * motion);
+    if (t >= duration) removeFromParent();
+  }
+
+  @override
+  void render(ui.Canvas canvas) {
+    final progress = (t / duration).clamp(0.0, 1.0);
+    final opacity =
+        progress < 0.6 ? 1.0 : (1 - (progress - 0.6) / 0.4).clamp(0.0, 1.0);
+    final pop = progress < 0.12
+        ? 0.52 + progress / 0.12 * 0.78
+        : progress < 0.28
+            ? 1.3 - (progress - 0.12) / 0.16 * 0.3
+            : 1.0;
+    final overlap = glyphHeight * 0.12;
+    final widths = [
+      for (final glyph in glyphs) glyphHeight * glyph.width / glyph.height,
+    ];
+    final totalWidth = widths.fold<double>(0, (sum, width) => sum + width) -
+        overlap * math.max(0, glyphs.length - 1);
+
+    canvas.save();
+    final shake = critical && progress < 0.2
+        ? math.sin(progress * 95) * glyphHeight * 0.025
+        : 0.0;
+    canvas.translate(shake, 0);
+    canvas.scale(pop * (critical ? 1.04 : 1));
+
+    if (burst case final image?) {
+      if (progress < 0.48) {
+        final burstOpacity = (1 - progress / 0.48).clamp(0.0, 1.0) * 0.8;
+        final extent = glyphHeight * (1.55 + progress * 1.2);
+        canvas.drawImageRect(
+            image,
+            ui.Rect.fromLTWH(
+                0, 0, image.width.toDouble(), image.height.toDouble()),
+            ui.Rect.fromCenter(
+                center: Offset(0, glyphHeight * 0.05),
+                width: extent,
+                height: extent),
+            ui.Paint()
+              ..filterQuality = ui.FilterQuality.medium
+              ..color = Colors.white.withValues(alpha: burstOpacity));
+      }
+    }
+
+    var x = -totalWidth / 2;
+    for (var index = 0; index < glyphs.length; index++) {
+      final glyph = glyphs[index];
+      final width = widths[index];
+      canvas.drawImageRect(
+          glyph,
+          ui.Rect.fromLTWH(
+              0, 0, glyph.width.toDouble(), glyph.height.toDouble()),
+          ui.Rect.fromLTWH(x, -glyphHeight / 2, width, glyphHeight),
+          ui.Paint()
+            ..filterQuality = ui.FilterQuality.medium
+            ..color = Colors.white.withValues(alpha: opacity));
+      x += width - overlap;
+    }
+    canvas.restore();
+  }
+}
+
 /// A shot in flight (the archer's arrow): flies in a straight line from the
 /// bow to the target, turned the way it travels, then calls [onArrive].
 class _Projectile extends PositionComponent {
@@ -626,6 +845,59 @@ class _Projectile extends PositionComponent {
         ui.Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
         ui.Rect.fromLTWH(-w / 2, -h / 2, w, h),
         ui.Paint()..filterQuality = ui.FilterQuality.medium);
+  }
+}
+
+/// Eight-frame generated skill animation. Target skills also translate from
+/// Mochi to the target; their painted head already points right, so the art
+/// is never mirrored or rotated at runtime.
+class _AnimatedSkillFx extends PositionComponent {
+  _AnimatedSkillFx({
+    required this.frames,
+    required Vector2 from,
+    this.to,
+    required this.duration,
+    required this.extent,
+    this.travel = false,
+  })  : from = from.clone(),
+        super(position: from.clone(), priority: 17);
+
+  final List<ui.Image> frames;
+  final Vector2 from;
+  final Vector2? to;
+  final double duration;
+  final double extent;
+  final bool travel;
+  double t = 0;
+
+  @override
+  void update(double dt) {
+    t += dt;
+    final destination = to;
+    if (travel && destination != null) {
+      // Reach the enemy on the impact frame, then hold there while the final
+      // sparks fade instead of drifting through it.
+      final k = (t / (duration * 0.72)).clamp(0.0, 1.0);
+      position = from + (destination - from) * k;
+    }
+    if (t >= duration) removeFromParent();
+  }
+
+  @override
+  void render(ui.Canvas canvas) {
+    final progress = (t / duration).clamp(0.0, 0.9999);
+    final frame = frames[(progress * frames.length).floor()];
+    final source =
+        ui.Rect.fromLTWH(0, 0, frame.width.toDouble(), frame.height.toDouble());
+    final destination =
+        ui.Rect.fromCenter(center: Offset.zero, width: extent, height: extent);
+    canvas.drawImageRect(
+        frame,
+        source,
+        destination,
+        ui.Paint()
+          ..filterQuality = ui.FilterQuality.medium
+          ..isAntiAlias = true);
   }
 }
 

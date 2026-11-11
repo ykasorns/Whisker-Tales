@@ -29,6 +29,19 @@ class Clock implements TimeSource {
   Duration utcOffset() => const Duration(hours: 7);
 }
 
+/// 800 ms of animation, as the goldens were drawn, but with real time spent
+/// after the first frame so the page's pictures finish decoding (they start
+/// on that frame; the game's own preload competes for the decoder).
+Future<void> settle(WidgetTester tester) async {
+  for (var k = 0; k < 4; k++) {
+    await tester.pump(const Duration(milliseconds: 200));
+    if (k < 3) {
+      await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 700)));
+    }
+  }
+}
+
 /// Golden screens for every panel, TH + EN (T-042 AC). Text renders in the
 /// test font (boxes); these guard layout, not wording.
 void main() {
@@ -88,22 +101,16 @@ void main() {
             app, matchesGoldenFile('goldens/$lang/${tabs[i]}.png'));
         if (tabs[i] == 'character') {
           await tester.tap(find.text(lang == 'en' ? 'Collection' : 'สมุดสะสม'));
-          for (var k = 0; k < 4; k++) {
-            await tester.pump(const Duration(milliseconds: 200));
-          }
+          await settle(tester);
           expect(tester.takeException(), isNull);
           await expectLater(
               app, matchesGoldenFile('goldens/$lang/wardrobe.png'));
           await tester.tap(find.text(lang == 'en' ? 'Pets' : 'เพื่อนสัตว์'));
-          for (var k = 0; k < 4; k++) {
-            await tester.pump(const Duration(milliseconds: 200));
-          }
+          await settle(tester);
           expect(tester.takeException(), isNull);
           await expectLater(app, matchesGoldenFile('goldens/$lang/pets.png'));
           await tester.tap(find.text(lang == 'en' ? 'Library' : 'ห้องสมุด'));
-          for (var k = 0; k < 4; k++) {
-            await tester.pump(const Duration(milliseconds: 200));
-          }
+          await settle(tester);
           expect(tester.takeException(), isNull);
           await expectLater(
               app, matchesGoldenFile('goldens/$lang/library.png'));

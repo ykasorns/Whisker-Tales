@@ -6,6 +6,9 @@ import 'buffs.dart';
 import 'combat_rules.dart';
 import 'fixed_point.dart';
 
+/// A target at or below this share of max HP (%) takes the execute bonus.
+const int executeBelowPct = 30;
+
 /// One hit, decided by a single roll in [0, kBp) (GDD v0.4 §4.2): below the
 /// evade chance is a dodge, the next crit-chance band is a crit, the rest is
 /// a normal hit.
@@ -18,6 +21,7 @@ import 'fixed_point.dart';
   required StatBlock defender,
   required int roll,
   bool defenderIsBoss = false,
+  bool defenderLow = false,
   DamageChannel channel = DamageChannel.normal,
   int? skillPct,
 }) {
@@ -32,7 +36,8 @@ import 'fixed_point.dart';
 
   final atk = skillPct == null ? attacker.atk : attacker.atk * skillPct ~/ 100;
   final floor = mulBp(atk, rules.defFloorBp);
-  final diff = atk - defender.def;
+  final pierce = rules.proc(Attribute.armorPierce, attacker[Attribute.armorPierce], 0);
+  final diff = atk - mulBp(defender.def, kBp - pierce);
   var damage = diff > floor ? diff : floor;
   if (isCrit) {
     final mult = rules.baseCritDmgBp +
@@ -50,6 +55,12 @@ import 'fixed_point.dart';
   if (defenderIsBoss) {
     damage = mulBp(damage, kBp + attacker[Attribute.bossDmg]);
   }
+  if (defenderLow) {
+    damage = mulBp(damage, kBp + attacker[Attribute.execute]);
+  }
+  final shrug =
+      rules.proc(Attribute.dmgReduction, defender[Attribute.dmgReduction], 0);
+  if (shrug > 0) damage = mulBp(damage, kBp - shrug);
   return (
     outcome: isCrit ? HitOutcome.crit : HitOutcome.normal,
     damage: damage < 1 ? 1 : damage,
@@ -72,6 +83,7 @@ class _Buff {
 }
 
 class _Unit {
+  int openShield = 0;
   _Unit(this.spec)
       : hp = spec.initialHp == null
             ? spec.stats.hp
@@ -175,6 +187,8 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
     _nextRegenAt = null;
     for (final u in _units) {
       _recompute(u);
+      u.openShield = mulBp(u.maxHp,
+          rules.proc(Attribute.openingShield, u.eff[Attribute.openingShield], 0));
       u.nextActAt = u.intervalMs;
       for (var i = 0; i < u.spec.skills.length; i++) {
         final first = _cooldown(u, i) * firstCastPct ~/ 100;
@@ -196,9 +210,10 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
             isPartner: u.spec.isPartner,
             hp: u.hp,
             maxHp: u.maxHp,
-            shield: u.buffs
-                .where((b) => b.def.action == BuffAction.shield)
-                .fold(0, (a, b) => a + b.shieldLeft),
+            shield: u.openShield +
+                u.buffs
+                    .where((b) => b.def.action == BuffAction.shield)
+                    .fold(0, (a, b) => a + b.shieldLeft),
             alive: u.alive,
             skills: [
               for (var i = 0; i < u.spec.skills.length; i++)
@@ -403,6 +418,7 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
       defender: d.eff,
       roll: _rng.nextBp(),
       defenderIsBoss: d.spec.isBoss,
+      defenderLow: d.hp * 100 <= d.maxHp * executeBelowPct,
       skillPct: pct,
     );
     final lost = _damageUnit(d, hit.damage, a, DamageChannel.skill);
@@ -425,6 +441,13 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
   /// Takes [amount] off [d] (shields first). Returns HP lost.
   int _damageUnit(_Unit d, int amount, _Unit? from, DamageChannel channel) {
     var left = amount;
+    if (d.openShield > 0) {
+      final taken = left < d.openShield ? left : d.openShield;
+      d.openShield -= taken;
+      left -= taken;
+      _emit(ShieldAbsorbed(
+          atMs: _now, unitId: d.spec.id, amount: taken, left: d.openShield));
+    }
     for (final b in [...d.buffs]) {
       if (left == 0) break;
       if (b.def.action != BuffAction.shield || b.shieldLeft <= 0) continue;
@@ -453,6 +476,7 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
       defender: d.eff,
       roll: _rng.nextBp(),
       defenderIsBoss: d.spec.isBoss,
+      defenderLow: d.hp * 100 <= d.maxHp * executeBelowPct,
       channel: a.channel,
     );
     final dealt = hit.outcome == HitOutcome.dodge
@@ -480,6 +504,11 @@ class CombatEngine implements ICombatEngine, IBuffEngine {
       final share = rules.proc(Attribute.lifesteal, a.eff[Attribute.lifesteal],
           d.eff[Attribute.lifestealRes]);
       if (share > 0) _heal(a, mulBp(dealt, share), HealCause.lifesteal);
+      final thorn = rules.proc(Attribute.thorns, d.eff[Attribute.thorns], 0);
+      if (thorn > 0 && source != AttackSource.counter && a.hp > 1) {
+        final back = mulBp(hit.damage, thorn);
+        if (back > 0) _damageUnit(a, back < a.hp ? back : a.hp - 1, d, d.channel);
+      }
 
       if (d.hp == 0) {
         if (d.alive) _kill(a, d);

@@ -553,7 +553,9 @@ class FarmPanel extends ConsumerStatefulWidget {
 class _FarmPanelState extends ConsumerState<FarmPanel> {
   StreamSubscription<(CraftResult, bool)>? _sub;
   int _wiggle = 0;
-  ({String art, bool kept, int key})? _pop;
+  // several pops may be on screen at once: auto-knit crafts every second, so
+  // one new piece must never cut the previous one short
+  final List<({String art, bool kept, int key})> _pops = [];
 
   GameDriver get driver => widget.driver;
 
@@ -566,12 +568,13 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
       if (!mounted) return;
       setState(() {
         _wiggle++;
-        _pop = (
+        _pops.add((
           art: FarmPanel.slotArt(
               r.slot, r.item, cls, ref.read(wardrobeRulesProvider)),
           kept: kept,
           key: _wiggle,
-        );
+        ));
+        if (_pops.length > 3) _pops.removeAt(0);
       });
     });
   }
@@ -744,18 +747,28 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
                                     ),
                                   ),
                                 ),
-                                if (_pop case final p?)
+                                for (final p in _pops)
                                   Positioned(
                                     top: 0,
-                                    child: KnitPop(
-                                        key: ValueKey(p.key),
-                                        art: p.art,
-                                        kept: p.kept,
-                                        onDone: () {
-                                          if (mounted && _pop?.key == p.key) {
-                                            setState(() => _pop = null);
-                                          }
-                                        }),
+                                    left: 0,
+                                    right: 0,
+                                    child: Center(
+                                      child: Transform.translate(
+                                        offset:
+                                            Offset((p.key % 3 - 1) * 40.0, 0),
+                                        child: KnitPop(
+                                            key: ValueKey(p.key),
+                                            art: p.art,
+                                            kept: p.kept,
+                                            onDone: () {
+                                              if (mounted) {
+                                                setState(() =>
+                                                    _pops.removeWhere(
+                                                        (x) => x.key == p.key));
+                                              }
+                                            }),
+                                      ),
+                                    ),
                                   ),
                               ]);
                         }),
@@ -1050,19 +1063,19 @@ class KnitPop extends StatelessWidget {
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 2200),
       onEnd: onDone,
       builder: (context, v, _) {
-        final up = Curves.easeOutBack.transform(math.min(1, v * 1.6));
+        final up = Curves.easeOutBack.transform(math.min(1, v * 3.2));
         // a kept piece lingers a moment (it is in the slot now), then both
         // kinds fade out completely — nothing stays on screen
         final fade = kept
-            ? 1 - math.max(0, (v - 0.7) / 0.3)
-            : (1 - math.max(0, (v - 0.55) / 0.45));
+            ? 1 - math.max(0, (v - 0.78) / 0.22)
+            : (1 - math.max(0, (v - 0.6) / 0.4));
         return Opacity(
           opacity: fade.clamp(0.0, 1.0).toDouble(),
           child: Transform.translate(
-            offset: Offset(kept ? 0 : 30 * math.max(0, v - 0.55), -60 * up),
+            offset: Offset(kept ? 0 : 30 * math.max(0, v - 0.6), -60 * up),
             child: Transform.scale(
               scale: 0.3 + 0.9 * up,
               child: Stack(
@@ -1073,11 +1086,11 @@ class KnitPop extends StatelessWidget {
                         width: size,
                         height: size,
                         child: Image.asset('assets/game/$art.png')),
-                    if (v < 0.5)
+                    if (v < 0.4)
                       const Positioned(
                           top: -14,
                           child: IconText('✨', style: TextStyle(fontSize: 18))),
-                    if (!kept && v > 0.6)
+                    if (!kept && v > 0.55)
                       const Positioned(
                           right: -18,
                           child:

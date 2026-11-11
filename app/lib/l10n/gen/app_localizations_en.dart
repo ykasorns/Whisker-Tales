@@ -703,4 +703,94 @@ class AppLocalizationsEn extends AppLocalizations {
   String dungeonUnlockHint(String n) {
     return 'Reach tier $n to open the next level';
   }
+
+  @override
+  String get attrCrit => 'Crit';
+
+  @override
+  String get attrCritDmg => 'Crit damage';
+
+  @override
+  String get attrCritRes => 'Crit resist';
+
+  @override
+  String get attrCritDmgRes => 'Crit dmg resist';
+
+  @override
+  String get attrCombo => 'Combo';
+
+  @override
+  String get attrComboRes => 'Combo resist';
+
+  @override
+  String get attrCounter => 'Counter';
+
+  @override
+  String get attrCounterRes => 'Counter resist';
+
+  @override
+  String get attrStun => 'Stun';
+
+  @override
+  String get attrStunRes => 'Stun resist';
+
+  @override
+  String get attrEvade => 'Dodge';
+
+  @override
+  String get attrAccuracy => 'Accuracy';
+
+  @override
+  String get attrLifesteal => 'Lifesteal';
+
+  @override
+  String get attrLifestealRes => 'Lifesteal resist';
+
+  @override
+  String get attrRegen => 'Regen';
+
+  @override
+  String get attrAttackSpeed => 'Attack speed';
+
+  @override
+  String get attrSkillDmg => 'Skill damage';
+
+  @override
+  String get attrBossDmg => 'Boss damage';
+
+  @override
+  String get attrPetDmg => 'Pet damage';
+
+  @override
+  String get attrCdr => 'Cooldown';
+
+  @override
+  String get attrYarnFind => 'Yarn find';
+
+  @override
+  String get attrFishFind => 'Goldfish find';
+
+  @override
+  String get attrExpFind => 'EXP find';
+
+  @override
+  String get attrCraftLuck => 'Knit luck';
+
+  @override
+  String get attrArmorPierce => 'Armor pierce';
+
+  @override
+  String get attrDmgReduction => 'Damage cut';
+
+  @override
+  String get attrThorns => 'Thorns';
+
+  @override
+  String get attrExecute => 'Execute';
+
+  @override
+  String get attrOpeningShield => 'Opening shield';
+
+  @override
+  String get statsMore => 'Other stats';
 }

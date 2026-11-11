@@ -388,7 +388,11 @@
       "ASSUMPTION_lifesteal": 30,
       "ASSUMPTION_regen": 5,
       "ASSUMPTION_attack_speed": 100,
-      "ASSUMPTION_cdr": 50
+      "ASSUMPTION_cdr": 50,
+      "ASSUMPTION_armor_pierce": 50,
+      "ASSUMPTION_dmg_reduction": 40,
+      "ASSUMPTION_thorns": 30,
+      "ASSUMPTION_opening_shield": 40
     },
     "ASSUMPTION_stun_ms": 1000,
     "ASSUMPTION_regen_tick_ms": 1000,
@@ -402,7 +406,12 @@
       "counter": 0.8,
       "stun": 1.0,
       "evade": 0.9,
-      "lifesteal": 0.7
+      "lifesteal": 0.7,
+      "armor_pierce": 0.8,
+      "dmg_reduction": 1.0,
+      "thorns": 0.4,
+      "execute": 0.5,
+      "opening_shield": 0.6
     }
   },
   "pages": {

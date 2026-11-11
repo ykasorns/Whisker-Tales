@@ -48,11 +48,14 @@ flutter:
     - assets/game/ui/
     - assets/game/story/portraits/
     - assets/game/story/cards/
+    - assets/game/story/cards_v2/
     - assets/game/story/fx/
     - assets/game/icon/
     - assets/game/home/
     - assets/game/dungeon/
     - assets/game/pet/
+    - assets/game/skill_fx/
+    - assets/game/damage_numbers/
     # Music + effects, made by tools/audio/make_sounds.py (T-024)
     - assets/audio/
   generate: true # T-004: lib/l10n/*.arb → AppLocalizations

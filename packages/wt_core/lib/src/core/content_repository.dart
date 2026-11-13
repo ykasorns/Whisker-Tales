@@ -129,7 +129,7 @@ class ContentRepository {
     'design/data/pets.json': 1,
     'design/data/research.json': 1,
     'design/data/iap.json': 1,
-    'design/data/chapters.json': 1,
+    'design/data/chapters.json': 2,
     'design/data/audio.json': 1,
     'design/data/story/relics.json': 1,
     'design/data/story/talents.json': 1,

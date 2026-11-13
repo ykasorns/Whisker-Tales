@@ -7,6 +7,8 @@ Assumption: "new map" = the next book of the main farm. Book 1 (pages 1–30) ha
 - Enemy power after page 30 already follows `page_power_growth_after_book1` (1.065/page), so book 2 needs no new balance numbers. Re-run the balance sim after wiring to confirm the day-by-day target still holds for pages 31–60.
 
 ## Work for Claude (no art needed)
+_Status 2026-11-13: steps 1, 2 and the tests in 5 are DONE (D-067, books[] model, last book loops, scenery from data). Book 2 itself is added to chapters.json when the art arrives._
+
 1. **Data model.** `design/data/chapters.json` becomes `books: [{ id, sky, ground, chapters: [...] }]`. `ChapterBook` in `wt_core` picks the book by `(page-1) ~/ (pages_per_chapter*chapters_per_book)`; from the last book onwards it loops the last book (not book 1). Keep a test that rejects a book with the wrong chapter count. This avoids hard-coding `bg_book1_` anywhere.
 2. **Scenery lookup.** `app/lib/game_view.dart` (lines ~200 and ~458) uses `bg/bg_book1_*`; take sky/ground/layer names from the book/chapter data instead and preload per book.
 3. **Sprite sync.** `tools/sync_sprites.py`: add the 9 new ids to `MONSTERS`, convert the 8 `bg_book2_*` layers to webp like Book 1, copy the three `ui_bossface_*` sets; keep the APK under 30 MB (Book 1 art is ~3 MB; budget ≤ 3 MB for Book 2, so cap sprite width at 440 px and quantise as for Book 1).

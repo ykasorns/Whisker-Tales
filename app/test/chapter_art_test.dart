@@ -18,7 +18,8 @@ void main() {
     expect(book.of(rules, 1).layer, 'ch1');
     expect(book.of(rules, 11).layer, 'ch2');
     expect(book.of(rules, 30).layer, 'ch3');
-    expect(book.of(rules, 31).layer, 'ch1'); // book 2 reuses book 1
+    // pages past the last book loop that book (book 1 until book 2 ships)
+    expect(book.of(rules, 31).layer, book.books.last.chapters.first.layer);
     expect(book.bossOf(rules, 10), 'eraserking');
     expect(book.bossOf(rules, 15), 'inkbat');
     expect(book.bossOf(rules, 20), 'sharpcrab');
@@ -36,10 +37,20 @@ void main() {
             reason: '$k $f');
       }
     }
+    for (final b in book.books) {
+      for (final l in ['L0_sky', 'L3_ground']) {
+        expect(
+            File('assets/game/bg/bg_${b.scenery}_$l.webp').existsSync(), isTrue,
+            reason: '${b.id} $l');
+      }
+    }
     for (final c in book.chapters) {
       for (final l in ['L1_far', 'L2_mid']) {
-        expect(File('assets/game/bg/bg_book1_${c.layer}_$l.webp').existsSync(),
-            isTrue);
+        expect(
+            File('assets/game/bg/bg_${c.scenery}_${c.layer}_$l.webp')
+                .existsSync(),
+            isTrue,
+            reason: '${c.id} $l');
       }
       for (final k in [c.boss, c.monsters.first]) {
         expect(File('assets/game/ui/ui_bossface_$k.png').existsSync(), isTrue,

@@ -228,11 +228,8 @@ class BattleGame extends FlameGame {
       ...damageNumberFrames,
       for (final k in chapters.kinds)
         for (final f in _monFrames) 'mon/${k}_$f.png',
-      'bg/bg_book1_L0_sky.webp',
-      'bg/bg_book1_L3_ground.webp',
       'story/fx/fx_hit_crit.png',
-      for (final a in chapters.chapters)
-        for (final l in ['L1_far', 'L2_mid']) 'bg/bg_book1_${a.layer}_$l.webp',
+      ..._sceneryKeys(chapters.bookOf(loop.rules, loop.state.farmPage)),
     ]);
     _bg = _Parallax(this);
     add(_bg);
@@ -254,6 +251,24 @@ class BattleGame extends FlameGame {
   /// `<class>/<frame>` → `cat/outfit_<class>_<frame>` (D-024); a class
   /// without art yet uses the base frames (its attack pose is
   /// `bare_<class>`).
+  /// Image keys of one book's scenery: shared sky and ground plus the far
+  /// and mid layer of each chapter.
+  static List<String> _sceneryKeys(BookInfo b) => [
+        'bg/bg_${b.scenery}_L0_sky.webp',
+        'bg/bg_${b.scenery}_L3_ground.webp',
+        for (final a in b.chapters)
+          for (final l in ['L1_far', 'L2_mid'])
+            'bg/bg_${b.scenery}_${a.layer}_$l.webp',
+      ];
+
+  final _sceneryLoading = <String>{};
+
+  /// Loads a later book's scenery the first time a page of it is drawn.
+  void ensureScenery(BookInfo b) {
+    if (!_sceneryLoading.add(b.id)) return;
+    images.loadAll(_sceneryKeys(b));
+  }
+
   ui.Image? _image(String key) {
     final slash = key.indexOf('/');
     final cls = key.substring(0, slash), frame = key.substring(slash + 1);
@@ -579,15 +594,15 @@ class _Parallax extends Component {
   @override
   void render(ui.Canvas c) {
     final s = game.size, gy = game.groundY;
-    _tile('bg/bg_book1_L0_sky.webp', 0.05, s.y, s.y, c);
-    final layer =
-        game.chapters.of(game.loop.rules, game.loop.state.farmPage).layer;
-    _tile('bg/bg_book1_${layer}_L1_far.webp', 0.2, s.y * 0.62, gy + s.y * 0.04,
-        c);
-    _tile(
-        'bg/bg_book1_${layer}_L2_mid.webp', 0.5, s.y * 0.6, gy + s.y * 0.06, c);
+    final rules = game.loop.rules, page = game.loop.state.farmPage;
+    game.ensureScenery(game.chapters.bookOf(rules, page));
+    final ch = game.chapters.of(rules, page);
+    final bg = 'bg/bg_${ch.scenery}';
+    _tile('${bg}_L0_sky.webp', 0.05, s.y, s.y, c);
+    _tile('${bg}_${ch.layer}_L1_far.webp', 0.2, s.y * 0.62, gy + s.y * 0.04, c);
+    _tile('${bg}_${ch.layer}_L2_mid.webp', 0.5, s.y * 0.6, gy + s.y * 0.06, c);
     final hg = (s.y - gy) / 0.3;
-    _tile('bg/bg_book1_L3_ground.webp', 1, hg, gy + 0.3 * hg, c);
+    _tile('${bg}_L3_ground.webp', 1, hg, gy + 0.3 * hg, c);
   }
 }
 

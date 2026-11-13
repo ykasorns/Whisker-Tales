@@ -665,3 +665,9 @@ Log การตัดสินใจของ Opus (Orchestrator/PM) — append
 
 ## D-068 เอฟเฟกต์สกิล + ตัวเลขดาเมจ + การ์ดเลือกของ Adventure (2026-11-11)
 ภาพจาก Codex ต่อเข้าเกมแล้ว: skill FX 12 สกิล × 8 เฟรม (`assets/game/skill_fx`), ตัวเลขดาเมจ 4 แบบ (`damage_numbers`), กรอบการ์ด 6 แบบ (`story/cards_v2`) ใช้กับการ์ดเลือกเรลิก/ทาเลนต์และของในร้านนกฮูก · golden หน้าสมุดสะสม/เพื่อนสัตว์/ห้องสมุดไม่เสถียรเพราะรูปถอดรหัสไม่ทันในเทสต์ → ให้เทสต์รอเวลาจริงหลังเฟรมแรก (`settle()` ใน panels_golden_test)
+
+## D-067 เล่ม 2 "Craft Room" — โครงข้อมูลหลายเล่ม (2026-11-13)
+1. `design/data/chapters.json` v2: `books[] = {id, scenery, chapters[]}` · แต่ละบทมี `layer` (ch1..ch6) · ภาพฉาก `bg_<scenery>_L0_sky`/`_L3_ground` ใช้ร่วมทั้งเล่ม และ `bg_<scenery>_<layer>_L1_far`/`_L2_mid` ต่อบท
+2. `ChapterBook.of/bossOf/bookOf(rules, page)` เลือกเล่มจาก `rules.bookOf(page)`; เลยเล่มสุดท้ายแล้ว**วนเล่มสุดท้าย** (เดิมวนเล่ม 1) · ชื่อ `bg_book1_` ไม่ถูก hard-code ใน `game_view.dart` แล้ว โหลดฉากของเล่มปัจจุบันตอนเริ่ม และเล่มถัดไปตอนวาดครั้งแรก (`ensureScenery`)
+3. ตอนนี้ `books` มีแค่ book1 (เล่ม 1 เล่นเหมือนเดิมทุกอย่าง) — **เพิ่ม book2 ลง chapters.json พร้อมภาพตอนภาพมาเท่านั้น** เพราะ `chapter_art_test` ตรวจว่าไฟล์ภาพทุกชิ้นมีจริง (ไฟล์หาย = เทสต์แดง ไม่ใช่เครื่องแครช) · prompt ภาพ: `design/art/book2_art_prompt.md` · แผน: `design/proposals/book2_plan.md`
+4. เหลือหลังภาพมา: `tools/sync_sprites.py` (มอน 6 + บอส 3 + ฉาก 8 → webp, งบ ≤ 3 MB), ไอคอนบอสท้าทาย (`ui_bossface_*` อ่านตาม id ในข้อมูลอยู่แล้ว), golden ฉากหน้า 31, รัน balance sim หน้า 31–60

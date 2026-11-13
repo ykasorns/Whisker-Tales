@@ -4,7 +4,7 @@ Assumption: "new map" = the next book of the main farm. Book 1 (pages 1–30) ha
 
 ## Content
 - 3 chapters × 10 pages (`pages_per_chapter` 10, `chapters_per_book` 3): `patch_meadow`, `ribbon_river`, `yarn_peaks`; 2 monsters + 1 boss each. Names, characters and all art specs: `design/art/book2_art_prompt.md` (20 images).
-- Enemy power after page 30 already follows `page_power_growth_after_book1` (1.065/page), so book 2 needs no new balance numbers. Re-run the balance sim after wiring to confirm the day-by-day target still holds for pages 31–60.
+- Enemy power after page 30 already follows `page_power_growth_after_book1` (1.09/page since D-067; was 1.065, which cleared pages 31–60 in ~1.3 days). Re-run the balance sim after wiring to confirm the day-by-day target still holds for pages 31–60.
 
 ## Work for Claude (no art needed)
 _Status 2026-11-13: steps 1, 2 and the tests in 5 are DONE (D-067, books[] model, last book loops, scenery from data). Book 2 itself is added to chapters.json when the art arrives._

@@ -11,7 +11,7 @@
     "page_power_base": 100,
     "page_power_growth": 1.18,
     "_doc_later_books": "After book 1, enemy power grows at the same per-page rate as gear base power so new books remain climbable. Book 1 keeps the faster onboarding curve.",
-    "page_power_growth_after_book1": 1.065,
+    "page_power_growth_after_book1": 1.09,
     "page_boss_mult": 1.5,
     "chapter_boss_mult": 1.3,
     "_doc_early": "D-050: บอสลดพลังเต็มถึงจบบท 3 (หน้า 30) แล้วคืนความยากแบบเส้นตรงหน้า 31–120 (~4–5 วัน); หลังหน้า 120 ใช้ multiplier เต็ม",

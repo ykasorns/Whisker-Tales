@@ -68,9 +68,9 @@ void main() {
           (rules.wavePower(121) * 1.5).round()); // full after page 120
       expect(rules.isChapterBoss(20), isTrue);
       expect(rules.wavePower(30), 12150);
-      expect(rules.wavePower(31), 12940);
+      expect(rules.wavePower(31), 13244); // 12150 × 1.09 (D-067)
       expect(rules.wavePower(60),
-          (100 * math.pow(1.18, 29) * math.pow(1.065, 30)).round());
+          (100 * math.pow(1.18, 29) * math.pow(1.09, 30)).round());
     });
 
     test('book / chapter / page numbering', () {

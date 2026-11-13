@@ -231,6 +231,7 @@ class BattleGame extends FlameGame {
       'story/fx/fx_hit_crit.png',
       ..._sceneryKeys(chapters.bookOf(loop.rules, loop.state.farmPage)),
     ]);
+    _sceneryReady.add(chapters.bookOf(loop.rules, loop.state.farmPage).id);
     _bg = _Parallax(this);
     add(_bg);
     mochi = AvatarComponent(rules: rules, images: _image, priority: 10)
@@ -261,12 +262,16 @@ class BattleGame extends FlameGame {
             'bg/bg_${b.scenery}_${a.layer}_$l.webp',
       ];
 
-  final _sceneryLoading = <String>{};
+  final _sceneryLoading = <String>{}, _sceneryReady = <String>{};
 
-  /// Loads a later book's scenery the first time a page of it is drawn.
+  /// True once every layer of [b] is decoded (drawing earlier would read an
+  /// image that is still loading).
+  bool sceneryReady(BookInfo b) => _sceneryReady.contains(b.id);
+
+  /// Loads a later book's scenery the first time it is wanted.
   void ensureScenery(BookInfo b) {
-    if (!_sceneryLoading.add(b.id)) return;
-    images.loadAll(_sceneryKeys(b));
+    if (!_sceneryLoading.add(b.id) || _sceneryReady.contains(b.id)) return;
+    images.loadAll(_sceneryKeys(b)).then((_) => _sceneryReady.add(b.id));
   }
 
   ui.Image? _image(String key) {
@@ -595,7 +600,14 @@ class _Parallax extends Component {
   void render(ui.Canvas c) {
     final s = game.size, gy = game.groundY;
     final rules = game.loop.rules, page = game.loop.state.farmPage;
-    game.ensureScenery(game.chapters.bookOf(rules, page));
+    final book = game.chapters.bookOf(rules, page);
+    game.ensureScenery(book);
+    // the last chapter of a book fetches the next book's scenery in advance
+    if (rules.chapterOf(page) == rules.chaptersPerBook) {
+      game.ensureScenery(
+          game.chapters.bookOf(rules, page + rules.pagesPerBook));
+    }
+    if (!game.sceneryReady(book)) return;
     final ch = game.chapters.of(rules, page);
     final bg = 'bg/bg_${ch.scenery}';
     _tile('${bg}_L0_sky.webp', 0.05, s.y, s.y, c);

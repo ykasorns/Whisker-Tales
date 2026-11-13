@@ -18,12 +18,18 @@ void main() {
     expect(book.of(rules, 1).layer, 'ch1');
     expect(book.of(rules, 11).layer, 'ch2');
     expect(book.of(rules, 30).layer, 'ch3');
-    // pages past the last book loop that book (book 1 until book 2 ships)
-    expect(book.of(rules, 31).layer, book.books.last.chapters.first.layer);
+    expect(book.of(rules, 31).layer, 'ch4');
+    expect(book.of(rules, 41).layer, 'ch5');
+    expect(book.of(rules, 51).layer, 'ch6');
+    // Pages past the last authored book loop its three chapters.
+    expect(book.of(rules, 61).layer, 'ch4');
     expect(book.bossOf(rules, 10), 'eraserking');
     expect(book.bossOf(rules, 15), 'inkbat');
     expect(book.bossOf(rules, 20), 'sharpcrab');
     expect(book.bossOf(rules, 30), 'paperwolf');
+    expect(book.bossOf(rules, 40), 'quiltbear');
+    expect(book.bossOf(rules, 50), 'thimbleturtle');
+    expect(book.bossOf(rules, 60), 'yarnyeti');
   });
 
   test('every frame, face and layer exists', () {
@@ -52,7 +58,7 @@ void main() {
             isTrue,
             reason: '${c.id} $l');
       }
-      for (final k in [c.boss, c.monsters.first]) {
+      for (final k in [...c.monsters, c.boss]) {
         expect(File('assets/game/ui/ui_bossface_$k.png').existsSync(), isTrue,
             reason: k);
       }

@@ -34,18 +34,7 @@ void main() {
   });
 
   test('books switch every pagesPerBook pages and the last book loops', () {
-    // Book 2 is a copy of book 1 with its own scenery and ids.
-    final two = jsonDecode(jsonEncode(data)) as Map<String, dynamic>;
-    final b1 = (two['books'] as List).first as Map<String, dynamic>;
-    final b2 = jsonDecode(jsonEncode(b1)) as Map<String, dynamic>
-      ..['id'] = 'book2'
-      ..['scenery'] = 'book2';
-    for (final c in b2['chapters'] as List) {
-      c['boss'] = 'b2_${c['boss']}';
-      c['monsters'] = [for (final m in c['monsters'] as List) 'b2_$m'];
-    }
-    (two['books'] as List).add(b2);
-    final book = ChapterBook.fromJson(two, rules);
+    final book = ChapterBook.fromJson(data, rules);
     final per = rules.pagesPerBook;
     expect(book.bookOf(rules, per).id, 'book1');
     expect(book.bookOf(rules, per + 1).id, 'book2');
@@ -53,7 +42,7 @@ void main() {
     expect(book.bookOf(rules, 2 * per + 1).id, 'book2'); // last book loops
     expect(book.of(rules, per + 1).scenery, 'book2');
     expect(book.of(rules, per).scenery, 'book1');
-    expect(book.bossOf(rules, 2 * per), startsWith('b2_'));
+    expect(book.bossOf(rules, 2 * per), 'yarnyeti');
     expect(book.chapters.length, 2 * rules.chaptersPerBook);
   });
 

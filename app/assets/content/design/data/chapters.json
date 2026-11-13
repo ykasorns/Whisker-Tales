@@ -40,6 +40,45 @@
           "boss": "paperwolf"
         }
       ]
+    },
+    {
+      "id": "book2",
+      "scenery": "book2",
+      "chapters": [
+        {
+          "id": "patch_meadow",
+          "name_th": "ทุ่งผ้าปะ",
+          "name_en": "Patchwork Meadow",
+          "layer": "ch4",
+          "monsters": [
+            "pincushionmole",
+            "buttonladybug"
+          ],
+          "boss": "quiltbear"
+        },
+        {
+          "id": "ribbon_river",
+          "name_th": "สายธารริบบิ้น",
+          "name_en": "Ribbon River",
+          "layer": "ch5",
+          "monsters": [
+            "sockjelly",
+            "spoolfrog"
+          ],
+          "boss": "thimbleturtle"
+        },
+        {
+          "id": "yarn_peaks",
+          "name_th": "ภูเขาไหมพรม",
+          "name_en": "Yarn Peaks",
+          "layer": "ch6",
+          "monsters": [
+            "woolpuff",
+            "tangleball"
+          ],
+          "boss": "yarnyeti"
+        }
+      ]
     }
   ]
 }

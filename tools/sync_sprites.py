@@ -58,7 +58,10 @@ os.makedirs(f'{OUT}/mon', exist_ok=True)
 m = 0
 MONSTERS = ['eraserslime', 'acorn', 'eraserking',   # book 1 chapter 1
             'inkbat', 'crayonsnail', 'sharpcrab',    # chapter 2
-            'shavinghog', 'clipbeetle', 'paperwolf']  # chapter 3
+            'shavinghog', 'clipbeetle', 'paperwolf',  # chapter 3
+            'pincushionmole', 'buttonladybug', 'quiltbear',  # book 2 chapter 4
+            'sockjelly', 'spoolfrog', 'thimbleturtle',       # chapter 5
+            'woolpuff', 'tangleball', 'yarnyeti']             # chapter 6
 for src in sorted(f for k in MONSTERS
                   for f in glob.glob(f'{ROOT}/assets/raw/frames/{k}/*.png')):
     name = os.path.basename(src)[:-4].replace('mon_', '').replace('boss_', '')

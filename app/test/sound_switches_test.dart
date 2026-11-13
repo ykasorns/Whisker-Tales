@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:whisker_tales/l10n/strings.dart';
 import 'package:whisker_tales/ui/pages.dart';
+import 'package:whisker_tales/ui/palette.dart';
 import 'package:wt_core/wt_core.dart';
 
 import '_l10n.dart';
@@ -46,7 +47,7 @@ void main() {
     final en = lookupAppLocalizations(const Locale('en'));
     Finder switchOf(String label) => find.descendant(
         of: find.ancestor(of: findLabel(label), matching: find.byType(Row)),
-        matching: find.byType(Switch));
+        matching: find.byType(KitSwitch));
 
     await tester.ensureVisible(switchOf(en.music));
     await tester.pump();

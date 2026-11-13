@@ -224,7 +224,7 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
                 builder: (context, snap) {
                   final sold = snap.data ?? const [];
                   if (snap.connectionState != ConnectionState.done) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: KitSpinner());
                   }
                   if (iap == null || sold.isEmpty) {
                     return Center(

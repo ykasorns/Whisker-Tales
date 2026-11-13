@@ -37,3 +37,14 @@ String attrName(AppLocalizations s, Attribute a) => switch (a) {
 
 /// "+5.0%" — attribute values are basis points.
 String attrValue(int bp) => '+${(bp / 100).toStringAsFixed(1)}%';
+
+/// Painted icon id of a secondary stat (`stat_crit_dmg`, …). Crit keeps the
+/// older `crit` icon; a few stats have no stat sheet icon (and use none).
+String? attrIconId(Attribute a) {
+  if (a == Attribute.crit) return 'crit';
+  if (a == Attribute.evade) return 'evade';
+  if (a == Attribute.skillDmg) return 'sparkle';
+  final snake = a.name.replaceAllMapped(
+      RegExp('[A-Z]'), (m) => '_${m[0]!.toLowerCase()}');
+  return 'stat_$snake';
+}

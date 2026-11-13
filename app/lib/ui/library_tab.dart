@@ -100,9 +100,8 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
               child: IconText(s.notifyResearch,
                   style: const TextStyle(fontSize: 13)),
             ),
-            Switch(
+            KitSwitch(
               value: r.notifyDone,
-              activeThumbColor: Palette.teal,
               onChanged: (v) => setState(() => r.notifyDone = v),
             ),
           ]),
@@ -141,7 +140,7 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
               style: const TextStyle(fontWeight: FontWeight.w800)),
         ]),
         const SizedBox(height: 4),
-        LinearProgressIndicator(value: done, color: Palette.teal, minHeight: 8),
+        KitBar(value: done),
         if (ad)
           GestureDetector(
             onTap: _busy ? null : () => _speedUp(r, t.nodeId),

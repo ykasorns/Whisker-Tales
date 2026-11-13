@@ -28,10 +28,11 @@ Widget _storyHeading(String t) => Padding(
             child: Container(
               width: 28,
               height: 7,
-              decoration: storybookButton(
-                fill: Palette.coral,
-                accent: Palette.mochi,
-                radius: 3,
+              // 28×7: smaller than a nine-slice's corners, so a plain stroke
+              // until the painted section mark (ui_section_mark) arrives
+              decoration: BoxDecoration(
+                color: Palette.coral,
+                borderRadius: BorderRadius.circular(3.5),
               ),
             ),
           ),
@@ -214,14 +215,7 @@ class _CatTabState extends ConsumerState<_CatTab> {
                       fontWeight: FontWeight.w700,
                       color: Palette.inkSoft)),
               const SizedBox(height: 5),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: LinearProgressIndicator(
-                    value: cat.expToNext == 0 ? 1 : cat.exp / cat.expToNext,
-                    color: Palette.teal,
-                    backgroundColor: Palette.paper.withValues(alpha: .75),
-                    minHeight: 7),
-              ),
+              KitBar(value: cat.expToNext == 0 ? 1 : cat.exp / cat.expToNext),
             ]),
           ),
         ]),
@@ -270,9 +264,13 @@ class _CatTabState extends ConsumerState<_CatTab> {
                             Attribute.crit,
                             Attribute.skillDmg
                           }.contains(e.key))
-                            IconText(
-                                '${attrName(s, e.key)} ${attrValue(e.value)}',
-                                style: const TextStyle(fontSize: 12)),
+                            Row(mainAxisSize: MainAxisSize.min, children: [
+                              GameIcon(attrIconId(e.key) ?? '', size: 18),
+                              const SizedBox(width: 3),
+                              Text(
+                                  '${attrName(s, e.key)} ${attrValue(e.value)}',
+                                  style: const TextStyle(fontSize: 12)),
+                            ]),
                       ]),
                     ]),
               ),
@@ -705,9 +703,8 @@ class _SoundSwitchesState extends ConsumerState<_SoundSwitches> {
                 child: IconText(label,
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.w800))),
-            Switch(
+            KitSwitch(
               value: on,
-              activeThumbColor: Palette.teal,
               onChanged: (v) => setState(() => set(v)),
             ),
           ],

@@ -805,21 +805,24 @@ class _Slot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!open) {
-      return Container(
-        alignment: Alignment.center,
-        child: IconText(
-            '🔒\n${AppLocalizations.of(context).unlockAt(unlockPage)}',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-                fontSize: 9, height: 1.1, color: Palette.inkSoft)),
+      return KitSlot(
+        state: 'locked',
+        child: Center(
+          child: IconText(
+              '🔒\n${AppLocalizations.of(context).unlockAt(unlockPage)}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  fontSize: 9, height: 1.1, color: Palette.inkSoft)),
+        ),
       );
     }
     return GestureDetector(
       onTap: onTap,
       child: Stack(clipBehavior: Clip.none, children: [
         Positioned.fill(
-          child: Container(
-            padding: const EdgeInsets.all(5),
+          child: KitSlot(
+            state: item == null ? 'empty' : 'filled',
+            grade: item?.grade,
             child: Opacity(
               opacity: item == null ? 0.65 : 1,
               child: Image.asset('assets/game/$art.png', fit: BoxFit.contain),

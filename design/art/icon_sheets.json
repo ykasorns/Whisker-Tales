@@ -124,5 +124,47 @@
   ],
   "out": "home",
   "prefix": ""
+ },
+ "sheet_icons_7_stats_1": {
+  "cols": 5,
+  "rows": 3,
+  "ids": [
+   "stat_crit_dmg",
+   "stat_crit_res",
+   "stat_crit_dmg_res",
+   "stat_combo",
+   "stat_combo_res",
+   "stat_counter",
+   "stat_counter_res",
+   "stat_stun",
+   "stat_stun_res",
+   "stat_accuracy",
+   "stat_lifesteal",
+   "stat_lifesteal_res",
+   "stat_regen",
+   "stat_attack_speed",
+   "stat_boss_dmg"
+  ]
+ },
+ "sheet_icons_8_stats_2": {
+  "cols": 5,
+  "rows": 3,
+  "ids": [
+   "stat_pet_dmg",
+   "stat_cdr",
+   "stat_yarn_find",
+   "stat_fish_find",
+   "stat_exp_find",
+   "stat_craft_luck",
+   "stat_armor_pierce",
+   "stat_dmg_reduction",
+   "stat_thorns",
+   "stat_execute",
+   "stat_opening_shield",
+   "speed_play",
+   "pet_cheese",
+   "pet_carrot",
+   "pet_rainbow"
+  ]
  }
 }

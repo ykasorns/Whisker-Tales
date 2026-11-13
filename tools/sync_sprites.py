@@ -196,6 +196,39 @@ if os.path.exists(currency_tag):
         im = im.crop(bbox)
     im.thumbnail((960, 240), Image.LANCZOS)
     im.save(f'{OUT}/ui/ui_frame_currency.png', optimize=True)
+# D-069: UI kit v3 (GPT, assets/raw/ui_v3/widgets). Only pieces at their brief
+# size are published (a raw oversized generation is skipped until it is
+# redone); colours are reduced to 256 so the kit stays small.
+KIT = {
+    'ui_panel_card': (256, 256), 'ui_panel_tile': (128, 128),
+    'ui_panel_dialog': (384, 384), 'ui_panel_sheet': (512, 256),
+    'ui_sheet_grabber': (128, 32), 'ui_panel_inset': (256, 128),
+    'ui_tab_strip': (768, 128), 'ui_tab_on': (256, 128), 'ui_tab_off': (256, 128),
+    'ui_btn_green': (480, 160), 'ui_btn_yellow': (480, 160),
+    'ui_btn_purple': (480, 160), 'ui_btn_coral': (480, 160),
+    'ui_btn_disabled': (480, 160), 'ui_btn_round_red': (160, 160),
+    'ui_btn_round_cream': (160, 160), 'ui_toggle_track_off': (192, 96),
+    'ui_toggle_track_on': (192, 96), 'ui_toggle_knob': (80, 80),
+    'ui_bar_track': (480, 64), 'ui_bar_fill_green': (480, 48),
+    'ui_bar_fill_teal': (480, 48), 'ui_bar_fill_coral': (480, 48),
+    'ui_bar_fill_sun': (480, 48), 'ui_spinner_yarn': (192, 192),
+    'ui_slot_empty': (160, 160), 'ui_slot_filled': (160, 160),
+    'ui_slot_locked': (160, 160), 'ui_slot_selected': (160, 160),
+    **{f'ui_rim_g{i}': (160, 160) for i in range(6)},
+    'ui_toast_plate': (480, 120), 'ui_chip_pill': (320, 96),
+}
+KIT_SKIP = set()
+os.makedirs(f'{OUT}/kit', exist_ok=True)
+for name, size in KIT.items():
+    src = f'{ROOT}/assets/raw/ui_v3/widgets/{name}.png'
+    if name in KIT_SKIP or not os.path.exists(src):
+        continue
+    im = Image.open(src).convert('RGBA')
+    if im.size != size:
+        print(f'kit: skipped {name} (size {im.size}, wants {size})')
+        continue
+    im.quantize(256, method=Image.FASTOCTREE, dither=Image.NONE).save(
+        f'{OUT}/kit/{name}.png', optimize=True)
 # D-060: calmer UI frames (GPT, assets/raw/frames/ui_v2). They are generated at
 # the exact size ui_frames.json was measured on, so they replace the atlas
 # slices above under the same published names. Tab icons and the cooldown

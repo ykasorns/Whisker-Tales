@@ -11,11 +11,12 @@
     "💜": "pity", "😿": "sadcat", "🎉": "party", "🛏️": "bed", "📚": "books", "👀": "eyes",
     "✌️": "victory", "💫": "dizzy", "〰️": "whisker", "😾": "angrycat", "💤": "zzz", "🥛": "milk",
     "📖": "openbook", "📜": "scroll", "🗡️": "dagger", "🧥": "coat", "🪨": "rock",
+    "▶": "speed_play", "🧀": "pet_cheese", "🥕": "pet_carrot", "🌈": "pet_rainbow",
     "🐱": "nav_cat", "🏰": "nav_castle", "🏠": "nav_home", "🛒": "nav_shop"
   },
   "skills": ["shield_bash", "iron_wall", "war_cry", "twin_strike", "poison_blade", "shadow_step", "power_shot", "arrow_rain", "eagle_eye", "fireball", "frost_nova", "meteor"],
   "events": ["grilled_fish", "tailwind", "rainbow", "fish_bag", "drizzle", "bees", "mud"],
   "classes": ["novice", "warrior", "rogue", "archer", "mage"],
   "projectiles": ["arrow"],
-  "keep_as_text": ["★", "▶", "🧀", "🥕", "🌈", "🐦", "🐭", "🐸", "🦔", "🐰", "🦄"]
+  "keep_as_text": ["★", "🐦", "🐭", "🐸", "🦔", "🐰", "🦄"]
 }

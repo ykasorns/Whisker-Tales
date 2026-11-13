@@ -52,8 +52,8 @@ Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
       elevation: 0,
       insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
       child: Container(
-        decoration: paintedCardDecoration('card_pick'),
-        padding: const EdgeInsets.fromLTRB(22, 26, 22, 24),
+        decoration: kitDialogDecoration(),
+        padding: const EdgeInsets.fromLTRB(30, 32, 30, 30),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Image.asset('assets/game/cat/sleep.png', height: 104),
           const SizedBox(height: 6),

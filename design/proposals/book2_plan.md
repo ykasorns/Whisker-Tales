@@ -25,3 +25,6 @@ _Status 2026-11-13: steps 1, 2 and the tests in 5 are DONE (D-067, books[] model
 - Is Book 2 the right "new map", or did you want a new Adventure mode / a map picker?
 - Keep the craft-room theme (sewing and knitting), or another theme?
 - Should the Adventure story (`wt_mode_story`) get a Book 2 chapter later, or is this farm-only?
+
+## Update 2026-11-13: scenery redo
+The first art pack made the far, mid and ground layers fully opaque (the first brief said "opaque"; Book 1's are transparent above the art), so the mid layers hide the far layer. Redo brief: `design/art/book2_layers_v2_prompt.md` (7 layers with true alpha, optional sky). Claude re-checks pages 31/41/51 in the game when the files arrive.

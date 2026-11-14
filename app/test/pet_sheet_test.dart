@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:whisker_tales/ui/game_icon.dart';
 import 'package:whisker_tales/l10n/strings.dart';
 import 'package:whisker_tales/ui/pets_tab.dart';
 import 'package:wt_core/wt_core.dart';
@@ -52,7 +53,12 @@ void main() {
         find.textContaining(
             en.petCooldown(hedgehog.skill!.spec.cooldownMs ~/ 1000)),
         findsOneWidget);
-    expect(find.textContaining('★★★'), findsOneWidget);
+    // three painted stars
+    expect(
+        find.descendant(
+            of: find.byKey(const Key('pet-stars')),
+            matching: find.byType(GameIcon)),
+        findsNWidgets(3));
     expect(find.text(en.rarityRare), findsOneWidget);
   });
 

@@ -158,8 +158,11 @@ void main() {
     // AssetImage decoding completes asynchronously outside fake time. Give
     // the painted scene a short real wait before capturing it.
     await tester.runAsync(
-        () => Future<void>.delayed(const Duration(milliseconds: 120)));
+        () => Future<void>.delayed(const Duration(milliseconds: 600)));
     await tester.pump(const Duration(milliseconds: 300));
+    await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 300)));
+    await tester.pump(const Duration(milliseconds: 100));
     expect(tester.takeException(), isNull);
     return container;
   }
@@ -474,7 +477,7 @@ void main() {
 
     await tester.tap(find.byKey(Key('potion-${potion.id}')));
     await tester.pump();
-    expect(find.byType(AlertDialog), findsOneWidget);
+    expect(find.byKey(const Key('kit-confirm')), findsOneWidget);
     expect(run.wallet.balance(Currency.goldfish), before);
 
     await tester.tap(find.text('Cancel'));
@@ -492,7 +495,7 @@ void main() {
     // A sold shop slot cannot silently consume fish a second time.
     await tester.tap(find.byKey(Key('potion-${potion.id}')));
     await tester.pump();
-    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.byKey(const Key('kit-confirm')), findsNothing);
     expect(run.wallet.balance(Currency.goldfish), before - potion.price);
   });
 
@@ -523,6 +526,14 @@ void main() {
 
     await tester.tap(findLabel('Adventure').last);
     await tester.pump(const Duration(milliseconds: 200));
+    // the painted panels and button faces decode after the first frame; wait
+    // for them, or the picture shows bare text (and the box-size asserts of
+    // the nine-slice never run)
+    for (var k = 0; k < 3; k++) {
+      await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 500)));
+      await tester.pump(const Duration(milliseconds: 100));
+    }
     expect(find.byType(AdventurePage), findsOneWidget);
     expect(
         container.read(modeUnlockContextProvider)().bossCleared('eraserking'),
@@ -541,9 +552,7 @@ void main() {
 
     await tester.tap(find.byKey(const Key('story-quit')));
     await tester.pump();
-    final leave = find.descendant(
-        of: find.byType(FilledButton), matching: findLabel('Leave story'));
-    await tester.tap(leave);
+    await tester.tap(find.byKey(const Key('kit-confirm')));
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
     expect(find.byType(StoryRunPage), findsNothing);

@@ -16,11 +16,10 @@ Future<void> showCraftSheet(BuildContext context, WidgetRef ref,
     {GearItem? stashed}) {
   return showModalBottomSheet(
     context: context,
-    backgroundColor: Palette.storyPaper,
+    backgroundColor: Colors.transparent,
+    elevation: 0,
     isScrollControlled: true,
-    shape: const ContinuousRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32))),
-    builder: (_) => _CraftSheet(stashed: stashed),
+    builder: (_) => KitSheet(child: _CraftSheet(stashed: stashed)),
   );
 }
 

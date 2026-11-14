@@ -36,7 +36,7 @@ Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
         height: 50,
         child: StretchFrame(
           frame: 'action',
-          child: Center(
+          child: FitLine(
             child: IconText('${e.$1} +${fmtNum(e.$3)}',
                 maxLines: 1,
                 style:
@@ -53,7 +53,7 @@ Future<void> showOfflineReward(BuildContext context, WidgetRef ref) async {
       insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
       child: Container(
         decoration: kitDialogDecoration(),
-        padding: const EdgeInsets.fromLTRB(30, 32, 30, 30),
+        padding: const EdgeInsets.fromLTRB(22, 24, 22, 22),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Image.asset('assets/game/cat/sleep.png', height: 104),
           const SizedBox(height: 6),

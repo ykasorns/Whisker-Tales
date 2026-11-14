@@ -23,20 +23,10 @@ Widget _storyHeading(String t) => Padding(
       child: Align(
         alignment: Alignment.centerLeft,
         child: Row(children: [
-          Transform.rotate(
-            angle: -.08,
-            child: Container(
-              width: 28,
-              height: 7,
-              // 28×7: smaller than a nine-slice's corners, so a plain stroke
-              // until the painted section mark (ui_section_mark) arrives
-              decoration: BoxDecoration(
-                color: Palette.coral,
-                borderRadius: BorderRadius.circular(3.5),
-              ),
-            ),
-          ),
-          const SizedBox(width: 9),
+          // the painted coral stroke (256x48 canvas, art ~200x32 px, at 4 px = 1 dp)
+          Image.asset('assets/game/kit/ui_section_mark.png',
+              width: 64, height: 12, filterQuality: FilterQuality.medium),
+          const SizedBox(width: 4),
           Flexible(
             child: IconText(t,
                 style:
@@ -46,21 +36,54 @@ Widget _storyHeading(String t) => Padding(
       ),
     );
 
-Widget _statCell(String label, String value, Color accent) => Expanded(
+/// One of the six main numbers: a small tinted paper tile.
+Widget _statCell(String icon, String label, String value, Color accent) =>
+    Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 8),
-        color: Color.lerp(Palette.parchment, accent, .11),
+        margin: const EdgeInsets.all(2.5),
+        padding: const EdgeInsets.fromLTRB(6, 8, 6, 8),
+        decoration: storybookCard(
+            fill: Color.lerp(Palette.paper, accent, .2)!, radius: 8),
         child: Column(children: [
-          IconText(label,
-              maxLines: 1,
-              style: const TextStyle(fontSize: 11, color: Palette.inkSoft)),
+          FitLine(
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              GameIcon(icon, size: 16),
+              const SizedBox(width: 4),
+              Text(label,
+                  maxLines: 1,
+                  style: const TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      color: Palette.inkSoft)),
+            ]),
+          ),
           const SizedBox(height: 2),
-          IconText(value,
-              style:
-                  const TextStyle(fontSize: 15, fontWeight: FontWeight.w900)),
+          FitLine(
+            child: Text(value,
+                maxLines: 1,
+                style:
+                    const TextStyle(fontSize: 17, fontWeight: FontWeight.w900)),
+          ),
         ]),
       ),
     );
+
+/// One secondary stat: icon, name (shrinks to fit), value at the right edge.
+Widget _statLine(AppLocalizations s, Attribute a, int bp) => Row(children: [
+      GameIcon(attrIconId(a) ?? '', size: 19),
+      const SizedBox(width: 5),
+      Expanded(
+        child: FitLine(
+          alignment: Alignment.centerLeft,
+          child: Text(attrName(s, a),
+              maxLines: 1,
+              style: const TextStyle(fontSize: 12, color: Palette.inkSoft)),
+        ),
+      ),
+      const SizedBox(width: 4),
+      Text(attrValue(bp),
+          style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w900)),
+    ]);
 
 Widget _soon(BuildContext context, String icon, String text) => Center(
       child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -97,12 +120,8 @@ class CharacterPage extends ConsumerWidget {
               animation: controller,
               builder: (context, _) => Container(
                 margin: const EdgeInsets.fromLTRB(8, 7, 8, 4),
-                padding: const EdgeInsets.all(3),
-                decoration: storybookCard(
-                  fill: Palette.parchmentDeep,
-                  accent: Palette.wood,
-                  radius: 9,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                decoration: kitDecoration('ui_tab_strip'),
                 child: TabBar(
                   dividerHeight: 0,
                   indicatorColor: Colors.transparent,
@@ -117,11 +136,7 @@ class CharacterPage extends ConsumerWidget {
                           margin: const EdgeInsets.all(2),
                           padding: const EdgeInsets.symmetric(horizontal: 2),
                           decoration: i == controller.index
-                              ? storybookButton(
-                                  fill: const Color(0xFFFFE1A0),
-                                  accent: Palette.coral,
-                                  radius: 8,
-                                )
+                              ? kitDecoration('ui_tab_on')
                               : null,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -186,6 +201,14 @@ class _CatTabState extends ConsumerState<_CatTab> {
     final st = ref.read(catSpecProvider)().stats; // as it fights
     String pct(Attribute a) => '${(st[a] / 100).toStringAsFixed(1)}%';
     final unlocked = cat.level >= rules.classUnlockLevel;
+    // secondary stats in the game's own order (not the order gear rolled them)
+    final more = [
+      for (final a in Attribute.values)
+        if (!const {Attribute.evade, Attribute.crit, Attribute.skillDmg}
+                .contains(a) &&
+            st[a] != 0)
+          a,
+    ];
     return ListView(padding: const EdgeInsets.all(16), children: [
       Container(
         padding: const EdgeInsets.fromLTRB(14, 11, 14, 12),
@@ -221,61 +244,51 @@ class _CatTabState extends ConsumerState<_CatTab> {
         ]),
       ),
       const SizedBox(height: 10),
-      ClipRRect(
-        borderRadius: BorderRadius.circular(9),
-        child: Container(
-          decoration: storybookCard(
-            fill: Palette.parchment,
-            accent: Palette.storyEdge,
-            radius: 9,
-          ),
-          child: Column(children: [
-            Row(children: [
-              _statCell('❤️ ${s.shortHp}', '${st.hp}', Palette.coral),
-              _statCell('⚔️ ${s.shortAtk}', '${st.atk}', Palette.mochi),
-              _statCell('🛡️ ${s.shortDef}', '${st.def}', Palette.teal),
-            ]),
-            Row(children: [
-              _statCell(
-                  '💨 ${s.shortEvade}', pct(Attribute.evade), Palette.lime),
-              _statCell(
-                  '💥 ${s.shortCrit}', pct(Attribute.crit), Palette.coral),
-              _statCell(
-                  '✨ ${s.shortSkill}', pct(Attribute.skillDmg), Palette.sun),
-            ]),
-            if (st.attrs.keys.any((k) => !const {
-                  Attribute.evade,
-                  Attribute.crit,
-                  Attribute.skillDmg
-                }.contains(k)))
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-                key: const Key('stats-more'),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      IconText(s.statsMore,
-                          style: const TextStyle(fontWeight: FontWeight.w900)),
-                      const SizedBox(height: 4),
-                      Wrap(spacing: 12, runSpacing: 2, children: [
-                        for (final e in st.attrs.entries)
-                          if (!const {
-                            Attribute.evade,
-                            Attribute.crit,
-                            Attribute.skillDmg
-                          }.contains(e.key))
-                            Row(mainAxisSize: MainAxisSize.min, children: [
-                              GameIcon(attrIconId(e.key) ?? '', size: 18),
-                              const SizedBox(width: 3),
-                              Text(
-                                  '${attrName(s, e.key)} ${attrValue(e.value)}',
-                                  style: const TextStyle(fontSize: 12)),
-                            ]),
-                      ]),
-                    ]),
-              ),
+      Container(
+        padding: const EdgeInsets.fromLTRB(9, 9, 9, 11),
+        decoration: storybookCard(fill: Palette.parchment, radius: 14),
+        child: Column(children: [
+          Row(children: [
+            _statCell('❤️', s.shortHp, fmtNum(st.hp), Palette.coral),
+            _statCell('⚔️', s.shortAtk, fmtNum(st.atk), Palette.mochi),
+            _statCell('🛡️', s.shortDef, fmtNum(st.def), Palette.teal),
           ]),
-        ),
+          Row(children: [
+            _statCell('💨', s.shortEvade, pct(Attribute.evade), Palette.lime),
+            _statCell('💥', s.shortCrit, pct(Attribute.crit), Palette.coral),
+            _statCell('✨', s.shortSkill, pct(Attribute.skillDmg), Palette.sun),
+          ]),
+          if (more.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+              key: const Key('stats-more'),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      IconText(s.statsMore,
+                          style: const TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.w900)),
+                      const SizedBox(width: 8),
+                      const Expanded(child: KitDivider()),
+                    ]),
+                    const SizedBox(height: 6),
+                    // two tidy columns: icon · name · value at the right edge
+                    for (var i = 0; i < more.length; i += 2)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2.5),
+                        child: Row(children: [
+                          Expanded(child: _statLine(s, more[i], st[more[i]])),
+                          const SizedBox(width: 14),
+                          Expanded(
+                              child: i + 1 < more.length
+                                  ? _statLine(s, more[i + 1], st[more[i + 1]])
+                                  : const SizedBox.shrink()),
+                        ]),
+                      ),
+                  ]),
+            ),
+        ]),
       ),
       _storyHeading(s.classPick),
       if (!unlocked) IconText(s.classAt(rules.classUnlockLevel)),
@@ -436,14 +449,8 @@ class _WardrobeTab extends ConsumerWidget {
         crossAxisSpacing: 8,
         children: [
           for (final e in wd.collection)
-            Container(
-              padding: const EdgeInsets.all(7),
-              decoration: storybookCard(
-                  fill: e.unlocked
-                      ? const Color(0xFFFFEBC9)
-                      : const Color(0xFFE6DAC2),
-                  accent: e.unlocked ? Palette.mochi : Palette.inkSoft,
-                  radius: 7),
+            KitSlot(
+              state: e.unlocked ? 'filled' : 'locked',
               child: ColorFiltered(
                 colorFilter: e.unlocked
                     ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
@@ -504,8 +511,8 @@ class _ShopPageState extends ConsumerState<ShopPage> {
     if (reward != null) {
       final amount = reward.amounts.values.single;
       final s = AppLocalizations.of(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: IconText('${s.claim} +$amount'),
+      ScaffoldMessenger.of(context).showSnackBar(kitToast(
+          IconText('${s.claim} +$amount'),
           duration: const Duration(seconds: 1)));
     }
   }

@@ -58,12 +58,9 @@ class _GameShellState extends ConsumerState<GameShell>
       if (!mounted) return;
       if (widget.saveFallback case final f?) {
         final s = AppLocalizations.of(context);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(kitToast(
+          IconText(f == BootFallback.olderSave ? s.saveOlder : s.saveNew),
           duration: const Duration(seconds: 8),
-          backgroundColor: Palette.ink,
-          content: IconText(
-              f == BootFallback.olderSave ? s.saveOlder : s.saveNew,
-              style: const TextStyle(fontWeight: FontWeight.w800)),
         ));
       }
       showOfflineReward(context, ref);
@@ -97,12 +94,8 @@ class _GameShellState extends ConsumerState<GameShell>
       if (!mounted || !research.notifyDone) return;
       final s = AppLocalizations.of(context);
       final node = research.rules.byId(e.nodeId)!;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: Palette.ink,
-        content: IconText(
-            s.researchDone(s.lang == 'en' ? node.nameEn : node.nameTh, e.level),
-            style: const TextStyle(fontWeight: FontWeight.w800)),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(kitToast(IconText(
+          s.researchDone(s.lang == 'en' ? node.nameEn : node.nameTh, e.level))));
     });
   }
 

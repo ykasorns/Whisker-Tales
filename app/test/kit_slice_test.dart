@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:whisker_tales/ui/kit_specs.g.dart';
 import 'package:whisker_tales/ui/palette.dart';
 
 /// Regression: the UI kit's nine-slices once passed `centerSlice` in source
@@ -17,23 +18,16 @@ void main() {
     return (b.getUint32(16), b.getUint32(20));
   }
 
-  final cases = <String, BoxDecoration Function()>{
-    'card': () => storybookCard(radius: 14),
-    'tile': () => storybookCard(radius: 8),
-    'button yellow': () => storybookButton(fill: const Color(0xFFFFD77F)),
-    'button green': () => storybookButton(fill: const Color(0xFF8CC152)),
-    'button purple': () => storybookButton(fill: const Color(0xFF7A5E8C)),
-    'button coral': () => storybookButton(fill: const Color(0xFFEE6352)),
-    'button disabled': () =>
-        storybookButton(fill: const Color(0xFFFFD77F), enabled: false),
-    'dialog': kitDialogDecoration,
-  };
-
-  for (final c in cases.entries) {
-    test('${c.key}: centerSlice is in logical units inside the picture', () {
-      final img = c.value().image!;
-      final name = (img.image as AssetImage).assetName;
-      final (w, h) = pngSize(name);
+  // every stretch piece, straight from its decoration
+  for (final name in kitSpecs.keys) {
+    final k = kitSpecs[name]!;
+    if (k.left == 0 && k.right == k.w) continue; // drawn whole
+    test('$name: centerSlice is in logical units inside the picture', () {
+      final img = kitDecoration(name).image!;
+      final file = (img.image as AssetImage).assetName;
+      final (w, h) = pngSize(file);
+      expect((w, h), (k.w.toInt(), k.h.toInt()),
+          reason: 'kit_specs.g.dart is stale: run tools/sync_sprites.py');
       final s = img.centerSlice!;
       final px = Rect.fromLTRB(s.left * img.scale, s.top * img.scale,
           s.right * img.scale, s.bottom * img.scale);

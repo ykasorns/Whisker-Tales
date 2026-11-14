@@ -115,9 +115,12 @@ class DungeonHubCard extends ConsumerWidget {
             fill: Colors.white.withValues(alpha: .55),
             accent: Palette.coral,
             radius: 8),
-        child: IconText('$icon $text',
-            maxLines: 1,
-            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+        child: FitLine(
+          child: IconText('$icon $text',
+              maxLines: 1,
+              style:
+                  const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+        ),
       );
 }
 

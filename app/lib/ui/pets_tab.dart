@@ -109,6 +109,7 @@ class _PetsTabState extends ConsumerState<PetsTab> {
                 height: 56,
                 alignment: Alignment.center,
                 margin: const EdgeInsets.all(4),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: storybookButton(
                     fill: fill,
                     accent: src == HatchSource.ad
@@ -118,10 +119,12 @@ class _PetsTabState extends ConsumerState<PetsTab> {
                             : Palette.teal,
                     enabled: enabled,
                     radius: 9),
-                child: IconText(label,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.w800)),
+                child: FitLine(
+                  child: IconText(label,
+                      maxLines: 1,
+                      style: const TextStyle(
+                          fontSize: 13, fontWeight: FontWeight.w800)),
+                ),
               ),
             ),
           ),
@@ -190,6 +193,7 @@ class _PetsTabState extends ConsumerState<PetsTab> {
         crossAxisCount: 3,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
+        childAspectRatio: .92,
         children: [
           for (final def in pets.rules.pets)
             Builder(builder: (_) {
@@ -232,11 +236,21 @@ class _PetsTabState extends ConsumerState<PetsTab> {
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                                 fontSize: 11, fontWeight: FontWeight.w700)),
-                        IconText(
-                            stars == null
-                                ? ''
-                                : '${'★' * stars} Lv.${pets.levelOf(def.id)}',
-                            style: const TextStyle(color: Palette.sun)),
+                        if (stars != null) ...[
+                          const SizedBox(height: 2),
+                          FitLine(
+                            child: Row(mainAxisSize: MainAxisSize.min, children: [
+                              for (var i = 0; i < stars; i++)
+                                const GameIcon('star', size: 12),
+                              const SizedBox(width: 4),
+                              Text(s.level(pets.levelOf(def.id)),
+                                  style: const TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w900,
+                                      color: Palette.inkSoft)),
+                            ]),
+                          ),
+                        ],
                       ]),
                 ),
               );
@@ -271,11 +285,10 @@ class PetPicture extends StatelessWidget {
 Future<void> showPetSheet(BuildContext context, WidgetRef ref, PetDef def) =>
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Palette.storyPaper,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
       isScrollControlled: true,
-      shape: const ContinuousRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(34))),
-      builder: (_) => PetSheet(def: def),
+      builder: (_) => KitSheet(child: PetSheet(def: def)),
     );
 
 class PetSheet extends ConsumerStatefulWidget {
@@ -347,11 +360,23 @@ class _PetSheetState extends ConsumerState<PetSheet> {
                         style: TextStyle(
                             fontWeight: FontWeight.w800,
                             color: _PetsTabState._rarityColor(def.rarity))),
-                    IconText(
-                        '${'★' * stars}  ${s.petLevel('$level', '${pets.rules.maxLevel}')}',
-                        key: const Key('pet-level'),
-                        style:
-                            const TextStyle(fontSize: 18, color: Palette.sun)),
+                    Row(key: const Key('pet-stars'), children: [
+                      for (var i = 0; i < stars; i++)
+                        const GameIcon('star', size: 18),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: FitLine(
+                          alignment: Alignment.centerLeft,
+                          child: IconText(
+                              s.petLevel('$level', '${pets.rules.maxLevel}'),
+                              key: const Key('pet-level'),
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w900,
+                                  color: Palette.inkSoft)),
+                        ),
+                      ),
+                    ]),
                     IconText('⚔️ ${s.petAttack} ${fmtNum(atk)}',
                         style: const TextStyle(fontWeight: FontWeight.w800)),
                   ]),

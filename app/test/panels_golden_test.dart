@@ -95,7 +95,9 @@ void main() {
             w.properties.button == true &&
             w.properties.selected != null);
         await tester.tap(labels.at(i));
-        await tester.pump(const Duration(milliseconds: 300));
+        // real time too: the page's painted panels must finish decoding, or
+        // the golden shows them on one run and not on the next
+        await settle(tester);
         expect(tester.takeException(), isNull);
         await expectLater(
             app, matchesGoldenFile('goldens/$lang/${tabs[i]}.png'));

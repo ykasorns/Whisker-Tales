@@ -223,13 +223,12 @@ class _LibraryTabState extends ConsumerState<LibraryTab> {
             opacity: block == null ? 1 : 0.5,
             child: Container(
               width: 104,
-              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
               alignment: Alignment.center,
               decoration: block == null
                   ? storybookButton(
                       fill: Palette.lime, accent: Palette.teal, radius: 8)
-                  : storybookCard(
-                      fill: Palette.sheet, accent: Palette.inkSoft, radius: 7),
+                  : storybookButton(enabled: false),
               child: IconText(label,
                   textAlign: TextAlign.center,
                   style: const TextStyle(

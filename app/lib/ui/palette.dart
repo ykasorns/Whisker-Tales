@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'kit_specs.g.dart';
+
 /// Colored-pencil storybook palette (ART_PROMPT_BIBLE; same as the web
 /// prototype).
 abstract final class Palette {
@@ -83,28 +85,44 @@ class StorybookPaper extends StatelessWidget {
       );
 }
 
-/// A painted 9-slice surface from the UI kit (D-069): the corners and edges
-/// keep their size, only the middle stretches. [slice] is in source pixels,
-/// [scale] sets how large the corners are drawn.
-BoxDecoration _kitSlice(String name, Rect slice, double scale, {Color? tint}) =>
-    BoxDecoration(
-      image: DecorationImage(
-        image: AssetImage('assets/game/kit/$name.png'),
-        scale: scale,
-        centerSlice: Rect.fromLTRB(slice.left / scale, slice.top / scale,
-            slice.right / scale, slice.bottom / scale),
-        fit: BoxFit.fill,
-        filterQuality: FilterQuality.medium,
-        colorFilter:
-            tint == null ? null : ColorFilter.mode(tint, BlendMode.modulate),
-      ),
-    );
+/// A painted stretch surface from the UI kit (D-069): the corners and edges
+/// keep their size, only the middle stretches. Sizes and slices come from
+/// `kit_specs.g.dart` (measured by `tools/sync_sprites.py`); Flutter wants
+/// the slice in logical units, i.e. picture pixels / [scale]. A box must be
+/// at least as large as the piece's fixed borders.
+BoxDecoration kitDecoration(String name, {Color? tint, double scale = 4}) {
+  final k = kitSpecs[name]!;
+  return BoxDecoration(
+    image: DecorationImage(
+      image: AssetImage('assets/game/kit/$name.png'),
+      scale: scale,
+      centerSlice: Rect.fromLTRB(
+          k.left / scale, k.top / scale, k.right / scale, k.bottom / scale),
+      fit: BoxFit.fill,
+      filterQuality: FilterQuality.medium,
+      colorFilter:
+          tint == null ? null : ColorFilter.mode(tint, BlendMode.modulate),
+    ),
+  );
+}
 
-BoxDecoration _kitCard(Color tint, double radius) => radius <= 10
-    ? _kitSlice('ui_panel_tile', const Rect.fromLTRB(32, 32, 96, 96), 4,
-        tint: tint)
-    : _kitSlice('ui_panel_card', const Rect.fromLTRB(56, 56, 200, 200), 4,
-        tint: tint);
+// A see-through tint would make the whole painted panel see-through
+// (modulate multiplies alpha too), so it is flattened onto white first.
+BoxDecoration _kitCard(Color tint, double radius) => kitDecoration(
+    radius <= 10 ? 'ui_panel_tile' : 'ui_panel_card',
+    tint: Color.alphaBlend(tint, Colors.white));
+
+/// Shrinks its one-line child until it fits the width it is given, instead
+/// of letting the end of a label wrap out of sight ("+101.5K", "Runs left
+/// today: 3"). Never enlarges.
+class FitLine extends StatelessWidget {
+  const FitLine({super.key, required this.child, this.alignment = Alignment.center});
+  final Widget child;
+  final Alignment alignment;
+  @override
+  Widget build(BuildContext context) =>
+      FittedBox(fit: BoxFit.scaleDown, alignment: alignment, child: child);
+}
 
 /// Painted paper panel. [fill] tints the cream paper (pink, mint, lilac …
 /// as before); [accent] is no longer needed (the painted edge carries it) but
@@ -138,12 +156,11 @@ BoxDecoration storybookButton({
   bool enabled = true,
 }) {
   if (!enabled) {
-    return _kitSlice(
-        'ui_btn_disabled', const Rect.fromLTRB(80, 70, 400, 90), 4);
+    return kitDecoration('ui_btn_disabled');
   }
   final name = _kitButtonFor(fill);
   if (name == null) return _kitCard(fill, radius);
-  return _kitSlice(name, const Rect.fromLTRB(80, 70, 400, 90), 4);
+  return kitDecoration(name);
 }
 
 /// Painted on/off switch (D-069), 52×26 dp.
@@ -239,8 +256,8 @@ class _KitSpinnerState extends State<KitSpinner>
       );
 }
 
-/// A painted progress bar: track 16 dp, fill 12 dp (art is drawn at 4x, so
-/// nothing is scaled vertically; only the middle stretches sideways).
+/// A painted progress bar, 15 dp tall (the art at 4×, never scaled up or
+/// down; only the middle stretches sideways).
 class KitBar extends StatelessWidget {
   const KitBar({super.key, required this.value, this.fill = 'teal'});
 
@@ -249,30 +266,29 @@ class KitBar extends StatelessWidget {
   /// `green`, `teal`, `coral` or `sun`.
   final String fill;
 
-  static BoxDecoration _strip(String name, double w) => BoxDecoration(
-      image: DecorationImage(
-          image: AssetImage('assets/game/kit/$name.png'),
-          scale: 4,
-          centerSlice: Rect.fromLTRB(w / 4, 1, (480 - w) / 4, 1.25),
-          fit: BoxFit.fill,
-          filterQuality: FilterQuality.medium));
-
   @override
   Widget build(BuildContext context) {
     final v = value.clamp(0.0, 1.0);
+    final track = kitSpecs['ui_bar_track']!;
+    final bar = kitSpecs['ui_bar_fill_$fill']!;
+    final h = track.h / 4, fh = bar.h / 4, pad = (h - fh) / 2;
+    // narrower than its two round ends, a fill cannot be drawn
+    final least = (bar.left + bar.w - bar.right) / 4 + 1;
     return SizedBox(
-      height: 16,
+      height: h,
       child: LayoutBuilder(builder: (_, c) {
+        final w = (c.maxWidth - 2 * pad) * v;
         return Stack(children: [
-          Positioned.fill(child: DecoratedBox(decoration: _strip('ui_bar_track', 32))),
-          if ((c.maxWidth - 4) * v >= 12)
+          Positioned.fill(
+              child: DecoratedBox(decoration: kitDecoration('ui_bar_track'))),
+          if (v > 0)
             Positioned(
-                left: 2,
-                top: 2,
-                width: (c.maxWidth - 4) * v,
-                height: 12,
+                left: pad,
+                top: pad,
+                width: w < least ? least : w,
+                height: fh,
                 child: DecoratedBox(
-                    decoration: _strip('ui_bar_fill_$fill', 24))),
+                    decoration: kitDecoration('ui_bar_fill_$fill'))),
         ]);
       }),
     );
@@ -280,8 +296,7 @@ class KitBar extends StatelessWidget {
 }
 
 /// Pop-up panel (welcome back, confirmations): honey rim, flat cream paper.
-BoxDecoration kitDialogDecoration() => _kitSlice(
-    'ui_panel_dialog', const Rect.fromLTRB(88, 88, 296, 296), 4);
+BoxDecoration kitDialogDecoration() => kitDecoration('ui_panel_dialog');
 
 /// A painted gear/wardrobe cell, drawn at its own size. [state]: `empty`,
 /// `filled`, `locked` or `selected`; [grade] (0–5) lays a coloured rim.
@@ -295,9 +310,141 @@ class KitSlot extends StatelessWidget {
   Widget build(BuildContext context) => Stack(fit: StackFit.expand, children: [
         Image.asset('assets/game/kit/ui_slot_$state.png',
             fit: BoxFit.fill, filterQuality: FilterQuality.medium),
-        if (child != null) Padding(padding: const EdgeInsets.all(5), child: child),
+        if (child != null)
+          Padding(padding: const EdgeInsets.all(7), child: child),
         if (grade != null)
           Image.asset('assets/game/kit/ui_rim_g${grade!.clamp(0, 5)}.png',
               fit: BoxFit.fill, filterQuality: FilterQuality.medium),
       ]);
+}
+
+/// A short message at the bottom of the screen on the painted toast plate
+/// (instead of Material's black bar).
+SnackBar kitToast(Widget content,
+        {Duration duration = const Duration(seconds: 4)}) =>
+    SnackBar(
+      duration: duration,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      padding: EdgeInsets.zero,
+      margin: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+      content: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+        decoration: kitDecoration('ui_toast_plate'),
+        child: DefaultTextStyle.merge(
+          style: const TextStyle(
+              color: Palette.ink, fontSize: 14, fontWeight: FontWeight.w800),
+          child: content,
+        ),
+      ),
+    );
+
+/// The painted bottom sheet: cream paper with a honey rim and a grabber.
+/// Use with `showModalBottomSheet(backgroundColor: Colors.transparent)`.
+class KitSheet extends StatelessWidget {
+  const KitSheet({super.key, required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        decoration: kitDecoration('ui_panel_sheet'),
+        padding: const EdgeInsets.only(top: 9),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Image.asset('assets/game/kit/ui_sheet_grabber.png',
+              width: 44, filterQuality: FilterQuality.medium),
+          Flexible(child: child),
+        ]),
+      );
+}
+
+/// A yes/no question on the painted dialog panel. Returns true on [confirm].
+Future<bool?> showKitConfirm(
+  BuildContext context, {
+  required Widget title,
+  Widget? body,
+  required Widget cancel,
+  required Widget confirm,
+}) =>
+    showDialog<bool>(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+        child: Container(
+          decoration: kitDialogDecoration(),
+          padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            DefaultTextStyle.merge(
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  fontSize: 19, fontWeight: FontWeight.w900, color: Palette.ink),
+              child: title,
+            ),
+            if (body != null) ...[
+              const SizedBox(height: 8),
+              DefaultTextStyle.merge(
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: Palette.inkSoft),
+                child: body,
+              ),
+            ],
+            const SizedBox(height: 16),
+            Row(children: [
+              for (final (i, w) in [cancel, confirm].indexed) ...[
+                if (i == 1) const SizedBox(width: 10),
+                Expanded(
+                  child: GestureDetector(
+                    key: Key(i == 1 ? 'kit-confirm' : 'kit-cancel'),
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => Navigator.pop(ctx, i == 1),
+                    child: Container(
+                      height: 48,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: i == 1
+                          ? storybookButton(fill: Palette.sun)
+                          : storybookCard(fill: Palette.paper, radius: 8),
+                      child: FitLine(
+                        child: DefaultTextStyle.merge(
+                          style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w900,
+                              color: i == 1 ? Palette.ink : Palette.inkSoft),
+                          child: w,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ]),
+          ]),
+        ),
+      ),
+    );
+
+/// A row of painted stitches, as wide as it is given (tiles sideways).
+class KitDivider extends StatelessWidget {
+  const KitDivider({super.key});
+  @override
+  Widget build(BuildContext context) => const SizedBox(
+        height: 6,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/game/kit/ui_divider_stitch.png'),
+              scale: 4,
+              repeat: ImageRepeat.repeatX,
+              alignment: Alignment.center,
+              fit: BoxFit.none,
+              filterQuality: FilterQuality.medium,
+            ),
+          ),
+        ),
+      );
 }

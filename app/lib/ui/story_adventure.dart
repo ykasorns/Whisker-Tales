@@ -232,21 +232,10 @@ class _StoryRunPageState extends ConsumerState<StoryRunPage>
 
   Future<void> _quit() async {
     final s = AppLocalizations.of(context);
-    final leave = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Palette.paper,
+    final leave = await showKitConfirm(context,
         title: IconText(s.storyQuit),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: Text(s.cancel)),
-          FilledButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: IconText(s.storyQuit)),
-        ],
-      ),
-    );
+        cancel: Text(s.cancel),
+        confirm: IconText(s.storyQuit));
     if (leave == true && mounted) {
       controller.abandon();
       Navigator.of(context).pop();
@@ -859,27 +848,16 @@ class _ShopPanel extends StatelessWidget {
       onTap: !usable
           ? null
           : () async {
-              final yes = await showDialog<bool>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  backgroundColor: Palette.paper,
+              final yes = await showKitConfirm(context,
                   title: IconText(s.storyConfirmBuy),
-                  content: IconText('🐟 ${potion.price}'),
-                  actions: [
-                    TextButton(
-                        onPressed: () => Navigator.pop(ctx, false),
-                        child: Text(s.cancel)),
-                    FilledButton(
-                        onPressed: () => Navigator.pop(ctx, true),
-                        child: IconText(s.storyBuy)),
-                  ],
-                ),
-              );
+                  body: IconText('🐟 ${potion.price}'),
+                  cancel: Text(s.cancel),
+                  confirm: IconText(s.storyBuy));
               if (yes == true &&
                   context.mounted &&
                   !controller.buyPotion(potion)) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: IconText(s.storyNotEnough)));
+                    kitToast(IconText(s.storyNotEnough)));
               }
             },
       child: Opacity(

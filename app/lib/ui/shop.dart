@@ -22,11 +22,10 @@ Future<void> openShop(BuildContext context, WidgetRef ref) async {
   if (pass == null || !context.mounted) return;
   await showModalBottomSheet<void>(
     context: context,
-    backgroundColor: Palette.storyPaper,
+    backgroundColor: Colors.transparent,
+    elevation: 0,
     isScrollControlled: true,
-    shape: const ContinuousRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(38))),
-    builder: (_) => ShopSheet(pass: pass),
+    builder: (_) => KitSheet(child: ShopSheet(pass: pass)),
   );
 }
 
@@ -189,7 +188,7 @@ class _ShopSheetState extends ConsumerState<ShopSheet> {
     if (r == PurchaseStart.needsGate) {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: IconText(s.gateExpired)));
+          .showSnackBar(kitToast(IconText(s.gateExpired)));
       return;
     }
     setState(() => _status = switch (r) {

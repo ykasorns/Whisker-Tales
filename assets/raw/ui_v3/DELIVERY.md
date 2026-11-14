@@ -89,3 +89,14 @@ Additional checks:
 - `sheets/sheet_icons_7_stats_1.png`: all six reviewed fragment regions contain 0 non-magenta pixels after cleanup; unrelated disconnected fragments below 600 px: 0. Intentional icon parts such as sparkles and speed marks are retained.
 - `sheets/sheet_icons_8_stats_2.png`: the reviewed carrot-cell fragment region contains 0 non-magenta pixels after cleanup; unrelated disconnected fragments below 600 px: 0.
 - `preview_fixes.png`: 3360 x 1995 px; every redrawn widget is composited on cream at its native width and at real 2x/3x middle-column stretch widths.
+
+## Round 3 audit — 2026-11-14
+
+| File | Measured result | Result |
+|---|---|---|
+| `widgets/ui_section_mark.png` | 256 x 48 canvas; painted bbox 200 x 32 px at `(28, 8)–(228, 40)`; transparent border; 0 magenta pixels | PASS |
+| `widgets/ui_divider_stitch.png` | 512 x 24 canvas; painted x-range 5–506; painted height 6 px; minimum 115 painted pixels in every 40 px window; 32 px tile period with 5 px half-gap at each edge | PASS |
+| `widgets/ui_panel_dialog.png` | 384 x 384 canvas; 0 pixels with alpha below 250 or 255 inside the silhouette eroded by 2 px; centre 208 x 208 contains one flat RGBA value; transparent outer border | PASS |
+| `preview_round3.png` | 1400 x 900 | PASS — all three assets composited over cream `#F6F0E1` and dark blue `#2B3A55` |
+
+All three files also pass the main size, transparent-border and magenta-fringe checks.

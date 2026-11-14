@@ -199,36 +199,78 @@ if os.path.exists(currency_tag):
 # D-069: UI kit v3 (GPT, assets/raw/ui_v3/widgets). Only pieces at their brief
 # size are published (a raw oversized generation is skipped until it is
 # redone); colours are reduced to 256 so the kit stays small.
+# UI kit v3 (D-069). Every piece is cropped to its painted area: the files
+# carry transparent margins (a button face is ~60% of its file's height), and
+# a box decorated with an untrimmed piece shows a face smaller than the box,
+# so labels sit outside it. Stretch pieces also get their slice (the part that
+# stretches) written to app/lib/ui/kit_specs.g.dart, measured after the crop.
+#   name: (file w, file h, kind, cap)   kind: 'nine' = corners `cap` px,
+#   'pill' = round ends `cap` px wide, middle stretches both ways,
+#   'fixed' = drawn whole.
 KIT = {
-    'ui_panel_card': (256, 256), 'ui_panel_tile': (128, 128),
-    'ui_panel_dialog': (384, 384), 'ui_panel_sheet': (512, 256),
-    'ui_sheet_grabber': (128, 32), 'ui_panel_inset': (256, 128),
-    'ui_tab_strip': (768, 128), 'ui_tab_on': (256, 128), 'ui_tab_off': (256, 128),
-    'ui_btn_green': (480, 160), 'ui_btn_yellow': (480, 160),
-    'ui_btn_purple': (480, 160), 'ui_btn_coral': (480, 160),
-    'ui_btn_disabled': (480, 160), 'ui_btn_round_red': (160, 160),
-    'ui_btn_round_cream': (160, 160), 'ui_toggle_track_off': (192, 96),
-    'ui_toggle_track_on': (192, 96), 'ui_toggle_knob': (80, 80),
-    'ui_bar_track': (480, 64), 'ui_bar_fill_green': (480, 48),
-    'ui_bar_fill_teal': (480, 48), 'ui_bar_fill_coral': (480, 48),
-    'ui_bar_fill_sun': (480, 48), 'ui_spinner_yarn': (192, 192),
-    'ui_slot_empty': (160, 160), 'ui_slot_filled': (160, 160),
-    'ui_slot_locked': (160, 160), 'ui_slot_selected': (160, 160),
-    **{f'ui_rim_g{i}': (160, 160) for i in range(6)},
-    'ui_toast_plate': (480, 120), 'ui_chip_pill': (320, 96),
+    'ui_panel_card': (256, 256, 'nine', 56), 'ui_panel_tile': (128, 128, 'nine', 32),
+    'ui_panel_dialog': (384, 384, 'nine', 88), 'ui_panel_sheet': (512, 256, 'nine', 72),
+    'ui_panel_inset': (256, 128, 'nine', 44),
+    'ui_tab_strip': (768, 128, 'pill', 56), 'ui_tab_on': (256, 128, 'pill', 40),
+    'ui_tab_off': (256, 128, 'pill', 40),
+    'ui_btn_green': (480, 160, 'pill', 80), 'ui_btn_yellow': (480, 160, 'pill', 80),
+    'ui_btn_purple': (480, 160, 'pill', 80), 'ui_btn_coral': (480, 160, 'pill', 80),
+    'ui_btn_disabled': (480, 160, 'pill', 80),
+    'ui_bar_track': (480, 64, 'pill', 32), 'ui_bar_fill_green': (480, 48, 'pill', 24),
+    'ui_bar_fill_teal': (480, 48, 'pill', 24), 'ui_bar_fill_coral': (480, 48, 'pill', 24),
+    'ui_bar_fill_sun': (480, 48, 'pill', 24),
+    'ui_toast_plate': (480, 120, 'pill', 60), 'ui_chip_pill': (320, 96, 'pill', 48),
+    'ui_btn_round_red': (160, 160, 'fixed', 0), 'ui_btn_round_cream': (160, 160, 'fixed', 0),
+    'ui_toggle_track_off': (192, 96, 'fixed', 0), 'ui_toggle_track_on': (192, 96, 'fixed', 0),
+    'ui_toggle_knob': (80, 80, 'fixed', 0), 'ui_sheet_grabber': (128, 32, 'fixed', 0),
+    'ui_spinner_yarn': (192, 192, 'fixed', 0), 'ui_section_mark': (256, 48, 'fixed', 0),
+    'ui_divider_stitch': (512, 24, 'fixed', 0), 'ui_badge_count': (96, 96, 'fixed', 0),
+    'ui_badge_dot': (64, 64, 'fixed', 0), 'ui_ribbon_new': (192, 96, 'fixed', 0),
+    'ui_slot_empty': (160, 160, 'fixed', 0), 'ui_slot_filled': (160, 160, 'fixed', 0),
+    'ui_slot_locked': (160, 160, 'fixed', 0), 'ui_slot_selected': (160, 160, 'fixed', 0),
+    **{f'ui_rim_g{i}': (160, 160, 'fixed', 0) for i in range(6)},
 }
-KIT_SKIP = set()
 os.makedirs(f'{OUT}/kit', exist_ok=True)
-for name, size in KIT.items():
+kit_specs = []
+for name, (fw, fh, kind, cap) in KIT.items():
     src = f'{ROOT}/assets/raw/ui_v3/widgets/{name}.png'
-    if name in KIT_SKIP or not os.path.exists(src):
+    if not os.path.exists(src):
         continue
     im = Image.open(src).convert('RGBA')
-    if im.size != size:
-        print(f'kit: skipped {name} (size {im.size}, wants {size})')
+    if im.size != (fw, fh):
+        print(f'kit: skipped {name} (size {im.size}, wants {(fw, fh)})')
         continue
+    box = im.split()[3].point(lambda a: 255 if a > 24 else 0).getbbox()
+    if kind != 'fixed':  # whole pieces keep their canvas: rims sit on slots,
+        im = im.crop(box)  # a knob is centred in its track, a spinner turns
+    w, h = im.size  # about the canvas centre
+    if kind != 'fixed':
+        left = max(4, cap - box[0])
+        right = w - max(4, cap - (fw - box[2]))
+        if kind == 'nine':
+            top = max(4, cap - box[1])
+            bottom = h - max(4, cap - (fh - box[3]))
+        else:  # pill: only a thin band in the middle stretches up and down
+            top, bottom = h // 2 - 2, h // 2 + 2
+        assert 0 < left < right < w and 0 < top < bottom < h, name
+        kit_specs.append((name, w, h, left, top, right, bottom))
+    else:
+        kit_specs.append((name, w, h, 0, 0, w, h))
     im.quantize(256, method=Image.FASTOCTREE, dither=Image.NONE).save(
         f'{OUT}/kit/{name}.png', optimize=True)
+if kit_specs:
+    with open(f'{ROOT}/app/lib/ui/kit_specs.g.dart', 'w') as f:
+        f.write('// GENERATED by tools/sync_sprites.py from assets/raw/ui_v3 — do not edit.\n'
+                '// Size of every published UI-kit picture and the part of it that\n'
+                '// stretches, in picture pixels (after the transparent margin is cut).\n\n'
+                'class KitSpec {\n'
+                '  const KitSpec(this.w, this.h, this.left, this.top, this.right, this.bottom);\n'
+                '  final double w, h, left, top, right, bottom;\n'
+                '}\n\n'
+                'const kitSpecs = <String, KitSpec>{\n')
+        for kit_name, *v in kit_specs:
+            f.write(f"  '{kit_name}': KitSpec({', '.join(str(x) for x in v)}),\n")
+        f.write('};\n')
 # D-060: calmer UI frames (GPT, assets/raw/frames/ui_v2). They are generated at
 # the exact size ui_frames.json was measured on, so they replace the atlas
 # slices above under the same published names. Tab icons and the cooldown

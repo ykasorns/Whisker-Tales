@@ -91,7 +91,8 @@ BoxDecoration _kitSlice(String name, Rect slice, double scale, {Color? tint}) =>
       image: DecorationImage(
         image: AssetImage('assets/game/kit/$name.png'),
         scale: scale,
-        centerSlice: slice,
+        centerSlice: Rect.fromLTRB(slice.left / scale, slice.top / scale,
+            slice.right / scale, slice.bottom / scale),
         fit: BoxFit.fill,
         filterQuality: FilterQuality.medium,
         colorFilter:
@@ -252,7 +253,7 @@ class KitBar extends StatelessWidget {
       image: DecorationImage(
           image: AssetImage('assets/game/kit/$name.png'),
           scale: 4,
-          centerSlice: Rect.fromLTRB(w, 4, 480 - w, 5),
+          centerSlice: Rect.fromLTRB(w / 4, 1, (480 - w) / 4, 1.25),
           fit: BoxFit.fill,
           filterQuality: FilterQuality.medium));
 
@@ -262,11 +263,9 @@ class KitBar extends StatelessWidget {
     return SizedBox(
       height: 16,
       child: LayoutBuilder(builder: (_, c) {
-        // a fill narrower than its two round ends would squash them
-        final w = c.maxWidth * v;
         return Stack(children: [
           Positioned.fill(child: DecoratedBox(decoration: _strip('ui_bar_track', 32))),
-          if (w >= 12)
+          if ((c.maxWidth - 4) * v >= 12)
             Positioned(
                 left: 2,
                 top: 2,

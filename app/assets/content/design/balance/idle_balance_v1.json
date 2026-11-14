@@ -417,7 +417,7 @@
   "pages": {
     "_doc": "GDD v0.5.2 §9.1 (D-008) — สุ่มจาก seed ของหน้า · [min, max] รวมปลาย · ASSUMPTION จูนใน T-029",
     "ASSUMPTION_waves_by_chapter": [[3, 4], [4, 6], [5, 8]],
-    "ASSUMPTION_monsters_per_wave_by_chapter": [[2, 3], [3, 4], [3, 5]],
+    "ASSUMPTION_monsters_per_wave_by_chapter": [[2, 3], [2, 3], [2, 3]],
     "long_pages_in_chapter": [5, 10],
     "ASSUMPTION_long_page_extra_waves": 2,
     "chapters_per_book": 3,

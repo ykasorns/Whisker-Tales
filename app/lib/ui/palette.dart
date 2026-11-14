@@ -108,15 +108,16 @@ BoxDecoration kitDecoration(String name, {Color? tint, double scale = 4}) {
 
 // A see-through tint would make the whole painted panel see-through
 // (modulate multiplies alpha too), so it is flattened onto white first.
-BoxDecoration _kitCard(Color tint, double radius) => kitDecoration(
-    radius <= 10 ? 'ui_panel_tile' : 'ui_panel_card',
-    tint: Color.alphaBlend(tint, Colors.white));
+BoxDecoration _kitCard(Color tint, double radius) =>
+    kitDecoration(radius <= 10 ? 'ui_panel_tile' : 'ui_panel_card',
+        tint: Color.alphaBlend(tint, Colors.white));
 
 /// Shrinks its one-line child until it fits the width it is given, instead
 /// of letting the end of a label wrap out of sight ("+101.5K", "Runs left
 /// today: 3"). Never enlarges.
 class FitLine extends StatelessWidget {
-  const FitLine({super.key, required this.child, this.alignment = Alignment.center});
+  const FitLine(
+      {super.key, required this.child, this.alignment = Alignment.center});
   final Widget child;
   final Alignment alignment;
   @override
@@ -379,7 +380,9 @@ Future<bool?> showKitConfirm(
             DefaultTextStyle.merge(
               textAlign: TextAlign.center,
               style: const TextStyle(
-                  fontSize: 19, fontWeight: FontWeight.w900, color: Palette.ink),
+                  fontSize: 19,
+                  fontWeight: FontWeight.w900,
+                  color: Palette.ink),
               child: title,
             ),
             if (body != null) ...[

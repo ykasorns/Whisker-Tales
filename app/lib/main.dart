@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'ui/battle_fx.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -62,6 +63,7 @@ Future<void> main() async {
     final boot = await bootGame(() => ProviderContainer(overrides: [
           ...content.overrides,
           modeRegistryProvider.overrideWithValue(modes),
+          avatarRulesProvider.overrideWithValue(content.avatar),
           saveServiceProvider.overrideWithValue(saves),
           iapStoreProvider.overrideWithValue(store),
           cloudStoreProvider.overrideWithValue(const PlayCloudStore()),

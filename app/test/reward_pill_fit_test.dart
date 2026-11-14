@@ -27,7 +27,9 @@ void main() {
       textDirection: TextDirection.ltr,
       child: Center(
           child: SizedBox(
-              width: 130, height: 50, child: FitLine(child: Text(long, style: style)))),
+              width: 130,
+              height: 50,
+              child: FitLine(child: Text(long, style: style)))),
     ));
     final box = t.getRect(find.byType(FitLine));
     final text = t.getRect(find.byType(Text));

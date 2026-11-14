@@ -628,100 +628,25 @@ class _PickPanelState<T> extends State<_PickPanel<T>> {
                       ]
                     : null,
               ),
-              child: LayoutBuilder(builder: (context, box) {
-                final h = box.maxHeight;
-                final iconSize = math.min(box.maxWidth * .42, h * .16);
-                return Stack(children: [
-                  Positioned.fill(
-                    child: Image.asset(
-                      'assets/game/story/cards_v2/card_$variant.png',
-                      fit: BoxFit.fill,
-                      filterQuality: FilterQuality.medium,
-                    ),
-                  ),
-                  Positioned(
-                    left: 8,
-                    right: 8,
-                    top: h * .075,
-                    height: h * .36,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GameIcon(widget.iconOf(choice),
-                            size: chosen ? iconSize * 1.08 : iconSize),
-                        SizedBox(height: h * .015),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            for (var i = 0; i < rank; i++)
-                              const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 1),
-                                child: GameIcon('star', size: 12),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    left: 11,
-                    right: 11,
-                    top: h * .49,
-                    height: h * .105,
-                    child: Center(
-                      child: IconText(widget.nameOf(choice),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 11.5,
-                              height: 1.05,
-                              fontWeight: FontWeight.w900)),
-                    ),
-                  ),
-                  Positioned(
-                    left: 13,
-                    right: 13,
-                    top: h * .625,
-                    bottom: h * .075,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconText(widget.descriptionOf(choice),
-                            textAlign: TextAlign.center,
-                            maxLines: 4,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                fontSize: 9.5,
-                                height: 1.18,
-                                fontWeight: FontWeight.w700,
-                                color: Palette.inkSoft)),
-                        if (chosen) ...[
-                          const SizedBox(height: 4),
-                          IconText(AppLocalizations.of(context).storyTapAgain,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                  fontSize: 8.5,
-                                  color: Palette.coral,
-                                  fontWeight: FontWeight.w900)),
-                        ],
-                      ],
-                    ),
-                  ),
-                  if (chosen)
-                    const Positioned(
-                      right: 7,
-                      top: 8,
-                      child: GameIcon('check', size: 22),
-                    ),
-                  if (synergy)
-                    const Positioned(
-                      left: 7,
-                      bottom: 8,
-                      child: GameIcon('bolt', size: 17),
-                    ),
-                ]);
-              }),
+              child: _CardFace(
+                art: 'card_$variant',
+                icon: widget.iconOf(choice),
+                iconScale: chosen ? 1.08 : 1,
+                stars: rank,
+                name: widget.nameOf(choice),
+                body: widget.descriptionOf(choice),
+                glow: chosen ? accent : null,
+                footer: chosen
+                    ? IconText(AppLocalizations.of(context).storyTapAgain,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontSize: 20,
+                            color: Palette.coral,
+                            fontWeight: FontWeight.w900))
+                    : null,
+                checked: chosen,
+                synergy: synergy,
+              ),
             ),
           ),
         ),
@@ -856,76 +781,21 @@ class _ShopPanel extends StatelessWidget {
               if (yes == true &&
                   context.mounted &&
                   !controller.buyPotion(potion)) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    kitToast(IconText(s.storyNotEnough)));
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(kitToast(IconText(s.storyNotEnough)));
               }
             },
       child: Opacity(
         opacity: usable ? 1 : .48,
-        child: LayoutBuilder(builder: (context, box) {
-          final h = box.maxHeight;
-          return Stack(children: [
-            Positioned.fill(
-              child: Image.asset(
-                'assets/game/story/cards_v2/card_relic_common.png',
-                fit: BoxFit.fill,
-                filterQuality: FilterQuality.medium,
-              ),
-            ),
-            Positioned(
-              left: 8,
-              right: 8,
-              top: h * .075,
-              height: h * .36,
-              child: Center(
-                child: GameIcon(
-                    usable && !purchased ? _potionIcon(potion.buffId) : 'check',
-                    size: math.min(box.maxWidth * .42, h * .16)),
-              ),
-            ),
-            Positioned(
-              left: 11,
-              right: 11,
-              top: h * .49,
-              height: h * .105,
-              child: Center(
-                child: IconText(s.lang == 'en' ? potion.nameEn : potion.nameTh,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontSize: 11.5,
-                        height: 1.05,
-                        fontWeight: FontWeight.w900)),
-              ),
-            ),
-            Positioned(
-              left: 13,
-              right: 13,
-              top: h * .625,
-              bottom: h * .075,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: IconText(
-                        s.lang == 'en'
-                            ? potion.descriptionEn
-                            : potion.descriptionTh,
-                        textAlign: TextAlign.center,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontSize: 9.5, color: Palette.inkSoft)),
-                  ),
-                  IconText('🐟 ${potion.price}',
-                      style: const TextStyle(
-                          fontSize: 11, fontWeight: FontWeight.w900)),
-                ],
-              ),
-            ),
-          ]);
-        }),
+        child: _CardFace(
+          art: 'card_relic_common',
+          icon: usable && !purchased ? _potionIcon(potion.buffId) : 'check',
+          name: s.lang == 'en' ? potion.nameEn : potion.nameTh,
+          body: s.lang == 'en' ? potion.descriptionEn : potion.descriptionTh,
+          footer: IconText('🐟 ${potion.price}',
+              style:
+                  const TextStyle(fontSize: 26, fontWeight: FontWeight.w900)),
+        ),
       ),
     );
   }
@@ -1254,4 +1124,135 @@ String _statusIcon(String id) {
 
 extension<T> on Iterable<T> {
   T? get firstOrNull => isEmpty ? null : first;
+}
+
+/// A story card laid out in the 320x480 coordinates of its painted frame and
+/// scaled as one piece, so the art keeps its proportions and the text always
+/// lands on the ribbon / description window (never stretched with the cell).
+class _CardFace extends StatelessWidget {
+  const _CardFace({
+    required this.art,
+    required this.icon,
+    required this.name,
+    required this.body,
+    this.stars = 0,
+    this.iconScale = 1,
+    this.glow,
+    this.footer,
+    this.checked = false,
+    this.synergy = false,
+  });
+
+  final String art, icon, name, body;
+  final int stars;
+  final double iconScale;
+  final Color? glow;
+  final Widget? footer;
+  final bool checked, synergy;
+
+  @override
+  Widget build(BuildContext context) {
+    return FittedBox(
+      fit: BoxFit.contain,
+      child: SizedBox(
+        width: 320,
+        height: 480,
+        child: Stack(children: [
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(40),
+                boxShadow: glow == null
+                    ? null
+                    : [
+                        BoxShadow(
+                            color: glow!.withValues(alpha: .65),
+                            blurRadius: 30,
+                            spreadRadius: 5)
+                      ],
+              ),
+              child: Image.asset('assets/game/story/cards_v2/$art.png',
+                  fit: BoxFit.fill, filterQuality: FilterQuality.medium),
+            ),
+          ),
+          // Picture window.
+          Positioned(
+            left: 40,
+            right: 40,
+            top: 52,
+            height: 176,
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              GameIcon(icon, size: 104 * iconScale),
+              if (stars > 0)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        for (var i = 0; i < stars; i++)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 2),
+                            child: GameIcon('star', size: 30),
+                          ),
+                      ]),
+                ),
+            ]),
+          ),
+          // Name ribbon.
+          Positioned(
+            left: 62,
+            right: 62,
+            top: 250,
+            height: 36,
+            child: Center(
+              child: FitLine(
+                child: IconText(name,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 24,
+                        height: 1.1,
+                        fontWeight: FontWeight.w900)),
+              ),
+            ),
+          ),
+          // Description window (+ optional footer: price / tap again).
+          Positioned(
+            left: 42,
+            right: 42,
+            top: 304,
+            height: 132,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: SizedBox(
+                width: 236,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconText(body,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontSize: 22,
+                            height: 1.2,
+                            fontWeight: FontWeight.w700,
+                            color: Palette.inkSoft)),
+                    if (footer != null) ...[
+                      const SizedBox(height: 8),
+                      footer!,
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (checked)
+            const Positioned(
+                right: 26, top: 30, child: GameIcon('check', size: 44)),
+          if (synergy)
+            const Positioned(
+                left: 26, bottom: 30, child: GameIcon('bolt', size: 36)),
+        ]),
+      ),
+    );
+  }
 }

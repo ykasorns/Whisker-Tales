@@ -16,8 +16,7 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
     for (final f in dir.listSync().whereType<File>()) {
       final name = f.uri.pathSegments.last;
       if (name.startsWith('Roboto-') && name.endsWith('.ttf')) {
-        loader.addFont(
-            f.readAsBytes().then((b) => ByteData.sublistView(b)));
+        loader.addFont(f.readAsBytes().then((b) => ByteData.sublistView(b)));
       }
     }
     await loader.load();

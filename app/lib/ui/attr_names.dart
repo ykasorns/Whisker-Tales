@@ -44,7 +44,7 @@ String? attrIconId(Attribute a) {
   if (a == Attribute.crit) return 'crit';
   if (a == Attribute.evade) return 'evade';
   if (a == Attribute.skillDmg) return 'sparkle';
-  final snake = a.name.replaceAllMapped(
-      RegExp('[A-Z]'), (m) => '_${m[0]!.toLowerCase()}');
+  final snake = a.name
+      .replaceAllMapped(RegExp('[A-Z]'), (m) => '_${m[0]!.toLowerCase()}');
   return 'stat_$snake';
 }

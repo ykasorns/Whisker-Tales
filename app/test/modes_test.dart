@@ -12,8 +12,7 @@ class _Assets implements ContentSource {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('story and the dungeon register from their bundled manifests',
-      () async {
+  test('story and the dungeon register from their bundled manifests', () async {
     final content = await ContentRepository(_Assets()).loadAll();
     final registry =
         await registerModes(content.story, await loadDungeonJson(_Assets()));

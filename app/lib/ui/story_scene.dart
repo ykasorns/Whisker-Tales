@@ -1,10 +1,12 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
 import 'package:wt_mode_story/wt_mode_story.dart';
 
 import '../l10n/strings.dart';
+import 'battle_fx.dart';
 import 'frames.dart';
 import 'game_icon.dart';
 import 'palette.dart';
@@ -63,8 +65,12 @@ class _StorySceneState extends State<StoryScene> with TickerProviderStateMixin {
   int _lastDepth = -1;
   int _lastHit = 0;
   final List<_Float> _floats = [];
-  DateTime _enemyHitAt = DateTime.fromMillisecondsSinceEpoch(0);
-  DateTime _catHitAt = DateTime.fromMillisecondsSinceEpoch(0);
+  final List<({int serial, ProjectileSpec spec})> _arrows = [];
+  DateTime _enemyHitAt = epoch;
+  DateTime _catHitAt = epoch;
+  // Attack poses follow the real hit events, like the main battle.
+  DateTime _catAttackAt = epoch;
+  DateTime _enemyAttackAt = epoch;
 
   StoryRunController get controller => widget.controller;
 
@@ -137,6 +143,21 @@ class _StorySceneState extends State<StoryScene> with TickerProviderStateMixin {
     for (final h in controller.hits) {
       if (h.serial <= _lastHit) continue;
       _lastHit = h.serial;
+      if (h.onCat) {
+        _enemyAttackAt = DateTime.now();
+      } else {
+        _catAttackAt = DateTime.now();
+        final spec = ProviderScope.containerOf(context, listen: false)
+            .read(avatarRulesProvider)
+            ?.projectiles[controller.classId];
+        if (spec != null && !_reduced) {
+          final entry = (serial: h.serial, spec: spec);
+          _arrows.add(entry);
+          Future.delayed(Duration(milliseconds: spec.flightMs + 40), () {
+            if (mounted) setState(() => _arrows.remove(entry));
+          });
+        }
+      }
       if (h.outcome == HitOutcome.dodge || h.damage <= 0) continue;
       if (h.onCat) {
         _catHitAt = DateTime.now();
@@ -188,22 +209,38 @@ class _StorySceneState extends State<StoryScene> with TickerProviderStateMixin {
             cat: cat,
             enemy: enemy,
             groundGap: h - gy,
+            catAttack:
+                DateTime.now().difference(_catAttackAt).inMilliseconds < 280,
+            enemyAttack:
+                DateTime.now().difference(_enemyAttackAt).inMilliseconds < 320,
             catHurt: _recent(_catHitAt),
             enemyHurt: _recent(_enemyHitAt),
             statusIcons: widget.statusIcons,
           ),
         ),
+        for (final shot in _arrows)
+          ArrowFlightFx(
+            key: ValueKey('arrow-${shot.serial}'),
+            spec: shot.spec,
+            sceneHeight: h,
+            from: Offset(24 + 52 + h * shot.spec.muzzleX,
+                h - (h - gy) * .35 + h * shot.spec.muzzleY),
+            to: Offset(w - 24 - 70, h - (h - gy) * .35 - 60),
+          ),
         for (final f in _floats)
-          _HitSpark(
+          HitSparkFx(
             key: ValueKey('spark-${f.hit.serial}'),
-            hit: f.hit,
+            onCat: f.hit.onCat,
+            crit: f.hit.outcome == HitOutcome.crit,
             left: f.hit.onCat ? 24 : w - 112,
             bottom: (h - gy) + 52,
           ),
         for (final f in _floats)
-          _HitNumber(
+          HitNumberFx(
             key: ValueKey(f.hit.serial),
-            hit: f.hit,
+            damage: f.hit.damage,
+            onCat: f.hit.onCat,
+            crit: f.hit.outcome == HitOutcome.crit,
             left: f.hit.onCat ? 40 : w - 150,
             bottom: (h - gy) + 96,
             onDone: () {
@@ -281,6 +318,8 @@ class _Actors extends StatelessWidget {
     required this.cat,
     required this.enemy,
     required this.groundGap,
+    required this.catAttack,
+    required this.enemyAttack,
     required this.catHurt,
     required this.enemyHurt,
     required this.statusIcons,
@@ -288,7 +327,7 @@ class _Actors extends StatelessWidget {
 
   final StoryRunController controller;
   final double phase, arrive, groundGap;
-  final bool walking, catHurt, enemyHurt;
+  final bool walking, catAttack, enemyAttack, catHurt, enemyHurt;
   final UnitView? cat;
   final UnitView? enemy;
   final Widget Function(List<CombatStatusView>) statusIcons;
@@ -297,8 +336,8 @@ class _Actors extends StatelessWidget {
 
   String get catFrame {
     if (fighting) {
-      if (phase < .22) return 'attack';
-      if (catHurt || (phase >= .58 && phase < .72)) return 'hurt';
+      if (catHurt) return 'hurt';
+      if (catAttack) return 'attack';
       return 'idle';
     }
     if (controller.panel == StoryRunPanel.result) {
@@ -311,14 +350,14 @@ class _Actors extends StatelessWidget {
   }
 
   String get enemyFrame {
-    if (phase >= .45 && phase < .66) return 'attack';
+    if (enemyAttack) return 'attack';
     return 'idle_f${(phase * 3).floor().clamp(0, 2) + 1}';
   }
 
   @override
   Widget build(BuildContext context) {
-    final catAdvance = fighting && phase < .22 ? 16.0 : 0.0;
-    final enemyAdvance = fighting && phase >= .45 && phase < .66 ? 14.0 : 0.0;
+    final catAdvance = fighting && catAttack ? 16.0 : 0.0;
+    final enemyAdvance = fighting && enemyAttack ? 14.0 : 0.0;
     final bob = walking
         ? math.sin(phase * math.pi * 6).abs() * 5
         : math.sin(phase * math.pi * 2) * 1.5;
@@ -400,103 +439,6 @@ Widget storyPortrait(String id, double size) => Image.asset(
     );
 
 /// A painted impact burst that pops and fades once under a hit number.
-class _HitSpark extends StatelessWidget {
-  const _HitSpark({
-    super.key,
-    required this.hit,
-    required this.left,
-    required this.bottom,
-  });
-
-  final StoryHit hit;
-  final double left, bottom;
-
-  @override
-  Widget build(BuildContext context) {
-    final name = hit.onCat
-        ? 'fx_hit_hurt'
-        : (hit.outcome == HitOutcome.crit ? 'fx_hit_crit' : 'fx_hit_white');
-    final size = hit.outcome == HitOutcome.crit ? 92.0 : 70.0;
-    return Positioned(
-      left: left,
-      bottom: bottom,
-      child: IgnorePointer(
-        child: TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0, end: 1),
-          duration: const Duration(milliseconds: 380),
-          builder: (_, t, __) => Opacity(
-            opacity: (1 - t * t).clamp(0, 1),
-            child: Transform.scale(
-              scale: 0.5 +
-                  0.8 * Curves.easeOutBack.transform(math.min(1, t * 1.6)),
-              child: Image.asset('assets/game/story/fx/$name.png',
-                  width: size,
-                  height: size,
-                  filterQuality: FilterQuality.medium),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// A hit number that pops, drifts up and fades once.
-class _HitNumber extends StatelessWidget {
-  const _HitNumber({
-    super.key,
-    required this.hit,
-    required this.left,
-    required this.bottom,
-    required this.onDone,
-  });
-
-  final StoryHit hit;
-  final double left, bottom;
-  final VoidCallback onDone;
-
-  @override
-  Widget build(BuildContext context) {
-    final crit = hit.outcome == HitOutcome.crit;
-    final color =
-        hit.onCat ? Palette.coral : (crit ? Palette.sun : Colors.white);
-    return Positioned(
-      left: left,
-      bottom: bottom,
-      child: IgnorePointer(
-        child: TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0, end: 1),
-          duration: const Duration(milliseconds: 850),
-          onEnd: onDone,
-          builder: (_, t, __) => Opacity(
-            opacity: (1 - t * t).clamp(0, 1),
-            child: Transform.translate(
-              offset: Offset(0, -46 * Curves.easeOut.transform(t)),
-              child: Transform.scale(
-                scale:
-                    0.7 + 0.5 * Curves.elasticOut.transform(math.min(1, t * 2)),
-                child: Text(
-                  hit.onCat ? '-${hit.damage}' : '${hit.damage}',
-                  style: TextStyle(
-                    color: color,
-                    fontSize: crit ? 26 : 19,
-                    fontWeight: FontWeight.w900,
-                    height: 1,
-                    shadows: const [
-                      Shadow(color: Palette.ink, blurRadius: 2),
-                      Shadow(color: Palette.ink, offset: Offset(1, 1)),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 /// HP and talent progress on the long wood plate; its round button is the
 /// quit button.
 class _HpPlate extends StatelessWidget {

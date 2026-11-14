@@ -94,8 +94,8 @@ class _GameShellState extends ConsumerState<GameShell>
       if (!mounted || !research.notifyDone) return;
       final s = AppLocalizations.of(context);
       final node = research.rules.byId(e.nodeId)!;
-      ScaffoldMessenger.of(context).showSnackBar(kitToast(IconText(
-          s.researchDone(s.lang == 'en' ? node.nameEn : node.nameTh, e.level))));
+      ScaffoldMessenger.of(context).showSnackBar(kitToast(IconText(s
+          .researchDone(s.lang == 'en' ? node.nameEn : node.nameTh, e.level))));
     });
   }
 

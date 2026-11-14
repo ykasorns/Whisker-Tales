@@ -239,7 +239,8 @@ class _PetsTabState extends ConsumerState<PetsTab> {
                         if (stars != null) ...[
                           const SizedBox(height: 2),
                           FitLine(
-                            child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            child:
+                                Row(mainAxisSize: MainAxisSize.min, children: [
                               for (var i = 0; i < stars; i++)
                                 const GameIcon('star', size: 12),
                               const SizedBox(width: 4),

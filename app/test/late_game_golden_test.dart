@@ -60,9 +60,9 @@ void main() {
       ..['goldfish'] = 5500000
       ..['yarn'] = 400
       ..['eggs'] = 8;
-    doc['cat'] = const CatState(
-            level: 119, exp: 4000, classId: 'archer', tier: 1)
-        .toJson();
+    doc['cat'] =
+        const CatState(level: 119, exp: 4000, classId: 'archer', tier: 1)
+            .toJson();
     (doc['idle'] as Map<String, dynamic>)['cleared_page'] = 50;
     doc['pets'] = {
       'owned': {

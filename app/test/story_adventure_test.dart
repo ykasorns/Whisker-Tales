@@ -23,12 +23,27 @@ class _DiskSource implements ContentSource {
 /// A readable combat snapshot whose timers move only when a test asks them
 /// to. This keeps combat goldens stable while retaining the real panel data.
 class _StillEngine implements ICombatEngine, IBuffEngine {
-  _StillEngine({this.damageOnFirstTick = 0});
+  _StillEngine({this.damageOnFirstTick = 0}) {
+    last = this;
+  }
 
   final int damageOnFirstTick;
   final _events = StreamController<CombatEvent>.broadcast(sync: true);
   List<UnitView> _view = const [];
   bool _damaged = false;
+  static _StillEngine? last;
+
+  /// One normal hit from the cat on the enemy, on demand.
+  void fireHit() {
+    final enemy = _view.last;
+    _events.add(HitResolved(
+        atMs: 0,
+        attackerId: _view.first.id,
+        targetId: enemy.id,
+        outcome: HitOutcome.normal,
+        damage: 7,
+        targetHp: enemy.hp));
+  }
 
   @override
   Stream<CombatEvent> get events => _events.stream;
@@ -389,20 +404,40 @@ void main() {
     expect(find.byKey(const Key('story-cat')), findsOneWidget);
     expect(find.byKey(const Key('story-enemy')), findsNothing);
 
-    final fight = combatRun();
+    StoryRunController? hitting;
+    for (var seed = 0; seed < 100 && hitting == null; seed++) {
+      final candidate = makeRun(seed, engineFactory: _StillEngine.new);
+      final combat = candidate.routeChoices.where((choice) =>
+          choice.type == EncounterType.combat ||
+          choice.type == EncounterType.boss);
+      if (combat.isNotEmpty) {
+        candidate.advance(routeId: combat.first.routeId);
+        hitting = candidate;
+      } else {
+        candidate.dispose();
+      }
+    }
+    final fight = hitting!;
     addTearDown(fight.dispose);
     await mount(tester, fight, key: UniqueKey());
     String catAsset() =>
         (tester.widget<Image>(find.byKey(const Key('story-cat'))).image
                 as AssetImage)
             .assetName;
-    final firstPose = catAsset();
-    var changed = false;
-    for (var i = 0; i < 6 && !changed; i++) {
-      await tester.pump(const Duration(milliseconds: 200));
-      changed = catAsset() != firstPose;
-    }
-    expect(changed, isTrue);
+    // a real hit makes Mochi swing; a moment later she is idle again
+    await tester
+        .runAsync(() => Future.delayed(const Duration(milliseconds: 400)));
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(catAsset().endsWith('_idle.png'), isTrue);
+    _StillEngine.last!.fireHit();
+    fight.tick(1);
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(catAsset().endsWith('_attack.png'), isTrue);
+    await tester
+        .runAsync(() => Future.delayed(const Duration(milliseconds: 400)));
+
+    await tester.pump(const Duration(milliseconds: 16));
+    expect(catAsset().endsWith('_idle.png'), isTrue);
     expect(find.byKey(const Key('story-enemy')), findsOneWidget);
   });
 

@@ -7,6 +7,7 @@ import 'package:wt_core/wt_core.dart';
 import 'package:wt_mode_dungeon/wt_mode_dungeon.dart';
 
 import '../l10n/strings.dart';
+import 'battle_fx.dart';
 import 'frames.dart';
 import 'game_icon.dart';
 import 'palette.dart';
@@ -155,6 +156,10 @@ class _DungeonPageState extends ConsumerState<DungeonPage>
   _Stage _stage = _Stage.ready;
   int _level = 1;
   int _lastHit = 0;
+  // strike poses follow the real hits, like the main battle
+  DateTime _catAttackAt = epoch, _bossAttackAt = epoch;
+  DateTime _catHitAt = epoch, _bossHitAt = epoch;
+  final _arrows = <({int serial, ProjectileSpec spec})>[];
   final _floats =
       <({int serial, bool onCat, int damage, HitOutcome o, int at})>[];
 
@@ -247,6 +252,23 @@ class _DungeonPageState extends ConsumerState<DungeonPage>
     for (final h in run.hits) {
       if (h.serial > _lastHit) {
         _lastHit = h.serial;
+        if (h.onCat) {
+          _bossAttackAt = DateTime.now();
+          if (h.outcome != HitOutcome.dodge) _catHitAt = DateTime.now();
+        } else {
+          _catAttackAt = DateTime.now();
+          if (h.outcome != HitOutcome.dodge) _bossHitAt = DateTime.now();
+          final spec = ref
+              .read(avatarRulesProvider)
+              ?.projectiles[ref.read(catClassProvider).current];
+          if (spec != null) {
+            final entry = (serial: h.serial, spec: spec);
+            _arrows.add(entry);
+            Future.delayed(Duration(milliseconds: spec.flightMs + 40), () {
+              if (mounted) setState(() => _arrows.remove(entry));
+            });
+          }
+        }
         _floats.add((
           serial: h.serial,
           onCat: h.onCat,
@@ -256,7 +278,7 @@ class _DungeonPageState extends ConsumerState<DungeonPage>
         ));
       }
     }
-    _floats.removeWhere((f) => run.elapsedMs - f.at > 700);
+    _floats.removeWhere((f) => run.elapsedMs - f.at > 900);
     if (!run.running) {
       _ticker.stop();
       _stage = _Stage.result;
@@ -310,9 +332,11 @@ class _DungeonPageState extends ConsumerState<DungeonPage>
     return LayoutBuilder(builder: (context, box) {
       final w = box.maxWidth, h = box.maxHeight;
       final gy = h * 0.84;
-      Widget tile(String name, double th, double bottom) {
+      // The painted layers are opaque, so far/mid layers fade in from their
+      // top edge instead of showing as hard stacked bands.
+      Widget tile(String name, double th, double bottom, {double fade = 0}) {
         final tw = th * (_bgAspect[name] ?? 1);
-        return Stack(clipBehavior: Clip.hardEdge, children: [
+        final strip = Stack(clipBehavior: Clip.hardEdge, children: [
           for (var x = 0.0; x < w; x += tw - 1)
             Positioned(
               left: x,
@@ -323,24 +347,41 @@ class _DungeonPageState extends ConsumerState<DungeonPage>
                   fit: BoxFit.fill, filterQuality: FilterQuality.low),
             ),
         ]);
+        if (fade <= 0) return strip;
+        return ShaderMask(
+          blendMode: BlendMode.dstIn,
+          shaderCallback: (r) => LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: const [Color(0x00000000), Color(0xFF000000)],
+            stops: [
+              (bottom - th) / r.height,
+              ((bottom - th) + th * fade) / r.height
+            ].map((v) => v.clamp(0.0, 1.0)).toList(),
+          ).createShader(r),
+          child: strip,
+        );
       }
 
-      final bossFrame = phase >= .45 && phase < .66
+      final bossFrame = recentAt(_bossAttackAt, 320)
           ? 'attack'
           : 'idle_f${(phase * 3).floor().clamp(0, 2) + 1}';
+      final catAttacking = showFight && recentAt(_catAttackAt, 280);
       final catFrame = !showFight
           ? 'idle'
-          : phase < .22
-              ? 'attack'
-              : 'idle';
+          : recentAt(_catHitAt, 220)
+              ? 'hurt'
+              : catAttacking
+                  ? 'attack'
+                  : 'idle';
       final sprite = rules.spriteOf(_level);
       return Stack(clipBehavior: Clip.hardEdge, children: [
         tile('L0_back', h, h),
-        tile('L1_far', h * .7, gy + h * .04),
-        tile('L2_mid', h * .62, gy + h * .06),
-        tile('L3_ground', (h - gy) / .3, h),
+        tile('L1_far', h * .7, gy + h * .04, fade: .45),
+        tile('L2_mid', h * .62, gy + h * .06, fade: .4),
+        tile('L3_ground', (h - gy) / .3, h, fade: .12),
         Positioned(
-          left: 24 + (showFight && phase < .22 ? 16 : 0),
+          left: 24 + (catAttacking ? 16 : 0),
           bottom: (h - gy) * .35,
           child: Image.asset(
             'assets/game/cat/outfit_${ref.read(catClassProvider).current}_$catFrame.png',
@@ -356,13 +397,17 @@ class _DungeonPageState extends ConsumerState<DungeonPage>
           ),
         ),
         Positioned(
-          right: 18,
+          right: 18 + (recentAt(_bossAttackAt, 320) ? 14 : 0),
           bottom: (h - gy) * .35 + 4,
           child: Opacity(
             opacity: boss != null && !boss.alive ? .35 : 1,
             child: Image.asset(
               'assets/game/mon/${sprite}_${boss != null && !boss.alive ? 'defeated' : showFight ? bossFrame : 'idle_f1'}.png',
               key: const Key('dungeon-boss'),
+              color: recentAt(_bossHitAt, 150)
+                  ? Colors.white.withValues(alpha: .55)
+                  : null,
+              colorBlendMode: BlendMode.srcATop,
               width: 170,
               height: 170,
               fit: BoxFit.contain,
@@ -370,29 +415,33 @@ class _DungeonPageState extends ConsumerState<DungeonPage>
             ),
           ),
         ),
-        for (final f in _floats)
-          Positioned(
-            key: ValueKey(f.serial),
-            left: f.onCat ? 40 : w - 150,
-            bottom: (h - gy) + 100 + ((t - f.at) / 700) * 40,
-            child: Opacity(
-              opacity: (1 - (t - f.at) / 700).clamp(0.0, 1.0),
-              child: Text(
-                f.o == HitOutcome.dodge ? '·' : '${f.damage}',
-                style: TextStyle(
-                    fontSize: f.o == HitOutcome.crit ? 22 : 16,
-                    fontWeight: FontWeight.w900,
-                    color: f.onCat
-                        ? Palette.coral
-                        : f.o == HitOutcome.crit
-                            ? const Color(0xFFE8742B)
-                            : Palette.ink,
-                    shadows: const [
-                      Shadow(color: Palette.paper, blurRadius: 3)
-                    ]),
-              ),
-            ),
+        for (final shot in _arrows)
+          ArrowFlightFx(
+            key: ValueKey('arrow-${shot.serial}'),
+            spec: shot.spec,
+            sceneHeight: h,
+            from: Offset(24 + 52 + h * shot.spec.muzzleX,
+                h - (h - gy) * .35 + h * shot.spec.muzzleY),
+            to: Offset(w - 18 - 85, h - (h - gy) * .35 - 85),
           ),
+        for (final f in _floats) ...[
+          HitSparkFx(
+            key: ValueKey('spark-${f.serial}'),
+            onCat: f.onCat,
+            crit: f.o == HitOutcome.crit,
+            left: f.onCat ? 24 : w - 112,
+            bottom: (h - gy) + 52,
+          ),
+          if (f.o != HitOutcome.dodge)
+            HitNumberFx(
+              key: ValueKey(f.serial),
+              damage: f.damage,
+              onCat: f.onCat,
+              crit: f.o == HitOutcome.crit,
+              left: f.onCat ? 40 : w - 150,
+              bottom: (h - gy) + 96,
+            ),
+        ],
         Positioned(
           left: 8,
           right: 8,

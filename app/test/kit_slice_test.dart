@@ -13,8 +13,8 @@ import 'package:whisker_tales/ui/palette.dart';
 /// a real rectangle strictly inside the picture, with a border on each side.
 void main() {
   (int, int) pngSize(String path) {
-    final b = ByteData.sublistView(Uint8List.fromList(
-        File(path).openSync().readSync(24)));
+    final b = ByteData.sublistView(
+        Uint8List.fromList(File(path).openSync().readSync(24)));
     return (b.getUint32(16), b.getUint32(20));
   }
 

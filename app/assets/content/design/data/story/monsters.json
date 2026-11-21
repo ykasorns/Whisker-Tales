@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "_doc": "T-026 · พลังเป็นเปอร์เซ็นต์ของ Power snapshot ตอนเริ่ม Run · stat_weights แบ่งบุคลิก HP/ATK/DEF · ตัวเลข ASSUMPTION รอจูนกับ T-028",
+  "schema_version": 2,
+  "_doc": "T-026 · พลังเป็นเปอร์เซ็นต์ของ Power snapshot ตอนเริ่ม Run · stat_weights แบ่งบุคลิก HP/ATK/DEF · ตัวเลข ASSUMPTION · boss_pattern (v2, T-028, D-070): phase2_hp_pct = เริ่มเฟส 2 เมื่อ HP เหลือกี่ % แล้วได้ phase2_buffs ครั้งเดียว · skill = ท่าตีแรงร่ายเองตาม cooldown, damage_pct ของ ATK, telegraph_ms = เวลาที่ฉากโชว์ท่าเตือนก่อนร่าย",
   "monsters": [
     {
       "id": "eraserslime",
@@ -75,10 +75,15 @@
       "role": "boss",
       "is_boss": true,
       "weight": 0,
-      "power_pct": 125,
-      "stat_weights": { "hp": 46, "atk": 38, "def": 16 },
-      "attack_interval_ms": 1250,
-      "on_hit_buffs": []
+      "power_pct": 172,
+      "stat_weights": { "hp": 103, "atk": 1, "def": 1 },
+      "attack_interval_ms": 1500,
+      "on_hit_buffs": [],
+      "boss_pattern": {
+        "phase2_hp_pct": 65,
+        "phase2_buffs": ["paperwolf_rage_atk", "paperwolf_rage_speed"],
+        "skill": { "id": "paper_storm", "cooldown_ms": 8000, "damage_pct": 180, "telegraph_ms": 1200 }
+      }
     }
   ]
 }

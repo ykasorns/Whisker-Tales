@@ -90,6 +90,31 @@ class StoryRunController extends ChangeNotifier {
   int captionSerial = 0;
   bool _combatClosing = false;
 
+  /// Boss fight phase (T-028, D-070): 1, then 2 once the boss HP falls to
+  /// its pattern's threshold. Always 1 for ordinary monsters.
+  int bossPhase = 1;
+
+  /// True while the boss is winding up its heavy hit: the scene shows the
+  /// warning pose and "!" (read from the engine's own skill timer).
+  bool get bossTelegraph {
+    final node = encounter;
+    final pattern =
+        node == null ? null : mode.content.monsters[node.contentId]?.pattern;
+    final engine = _combat;
+    if (pattern == null || engine == null || _combatClosing) return false;
+    for (final unit in engine.view) {
+      if (unit.id != node!.contentId || !unit.alive) continue;
+      for (final skill in unit.skills) {
+        if (skill.id == pattern.skillId &&
+            skill.remainingMs > 0 &&
+            skill.remainingMs <= pattern.telegraphMs) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   StorySave get save => _save;
 
   /// The lines to tell for [captionKey]: the opening and the endings in full,
@@ -222,6 +247,7 @@ class StoryRunController extends ChangeNotifier {
   void tick(int milliseconds) {
     if (panel != StoryRunPanel.combat || milliseconds <= 0) return;
     _combat?.tick(milliseconds);
+    _drainCombatEvents();
     notifyListeners();
   }
 
@@ -331,8 +357,14 @@ class StoryRunController extends ChangeNotifier {
     _combatSub?.cancel();
     _combat = engine;
     _combatClosing = false;
+    bossPhase = 1;
     hits.clear();
-    _combatSub = engine.events.listen(_onCombatEvent);
+    _pendingEvents.clear();
+    // The engine's event stream is synchronous: applying a buff from inside
+    // a listener would fire an event while one is firing (StateError, and
+    // the effect is lost). Queue events and handle them after the engine
+    // call returns.
+    _combatSub = engine.events.listen(_pendingEvents.add);
     final enemy = _monsterSpec(monster, manager.current!.cat.power);
     engine.start(CombatSetup(
       seed: mixSeed([manager.current!.config.seed, node.depth, 0xC08A7]),
@@ -351,6 +383,7 @@ class StoryRunController extends ChangeNotifier {
     items.resolve(EffectTrigger.passive, context);
     talents.resolve(EffectTrigger.passive, context);
     panel = StoryRunPanel.combat;
+    _drainCombatEvents();
   }
 
   CombatUnitSpec _monsterSpec(StoryMonster monster, int catPower) {
@@ -372,7 +405,26 @@ class StoryRunController extends ChangeNotifier {
       ),
       attackIntervalMs: monster.attackIntervalMs,
       isBoss: monster.isBoss,
+      skills: [
+        if (monster.pattern case final p?)
+          SkillSpec(
+            id: p.skillId,
+            cooldownMs: p.skillCooldownMs,
+            target: SkillTarget.front,
+            damagePct: p.skillDamagePct,
+          ),
+      ],
     );
+  }
+
+  final List<CombatEvent> _pendingEvents = [];
+
+  void _drainCombatEvents() {
+    while (_pendingEvents.isNotEmpty) {
+      final next = _pendingEvents.removeAt(0);
+      _onCombatEvent(next);
+      if (next is CombatEnded) _pendingEvents.clear();
+    }
   }
 
   void _onCombatEvent(CombatEvent combatEvent) {
@@ -381,6 +433,7 @@ class StoryRunController extends ChangeNotifier {
     if (engine == null || engine is! IBuffEngine || node == null) return;
     final buffEngine = engine as IBuffEngine;
     final enemyId = node.contentId;
+    _checkBossPhase(engine, buffEngine, enemyId);
     final context = RunEffectContext(
       ownerUnitId: cat.id,
       enemyUnitId: enemyId,
@@ -443,6 +496,22 @@ class StoryRunController extends ChangeNotifier {
         }
         _completeEncounter(playerWon);
       default:
+    }
+  }
+
+  void _checkBossPhase(
+      ICombatEngine engine, IBuffEngine buffEngine, String? enemyId) {
+    final pattern = mode.content.monsters[enemyId]?.pattern;
+    if (pattern == null || bossPhase != 1 || _combatClosing) return;
+    for (final unit in engine.view) {
+      if (unit.id != enemyId || !unit.alive) continue;
+      if (unit.hp * 100 <= unit.maxHp * pattern.phase2HpPct) {
+        bossPhase = 2;
+        for (final buff in pattern.phase2Buffs) {
+          buffEngine.apply(unit.id, buff, sourceId: unit.id);
+        }
+        notifyListeners();
+      }
     }
   }
 

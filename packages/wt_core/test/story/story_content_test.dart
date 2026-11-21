@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -128,5 +129,66 @@ void main() {
           isTrue,
           reason: monster.id);
     }
+  });
+
+  group('boss_pattern (T-028, D-070)', () {
+    Map<String, dynamic> j(String name) => jsonDecode(
+            File('../../design/data/story/$name.json').readAsStringSync())
+        as Map<String, dynamic>;
+    final buffs = BuffBook.fromJson(
+        jsonDecode(File('../../design/data/buffs.json').readAsStringSync())
+            as Map<String, dynamic>);
+
+    StoryContent load(void Function(Map<String, dynamic> boss) edit) {
+      final monsters = j('monsters');
+      edit((monsters['monsters'] as List)
+          .cast<Map<String, dynamic>>()
+          .firstWhere((m) => m['is_boss'] == true));
+      return StoryContent.fromJson(
+        relicsJson: j('relics'),
+        talentsJson: j('talents'),
+        monstersJson: monsters,
+        eventsJson: j('events'),
+        balanceJson: j('balance'),
+        buffs: buffs,
+      );
+    }
+
+    Matcher fails(String text) => throwsA(isA<FormatException>()
+        .having((e) => e.message, 'message', contains(text)));
+
+    test('the paper wolf loads its two phases and heavy hit', () {
+      final p = story.monsters['paperwolf']!.pattern!;
+      expect(p.phase2HpPct, inInclusiveRange(1, 99));
+      expect(p.phase2Buffs, isNotEmpty);
+      expect(p.telegraphMs, lessThanOrEqualTo(p.skillCooldownMs));
+      expect(story.monsters.values.where((m) => !m.isBoss),
+          everyElement(predicate<StoryMonster>((m) => m.pattern == null)));
+    });
+
+    test('a boss without a pattern is rejected', () {
+      expect(() => load((b) => b.remove('boss_pattern')),
+          fails('needs boss_pattern'));
+    });
+
+    test('an unknown phase 2 buff is rejected', () {
+      expect(
+          () => load((b) =>
+              (b['boss_pattern'] as Map)['phase2_buffs'] = ['no_such_buff']),
+          fails('unknown buff "no_such_buff"'));
+    });
+
+    test('a telegraph longer than the cooldown is rejected', () {
+      expect(
+          () => load((b) => ((b['boss_pattern'] as Map)['skill']
+              as Map)['telegraph_ms'] = 999999),
+          fails('telegraph_ms'));
+    });
+
+    test('a phase 2 threshold outside 1 to 99 is rejected', () {
+      expect(
+          () => load((b) => (b['boss_pattern'] as Map)['phase2_hp_pct'] = 100),
+          fails('phase2_hp_pct'));
+    });
   });
 }

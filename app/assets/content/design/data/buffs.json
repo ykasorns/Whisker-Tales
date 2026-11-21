@@ -308,6 +308,22 @@
       "stack_max": 1
     },
     {
+      "id": "paperwolf_rage_atk",
+      "action": "attrib",
+      "params": { "attr": "atk", "mode": "pct", "value": 35 },
+      "duration_ms": -1,
+      "group": "paperwolf_rage_atk",
+      "stack_max": 1
+    },
+    {
+      "id": "paperwolf_rage_speed",
+      "action": "attrib",
+      "params": { "attr": "attack_speed", "mode": "add", "value": 25 },
+      "duration_ms": -1,
+      "group": "paperwolf_rage_speed",
+      "stack_max": 1
+    },
+    {
       "id": "story_crit_haste",
       "action": "attrib",
       "params": { "attr": "attack_speed", "mode": "add", "value": 30 },

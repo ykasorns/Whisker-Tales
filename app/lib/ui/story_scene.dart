@@ -274,7 +274,10 @@ class _StorySceneState extends State<StoryScene> with TickerProviderStateMixin {
               lines: controller.captionLines(s.lang),
             ),
           ),
-        if (controller.panel == StoryRunPanel.result)
+        // a beaten boss stays on stage in its own dizzy pose instead
+        if (controller.panel == StoryRunPanel.result &&
+            !(controller.completion?.result.outcome == RunOutcome.won &&
+                (enemy?.isBoss ?? false)))
           Positioned(
             right: 36,
             bottom: (h - gy) + 20,
@@ -334,6 +337,15 @@ class _Actors extends StatelessWidget {
 
   bool get fighting => controller.panel == StoryRunPanel.combat;
 
+  /// The boss stays on stage after it is beaten, dizzy (T-028, D-070).
+  bool get bossDown =>
+      controller.panel == StoryRunPanel.result &&
+      controller.completion?.result.outcome == RunOutcome.won &&
+      (enemy?.isBoss ?? false);
+
+  /// The boss winds up its heavy hit (read from the engine's skill timer).
+  bool get windUp => fighting && controller.bossTelegraph;
+
   String get catFrame {
     if (fighting) {
       if (catHurt) return 'hurt';
@@ -350,6 +362,8 @@ class _Actors extends StatelessWidget {
   }
 
   String get enemyFrame {
+    if (bossDown) return 'defeated';
+    if (windUp) return 'telegraph_f${(phase * 6).floor() % 2 + 1}';
     if (enemyAttack) return 'attack';
     return 'idle_f${(phase * 3).floor().clamp(0, 2) + 1}';
   }
@@ -402,12 +416,18 @@ class _Actors extends StatelessWidget {
           ),
         ]),
       ),
-      if (fighting && enemy != null)
+      if ((fighting || bossDown) && enemy != null)
         Positioned(
           right: 24 + enemyAdvance - enter + shake,
           bottom: bottom + 4,
           child: Column(children: [
-            statusIcons(enemy!.statuses),
+            if (bossDown)
+              // the defeated art already has spiral eyes and a puff of smoke
+              const SizedBox(key: Key('boss-dizzy'), height: 8)
+            else if (windUp)
+              _WarnMark(key: const Key('boss-warn'), phase: phase)
+            else
+              statusIcons(enemy!.statuses),
             ColorFiltered(
               colorFilter: enemyHurt
                   ? const ColorFilter.mode(Color(0x99FFFFFF), BlendMode.srcATop)
@@ -424,6 +444,31 @@ class _Actors extends StatelessWidget {
           ]),
         ),
     ]);
+  }
+}
+
+/// The "!" over a boss winding up its heavy hit (T-028, D-070): coral ink
+/// with a cream edge, pulsing so it reads at a glance.
+class _WarnMark extends StatelessWidget {
+  const _WarnMark({super.key, required this.phase});
+  final double phase;
+
+  @override
+  Widget build(BuildContext context) {
+    final scale = 1 + math.sin(phase * math.pi * 8).abs() * .18;
+    const style = TextStyle(fontSize: 34, fontWeight: FontWeight.w900);
+    return Transform.scale(
+      scale: scale,
+      child: Stack(children: [
+        Text('!',
+            style: style.copyWith(
+                foreground: Paint()
+                  ..style = PaintingStyle.stroke
+                  ..strokeWidth = 6
+                  ..color = Palette.paper)),
+        Text('!', style: style.copyWith(color: Palette.coral)),
+      ]),
+    );
   }
 }
 

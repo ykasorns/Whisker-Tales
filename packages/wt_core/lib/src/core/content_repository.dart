@@ -133,7 +133,7 @@ class ContentRepository {
     'design/data/audio.json': 1,
     'design/data/story/relics.json': 1,
     'design/data/story/talents.json': 1,
-    'design/data/story/monsters.json': 1,
+    'design/data/story/monsters.json': 2, // v2: boss_pattern (T-028)
     'design/data/story/events.json': 1,
     'design/data/story/balance.json': 1,
   };

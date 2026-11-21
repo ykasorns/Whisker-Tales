@@ -87,12 +87,38 @@ class StoryMonster {
     required this.defWeight,
     required this.attackIntervalMs,
     required this.onHitBuffs,
+    this.pattern,
   });
 
   final String id, nameTh, nameEn, sprite, role;
   final bool isBoss;
   final int weight, powerPct, hpWeight, atkWeight, defWeight, attackIntervalMs;
   final List<String> onHitBuffs;
+
+  /// The boss fight pattern (T-028, D-070); null for ordinary monsters.
+  final StoryBossPattern? pattern;
+}
+
+/// A boss's two-phase pattern (T-028, D-070): a telegraphed heavy hit cast
+/// on its own cooldown, and a rage that starts once when HP falls to
+/// [phase2HpPct] % of max.
+class StoryBossPattern {
+  const StoryBossPattern({
+    required this.phase2HpPct,
+    required this.phase2Buffs,
+    required this.skillId,
+    required this.skillCooldownMs,
+    required this.skillDamagePct,
+    required this.telegraphMs,
+  });
+
+  final int phase2HpPct;
+  final List<String> phase2Buffs;
+  final String skillId;
+  final int skillCooldownMs, skillDamagePct;
+
+  /// How long before the heavy hit the scene shows the warning pose.
+  final int telegraphMs;
 }
 
 class StoryEventOutcome {
@@ -483,6 +509,39 @@ class StoryContent {
           throw FormatException('$owner: unknown buff "$id"');
         }
       }
+      StoryBossPattern? pattern;
+      if (m['boss_pattern'] case final Map<String, dynamic> b) {
+        final po = '$owner boss_pattern';
+        final rage = (b['phase2_buffs'] as List? ?? const []).cast<String>();
+        if (rage.isEmpty) {
+          throw FormatException('$po: phase2_buffs needs at least one buff');
+        }
+        for (final r in rage) {
+          if (!buffs.defs.containsKey(r)) {
+            throw FormatException('$po: unknown buff "$r"');
+          }
+        }
+        final skill = b['skill'];
+        if (skill is! Map<String, dynamic>) {
+          throw FormatException('$po: skill must be an object');
+        }
+        final cooldown =
+            integer(skill, 'cooldown_ms', '$po skill', min: 1000);
+        pattern = StoryBossPattern(
+          phase2HpPct: integer(b, 'phase2_hp_pct', po, min: 1, max: 99),
+          phase2Buffs: List.unmodifiable(rage),
+          skillId: text(skill, 'id', '$po skill'),
+          skillCooldownMs: cooldown,
+          skillDamagePct: integer(skill, 'damage_pct', '$po skill', min: 1),
+          telegraphMs: integer(skill, 'telegraph_ms', '$po skill',
+              min: 300, max: cooldown),
+        );
+      } else if (m.containsKey('boss_pattern')) {
+        throw FormatException('$owner: boss_pattern must be an object');
+      }
+      if (m['is_boss'] == true && pattern == null) {
+        throw FormatException('$owner: a boss needs boss_pattern (T-028)');
+      }
       monsters[id] = StoryMonster(
         id: id,
         nameTh: text(m, 'name_th', owner),
@@ -497,6 +556,7 @@ class StoryContent {
         defWeight: integer(stats, 'def', '$owner stat_weights', min: 1),
         attackIntervalMs: integer(m, 'attack_interval_ms', owner, min: 200),
         onHitBuffs: List.unmodifiable(onHit),
+        pattern: pattern,
       );
     }
     if (monsters.values.where((m) => m.isBoss).length != 1) {

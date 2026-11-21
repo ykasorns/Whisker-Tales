@@ -25,6 +25,10 @@ class GameDriver {
   final ui$ = ValueNotifier<int>(0);
   double _sinceUi = 0;
 
+  /// Seconds left of Mochi's happy pose (T-049: the first knit). Drawn only;
+  /// the fight goes on underneath.
+  double cheer = 0;
+
   void tick(double dt) {
     // music follows the scene (T-024): the boss track while a boss fight
     // runs, crossfading in real time whatever the game speed
@@ -330,6 +334,10 @@ class BattleGame extends FlameGame {
       if (loop.fightId != _seenFight) _spawn();
       _attackT -= dt;
       mochi.play(_attackT > 0 ? 'attack' : 'idle');
+    }
+    if (driver.cheer > 0) {
+      driver.cheer -= dt;
+      mochi.play('victory');
     }
   }
 

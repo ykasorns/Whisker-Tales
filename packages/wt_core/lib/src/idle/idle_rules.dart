@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import '../core/contracts/gear_basket.dart';
 import '../core/contracts/rewards.dart';
 
 /// `enemy`, `pages`, `income` and `player` from `idle_balance_v1.json`
@@ -44,7 +45,20 @@ class IdleRules {
     bossFishWaves = _int(_income, 'boss_fish_mult_waves');
     eggPageBoss = _int(_income, 'egg_page_boss');
     eggChapterBoss = _int(_income, 'egg_chapter_boss');
+    final onboarding = _map(b, 'onboarding');
+    final slot = onboarding['first_knit_slot'];
+    firstKnitSlot = GearSlot.values.firstWhere((s) => s.name == slot,
+        orElse: () => throw FormatException(
+            'onboarding: "first_knit_slot" is not a gear slot: $slot'));
+    autoKnitUnlockPage = _int(onboarding, 'auto_knit_unlock_cleared_page');
   }
+
+  /// T-049: the slot a new game's first knit makes (worn at once).
+  late final GearSlot firstKnitSlot;
+
+  /// T-049: auto-knit and its "better" switch show from this many pages
+  /// cleared.
+  late final int autoKnitUnlockPage;
 
   factory IdleRules.fromBalance(Map<String, dynamic> balance) =>
       IdleRules._(balance);

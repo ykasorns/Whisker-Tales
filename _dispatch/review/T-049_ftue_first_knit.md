@@ -26,3 +26,19 @@ Module: app/ui | Priority: P1 | Owner: Claude | Depends: ไม่มี
 
 ## DoD
 ตาม GAME_CONTRACT §6 ทุกข้อ + ลองบนมือถือ Android จริงอย่างน้อย 1 เครื่อง + ย้าย card นี้ไป _dispatch/review/ พร้อมสรุปผล
+
+---
+## Amendment (D-072, 2026-11-21)
+D-024 ไม่วาดของบนตัวแมว · YK เลือกให้หมวกบินจากตะกร้าเข้าช่องหมวก แทน "โมจิในฉากใส่หมวก" · ข้อ Acceptance ที่ 2 จึงอ่านเป็น: กดครั้งแรกได้หมวก สวมทันที หมวกบินเข้าช่องหมวก โมจิทำท่าดีใจ · ตัวชี้หายไป
+
+## Delivery summary (2026-11-21, Claude)
+- ข้อมูล: `idle_balance_v1.json → onboarding` · `IdleRules.firstKnitSlot` / `autoKnitUnlockPage` ตรวจค่าตอนโหลด
+- `GameSaver.addProfileFlag` เขียน `profile.flags` (flag `first_knit`)
+- `FarmPanel`: ตัวชี้อุ้งเท้า + ลูกศรเด้งเหนือตะกร้า · กดครั้งแรกถัก + สวม ไม่เปิดชีต · หมวกบินโค้งเข้าช่อง ช่องเด้งพร้อม ✦ · ซ่อนปุ่มถักอัตโนมัติ/"ของดีกว่า" ก่อนหน้า 5
+- `GameDriver.cheer`: โมจิทำท่า victory 1.6 วินาที (แค่ภาพ การสู้เดินต่อ)
+
+### Verification
+- [x] save ใหม่เห็นตัวชี้ · [x] กดแรกได้หมวก สวมทันที ไม่มีชีต ตัวชี้หาย · [x] ก่อนหน้า 5 ไม่มีปุ่มถักอัตโนมัติ, หลังหน้า 5 มี · [x] save เก่าผ่านหน้า 5 ไม่เห็นตัวชี้ · [x] flag อยู่รอดหลังเซฟ/โหลด · [x] ไม่มีข้อความใหม่
+- `app/test/first_knit_test.dart` 6 เทสต์ + golden `goldens/onboarding/{th,en}_{pointer,worn}.png` · golden หน้าหลักเกมใหม่ 5 ภาพอัปเดตตามที่ตั้งใจ
+- wt_core 354 · wt_mode_story 10 · app 117 ผ่านทั้งหมด · analyze ไม่มี error/warning
+- [ ] **ยังไม่ได้ลองบนมือถือ Android จริง** (ใน DoD) · ท่า victory ของโมจิไม่ได้ตรวจด้วยภาพ (golden จับหลังท่าจบ)

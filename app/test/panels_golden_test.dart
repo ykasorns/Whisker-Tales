@@ -125,11 +125,19 @@ void main() {
           w.properties.selected != null);
       await tester.tap(labels.at(2));
       await tester.pump(const Duration(milliseconds: 300));
-      await tester.tap(find.byWidgetPredicate((w) =>
+      final basket = find.byWidgetPredicate((w) =>
           w is Semantics &&
           w.properties.button == true &&
           w.properties.label != null &&
-          (w.properties.label == 'ถักของ' || w.properties.label == 'Knit')));
+          (w.properties.label == 'ถักของ' || w.properties.label == 'Knit'));
+      // a new game's first tap knits and wears the first piece (T-049);
+      // the sheet opens from the second
+      await tester.tap(basket);
+      for (var i = 0; i < 15; i++) {
+        await tester.pump(const Duration(milliseconds: 100)); // fly, land
+      }
+      expect(find.byType(BottomSheet), findsNothing);
+      await tester.tap(basket);
       for (var i = 0; i < 5; i++) {
         await tester.pump(const Duration(milliseconds: 200));
       }

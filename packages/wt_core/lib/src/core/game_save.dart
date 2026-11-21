@@ -34,6 +34,18 @@ class GameSaver {
           ...l.whereType<String>(),
       };
 
+  /// Adds [flag] to `profile.flags`; saved with the next [capture].
+  void addProfileFlag(String flag) {
+    if (profileFlags.contains(flag)) return;
+    _carry = {
+      ..._carry,
+      'profile': {
+        ..._section('profile', const {}),
+        'flags': [...profileFlags, flag],
+      },
+    };
+  }
+
   Map<String, dynamic> _section(String k, Map<String, dynamic> fallback) {
     final v = _carry[k];
     return v is Map<String, dynamic> ? v : fallback;

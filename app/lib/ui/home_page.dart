@@ -529,6 +529,9 @@ class _BossButton extends StatelessWidget {
 }
 
 /// The 40% farm panel: gear slots, auto-knit toggles, the yarn ball.
+/// `profile.flags` entry once the first knit is done (T-049).
+const firstKnitFlag = 'first_knit';
+
 class FarmPanel extends ConsumerStatefulWidget {
   const FarmPanel({super.key, required this.driver});
   final GameDriver driver;
@@ -557,7 +560,59 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
   // one new piece must never cut the previous one short
   final List<({String art, bool kept, int key})> _pops = [];
 
+  // T-049: the first knit flies from the basket into its slot
+  final _panelKey = GlobalKey();
+  final _basketKey = GlobalKey();
+  final _slotKeys = {for (final s in GearSlot.values) s: GlobalKey()};
+  ({String art, Offset from, Offset to, GearSlot slot})? _flight;
+  GearSlot? _landed;
+  int _bounce = 0;
+
   GameDriver get driver => widget.driver;
+
+  /// T-049: a new game (nothing worn yet, before auto-knit opens) is shown
+  /// the basket with a pointer; its first knit is worn at once.
+  bool _isFirstKnit(GearBasket basket, IdleRules rules) =>
+      !ref.read(gameSaverProvider).profileFlags.contains(firstKnitFlag) &&
+      ref.read(idleLoopProvider).state.clearedPage < rules.autoKnitUnlockPage &&
+      GearSlot.values.every((s) => basket.equipped(s) == null);
+
+  void _knitFirst() {
+    final rules = ref.read(idleRulesProvider);
+    final basket = ref.read(gearBasketProvider);
+    final slot = rules.firstKnitSlot;
+    final r = basket.craft(slot);
+    basket.equip(r.item.id);
+    ref.read(gameSaverProvider).addProfileFlag(firstKnitFlag);
+    ref.read(audioServiceProvider).playSfx('knit');
+    driver.cheer = 1.6;
+    final panel = _panelKey.currentContext?.findRenderObject() as RenderBox?;
+    Offset? centre(GlobalKey k) {
+      final box = k.currentContext?.findRenderObject() as RenderBox?;
+      if (panel == null || box == null) return null;
+      return box.localToGlobal(box.size.center(Offset.zero), ancestor: panel);
+    }
+
+    final from = centre(_basketKey), to = centre(_slotKeys[slot]!);
+    setState(() {
+      _wiggle++;
+      if (from != null && to != null) {
+        _flight = (
+          art: FarmPanel.slotArt(
+              slot,
+              r.item,
+              ref.read(catClassProvider).current,
+              ref.read(wardrobeRulesProvider)),
+          from: from,
+          to: to,
+          slot: slot,
+        );
+      } else {
+        _landed = slot;
+        _bounce++;
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -596,6 +651,11 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
         final yarn = ref.read(walletProvider).balance(Currency.yarn);
         final cls = ref.read(catClassProvider).current;
         final wr = ref.read(wardrobeRulesProvider);
+        final rules = ref.read(idleRulesProvider);
+        final firstKnit = _isFirstKnit(basket, rules);
+        final showAuto = ref.read(idleLoopProvider).state.clearedPage >=
+            rules.autoKnitUnlockPage;
+        final flight = _flight;
         return LayoutBuilder(builder: (context, box) {
           // The book keeps the same width as the old shelf, but shrinks on
           // short phones so the basket and its controls remain reachable.
@@ -605,27 +665,36 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
           // The painted book curls upward along its lower edge. Leave more
           // room below the second row so boots and gloves stay on the page.
           final slotSize = ((shelfH - 34) / 2).clamp(30.0, 55.0);
-          Widget slotOf(GearSlot slot) => SizedBox(
+          Widget slotOf(GearSlot slot) {
+            // the flying first knit lands before its slot shows it
+            final worn = flight?.slot == slot ? null : basket.equipped(slot);
+            Widget child = _Slot(
+              slot: slot,
+              open: basket.isOpen(slot),
+              item: worn,
+              hasNew: basket.stashed(slot) != null,
+              art: FarmPanel.slotArt(slot, worn, cls, wr),
+              unlockPage: basket.rules.slots[slot]!.unlockPage,
+              onTap: basket.stashed(slot) == null
+                  ? null
+                  : () => showCraftSheet(context, ref,
+                      stashed: basket.stashed(slot)),
+            );
+            if (_landed == slot) {
+              child = _SlotLanding(key: ValueKey(_bounce), child: child);
+            }
+            return SizedBox(
+                key: _slotKeys[slot],
                 width: slotSize,
                 height: slotSize,
-                child: _Slot(
-                  slot: slot,
-                  open: basket.isOpen(slot),
-                  item: basket.equipped(slot),
-                  hasNew: basket.stashed(slot) != null,
-                  art: FarmPanel.slotArt(slot, basket.equipped(slot), cls, wr),
-                  unlockPage: basket.rules.slots[slot]!.unlockPage,
-                  onTap: basket.stashed(slot) == null
-                      ? null
-                      : () => showCraftSheet(context, ref,
-                          stashed: basket.stashed(slot)),
-                ),
-              );
+                child: child);
+          }
+
           const slots = GearSlot.values;
           Widget shelfRow(List<GearSlot> row) => Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [for (final slot in row) slotOf(slot)]);
-          return Padding(
+          final panel = Padding(
             padding: const EdgeInsets.fromLTRB(10, 8, 10, 6),
             child: Column(children: [
               // The painted pages are behind the live, tappable gear slots.
@@ -649,53 +718,61 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
               const SizedBox(height: 6),
               Expanded(
                 child: Row(children: [
-                  // the two auto-knit switches, one above the other
-                  SizedBox(
-                    width: box.maxWidth * 0.42,
-                    // ≥ 48 dp tall on a normal phone; scaled down only when
-                    // the panel is too short for both
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: SizedBox(
-                        width: box.maxWidth * 0.42,
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _AutoKnitToggle(
-                                  label: s.autoCraft,
-                                  on: auto.running,
-                                  hasYarn: yarn > 0,
-                                  onTap: () => auto.running
-                                      ? auto.stop()
-                                      : auto.start()),
-                              const SizedBox(height: 8),
-                              _Toggle(
-                                  label: auto.rule.mode == AutoCraftMode.equip
-                                      ? s.betterEquip
-                                      : s.betterStash,
-                                  on: auto.rule.mode == AutoCraftMode.equip,
-                                  onTap: () => auto.configure(AutoCraftRule(
-                                      on: auto.running,
-                                      mode:
-                                          auto.rule.mode == AutoCraftMode.equip
-                                              ? AutoCraftMode.stash
-                                              : AutoCraftMode.equip))),
-                            ]),
+                  // the two auto-knit switches, one above the other; hidden
+                  // until auto-knit opens, so a new player sees the basket
+                  // alone (T-049)
+                  if (showAuto) ...[
+                    SizedBox(
+                      width: box.maxWidth * 0.42,
+                      // ≥ 48 dp tall on a normal phone; scaled down only when
+                      // the panel is too short for both
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: SizedBox(
+                          width: box.maxWidth * 0.42,
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _AutoKnitToggle(
+                                    label: s.autoCraft,
+                                    on: auto.running,
+                                    hasYarn: yarn > 0,
+                                    onTap: () => auto.running
+                                        ? auto.stop()
+                                        : auto.start()),
+                                const SizedBox(height: 8),
+                                _Toggle(
+                                    label: auto.rule.mode == AutoCraftMode.equip
+                                        ? s.betterEquip
+                                        : s.betterStash,
+                                    on: auto.rule.mode == AutoCraftMode.equip,
+                                    onTap: () => auto.configure(AutoCraftRule(
+                                        on: auto.running,
+                                        mode: auto.rule.mode ==
+                                                AutoCraftMode.equip
+                                            ? AutoCraftMode.stash
+                                            : AutoCraftMode.equip))),
+                              ]),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
+                    const SizedBox(width: 8),
+                  ],
                   // the basket: the big button — it opens the knit sheet
-                  // (odds first), and its balls move when auto-knit knits
+                  // (odds first), and its balls move when auto-knit knits;
+                  // a new game's first tap knits and wears at once (T-049)
                   Expanded(
                     child: Semantics(
                       button: true,
                       label: s.knit,
                       child: GestureDetector(
+                        key: _basketKey,
                         behavior: HitTestBehavior.opaque,
-                        onTap: yarn < 1
+                        onTap: yarn < 1 || flight != null
                             ? null
-                            : () => showCraftSheet(context, ref),
+                            : firstKnit
+                                ? _knitFirst
+                                : () => showCraftSheet(context, ref),
                         child: LayoutBuilder(builder: (context, area) {
                           const tagH = 30.0;
                           final basketH = math.max(
@@ -747,6 +824,15 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
                                     ),
                                   ),
                                 ),
+                                if (firstKnit && yarn >= 1 && flight == null)
+                                  const Positioned(
+                                    top: -34,
+                                    left: 0,
+                                    right: 0,
+                                    child: Center(
+                                        child: _KnitPointer(
+                                            key: Key('first-knit-pointer'))),
+                                  ),
                                 for (final p in _pops)
                                   Positioned(
                                     top: 0,
@@ -779,10 +865,137 @@ class _FarmPanelState extends ConsumerState<FarmPanel> {
               ),
             ]),
           );
+          return Stack(key: _panelKey, children: [
+            panel,
+            if (flight != null)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: _KnitFlight(
+                    key: ValueKey(flight),
+                    art: flight.art,
+                    from: flight.from,
+                    to: flight.to,
+                    size: slotSize,
+                    onLanded: () {
+                      if (!mounted) return;
+                      setState(() {
+                        _flight = null;
+                        _landed = flight.slot;
+                        _bounce++;
+                      });
+                    },
+                  ),
+                ),
+              ),
+          ]);
         });
       },
     );
   }
+}
+
+/// T-049: a paw and an arrow bob over the basket until the first knit. No
+/// words: the player this is for may not read yet.
+class _KnitPointer extends StatefulWidget {
+  const _KnitPointer({super.key});
+
+  @override
+  State<_KnitPointer> createState() => _KnitPointerState();
+}
+
+class _KnitPointerState extends State<_KnitPointer>
+    with SingleTickerProviderStateMixin {
+  late final _bob = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 700))
+    ..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _bob.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: _bob,
+        builder: (context, child) => Transform.translate(
+            offset: Offset(0, Curves.easeInOut.transform(_bob.value) * 10),
+            child: child),
+        child: const Row(mainAxisSize: MainAxisSize.min, children: [
+          GameIcon('paw', size: 40),
+          RotatedBox(
+              quarterTurns: 1, child: GameIcon('ui_arrow_next', size: 50)),
+        ]),
+      );
+}
+
+/// T-049: the first knitted piece arcs from the basket into its slot.
+class _KnitFlight extends StatelessWidget {
+  const _KnitFlight({
+    super.key,
+    required this.art,
+    required this.from,
+    required this.to,
+    required this.size,
+    required this.onLanded,
+  });
+  final String art;
+  final Offset from, to;
+  final double size;
+  final VoidCallback onLanded;
+
+  @override
+  Widget build(BuildContext context) => TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0, end: 1),
+        duration: const Duration(milliseconds: 900),
+        curve: Curves.easeInOut,
+        onEnd: onLanded,
+        builder: (context, t, child) {
+          // up out of the basket, over and down into the slot
+          final p = Offset.lerp(from, to, t)! +
+              Offset(0, -math.sin(math.pi * t) * 70);
+          final s = size * (1.6 - 0.6 * t);
+          return Stack(children: [
+            Positioned(
+                left: p.dx - s / 2,
+                top: p.dy - s / 2,
+                width: s,
+                height: s,
+                child: child!),
+          ]);
+        },
+        child: Image.asset('assets/game/$art.png',
+            key: const Key('first-knit-flight'), fit: BoxFit.contain),
+      );
+}
+
+/// T-049: the slot the first knit lands in bounces once, with a sparkle.
+class _SlotLanding extends StatelessWidget {
+  const _SlotLanding({super.key, required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0, end: 1),
+        duration: const Duration(milliseconds: 1200),
+        builder: (context, t, child) {
+          final scale = 1 + 0.35 * (1 - Curves.elasticOut.transform(t));
+          return Stack(clipBehavior: Clip.none, children: [
+            Positioned.fill(child: Transform.scale(scale: scale, child: child)),
+            Positioned(
+              right: -10,
+              top: -12,
+              child: Opacity(
+                opacity: (1 - t).clamp(0.0, 1.0),
+                child: const IconText('✦',
+                    key: Key('first-knit-sparkle'),
+                    style: TextStyle(fontSize: 20)),
+              ),
+            ),
+          ]);
+        },
+        child: child,
+      );
 }
 
 class _Slot extends StatelessWidget {

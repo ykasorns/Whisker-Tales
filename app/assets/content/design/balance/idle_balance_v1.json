@@ -284,6 +284,11 @@
       }
     ]
   },
+  "onboarding": {
+    "_doc": "T-049 นาทีแรกไม่ต้องอ่าน: เกมใหม่ (ยังไม่มีของที่สวม) มีลูกศรชี้ตะกร้า · กดครั้งแรกถักช่อง first_knit_slot แล้วสวมทันที · ปุ่มถักอัตโนมัติและ 'ของดีกว่า' ซ่อนจนผ่านหน้า auto_knit_unlock_cleared_page",
+    "first_knit_slot": "hat",
+    "auto_knit_unlock_cleared_page": 5
+  },
   "slot_unlocks": {
     "_doc": "GDD v0.5 §4.1 — cleared_page ที่ปลดช่อง (0 = เริ่ม)",
     "weapon": 0,

@@ -124,8 +124,8 @@ final idleSeedProvider = Provider<int>((ref) => 0);
 final catExtraStatsProvider = Provider<StatBlock Function()>(
     (ref) => () => ref.read(gearBasketProvider).totalStats);
 
-/// Player currencies. In memory until `meta_progression` (T-021) owns them;
-/// a new game starts with the starter yarn (D-011).
+/// Player currencies (the four permanent ones, GDD v0.4 §10). Saved and
+/// restored by [GameSaver]; a new game starts with the starter yarn (D-011).
 final walletProvider = Provider<IWallet>((ref) =>
     MemoryWallet({Currency.yarn: ref.watch(idleRulesProvider).starterYarn}));
 

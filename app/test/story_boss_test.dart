@@ -241,4 +241,50 @@ void main() {
     await expectLater(find.byType(StoryRunPage),
         matchesGoldenFile('goldens/story/boss_defeated.png'));
   });
+
+  test('Fail Forward: goldfish from a lost run is kept and saved (T-021)', () {
+    final c = ProviderContainer(overrides: [
+      ...content.overrides,
+      saveServiceProvider.overrideWithValue(SaveService(MemorySaveStore())),
+    ]);
+    addTearDown(c.dispose);
+    final wallet = c.read(walletProvider);
+    final before = wallet.balance(Currency.goldfish);
+    final run = StoryRunController(
+      mode: mode,
+      save: StorySave(),
+      manager: RunManager(RunStateMachine()),
+      cat: catOf(reference),
+      classId: reference,
+      powerScore: PowerScore(content.combat.powerWeights),
+      engineFactory: c.read(combatEngineFactoryProvider),
+      wallet: wallet,
+      buffBook: content.buffs,
+      dayKey: '2026-11-21',
+      onSave: (_) {},
+    )..start();
+    addTearDown(run.dispose);
+    while (!run.routeChoices.any((e) => e.type == EncounterType.boss)) {
+      run.manager.advanceToNextNode(routeId: run.routeChoices.first.routeId);
+      run.manager.resolveEncounter(survived: true);
+    }
+    run.advance(); // a bare cat loses to the boss (D-070)
+    for (var ms = 0; run.panel == StoryRunPanel.combat && ms < 70000;) {
+      run.tick(100);
+      ms += 100;
+    }
+    expect(run.completion?.result.outcome, RunOutcome.died);
+    final earned = wallet.balance(Currency.goldfish) - before;
+    expect(earned, greaterThan(0));
+
+    final doc = c.read(gameSaverProvider).capture();
+    final again = ProviderContainer(overrides: [
+      ...content.overrides,
+      saveServiceProvider.overrideWithValue(SaveService(MemorySaveStore())),
+    ]);
+    addTearDown(again.dispose);
+    again.read(gameSaverProvider).restore(doc);
+    expect(
+        again.read(walletProvider).balance(Currency.goldfish), before + earned);
+  });
 }

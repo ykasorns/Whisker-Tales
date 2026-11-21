@@ -29,3 +29,7 @@ content ของ**โหมดนิทานผจญภัย**เท่า�
 - [x] generator เลือก monster/event id จาก content จริงและจบด้วย `paperwolf`; `eraserking` ยังเป็นบอส idle ที่ปลดล็อกโหมด
 - [x] sync script รองรับ `design/data/story/` และ content sync test ตรวจทุกไฟล์
 - [x] wt_core analyze + tests 321, story tests 7 และ app analyze + tests 45 ผ่าน
+
+---
+## ตรวจรับ (2026-11-21, Claude)
+ผ่าน: ตรวจ AC กับโค้ด เทสต์ และ golden แล้ว · wt_core 349 tests, story 10, app 106 ผ่าน

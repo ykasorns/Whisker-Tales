@@ -26,3 +26,8 @@ ItemSystem.addRelic(id) / resolve(trigger, ctx)
 - [x] เพิ่ม relic definition ใหม่ใน data model แล้วทำงานทันทีโดยไม่เพิ่มเงื่อนไขเฉพาะ id
 - [x] test ครบ trigger vocabulary ทั้ง 7 แบบ, target, chance boundary, missing enemy, unknown id และการส่ง buff
 - [x] wt_core tests 328, story tests 7, app tests 45; analyze ทั้งสามส่วนผ่าน
+
+---
+## ตรวจรับ (2026-11-21, Claude)
+ผ่าน: ตรวจ AC กับโค้ด เทสต์ และ golden แล้ว · wt_core 349 tests, story 10, app 106 ผ่าน
+หมายเหตุ: เพิ่มเทสต์ action `extra_hit` ใน combat (skills_buffs_test) เพราะเดิมเทสต์แค่ว่าส่ง buff id

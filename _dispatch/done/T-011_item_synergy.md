@@ -26,3 +26,7 @@ synergy = `on_event` ของ buff engine (CONTRACT §4.7) · resolver ทำ�
 - [x] resolver ทำเฉพาะตรวจคู่/emit; combo effect ถูก ItemSystem ส่งต่อเข้า BuffEngine
 - [x] synergy data ระบุ trigger และ target จึงใช้ extra hit, heal หลัง combat และ crit haste ถูกจังหวะโดยไม่ hardcode คู่ในระบบ
 - [x] test ครอบ activation, duplicate, removal และ combo buffs ทั้งสามคู่
+
+---
+## ตรวจรับ (2026-11-21, Claude)
+ผ่าน: ตรวจ AC กับโค้ด เทสต์ และ golden แล้ว · wt_core 349 tests, story 10, app 106 ผ่าน

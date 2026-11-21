@@ -26,3 +26,7 @@ PanelController.show(PanelState) — ฟัง provider จาก core เท่
 
 - `flutter test` ที่ `app`: ผ่าน 54 tests
 - `flutter analyze` ที่ `app`: 0 issue
+
+---
+## ตรวจรับ (2026-11-21, Claude)
+ผ่าน: ตรวจ AC กับโค้ด เทสต์ และ golden แล้ว · wt_core 349 tests, story 10, app 106 ผ่าน

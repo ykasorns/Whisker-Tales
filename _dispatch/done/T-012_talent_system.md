@@ -34,3 +34,7 @@ TalentSystem.gainXp(n) / Stream<LevelUp> / pickOptions() -> List<Talent>
 ### Notes
 
 - ระบบนี้อยู่ใน Story Challenge เท่านั้นตาม Amendment v2.0 และยังไม่เปิดโหมด Story ใน manifest ระหว่างที่ T-014–T-020 ยังพักไว้
+
+---
+## ตรวจรับ (2026-11-21, Claude)
+ผ่าน: ตรวจ AC กับโค้ด เทสต์ และ golden แล้ว · wt_core 349 tests, story 10, app 106 ผ่าน

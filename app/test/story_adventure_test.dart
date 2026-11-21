@@ -500,6 +500,19 @@ void main() {
       ),
       findsOneWidget,
     );
+    // every other card on offer has no real pair, so no synergy line
+    for (final id in run.talents.pickOptions()) {
+      if (id == 'magic_t3_starfall') continue;
+      expect(
+        find.descendant(
+          of: find.byKey(Key('pick-$id')),
+          matching: find.byWidgetPredicate((widget) =>
+              widget is CustomPaint && widget.foregroundPainter != null),
+        ),
+        findsNothing,
+        reason: id,
+      );
+    }
   });
 
   testWidgets('the owl shop asks before spending goldfish', (tester) async {

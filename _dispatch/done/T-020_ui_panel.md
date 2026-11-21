@@ -33,3 +33,7 @@ VillageScreen
 
 - Widget integration test ครบเส้นทาง app → Adventure → run → return
 - Mode registration, unlock, parental-gate tests และ app tests 54 รายการผ่าน
+
+---
+## ตรวจรับ (2026-11-21, Claude)
+ผ่าน: ตรวจ AC กับโค้ด เทสต์ และ golden แล้ว · wt_core 349 tests, story 10, app 106 ผ่าน

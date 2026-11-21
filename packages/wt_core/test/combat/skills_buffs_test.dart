@@ -290,6 +290,31 @@ void main() {
       expect((e.statsOf('mochi').atk, e.statsOf('mochi').def), (100, 10));
     });
 
+    test('extra_hit strikes once at once; a stunned unit gets none', () {
+      List<HitResolved> hits({required bool stunned}) {
+        final e = engine();
+        final ev = <CombatEvent>[];
+        e.events.listen(ev.add);
+        e.start(CombatSetup(seed: 9, units: [
+          cat(atk: 100, intervalMs: 1 << 30),
+          mon('m', hp: 1 << 30, intervalMs: 1 << 30),
+        ]));
+        if (stunned) e.apply('mochi', 'stun_short', sourceId: 'm');
+        e.apply('mochi', 'story_extra_hit', sourceId: 'mochi');
+        e.tick(10);
+        return ev
+            .whereType<HitResolved>()
+            .where((h) => h.attackerId == 'mochi')
+            .toList();
+      }
+
+      final free = hits(stunned: false);
+      expect(free, hasLength(1));
+      expect(free.single.source, AttackSource.extra);
+      expect(free.single.targetId, 'm');
+      expect(hits(stunned: true), isEmpty);
+    });
+
     test('a buff defined only in data works (no code change)', () {
       final b = withFixture([
         {

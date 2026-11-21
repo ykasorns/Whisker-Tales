@@ -31,3 +31,7 @@ RunManager ใช้เฉพาะ **โหมดเสริมแบบ run**
 - [x] source แบบ finite และ infinite ใช้ RunManager ตัวเดียวกัน โดยมี test ทั้งสองแบบ
 - [x] โควตารางวัลรายวันส่งผ่าน config/result แบบ deterministic และบันทึกโดยโหมด
 - [x] `flutter analyze` และ wt_core tests 316 รายการผ่าน; story tests 7 รายการและ app tests 45 รายการผ่าน
+
+---
+## ตรวจรับ (2026-11-21, Claude)
+ผ่าน: ตรวจ AC กับโค้ด เทสต์ และ golden แล้ว · wt_core 349 tests, story 10, app 106 ผ่าน

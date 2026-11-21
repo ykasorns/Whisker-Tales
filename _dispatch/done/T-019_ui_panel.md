@@ -24,3 +24,8 @@ EventPanel/ShopPanel/CampfirePanel
 
 - Widget test ยืนยันว่าร้านไม่หักปลาทองก่อนกดยืนยัน
 - Golden event/shop/campfire และ run simulation 50 seeds ผ่าน
+
+---
+## ตรวจรับ (2026-11-21, Claude)
+ผ่าน: ตรวจ AC กับโค้ด เทสต์ และ golden แล้ว · wt_core 349 tests, story 10, app 106 ผ่าน
+ข้อสังเกตให้ YK: ในร้านนกฮูก โพชั่นฮีลตอนเลือดเต็มแสดงเป็นเครื่องหมายถูกสีเขียว เด็กอาจเข้าใจว่าซื้อแล้ว

@@ -24,3 +24,7 @@ HudOverlay widget ฟัง providers
 
 - Story UI goldens ผ่านทั้งหมด; app tests 54 รายการผ่าน
 - `flutter analyze` ที่ `app`: 0 issue
+
+---
+## ตรวจรับ (2026-11-21, Claude)
+ยังไม่ย้าย: AC ผ่าน แต่ HUD ไม่มี 🐟 ปลาทองตาม Goal/GDD §10.1 และแสดงจำนวน relic แทนแถวไอคอน (D-049 บันทึกเรื่องจำนวนไว้ แต่ไม่ได้พูดถึงปลาทอง) รอ YK ตัดสิน: เพิ่มปลาทองใน HUD หรือบันทึก decision ว่าตัดออก

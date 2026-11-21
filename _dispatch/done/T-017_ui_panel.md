@@ -28,3 +28,7 @@ CombatPanel ฟัง CombatEngine streams
 
 - Widget test ตรวจค่าคูลดาวน์และยืนยันว่าไอคอนสกิลกดไม่ได้
 - Golden combat + app tests 54 รายการผ่าน
+
+---
+## ตรวจรับ (2026-11-21, Claude)
+ผ่าน: ตรวจ AC กับโค้ด เทสต์ และ golden แล้ว · wt_core 349 tests, story 10, app 106 ผ่าน

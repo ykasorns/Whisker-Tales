@@ -34,3 +34,7 @@ effect ของ talent → buff id ผ่าน BuffEngine (T-008) · cross-syn
 ### Notes
 
 - cross-synergy ถูกเก็บเป็น structured effect แทนข้อความ เพื่อให้ resolver ทำงานจากข้อมูลได้จริง
+
+---
+## ตรวจรับ (2026-11-21, Claude)
+ผ่าน: ตรวจ AC กับโค้ด เทสต์ และ golden แล้ว · wt_core 349 tests, story 10, app 106 ผ่าน

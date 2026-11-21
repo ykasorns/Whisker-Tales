@@ -33,3 +33,7 @@ currency ถาวร 4 สกุล (ปลาทอง/ไหมพรม/ไ�
 | ตัด starting relic slot / village level | ตาม Amendment v2.0 (ย้ายไป meta ของโหมดผจญภัย v1.1) | ไม่มี |
 
 เหลือให้ YK เลือก: `IMetaProgression` ไม่มีตัว implement (ลบหรือเก็บเป็นเอกสาร) · ข้อมูลค้าง `skills.unlocked_by_chapter` เสนอให้ T-029 ลบ
+
+---
+## ตรวจรับ YK (2026-11-21)
+YK ยืนยัน D-071: ลบ `IMetaProgression` แล้ว · `skills.unlocked_by_chapter` เก็บไว้เพราะ balance sim ยังใช้

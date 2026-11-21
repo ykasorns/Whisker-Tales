@@ -9,6 +9,7 @@ import '../l10n/strings.dart';
 import 'battle_fx.dart';
 import 'frames.dart';
 import 'game_icon.dart';
+import 'home_page.dart' show fmtNum;
 import 'palette.dart';
 
 /// The upper part of a Story run: parallax scenery, Mochi and the enemy, the
@@ -260,6 +261,15 @@ class _StorySceneState extends State<StoryScene> with TickerProviderStateMixin {
               _CountTag(icon: 'sparkle', count: controller.relicIds.length),
               const SizedBox(width: 4),
               _CountTag(icon: 'star', count: controller.talentIds.length),
+              const SizedBox(width: 4),
+              // goldfish in hand (GDD §10.1, T-015): earned per node and
+              // spent at the owl shop
+              _CountTag(
+                  key: const Key('hud-goldfish'),
+                  icon: 'fish',
+                  count: controller.wallet.balance(Currency.goldfish),
+                  short: true,
+                  width: 70),
             ]),
           ]),
         ),
@@ -576,13 +586,22 @@ class _Bar extends StatelessWidget {
 }
 
 class _CountTag extends StatelessWidget {
-  const _CountTag({required this.icon, required this.count});
+  const _CountTag(
+      {super.key,
+      required this.icon,
+      required this.count,
+      this.short = false,
+      this.width = 54});
   final String icon;
   final int count;
 
+  /// Big numbers as 1.2K / 3.4M (goldfish).
+  final bool short;
+  final double width;
+
   @override
   Widget build(BuildContext context) => SizedBox(
-        width: 54,
+        width: width,
         height: 36,
         child: StretchFrame(
           frame: 'action',
@@ -592,7 +611,7 @@ class _CountTag extends StatelessWidget {
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 GameIcon(icon, size: 16),
                 const SizedBox(width: 2),
-                Text('$count',
+                Text(short ? fmtNum(count) : '$count',
                     style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w900,

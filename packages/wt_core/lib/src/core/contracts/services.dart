@@ -1,14 +1,3 @@
-import 'rewards.dart';
-
-/// Permanent currencies, owl shop and feature unlocks (GDD v0.4 §10).
-/// No API here may add yarn, eggs or goldfish from a purchase (D-002).
-/// Owner: `meta_progression` (T-021).
-abstract class IMetaProgression {
-  int balance(Currency currency);
-  bool canAfford(String unlockId);
-  bool unlock(String unlockId);
-}
-
 /// Versioned local save (GAME_CONTRACT §4.6 Save v3). Owner: T-022.
 abstract class ISaveService {
   Future<Map<String, dynamic>> load();

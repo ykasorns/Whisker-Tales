@@ -100,3 +100,17 @@ Additional checks:
 | `preview_round3.png` | 1400 x 900 | PASS — all three assets composited over cream `#F6F0E1` and dark blue `#2B3A55` |
 
 All three files also pass the main size, transparent-border and magenta-fringe checks.
+
+## Round 4 audit
+
+`sheets/sheet_icons_9_glyphs.png` passed the Python (Pillow/NumPy) checks at 1500 × 900 px in RGB. The five glyphs were resized from the 1619 × 971 generated sheet and centered in the top-row 300 × 300 cells.
+
+| Glyph | Padding left / top / right / bottom (px) |
+|---|---|
+| `ui_arrow_next` | 60 / 77 / 60 / 78 |
+| `ui_stat_up` | 60 / 70 / 60 / 71 |
+| `ui_stat_down` | 60 / 69 / 60 / 69 |
+| `ui_key_backspace` | 60 / 76 / 60 / 77 |
+| `ui_sparkle` | 60 / 60 / 60 / 60 |
+
+Minimum padding was 60 px against the 45 px requirement. The background contained 1,257,993 exact `#FF00FF` pixels, including all 900,000 pixels in rows 2 and 3. Checks found 0 stray fragment pixels, 0 enclosed magenta pixels, and 0 painted pixels flagged by the magenta-fringe check.

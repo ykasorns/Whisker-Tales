@@ -166,5 +166,16 @@
    "pet_carrot",
    "pet_rainbow"
   ]
+ },
+ "sheet_icons_9_glyphs": {
+  "cols": 5,
+  "rows": 1,
+  "ids": [
+   "ui_arrow_next",
+   "ui_stat_up",
+   "ui_stat_down",
+   "ui_key_backspace",
+   "ui_sparkle"
+  ]
  }
 }

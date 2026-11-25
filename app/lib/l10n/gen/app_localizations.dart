@@ -470,6 +470,12 @@ abstract class AppLocalizations {
   /// **'📺 Free · {n} left'**
   String adFree(int n);
 
+  /// No description provided for @freeLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Free · {n} left'**
+  String freeLeft(int n);
+
   /// No description provided for @fishHatch.
   ///
   /// In en, this message translates to:

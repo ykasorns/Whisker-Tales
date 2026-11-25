@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <!-- replaced by `flutter build web --base-href` -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Whisker Tales: a cosy idle adventure with Mochi the cat.">
+  <meta name="theme-color" content="#33291F">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Whisker Tales">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>Whisker Tales</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    html, body { margin: 0; height: 100%; background: #33291F; }
+    /* shown until Flutter draws its first frame */
+    #boot {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 18px;
+      font: 700 16px/1.4 system-ui, sans-serif; color: #FFFBF2;
+      transition: opacity .3s;
+    }
+    #boot img { width: 112px; height: 112px; border-radius: 26px; }
+    #boot .bar { width: 180px; height: 8px; border-radius: 4px; background: #6B5D4E; overflow: hidden; }
+    #boot .bar i { display: block; height: 100%; width: 40%; border-radius: 4px; background: #FFC857;
+      animation: slide 1.1s ease-in-out infinite alternate; }
+    @keyframes slide { from { transform: translateX(-10%); } to { transform: translateX(160%); } }
+  </style>
+</head>
+<body>
+  <div id="boot">
+    <img src="icons/Icon-192.png" alt="">
+    <div>Whisker Tales</div>
+    <div class="bar"><i></i></div>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      var b = document.getElementById('boot');
+      b.style.opacity = '0';
+      setTimeout(function () { b.remove(); }, 300);
+    });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

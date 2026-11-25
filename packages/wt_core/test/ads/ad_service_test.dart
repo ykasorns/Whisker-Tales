@@ -41,6 +41,29 @@ void main() {
     noAds = false;
   });
 
+  test('web rules: gifts claimed directly, never through the ad network',
+      () async {
+    final web = AdService(
+        rules: rules.freeGifts(alsoFree: const {'pet_hatch'}),
+        network: net,
+        clock: clock,
+        ageBand: () => band,
+        hasNoAds: () => true);
+    for (final id in [
+      'daily_gift',
+      'yarn_bundle',
+      'dungeon_entry',
+      'pet_hatch'
+    ]) {
+      expect(web.remainingToday(id), rules.placements[id]!.perDay, reason: id);
+      expect(await web.show(id), AdOutcome.rewarded, reason: id);
+    }
+    for (final id in ['research_speedup', 'road_event', 'offline_x2']) {
+      expect(web.canShow(id), isFalse, reason: id);
+    }
+    expect(net.requests, isEmpty);
+  });
+
   Future<int> watchAll(AdService s, String id) async {
     var n = 0;
     while (await s.show(id) == AdOutcome.rewarded) {
@@ -200,7 +223,8 @@ void main() {
         if (f.path.endsWith('wt_core.dart') ||
             f.path.endsWith('providers.dart') ||
             f.path.endsWith('game_save.dart') ||
-            f.path.endsWith('content_repository.dart')) {
+            f.path.endsWith('content_repository.dart') ||
+            f.path.endsWith('platform_services_mobile.dart')) {
           continue; // barrel export + the wiring layer (no network calls)
         }
         final src = f.readAsStringSync();

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:hive/hive.dart';
 
+import '../core/random/seeded_rng.dart';
+
 /// Key–value storage the save slots live in. [HiveSaveStore] on device,
 /// [MemorySaveStore] in tests.
 abstract class SaveStore {
@@ -187,7 +189,7 @@ class SaveService {
   static int _checksum(String s) {
     var h = 0x811C9DC5;
     for (final b in utf8.encode(s)) {
-      h = ((h ^ b) * 0x01000193) & 0xFFFFFFFF;
+      h = mul32(h ^ b, 0x01000193);
     }
     return h;
   }

@@ -31,3 +31,14 @@ class SeededRng {
   /// Next value in [0, [kBp]) — compared against basis-point chances.
   int nextBp() => nextUint32() % kBp;
 }
+
+/// `(a * b) mod 2^32` for 32-bit [a] and [b], exact on every platform. A
+/// plain product can pass 2^53, where web numbers lose their low bits, so
+/// hashes would differ between the web and Android builds.
+int mul32(int a, int b) {
+  a &= 0xFFFFFFFF;
+  b &= 0xFFFFFFFF;
+  final lo = (a & 0xFFFF) * b; // < 2^48
+  final hi = ((a >> 16) * b) & 0xFFFF; // only its low 16 bits survive
+  return (lo + hi * 0x10000) & 0xFFFFFFFF;
+}

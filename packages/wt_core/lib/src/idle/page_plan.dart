@@ -6,7 +6,7 @@ import 'idle_rules.dart';
 int mixSeed(List<int> parts) {
   var h = 0x811C9DC5;
   for (final p in parts) {
-    h = ((h ^ (p & 0xFFFFFFFF)) * 0x01000193) & 0xFFFFFFFF;
+    h = mul32(h ^ (p & 0xFFFFFFFF), 0x01000193);
   }
   return h;
 }

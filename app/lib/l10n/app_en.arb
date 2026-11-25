@@ -145,6 +145,14 @@
       }
     }
   },
+  "freeLeft": "Free · {n} left",
+  "@freeLeft": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "fishHatch": "🐟 {cost} · {n} left",
   "@fishHatch": {
     "placeholders": {

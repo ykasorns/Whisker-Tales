@@ -34,6 +34,18 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  # Thai for the web build, which has no system Thai font (Noto Sans Thai,
+  # OFL: assets/fonts/OFL.txt). Android keeps the phone's own font.
+  fonts:
+    - family: NotoSansThai
+      fonts:
+        - asset: assets/fonts/NotoSansThai-Regular.ttf
+        - asset: assets/fonts/NotoSansThai-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/NotoSansThai-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/NotoSansThai-Black.ttf
+          weight: 900
   # Game data, copied from design/ by tools/sync_content.sh (T-003)
   assets:
     - assets/content/design/balance/

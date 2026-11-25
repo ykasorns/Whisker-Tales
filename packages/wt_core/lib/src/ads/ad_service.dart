@@ -76,6 +76,23 @@ class AdRules {
     return AdRules(
         dailyCapTotal: total, placements: Map.unmodifiable(placements));
   }
+
+  /// Rules for a build with no ad SDK (the web build), played as if the
+  /// player owned no-ads: placements that are gifts ([NoAdsBehavior.grant],
+  /// plus those named in [alsoFree]) are claimed directly within their daily
+  /// caps; every other placement is off. Placements stay listed because
+  /// gifts look them up.
+  AdRules freeGifts({Set<String> alsoFree = const {}}) =>
+      AdRules(dailyCapTotal: dailyCapTotal, placements: {
+        for (final p in placements.values)
+          p.id: PlacementRule(
+              id: p.id,
+              enabled: p.enabled &&
+                  (p.noAds == NoAdsBehavior.grant || alsoFree.contains(p.id)),
+              perDay: p.perDay,
+              noAds: alsoFree.contains(p.id) ? NoAdsBehavior.grant : p.noAds,
+              params: p.params),
+      });
 }
 
 /// Save v3 `daily` ad counters (GAME_CONTRACT §4.6).

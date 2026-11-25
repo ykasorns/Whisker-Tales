@@ -217,6 +217,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String freeLeft(int n) {
+    return 'Free · $n left';
+  }
+
+  @override
   String fishHatch(int cost, int n) {
     return '🐟 $cost · $n left';
   }

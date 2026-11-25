@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'ui/battle_fx.dart';
 import 'package:flutter/services.dart';
@@ -5,16 +8,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:wt_core/wt_core.dart';
 
-import 'ads/admob_network.dart';
 import 'audio/player_output.dart';
-import 'cloud/play_cloud.dart';
-import 'iap/play_store.dart';
+import 'platform/platform_services.dart';
 import 'ui/age_screen.dart';
 import 'ui/frames.dart';
 import 'ui/game_icon.dart';
 import 'ui/yarn_basket.dart';
 import 'ui/game_shell.dart';
 import 'ui/palette.dart';
+import 'ui/portrait_frame.dart';
 import 'l10n/strings.dart';
 import 'modes.dart';
 
@@ -56,19 +58,18 @@ Future<void> main() async {
     await Hive.initFlutter();
     final box = await Hive.openBox<String>('whisker_tales_save');
     final saves = SaveService(HiveSaveStore(box));
-    // Google Play Billing, listening from boot so no purchase is missed
-    final store = PlayIapStore();
+    // Play Billing, Play Games and AdMob on Android; none on the web. Made
+    // once: Billing listens from boot so no purchase is missed, and bootGame
+    // may build the container twice.
+    final platform = platformOverrides();
     // a save this build cannot load never stops the app: older slot or a
     // new game, with the broken save kept aside (bootGame)
     final boot = await bootGame(() => ProviderContainer(overrides: [
-          ...content.overrides,
+          ...content.overridesWith(adsOff: !platformHasAds),
           modeRegistryProvider.overrideWithValue(modes),
           avatarRulesProvider.overrideWithValue(content.avatar),
           saveServiceProvider.overrideWithValue(saves),
-          iapStoreProvider.overrideWithValue(store),
-          cloudStoreProvider.overrideWithValue(const PlayCloudStore()),
-          // AdMob rewarded ads (D-033); caps and age flags stay in AdService
-          adNetworkProvider.overrideWithValue(AdMobNetwork()),
+          ...platform,
           // real playback of music + effects (T-024)
           audioOutputProvider.overrideWithValue(PlayerAudioOutput()),
         ]));
@@ -108,9 +109,18 @@ class WhiskerTalesApp extends ConsumerStatefulWidget {
 class _WhiskerTalesAppState extends ConsumerState<WhiskerTalesApp> {
   late final AppLifecycleListener _lifecycle;
 
+  /// Web only: a browser tab can be closed or reloaded without the app ever
+  /// pausing, so progress is also saved on a timer and when the tab hides.
+  Timer? _autosave;
+  static const autosaveEvery = Duration(seconds: 15);
+
   @override
   void initState() {
     super.initState();
+    if (kIsWeb && widget.avatarRules != null) {
+      _autosave = Timer.periodic(
+          autosaveEvery, (_) => ref.read(gameSaverProvider).save());
+    }
     // Save when the app goes to the background; check the offline window
     // when it comes back (the "welcome back" screen is T-042).
     _lifecycle = AppLifecycleListener(
@@ -119,11 +129,13 @@ class _WhiskerTalesAppState extends ConsumerState<WhiskerTalesApp> {
           .read(gameSaverProvider)
           .save()
           .then((_) => ref.read(cloudSyncProvider).push()),
+      onHide: kIsWeb ? () => ref.read(gameSaverProvider).save() : null,
     );
   }
 
   @override
   void dispose() {
+    _autosave?.cancel();
     _lifecycle.dispose();
     super.dispose();
   }
@@ -135,6 +147,8 @@ class _WhiskerTalesAppState extends ConsumerState<WhiskerTalesApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
+        // the web has no system Thai font: use the bundled one
+        fontFamily: kIsWeb ? 'NotoSansThai' : null,
         scaffoldBackgroundColor: Palette.paper,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Palette.mochi,
@@ -177,6 +191,9 @@ class _WhiskerTalesAppState extends ConsumerState<WhiskerTalesApp> {
       locale: Locale(widget.lang ?? ref.watch(langProvider)),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      // wide screens (web on a desktop): an upright frame for now
+      builder: (context, child) =>
+          PortraitFrame(child: child ?? const SizedBox()),
       home: widget.avatarRules == null
           ? const Scaffold(body: ColoredBox(color: Colors.black12))
           // first launch: the neutral age screen before anything else

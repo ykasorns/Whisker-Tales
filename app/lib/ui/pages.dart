@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
 
 import '../l10n/strings.dart';
+import '../platform/platform_services.dart';
 import 'home_page.dart';
 import 'game_icon.dart';
 import 'palette.dart';
@@ -610,59 +611,64 @@ class _ShopPageState extends ConsumerState<ShopPage> {
     return StorybookPaper(
       child: ListView(children: [
         _pageTitle(s.navShop),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 2, 16, 4),
-          child: IconText(s.lang == 'th' ? 'ของฟรีวันนี้' : 'Free today',
-              style:
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(children: [
-            gift('daily_gift', '🐟', s.dailyGift, Currency.goldfish),
-            gift('yarn_bundle', '🧶', s.yarnBundle, Currency.yarn),
-          ]),
-        ),
-        Container(
-          margin: const EdgeInsets.fromLTRB(16, 8, 16, 10),
-          padding: const EdgeInsets.all(16),
-          decoration: storybookCard(
-              fill: const Color(0xFFFFE8C4), accent: Palette.coral),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            IconText(
-                s.lang == 'th'
-                    ? '🎁 เสบียงและนิทานไร้โฆษณา'
-                    : '🎁 Supplies & ad-free story',
+        // rewarded ads; claimed directly in the web build (no ads there)
+        ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 2, 16, 4),
+            child: IconText(s.lang == 'th' ? 'ของฟรีวันนี้' : 'Free today',
                 style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 4),
-            IconText(s.lang == 'th'
-                ? 'แพ็กเริ่ม \$0.99 ถึง \$99.99 · ราคาในหน้าซื้อจะแสดงตามประเทศ'
-                : 'Packs from \$0.99 to \$99.99 · checkout shows the local price'),
-            const SizedBox(height: 12),
-            _packShelf(s, Currency.goldfish, '🐟'),
-            const SizedBox(height: 6),
-            _packShelf(s, Currency.yarn, '🧶'),
-            const SizedBox(height: 12),
-            // the parental gate comes first, always (T-025)
-            Semantics(
-              button: true,
-              label: s.askParent,
-              child: GestureDetector(
-                onTap: () => openShop(context, ref),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: storybookButton(
-                      fill: Palette.lime, accent: Palette.teal, radius: 9),
-                  child: IconText('👨‍👩‍👧 ${s.askParent}',
-                      style: const TextStyle(fontWeight: FontWeight.w800)),
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(children: [
+              gift('daily_gift', '🐟', s.dailyGift, Currency.goldfish),
+              gift('yarn_bundle', '🧶', s.yarnBundle, Currency.yarn),
+            ]),
+          ),
+        ],
+        // packs need a store: none in the web build
+        if (platformHasStore)
+          Container(
+            margin: const EdgeInsets.fromLTRB(16, 8, 16, 10),
+            padding: const EdgeInsets.all(16),
+            decoration: storybookCard(
+                fill: const Color(0xFFFFE8C4), accent: Palette.coral),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              IconText(
+                  s.lang == 'th'
+                      ? '🎁 เสบียงและนิทานไร้โฆษณา'
+                      : '🎁 Supplies & ad-free story',
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 4),
+              IconText(s.lang == 'th'
+                  ? 'แพ็กเริ่ม \$0.99 ถึง \$99.99 · ราคาในหน้าซื้อจะแสดงตามประเทศ'
+                  : 'Packs from \$0.99 to \$99.99 · checkout shows the local price'),
+              const SizedBox(height: 12),
+              _packShelf(s, Currency.goldfish, '🐟'),
+              const SizedBox(height: 6),
+              _packShelf(s, Currency.yarn, '🧶'),
+              const SizedBox(height: 12),
+              // the parental gate comes first, always (T-025)
+              Semantics(
+                button: true,
+                label: s.askParent,
+                child: GestureDetector(
+                  onTap: () => openShop(context, ref),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
+                    decoration: storybookButton(
+                        fill: Palette.lime, accent: Palette.teal, radius: 9),
+                    child: IconText('👨‍👩‍👧 ${s.askParent}',
+                        style: const TextStyle(fontWeight: FontWeight.w800)),
+                  ),
                 ),
               ),
-            ),
-          ]),
-        ),
+            ]),
+          ),
         // music and effects, each off at once and saved (T-024)
         const _SoundSwitches(),
         // language, shown in the language it switches to (T-004)

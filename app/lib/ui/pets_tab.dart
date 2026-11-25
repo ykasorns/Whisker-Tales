@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wt_core/wt_core.dart';
 
 import '../l10n/strings.dart';
+import '../platform/platform_services.dart';
 import 'game_icon.dart';
 import 'home_page.dart' show fmtNum;
 import 'palette.dart';
@@ -172,8 +173,14 @@ class _PetsTabState extends ConsumerState<PetsTab> {
           Row(children: [
             button(s.useEgg(wallet.balance(Currency.eggs)),
                 pets.canHatch(HatchSource.egg), Palette.paper, HatchSource.egg),
-            button(s.adFree(ads.remainingToday(petHatchPlacement)),
-                pets.canHatch(HatchSource.ad), Palette.sun, HatchSource.ad),
+            // a rewarded ad; the web build has no ads, so it is a free gift
+            button(
+                (platformHasAds
+                    ? s.adFree
+                    : s.freeLeft)(ads.remainingToday(petHatchPlacement)),
+                pets.canHatch(HatchSource.ad),
+                Palette.sun,
+                HatchSource.ad),
             button(
                 s.fishHatch(pets.nextFishCost, pets.fishHatchesLeftToday),
                 pets.canHatch(HatchSource.fish),

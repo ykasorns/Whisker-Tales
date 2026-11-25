@@ -305,7 +305,7 @@ Future<GameBoot> bootGame(ProviderContainer Function() make,
   saves.resumeAfter(read, null);
   container
       .read(gameSaverProvider)
-      .newWorld(newWorldSeed?.call() ?? math.Random().nextInt(1 << 32));
+      .newWorld(newWorldSeed?.call() ?? math.Random().nextInt(0x100000000));
   if (read.slots.isEmpty) return GameBoot(container);
   await saves.keepBroken();
   return GameBoot(container, fallback: BootFallback.newGame, error: error);

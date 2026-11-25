@@ -88,14 +88,20 @@ class GameContent {
   final StoryContent story;
 
   /// Provider overrides for `ProviderScope` / `ProviderContainer`.
-  List<Override> get overrides => [
+  List<Override> get overrides => overridesWith();
+
+  /// [overrides]; with [adsOff] (a build with no ad SDK, the web build) the
+  /// ad gifts are claimed directly, see [AdRules.freeGifts].
+  List<Override> overridesWith({bool adsOff = false}) => [
         combatRulesProvider.overrideWithValue(combat),
         catRulesProvider.overrideWithValue(cat),
         idleRulesProvider.overrideWithValue(idle),
         gearRulesProvider.overrideWithValue(gear),
         wardrobeRulesProvider.overrideWithValue(wardrobe),
         roadEventRulesProvider.overrideWithValue(roadEvents),
-        adRulesProvider.overrideWithValue(ads),
+        adRulesProvider.overrideWithValue(
+            adsOff ? ads.freeGifts(alsoFree: const {'pet_hatch'}) : ads),
+        if (adsOff) noAdsProvider.overrideWithValue(() => true),
         offlineRulesProvider.overrideWithValue(offline),
         buffBookProvider.overrideWithValue(buffs),
         skillBookProvider.overrideWithValue(skills),
